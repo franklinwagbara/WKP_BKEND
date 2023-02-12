@@ -16,6 +16,9 @@
     [Consession_Type] VARCHAR (50)  NULL,
     [COMPANY_ID]      VARCHAR (100) NULL,
     [CompanyNumber]   INT           NULL,
-    [Field_ID]        INT           NULL
+    [Field_ID]        INT           NULL,
+    CONSTRAINT [PK_RESERVES_UPDATES_DEPLETION_RATE] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 

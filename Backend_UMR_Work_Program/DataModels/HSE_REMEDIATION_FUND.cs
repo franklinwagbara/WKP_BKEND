@@ -17,5 +17,10 @@ namespace Backend_UMR_Work_Program.DataModels
         public string? evidenceOfPaymentPath { get; set; }
         public string? reasonForNoRemediation { get; set; }
         public string? areThereRemediationFund { get; set; }
+        public string? Created_by { get; set; }
+        public DateTime? Date_Created { get; set; }
+        public DateTime? Date_Updated { get; set; }
+        public int? Field_ID { get; set; }
+        public string? Updated_by { get; set; }
     }
 }

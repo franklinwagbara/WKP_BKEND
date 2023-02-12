@@ -33,5 +33,6 @@ namespace Backend_UMR_Work_Program.DataModels
         public string? Waste_Service_Permit_Filename { get; set; }
         public double? Waste_Service_Permit_Path { get; set; }
         public string? Field_Name { get; set; }
+        public int? Field_ID { get; set; }
     }
 }

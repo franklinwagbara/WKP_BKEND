@@ -11,6 +11,9 @@
     [evidence_of_PSP_filename]      VARCHAR (MAX)  NULL,
     [evidence_of_PSP_path]          VARCHAR (MAX)  NULL,
     [reason_for_no_PSP]             VARCHAR (MAX)  NULL,
+    [Field_ID]                      INT            NULL,
     CONSTRAINT [PK_HSE_POINT_SOURCE_REGISTRATION] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 

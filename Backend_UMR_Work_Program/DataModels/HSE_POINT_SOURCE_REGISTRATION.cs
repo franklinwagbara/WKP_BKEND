@@ -17,5 +17,6 @@ namespace Backend_UMR_Work_Program.DataModels
         public string? evidence_of_PSP_filename { get; set; }
         public string? evidence_of_PSP_path { get; set; }
         public string? reason_for_no_PSP { get; set; }
+        public int? Field_ID { get; set; }
     }
 }

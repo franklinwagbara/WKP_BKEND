@@ -413,8 +413,244 @@ namespace Backend_UMR_Work_Program.Controllers
 			}
 		}
 
+		
+		//Added by Musa
+		[HttpPost("CREATE_USER_NEW")]
+		public async Task<WebApiResponse> CreateUserNew([FromBody] ADMIN_COMPANY_INFORMATION_Model userModel)
+		{
 
-		[HttpPost("CREATE_USER")]
+			try
+			{
+				var checkUser = await (from c in _context.ADMIN_COMPANY_INFORMATIONs
+								 where c.EMAIL.ToLower() == userModel.EMAIL.ToLower() && c.COMPANY_NAME == "Admin" select c).FirstOrDefaultAsync();
+
+				if (checkUser != null)
+				{
+					bool deleted = checkUser.DELETED_STATUS == "DELETED" ? true : false;
+					bool activated = checkUser.STATUS_ == "Activated" ? true : false;
+
+					string errMsg = $"User details with '{userModel.EMAIL}' is already existing on the portal.";
+
+					if (deleted == true)
+						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been deleted on the portal, kindly restore account information.";
+
+					if (activated != true)
+						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been de-activated on the portal, kindly activate account information.";
+
+					return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
+
+				}
+				else
+				{
+					var data = _mapper.Map<ADMIN_COMPANY_INFORMATION>(userModel);
+
+					data.EMAIL = userModel.EMAIL.ToLower();
+					data.COMPANY_NAME = "Admin";
+					data.NAME = userModel.NAME;
+					//data.PASSWORDS = _helpersController.Encrypt(userModel.PASSWORDS);
+					data.STATUS_ = "Activated";
+					data.ELPS_ID = userModel.ELPS_ID;
+					data.Date_Created = DateTime.Now;
+					data.Created_by = WKPCompanyEmail;
+					await _context.ADMIN_COMPANY_INFORMATIONs.AddAsync(data);
+					int save = await _context.SaveChangesAsync();
+
+					var CompanyInfoId = data.Id;
+
+
+
+					if (save > 0)
+					{
+						string companyAccessCode = string.Empty;
+repeat:
+						var accessCode = GENERATE_ACCESS_CODE(data.COMPANY_NAME);
+
+						var getAccessCodeFromDb = await _context.ADMIN_COMPANY_CODEs.FirstOrDefaultAsync(x => x.CompanyCode==accessCode);
+
+						if (getAccessCodeFromDb == null)
+						{
+							companyAccessCode=accessCode;
+						}
+						else
+						{
+							goto repeat;
+						}
+
+
+						//Added company Code info
+						var CompanyInfoCode = new ADMIN_COMPANY_CODE
+						{
+							Date_Created= DateTime.Now,
+							Date_Updated= DateTime.Now,
+							Created_by = WKPCompanyEmail,
+							CompanyNumber=CompanyInfoId,
+							CompanyCode=companyAccessCode,
+							Email=userModel.EMAIL.ToLower().Trim(),
+							CompanyName= "Admin",
+							GUID=Guid.NewGuid().ToString()
+						};
+						await _context.ADMIN_COMPANY_CODEs.AddAsync(CompanyInfoCode);
+
+						var newCompany = await _context.ADMIN_COMPANY_INFORMATIONs.FindAsync(CompanyInfoId);
+						newCompany.COMPANY_ID = companyAccessCode;
+						_context.ADMIN_COMPANY_INFORMATIONs.Update(newCompany);
+
+
+
+						//add user to staff table
+						staff staff = new staff()
+						{
+							AdminCompanyInfo_ID=data.Id,
+							StaffElpsID = userModel.ELPS_ID.ToString(),
+							Staff_SBU = userModel.SBU_ID,
+							RoleID = userModel.ROLE_ID,
+							LocationID = 1,
+							StaffEmail = data.EMAIL,
+							FirstName = userModel.NAME.Split(",")[0],
+							LastName = userModel.NAME.Split(",")[1],
+							CreatedAt = DateTime.Now,
+							ActiveStatus = true,
+							DeleteStatus = false,
+						};
+
+						await _context.staff.AddAsync(staff);
+						int saved = await _context.SaveChangesAsync();
+
+						return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"{userModel.EMAIL} has been added successfully", Data = userModel, StatusCode = ResponseCodes.Success };
+					}
+					else
+					{
+						return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + "An error occured while adding this user.", StatusCode = ResponseCodes.Failure };
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+			}
+		}
+
+
+        ////Added by Musa
+        //[HttpPost("CREATE_USER_NEW")]
+        //public async Task<WebApiResponse> CreateUserNew([FromBody] ADMIN_COMPANY_INFORMATION_Model userModel)
+        //{
+
+        //    try
+        //    {
+        //        var checkUser = (from c in _context.ADMIN_COMPANY_INFORMATIONs
+        //                         where c.EMAIL.ToLower() == userModel.EMAIL.ToLower()
+        //                         select c).FirstOrDefault();
+
+        //        if (checkUser != null)
+        //        {
+        //            bool deleted = checkUser.DELETED_STATUS == "DELETED" ? true : false;
+        //            bool activated = checkUser.STATUS_ == "Activated" ? true : false;
+
+        //            string errMsg = $"User details with '{userModel.EMAIL}' is already existing on the portal.";
+
+        //            if (deleted == true)
+        //                errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been deleted on the portal, kindly restore account information.";
+
+        //            if (activated != true)
+        //                errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been de-activated on the portal, kindly activate account information.";
+
+        //            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
+
+        //        }
+        //        else
+        //        {
+        //            var data = _mapper.Map<ADMIN_COMPANY_INFORMATION>(userModel);
+
+        //            data.EMAIL = userModel.EMAIL.ToLower();
+        //            data.PASSWORDS = _helpersController.Encrypt(userModel.PASSWORDS);
+        //            data.STATUS_ = "Activated";
+        //            data.Date_Created = DateTime.Now;
+        //            data.Created_by = WKPCompanyEmail;
+        //            await _context.ADMIN_COMPANY_INFORMATIONs.AddAsync(data);
+        //            int save = await _context.SaveChangesAsync();
+
+        //            var CompanyInfoId = data.Id;
+
+
+
+        //            if (save > 0)
+        //            {
+        //                string companyAccessCode = string.Empty;
+        //            repeat:
+        //                var accessCode = GENERATE_ACCESS_CODE(data.COMPANY_NAME);
+
+        //                var getAccessCodeFromDb = await _context.ADMIN_COMPANY_CODEs.FirstOrDefaultAsync(x => x.CompanyCode == accessCode);
+
+        //                if (getAccessCodeFromDb != null)
+        //                {
+        //                    companyAccessCode = accessCode;
+        //                }
+        //                else
+        //                {
+        //                    goto repeat;
+        //                }
+
+
+        //                //Added company Code info
+        //                var CompanyInfoCode = new ADMIN_COMPANY_CODE
+        //                {
+        //                    Date_Created = DateTime.Now,
+        //                    Date_Updated = DateTime.Now,
+        //                    Created_by = WKPCompanyEmail,
+        //                    CompanyNumber = CompanyInfoId,
+        //                    CompanyCode = companyAccessCode,
+        //                    Email = userModel.EMAIL.ToLower().Trim(),
+        //                    CompanyName = userModel.COMPANY_NAME,
+        //                    GUID = Guid.NewGuid().ToString()
+        //                };
+        //                await _context.ADMIN_COMPANY_CODEs.AddAsync(CompanyInfoCode);
+
+        //                var newCompany = await _context.ADMIN_COMPANY_INFORMATIONs.FindAsync(CompanyInfoId);
+        //                newCompany.COMPANY_ID = companyAccessCode;
+        //                _context.ADMIN_COMPANY_INFORMATIONs.Update(newCompany);
+
+
+
+        //                //add user to staff table
+        //                staff staff = new staff()
+        //                {
+        //                    AdminCompanyInfo_ID = data.Id,
+        //                    StaffElpsID = "123456",
+        //                    Staff_SBU = userModel.SBU_ID,
+        //                    RoleID = userModel.ROLE_ID,
+        //                    LocationID = 1,
+        //                    StaffEmail = data.EMAIL,
+        //                    FirstName = "ADMIN",
+        //                    LastName = "STAFF",
+        //                    CreatedAt = DateTime.Now,
+        //                    ActiveStatus = true,
+        //                    DeleteStatus = false,
+        //                };
+
+        //                await _context.staff.AddAsync(staff);
+        //                int saved = await _context.SaveChangesAsync();
+
+        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"{userModel.EMAIL} has been added successfully", Data = userModel, StatusCode = ResponseCodes.Success };
+        //            }
+        //            else
+        //            {
+        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + "An error occured while adding this user.", StatusCode = ResponseCodes.Failure };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+        //    }
+        //}
+
+
+
+
+        [HttpPost("CREATE_USER")]
 		public async Task<WebApiResponse> CreateUser([FromBody] ADMIN_COMPANY_INFORMATION_Model userModel)
 		{
 
@@ -443,6 +679,7 @@ namespace Backend_UMR_Work_Program.Controllers
 				else
 				{
 					var data = _mapper.Map<ADMIN_COMPANY_INFORMATION>(userModel);
+
 					data.EMAIL = userModel.EMAIL.ToLower();
 					data.PASSWORDS = _helpersController.Encrypt(userModel.PASSWORDS);
 					data.STATUS_ = "Activated";
@@ -451,8 +688,45 @@ namespace Backend_UMR_Work_Program.Controllers
 					await _context.ADMIN_COMPANY_INFORMATIONs.AddAsync(data);
 					int save = await _context.SaveChangesAsync();
 
+					var CompanyInfoId = data.Id;
+
+
+
 					if (save > 0)
 					{
+						//						string companyAccessCode = string.Empty;
+						//repeat:
+						//						var accessCode = GenerateAccessCode(data.COMPANY_NAME);
+
+						//						var getAccessCodeFromDb = await _context.ADMIN_COMPANY_CODEs.FirstOrDefaultAsync(x => x.CompanyCode==accessCode);
+
+						//						if (getAccessCodeFromDb != null)
+						//						{
+						//							companyAccessCode=accessCode;
+						//						}
+						//						else
+						//						{
+						//							goto repeat;
+						//						}
+
+
+
+
+
+						//Added company Code info
+						//var CompanyInfoCode = new ADMIN_COMPANY_CODE
+						//{
+						//	Date_Created= DateTime.Now,
+						//	Date_Updated= DateTime.Now,
+						//	Created_by = WKPCompanyEmail,
+						//	CompanyNumber=CompanyInfoId,
+						//	CompanyCode=companyAccessCode,
+						//	Email=userModel.EMAIL.ToLower().Trim(),
+						//	CompanyName=userModel.COMPANY_NAME,
+						//	GUID=Guid.NewGuid().ToString()
+						//};
+						//await _context.ADMIN_COMPANY_CODEs.AddAsync(CompanyInfoCode);
+
 						//add user to staff table
 						staff staff = new staff()
 						{
@@ -487,28 +761,104 @@ namespace Backend_UMR_Work_Program.Controllers
 			}
 		}
 		//Create a method to Generate AccessCode
-		private string GenerateAccessCode(string companyName)
+		[HttpGet("GENERATE_ACCESS_CODE")]
+		public string GENERATE_ACCESS_CODE(string companyName)
 		{
-			var strIntitials = string.Empty;
-
-			var companyNames = companyName.Split(' ');
-
-			foreach (var item in companyNames)
+			try
 			{
-				strIntitials+= item.Substring(0);
+				var strIntitials = string.Empty;
+
+				var companyNames = companyName.Split(' ');
+
+				//check if company name has more than one string
+
+				if (companyNames.Length<=1)
+				{
+					strIntitials= companyName.Substring(0, 4);
+				}
+				else
+				{
+					foreach (var item in companyNames)
+					{
+						strIntitials+= item.Substring(0);
+					}
+				}
+
+				//var rndmize=new Randomize
+				var rnd = new Random();
+
+				var firstRndNumber = rnd.Next(0, 9999).ToString().PadLeft(4, '0');
+
+
+				var accessCaode = strIntitials.ToUpper() + firstRndNumber;
+
+
+				return accessCaode;
 			}
-			//var rndmize=new Randomize
-			var rnd = new Random();
+			catch (Exception ex)
+			{
 
-			var firstRndNumber = rnd.Next(0, 9999).ToString().PadLeft(4, '0');
-
-
-			var accessCaode = strIntitials.ToUpper() + firstRndNumber;
-
-
-			return accessCaode.PadLeft(3, '0');
+				throw ex;
+			}
 		}
 
+		[HttpGet("GET_COMPANY_INFORMATION_BY_ACCESSCODE")]
+		public async Task<ADMIN_COMPANY_CODE> GET_COMPANY_INFORMATION_BY_ACCESSCODE(string accessCode)
+		{
+			try
+			{
+				var companyInfo = await _context.ADMIN_COMPANY_CODEs.Where(x => x.CompanyCode==accessCode).FirstOrDefaultAsync();
+				if (companyInfo != null)
+				{
+					return companyInfo;
+				}
+				return null;
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
+
+		[HttpPost("UPDATE_COMPANY_INFORMATION_BY_ACCESSCODE")]
+		public async Task<ADMIN_COMPANY_INFORMATION> UPDATE_COMPANY_INFORMATION_BY_ACCESSCODE(ADMIN_COMPANY_CODE companyCode)
+		{
+			try
+			{
+				var accessCode = companyCode.CompanyCode;
+				var companyId = 0;
+				var companyEmail = companyCode.Email;
+				var getCompanyNumber = await _context.ADMIN_COMPANY_CODEs.FirstOrDefaultAsync(x => x.CompanyCode==accessCode);
+
+				if (getCompanyNumber != null)
+				{
+					companyId= (int)getCompanyNumber.CompanyNumber;
+
+					var getCompanyInfo = await _context.ADMIN_COMPANY_INFORMATIONs.FirstOrDefaultAsync(x => x.Id==companyId);
+
+
+					if (getCompanyInfo != null)
+					{
+						getCompanyInfo.EMAIL= companyEmail;
+
+					}
+					_context.ADMIN_COMPANY_INFORMATIONs.Update(getCompanyInfo);
+
+					var save = await _context.SaveChangesAsync();
+					if (save>0)
+					{
+						return getCompanyInfo;
+					}
+				}
+				return null;
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
 		[HttpGet("GET_UPDATEUSER")]
 		public async Task<WebApiResponse> Get_UpdateUser(int id)
 		{
@@ -1950,7 +2300,7 @@ namespace Backend_UMR_Work_Program.Controllers
 		{
 
 			int save = 0;
-			string action = actionToDo == null ? GeneralModel.Insert : actionToDo;
+			string action = actionToDo == null ? GeneralModel.Insert.Trim().ToLower() : actionToDo.Trim().ToLower();
 
 			try
 			{
@@ -2002,7 +2352,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 				if (save > 0)
 				{
-					string successMsg = "Field has been " + action + "D successfully.";
+					string successMsg = Messager.ShowMessage(action);
 					return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
 				}
 				else

@@ -13,7 +13,6 @@ namespace Backend_UMR_Work_Program.Controllers
 {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[Route("api/[controller]")]
-	[ApiController]
 
 	public class PresentationController : ControllerBase
 	{
@@ -172,6 +171,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 			}
 		}
+
 		[HttpPost("SCHEDULEPRESENTATION")]
 		public async Task<WebApiResponse> SCHEDULE_PRESENTATION_DATETIME(string time, DateTime date)
 		{
@@ -182,8 +182,20 @@ namespace Backend_UMR_Work_Program.Controllers
 
 				if (checkCompanySchedule != null)
 				{
+					string Date_Conversion1 = date.ToString("dddd , dd MMMM yyyy");
+					checkCompanySchedule.wp_date = Date_Conversion1;
+					checkCompanySchedule.DATE_TIME_TEXT = Date_Conversion1;
+					checkCompanySchedule.wp_time = time;
+					checkCompanySchedule.Updated_by = WKPUserEmail;
+					_context.Entry(checkCompanySchedule).State = EntityState.Modified;
+					await _context.SaveChangesAsync();
+
+					var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+					return new WebApiResponse { ResponseCode = "200", Message = "A presentation schedule was created successfully.", Data = companyPresentations, StatusCode = 200 };
+
+
 					//schedule already exist for company
-					return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "There is an existing presentation schedule for this year.", StatusCode = ResponseCodes.Failure };
+					//return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "There is an existing presentation schedule for this year.", StatusCode = ResponseCodes.Failure };
 
 				}
 				else
@@ -195,7 +207,7 @@ namespace Backend_UMR_Work_Program.Controllers
 					var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.wp_date == Date_Conversion && c.wp_time == time).FirstOrDefault();
 					if (checkSchedule != null)
 					{
-						return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, date and time have already been selected. Kindly select another day and/or time.", StatusCode = ResponseCodes.Failure };
+						return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, date and time have already been selected by another company. Kindly select another day and/or time.", StatusCode = ResponseCodes.Failure };
 					}
 
 					var presentation = new ADMIN_DATETIME_PRESENTATION()
@@ -214,8 +226,9 @@ namespace Backend_UMR_Work_Program.Controllers
 					};
 
 					_context.ADMIN_DATETIME_PRESENTATIONs.Add(presentation);
+					var myTime = await _context.SaveChangesAsync();
 
-					if (await _context.SaveChangesAsync() > 0)
+					if ( myTime > 0)
 					{
 						var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
 						return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was created successfully.", Data = companyPresentations, StatusCode = ResponseCodes.Success };

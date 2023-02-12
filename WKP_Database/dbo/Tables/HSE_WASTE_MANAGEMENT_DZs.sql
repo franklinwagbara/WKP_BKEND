@@ -27,8 +27,11 @@
     [Waste_Service_Permit_Filename]                    NVARCHAR (MAX) NULL,
     [Waste_Service_Permit_Path]                        FLOAT (53)     NULL,
     [Field_Name]                                       NVARCHAR (MAX) NULL,
+    [Field_ID]                                         INT            NULL,
     CONSTRAINT [PK_HSE_WASTE_MANAGEMENT_DZs] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 

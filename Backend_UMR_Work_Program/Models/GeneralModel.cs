@@ -31,9 +31,9 @@ namespace Backend_UMR_Work_Program.Models
         public static string HumanError = "HUMAN ERROR";
         public static string MysterySpills = "MYSTERY SPILLS";
         public static string EquipmentFailure = "EQUIPMENT_FAILURE";
-        public static string Insert = "INSERT";
-        public static string Update = "UPDATE";
-        public static string Delete = "DELETE";
+        public static string Insert = "Insert";
+        public static string Update = "Update";
+        public static string Delete = "Delete";
         public static string New = "New";
         public static string Modification = "MODIFICATION";
         public static string ActualYear = "Actual Year";
@@ -386,6 +386,8 @@ namespace Backend_UMR_Work_Program.Models
             public string? STATUS_ { get; set; }
             public string? FLAG_PASSWORD_CHANGE { get; set; }
             public string? CATEGORY { get; set; }
+            public string? Created_by { get; set; }
+            public DateTime? Date_Created { get; set; }
             public string? NAME { get; set; }
             public string? DESIGNATION { get; set; }
             public string? PHONE_NO { get; set; }
@@ -398,6 +400,7 @@ namespace Backend_UMR_Work_Program.Models
             public string? EMAIL_REMARK { get; set; }
             public int? ROLE_ID { get; set; }
             public int? SBU_ID { get; set; }
+            public int? ELPS_ID { get; set; }
         }
         public partial class ADMIN_CONCESSIONS_INFORMATION_Model
         {

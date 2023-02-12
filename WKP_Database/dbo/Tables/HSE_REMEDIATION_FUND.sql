@@ -11,6 +11,13 @@
     [evidenceOfPaymentPath]     VARCHAR (MAX)  NULL,
     [reasonForNoRemediation]    VARCHAR (MAX)  NULL,
     [areThereRemediationFund]   NVARCHAR (MAX) NULL,
+    [Created_by]                NVARCHAR (MAX) NULL,
+    [Date_Created]              DATETIME2 (7)  NULL,
+    [Date_Updated]              DATETIME2 (7)  NULL,
+    [Field_ID]                  INT            NULL,
+    [Updated_by]                NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_HSE_REMEDIATION_FUND] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 

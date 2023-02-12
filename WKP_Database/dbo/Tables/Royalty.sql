@@ -12,8 +12,11 @@
     [Status]             VARCHAR (50)   NULL,
     [Date_Created]       DATE           NULL,
     [Last_Qntr_Royalty]  VARCHAR (1000) NULL,
+    [OmlName]            NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_Royalty] PRIMARY KEY CLUSTERED ([Royalty_ID] ASC)
 );
+
+
 
 
 

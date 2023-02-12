@@ -519,5 +519,6 @@
     <Build Include="dbo\Views\WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_By_month_year_PROPOSED.sql" />
     <Build Include="dbo\Tables\HSE_WASTE_MANAGEMENT_DZs.sql" />
     <Build Include="dbo\Tables\BUDGET_CAPEX.sql" />
+    <Build Include="dbo\Tables\BUDGET_OPEX.sql" />
   </ItemGroup>
 </Project>
