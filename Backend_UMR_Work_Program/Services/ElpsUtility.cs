@@ -122,7 +122,6 @@ namespace Backend_UMR_Work_Program.Services
 							Message = "Successful",
 							StatusCode = ResponseCodes.Success,
 							Data = company.Id
-
 						};
 					}
 					else

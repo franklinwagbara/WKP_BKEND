@@ -4,5 +4,6 @@
     <Controller_SelectedScaffolderID>ApiControllerEmptyScaffolder</Controller_SelectedScaffolderID>
     <Controller_SelectedScaffolderCategoryPath>root/Common/Api</Controller_SelectedScaffolderCategoryPath>
     <NameOfLastUsedPublishProfile>C:\Workcode\WORKPROGRAMV2\Backend_UMR_Work_Program\Properties\PublishProfiles\workprogramtest - Web Deploy1.pubxml</NameOfLastUsedPublishProfile>
+    <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
 </Project>

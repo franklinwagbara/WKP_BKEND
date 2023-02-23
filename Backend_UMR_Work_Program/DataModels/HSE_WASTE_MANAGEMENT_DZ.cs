@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Backend_UMR_Work_Program.DataModels
+namespace Backend_UMR_Work_Program.DataModels;
+
+public partial class HSE_WASTE_MANAGEMENT_DZ
 {
-    public partial class HSE_WASTE_MANAGEMENT_DZ
-    {
         public int Id { get; set; }
         public string? OML_ID { get; set; }
         public string? OML_Name { get; set; }
@@ -31,8 +31,8 @@ namespace Backend_UMR_Work_Program.DataModels
         public DateTime? Date_Created { get; set; }
         public DateTime? Date_Updated { get; set; }
         public string? Waste_Service_Permit_Filename { get; set; }
-        public double? Waste_Service_Permit_Path { get; set; }
+        public string? Waste_Service_Permit_Path { get; set; }
         public string? Field_Name { get; set; }
         public int? Field_ID { get; set; }
-    }
+
 }
