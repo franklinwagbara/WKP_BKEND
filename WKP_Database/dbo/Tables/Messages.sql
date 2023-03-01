@@ -12,3 +12,7 @@
     CONSTRAINT [PK_Messages] PRIMARY KEY CLUSTERED ([id] ASC)
 );
 
+
+
+
+

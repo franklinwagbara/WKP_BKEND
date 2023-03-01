@@ -22,5 +22,8 @@
 		public bool DeleteStatus { get; set; }
 		public string? DeletedBy { get; set; }
 		public DateTime? DeletedAt { get; set; }
+
+		//To track hierarchy
+		//public int? Tier { get; set; }
 	}
 }

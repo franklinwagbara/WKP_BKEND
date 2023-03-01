@@ -22,5 +22,3 @@
     CONSTRAINT [PK_Applications] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
-
-

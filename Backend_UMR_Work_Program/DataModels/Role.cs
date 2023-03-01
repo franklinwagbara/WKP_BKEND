@@ -13,5 +13,7 @@ public partial class Role
 
     public string? RoleName { get; set; }
 
+    public int? Rank { get; set; }
+
     public virtual ICollection<Functionality> Funcs { get; } = new List<Functionality>();
 }

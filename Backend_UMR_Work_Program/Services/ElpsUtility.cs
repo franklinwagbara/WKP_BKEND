@@ -111,7 +111,7 @@ namespace Backend_UMR_Work_Program.Services
                             }
 							else
 							{
-								var staticResponse = GetStaff("silas.oparaiwu@brandonetech.com", appSettings, webApiResponse);
+								var staticResponse = GetStaff("wkpone@mailinator.com", appSettings, webApiResponse);
 								var staticStaff = (StaffResponseDto)staticResponse.Data;
 								var seed = await (from a in _context.ADMIN_COMPANY_INFORMATIONs where a.EMAIL.ToLower() == staticStaff.email.ToLower() select a).FirstOrDefaultAsync();
 								if (seed == null)

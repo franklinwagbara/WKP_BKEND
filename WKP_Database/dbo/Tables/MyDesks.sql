@@ -7,13 +7,12 @@
     [HasWork]     BIT            NOT NULL,
     [HasPushed]   BIT            NOT NULL,
     [FromStaffID] NVARCHAR (MAX) NULL,
-    [FromSBU]     INT            DEFAULT ((0)) NOT NULL,
-    [CreatedAt]   DATETIME       NULL,
-    [UpdatedAt]   DATETIME       NULL,
+    [FromSBU]     INT            CONSTRAINT [DF__MyDesks__FromSBU__7BBB44FE] DEFAULT ((0)) NOT NULL,
+    [CreatedAt]   DATETIME2 (7)  NULL,
+    [UpdatedAt]   DATETIME2 (7)  NULL,
     [Comment]     VARCHAR (MAX)  NULL,
     [FromRoleId]  INT            NULL,
+    [LastJobDate] DATETIME2 (7)  CONSTRAINT [DF_MyDesks_LastJobDate] DEFAULT (getdate()) NOT NULL,
     CONSTRAINT [PK_MyDesk_UT] PRIMARY KEY CLUSTERED ([DeskID] ASC)
 );
-
-
 

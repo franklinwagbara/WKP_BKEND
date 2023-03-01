@@ -6,13 +6,15 @@ namespace Backend_UMR_Work_Program.DataModels;
 
 public partial class WKP_DBContext : DbContext
 {
+    public IConfiguration _configuration { get; }
     public WKP_DBContext()
     {
     }
 
-    public WKP_DBContext(DbContextOptions<WKP_DBContext> options)
+    public WKP_DBContext(DbContextOptions<WKP_DBContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSEs { get; set; }
@@ -929,8 +931,10 @@ public partial class WKP_DBContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=tcp:workprogram.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=workprogram;Password=Br@nd0ne;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+        => optionsBuilder.UseSqlServer(_configuration["Data:Wkpconnect:ConnectionString"]);
 
+    
+    //"Server=tcp:workprogram.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=workprogram;Password=Br@nd0ne;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE>(entity =>
@@ -11571,7 +11575,7 @@ public partial class WKP_DBContext : DbContext
 
         modelBuilder.Entity<SBU_ApplicationComment>(entity =>
         {
-            entity.HasNoKey();
+            //entity.HasNoKey();
 
             entity.Property(e => e.ActionStatus)
                 .HasMaxLength(50)

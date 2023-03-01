@@ -287,7 +287,23 @@ namespace Backend_UMR_Work_Program.Models
 			public int DeskCount { get; set; }
 			public string RoleName { get; set; }
 		}
-		public class Application_Model
+
+        public class DeskStaffAppsModel
+        {
+			public staff Staff { get; set; }
+			public MyDesk Desk { get; set; }
+			public Application Application { get; set; }
+        }
+
+        public class StaffSBURoleModel
+        {
+            public staff Staff { get; set; }
+            public Role Role { get; set; }
+			public StrategicBusinessUnit SBU { get; set; }
+        }
+
+
+        public class Application_Model
 		{
 			public int Id { get; set; }
 			public int RejectId { get; set; }
