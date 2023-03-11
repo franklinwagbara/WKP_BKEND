@@ -652,7 +652,10 @@ namespace Backend_UMR_Work_Program.Controllers
 			}
 			catch (Exception e)
 			{
-				return BadRequest(e);
+				return BadRequest(new
+				{
+					message = "Error : " + e.ToString() + "---" + e.InnerException.ToString()
+				});
 			}
 		}
 
