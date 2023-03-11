@@ -532,71 +532,71 @@ namespace Backend_UMR_Work_Program.Controllers
 		[HttpPost("SubmitApplication")]
 		public async Task<object> SubmitApplication(string year, string omlName, string fieldName)
 		{
-			string a="aaaaaaa";
+			
 			try
 			{
 				int yearID = Convert.ToInt32(year);
-a="a";
+
 				var concession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Concession_Held.ToLower() == omlName.ToLower() select d).FirstOrDefaultAsync();
-a="b";
+
 				var field = await (from d in _context.COMPANY_FIELDs where d.Field_Name.ToLower() == fieldName.ToLower() || d.Field_ID.ToString() == fieldName select d).FirstOrDefaultAsync();
 
-a="c";
+
 				var applicationProcesses = await _helpersController.GetApplicationProccessByAction(GeneralModel.Submit);
 
-a="d";
+
 				if (applicationProcesses.Count <= 0)
 				{
-					a="e";
+					
 					return BadRequest(new { message = "An error occured while trying to get process flow for this application." });
 				}
 
 				var app = new Application();
-a="f";
+
 
                 if (field != null)
 				{
 					 app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id && a.FieldID == field.Field_ID).FirstOrDefaultAsync();
-a="g";
+
 				}
 				else
 				{
 					app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id).FirstOrDefaultAsync();
-				a="h";
+				
 				}
 
 				if(app != null)
 				{
-					a="i";
+					
                     return BadRequest(new { message = $"Error : An application for the Concession {omlName}, and Field Name {field.Field_Name} for the year {year} has already been submitted." });
                 }
-a="j";
+
 				Application application = new Application();
-a="k";
+
 				application.ReferenceNo = _helpersController.Generate_Reference_Number();
-				a="l";
+				
 				application.YearOfWKP = yearID;
-				a="m";
+				
 				application.ConcessionID = concession.Consession_Id;
-				a="n";
+				
 				application.FieldID = field?.Field_ID ?? null;
-				a="o";
+				
 				application.CompanyID = (int)WKPCompanyNumber;
 				application.CurrentUserEmail=WKPCompanyEmail;
 
 				application.CategoryID = _context.ApplicationCategories.Where(x => x.Name == GeneralModel.New).FirstOrDefault().Id;
-a="p";
+
 				application.Status = GeneralModel.Processing;
 				application.PaymentStatus = GeneralModel.PaymentPending;
-				a="q";
+				
 				application.CurrentDesk = applicationProcesses.FirstOrDefault().RoleID; //to change
-				a="r";
+				
 				application.Submitted = true;
 				application.CreatedAt = DateTime.Now;
 				application.SubmittedAt = DateTime.Now;
-				a="s";
+				
 				_context.Applications.Add(application);
-a="t";
+
 				if (_context.SaveChanges() > 0)
 				{
 
@@ -607,7 +607,7 @@ a="t";
 
 
 					var staffList = await _helpersController.GetReviewerStafff(applicationProcesses);
-					a="u";
+					
 					//foreach (var item in applicationProcesses)
 					//{
 					//	staffLists=_context.staff.Where(x => x.Staff_SBU==item.TargetedToSBU && x.RoleID==item.TargetedToRole).ToList();
@@ -616,17 +616,17 @@ a="t";
 					{
 						//Get The process Flow
 						var processFlow = _context.ApplicationProccesses.Where<ApplicationProccess>(p => p.TargetedToRole == staff.RoleID && p.TargetedToSBU == staff.Staff_SBU).FirstOrDefault();
-a="v" + staff.ToString();
+
 						int FromStaffID = 0; //This value is zero, because, this is company and not a staff
 						int FromStaffSBU = 0; // This value is zero, because, this is company and not a staff
 						int FromStaffRoleID = 0; //This value is zero, because, this is company and not a staff
 
                         int saveStaffDesk = _helpersController.RecordStaffDesks(application.Id, staff, FromStaffID, FromStaffSBU, FromStaffRoleID, processFlow.ProccessID);
-a="w" + staff.ToString();
+
 						if (saveStaffDesk > 0)
 						{
 							_helpersController.SaveHistory(application.Id, staff.StaffID, "Submitted", "Application submitted and landed on staff desk");
-a= "x"+ staff.ToString();
+
 							//send mail to staff
 							//var getStaff = (from stf in _context.staff where stf.StaffID == staff.StaffId select stf).FirstOrDefault();
 							var getStaff = (from stf in _context.staff
@@ -634,16 +634,16 @@ a= "x"+ staff.ToString();
 											where stf.StaffID == staff.StaffID && stf.DeleteStatus != true
 											select stf).FirstOrDefault();
 
-											a= "y"+ staff.ToString();
+											
 
 							string content2 = $"{WKPCompanyName} have submitted their WORK PROGRAM application for year {year}.";
 
 							var emailMsg2 = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject2, content2, "Staff");
 
-							a= "y"+ staff.ToString();
+							
 
 							var sendEmail2 = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg2, null);
-							a= "z"+ staff.ToString();
+							
 
 							_helpersController.LogMessages("Submission of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
 
@@ -656,20 +656,19 @@ a= "x"+ staff.ToString();
 					//send mail to company
 					string subject = $"{year} submission of WORK PROGRAM application for field - {field?.Field_Name} : {application.ReferenceNo}";
 				
-					a="a1";
+				
 				
 					string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
 					var emailMsg = _helpersController.SaveMessage(application.Id, (int)WKPCompanyNumber, subject, content, "Company");
 				
-					a="b1";
+				
 
 					var sendEmail = _helpersController.SendEmailMessage(WKPCompanyEmail, WKPCompanyName, emailMsg, null);
 
-a="c1";
+
 
 					var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.";
 					
-					a="d1";
 
 					return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
 
