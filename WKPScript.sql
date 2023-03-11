@@ -623,3 +623,11 @@ GO
 
 ALTER TABLE dbo.MyDesks ADD
 	LastJobDate datetime NULL
+
+
+INSERT INTO [dbo].[ApplicationCategories]
+           ([Name]
+            ,[DeleteStatus])
+     VALUES
+           ('New', 0)
+GO
