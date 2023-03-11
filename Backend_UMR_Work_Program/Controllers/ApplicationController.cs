@@ -532,7 +532,7 @@ namespace Backend_UMR_Work_Program.Controllers
 		[HttpPost("SubmitApplication")]
 		public async Task<object> SubmitApplication(string year, string omlName, string fieldName)
 		{
-			string a="aaaa";
+			string a="aaaaaaa";
 			try
 			{
 				int yearID = Convert.ToInt32(year);
