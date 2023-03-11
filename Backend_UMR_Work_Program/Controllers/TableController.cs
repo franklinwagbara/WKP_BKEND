@@ -79,25 +79,5 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
 
-        [HttpGet("AddData")]
-        public async Task<string> AddSql()
-        {
-            try
-            { using (SqlConnection conn = new SqlConnection(_configuration["Data:Wkpconnect:ConnectionString"])) {
-                    await conn.OpenAsync();
-                    string query0 = $"INSERT INTO [dbo].[ApplicationCategories] ([Name], [DeleteStatus]) VALUES('New', 0);";
-                    SqlCommand cmd0 = new SqlCommand(query0, conn);
-                    var reader = await cmd0.ExecuteReaderAsync();
-
-                    return "Inserted";
-                }
-
-            }
-            catch (Exception e)
-            {
-                return null;
-
-            }
-        }
     }
 }
