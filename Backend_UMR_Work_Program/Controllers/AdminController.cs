@@ -415,6 +415,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 		
 		//Added by Musa
+		[AllowAnonymous]
 		[HttpPost("CREATE_USER_NEW")]
 		public async Task<WebApiResponse> CreateUserNew([FromBody] ADMIN_COMPANY_INFORMATION_Model userModel)
 		{
@@ -507,7 +508,7 @@ repeat:
 							LocationID = 1,
 							StaffEmail = data.EMAIL,
 							FirstName = userModel.NAME.Split(",")[0],
-							LastName = userModel.NAME.Split(",")[1],
+							LastName = userModel.NAME.Split(",").Count() > 1 ? userModel.NAME.Split(",")[0] : "",
 							CreatedAt = DateTime.Now,
 							ActiveStatus = true,
 							DeleteStatus = false,
