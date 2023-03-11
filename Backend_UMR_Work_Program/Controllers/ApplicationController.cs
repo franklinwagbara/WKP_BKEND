@@ -475,7 +475,8 @@ namespace Backend_UMR_Work_Program.Controllers
 											Staff_Email = stf.StaffEmail,
 											Staff_SBU = sbu.SBU_Name,
 											Staff_Role = rol.RoleName,
-											Comment = his.Comment
+											Comment = his.Comment,
+											Date = his.ActionDate
 										}).ToListAsync();
 
 				var staffDesk = await (from dsk in _context.MyDesks
@@ -749,8 +750,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                 var save = await _context.SaveChangesAsync();
                                 if (save > 0)
                                 {
-                                    //var trigeredbyDeskId = await _helpersController.GetDeskIdByStaffIdAndAppId((int)staffId, appId);
-                                    //var result = await _helpersController.DeleteDeskIdByDeskId(trigeredbyDeskId);
+									//var trigeredbyDeskId = await _helpersController.GetDeskIdByStaffIdAndAppId((int)staffId, appId);
+									//var result = await _helpersController.DeleteDeskIdByDeskId(trigeredbyDeskId);
+
+									//update records of approval status coming in from each SBU for workprogram team consumption
+									if (processFlow.ProcessAction == GeneralModel.Approve) ;									
+
 
                                     await _helpersController.UpdateDeskAfterPush(staffDesk, comment, STAFF_DESK_STATUS.APPROVED);
                                 }
