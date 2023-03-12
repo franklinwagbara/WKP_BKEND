@@ -15,6 +15,7 @@ public partial class WKP_DBContext : DbContext
     {
     }
 
+    public virtual DbSet<SBU_Submission> SBU_Submissions { get; set; }
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSEs { get; set; }
 
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CONSEQUENCE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CONSEQUENCEs { get; set; }
@@ -935,6 +936,16 @@ public partial class WKP_DBContext : DbContext
     //"Server=tcp:workprogram.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=workprogram;Password=Br@nd0ne;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<SBU_Submission>(entity =>
+        {
+            entity.ToTable("SBU_Submission");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.ProcessStatus).HasMaxLength(100);
+            entity.Property(e => e.SBU_ID).HasColumnName("SBU_ID");
+            entity.Property(e => e.StaffID).HasColumnName("StaffID");
+        });
+
         modelBuilder.Entity<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE>(entity =>
         {
             entity.ToTable("ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE");

@@ -114,7 +114,7 @@ namespace Backend_UMR_Work_Program.Controllers
 		}
 
         [HttpGet("GetStaffDesksBySBUAndRole")]
-        public async Task<object> GetAppsOnMyDesk(int sbuID, int roleID)
+        public async Task<object> GetAppsOnMyDeskBySBUAndRole(int sbuID, int roleID)
         {
             try
             {
@@ -122,13 +122,38 @@ namespace Backend_UMR_Work_Program.Controllers
                 var staffDesks = await (from desk in _context.MyDesks
 										join staff in _context.staff on desk.StaffID equals staff.StaffID
 										join app in _context.Applications on desk.AppId equals app.Id
-										where staff.Staff_SBU == sbuID && staff.RoleID == roleID
-										select new DeskStaffAppsModel
+										where staff.Staff_SBU == sbuID && staff.RoleID == roleID && desk.HasWork == true
+                                        select new DeskStaffAppsModel
 										{
 											Staff = staff,
 											Desk = desk,
 											Application = app
 										}).ToListAsync();
+
+                return new WebApiResponse { Data = staffDesks, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = "Error : " + e.Message });
+            }
+        }
+
+        [HttpGet("GetStaffDesksByStaffID")]
+        public async Task<object> GetAppsOnMyDeskByStaffID(int staffID)
+        {
+            try
+            {
+                //var staffs = _context.staff.Where<staff>(s => s.Staff_SBU == sbuID && s.RoleID == roleID).ToList();
+                var staffDesks = await (from desk in _context.MyDesks
+                                        join staff in _context.staff on desk.StaffID equals staff.StaffID
+                                        join app in _context.Applications on desk.AppId equals app.Id
+                                        where staff.StaffID == staffID && desk.HasWork == true
+                                        select new DeskStaffAppsModel
+                                        {
+                                            Staff = staff,
+                                            Desk = desk,
+                                            Application = app
+                                        }).ToListAsync();
 
                 return new WebApiResponse { Data = staffDesks, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
@@ -475,7 +500,8 @@ namespace Backend_UMR_Work_Program.Controllers
 											Staff_Email = stf.StaffEmail,
 											Staff_SBU = sbu.SBU_Name,
 											Staff_Role = rol.RoleName,
-											Comment = his.Comment
+											Comment = his.Comment,
+											Date = his.ActionDate
 										}).ToListAsync();
 
 				var staffDesk = await (from dsk in _context.MyDesks
@@ -540,10 +566,9 @@ namespace Backend_UMR_Work_Program.Controllers
 
 				var field = await (from d in _context.COMPANY_FIELDs where d.Field_Name.ToLower() == fieldName.ToLower() || d.Field_ID.ToString() == fieldName select d).FirstOrDefaultAsync();
 
-
 				var applicationProcesses = await _helpersController.GetApplicationProccessByAction(GeneralModel.Submit);
 
-
+				
 				if (applicationProcesses.Count <= 0)
 				{
 					return BadRequest(new { message = "An error occured while trying to get process flow for this application." });
@@ -555,7 +580,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (field != null)
 				{
 					 app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id && a.FieldID == field.Field_ID).FirstOrDefaultAsync();
-
 				}
 				else
 				{
@@ -568,16 +592,14 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
 
 				Application application = new Application();
-
 				application.ReferenceNo = _helpersController.Generate_Reference_Number();
 				application.YearOfWKP = yearID;
 				application.ConcessionID = concession.Consession_Id;
-				application.FieldID = field?.Field_ID;
+				application.FieldID = field?.Field_ID ??  null;
 				application.CompanyID = (int)WKPCompanyNumber;
 				application.CurrentUserEmail=WKPCompanyEmail;
 
 				application.CategoryID = _context.ApplicationCategories.Where(x => x.Name == GeneralModel.New).FirstOrDefault().Id;
-
 				application.Status = GeneralModel.Processing;
 				application.PaymentStatus = GeneralModel.PaymentPending;
 				application.CurrentDesk = applicationProcesses.FirstOrDefault().RoleID; //to change
@@ -654,10 +676,10 @@ namespace Backend_UMR_Work_Program.Controllers
 			{
 				return BadRequest(new
 				{
-					message = "Error : " + e.Message
-				});
+					message = "Error : " + e.ToString()
+				}) ; 
 			}
-		}
+        }
 
 		[HttpPost("PushApplication")]
 		public async Task<object> PushApplication(int deskID, string comment, string[] selectedApps)
@@ -749,8 +771,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                 var save = await _context.SaveChangesAsync();
                                 if (save > 0)
                                 {
-                                    //var trigeredbyDeskId = await _helpersController.GetDeskIdByStaffIdAndAppId((int)staffId, appId);
-                                    //var result = await _helpersController.DeleteDeskIdByDeskId(trigeredbyDeskId);
+									//var trigeredbyDeskId = await _helpersController.GetDeskIdByStaffIdAndAppId((int)staffId, appId);
+									//var result = await _helpersController.DeleteDeskIdByDeskId(trigeredbyDeskId);
+
+									//update records of approval status coming in from each SBU for workprogram team consumption
+									if (processFlow.ProcessAction == GeneralModel.Approve) ;									
+
 
                                     await _helpersController.UpdateDeskAfterPush(staffDesk, comment, STAFF_DESK_STATUS.APPROVED);
                                 }
