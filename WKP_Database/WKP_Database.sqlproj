@@ -525,5 +525,6 @@
     <Build Include="dbo\Views\Sum_GEOPHYSICAL_ACTIVITIES_ACQUISITION.sql" />
     <Build Include="dbo\Views\Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLS.sql" />
     <Build Include="dbo\Views\ADMIN_COMPANYEMAIL_REMINDER_TABLE.sql" />
+    <Build Include="dbo\Tables\SBU_Submission.sql" />
   </ItemGroup>
 </Project>
