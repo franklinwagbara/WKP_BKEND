@@ -86,7 +86,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 using (SqlConnection conn = new SqlConnection(_configuration["Data:Wkpconnect:ConnectionString"]))
                 {
                     await conn.OpenAsync();
-                    string query0 = $"ALTER TABLE dbo.ApplicationProccesses ADD ProcessStatus nvarchar(500) NULL;";
+                    string query0 = $"ALTER TABLE dbo.MyDesks ADD ProcessStatus nvarchar(500) NULL;";
                     SqlCommand cmd0 = new SqlCommand(query0, conn);
                     var reader = await cmd0.ExecuteReaderAsync();
 
