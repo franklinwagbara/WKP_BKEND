@@ -86,7 +86,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 using (SqlConnection conn = new SqlConnection("Server=tcp:staging-servers.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=serveradmin;Password=*123*brandonetech#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
                 {
                     await conn.OpenAsync();
-                    string query0 = $"INSERT INTO [dbo].[ApplicationCategories] ([Name], [DeleteStatus]) VALUES('Old', 0);";
+                    string query0 = $"ALTER TABLE dbo.ApplicationProccesses ADD ProcessStatus nvarchar(500) NULL;";
                     SqlCommand cmd0 = new SqlCommand(query0, conn);
                     var reader = await cmd0.ExecuteReaderAsync();
 
