@@ -682,7 +682,7 @@ namespace Backend_UMR_Work_Program.Controllers
 			{
 				return BadRequest(new
 				{
-					message = "Error : "  + a
+					message = "Error : "  + e.Message
 				});
 			}
 		}
