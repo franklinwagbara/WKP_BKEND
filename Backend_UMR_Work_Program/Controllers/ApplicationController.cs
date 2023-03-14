@@ -558,6 +558,7 @@ namespace Backend_UMR_Work_Program.Controllers
 		[HttpPost("SubmitApplication")]
 		public async Task<object> SubmitApplication(string year, string omlName, string fieldName)
 		{
+			
 			try
 			{
 				int yearID = Convert.ToInt32(year);
@@ -571,6 +572,7 @@ namespace Backend_UMR_Work_Program.Controllers
 				
 				if (applicationProcesses.Count <= 0)
 				{
+					
 					return BadRequest(new { message = "An error occured while trying to get process flow for this application." });
 				}
 
@@ -584,16 +586,20 @@ namespace Backend_UMR_Work_Program.Controllers
 				else
 				{
 					app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id).FirstOrDefaultAsync();
+				
 				}
 
 				if(app != null)
 				{
+					
                     return BadRequest(new { message = $"Error : An application for the Concession {omlName}, and Field Name {field.Field_Name} for the year {year} has already been submitted." });
                 }
 
 				Application application = new Application();
 				application.ReferenceNo = _helpersController.Generate_Reference_Number();
+				
 				application.YearOfWKP = yearID;
+				
 				application.ConcessionID = concession.Consession_Id;
 				application.FieldID = field?.Field_ID ??  null;
 				application.CompanyID = (int)WKPCompanyNumber;
@@ -602,10 +608,13 @@ namespace Backend_UMR_Work_Program.Controllers
 				application.CategoryID = _context.ApplicationCategories.Where(x => x.Name == GeneralModel.New).FirstOrDefault().Id;
 				application.Status = GeneralModel.Processing;
 				application.PaymentStatus = GeneralModel.PaymentPending;
+				
 				application.CurrentDesk = applicationProcesses.FirstOrDefault().RoleID; //to change
+				
 				application.Submitted = true;
 				application.CreatedAt = DateTime.Now;
 				application.SubmittedAt = DateTime.Now;
+				
 				_context.Applications.Add(application);
 
 				if (_context.SaveChanges() > 0)
@@ -618,6 +627,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
 					var staffList = await _helpersController.GetReviewerStafff(applicationProcesses);
+					
 					//foreach (var item in applicationProcesses)
 					//{
 					//	staffLists=_context.staff.Where(x => x.Staff_SBU==item.TargetedToSBU && x.RoleID==item.TargetedToRole).ToList();
@@ -644,11 +654,16 @@ namespace Backend_UMR_Work_Program.Controllers
 											where stf.StaffID == staff.StaffID && stf.DeleteStatus != true
 											select stf).FirstOrDefault();
 
+											
+
 							string content2 = $"{WKPCompanyName} have submitted their WORK PROGRAM application for year {year}.";
 
 							var emailMsg2 = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject2, content2, "Staff");
 
+							
+
 							var sendEmail2 = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg2, null);
+							
 
 							_helpersController.LogMessages("Submission of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
 
@@ -660,10 +675,21 @@ namespace Backend_UMR_Work_Program.Controllers
 					}
 					//send mail to company
 					string subject = $"{year} submission of WORK PROGRAM application for field - {field?.Field_Name} : {application.ReferenceNo}";
+				
+				
+				
 					string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
 					var emailMsg = _helpersController.SaveMessage(application.Id, (int)WKPCompanyNumber, subject, content, "Company");
+				
+				
+
 					var sendEmail = _helpersController.SendEmailMessage(WKPCompanyEmail, WKPCompanyName, emailMsg, null);
+
+
+
 					var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.";
+					
+
 					return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
 
 				}
@@ -676,8 +702,8 @@ namespace Backend_UMR_Work_Program.Controllers
 			{
 				return BadRequest(new
 				{
-					message = "Error : " + e.ToString()
-				}) ; 
+					message = "Error : " + e.Message
+				});
 			}
         }
 

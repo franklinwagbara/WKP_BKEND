@@ -623,4 +623,3 @@ GO
 
 ALTER TABLE dbo.MyDesks ADD
 	LastJobDate datetime NULL
-
