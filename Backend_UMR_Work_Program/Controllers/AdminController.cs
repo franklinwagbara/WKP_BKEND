@@ -427,18 +427,42 @@ namespace Backend_UMR_Work_Program.Controllers
 
 				if (checkUser != null)
 				{
-					bool deleted = checkUser.DELETED_STATUS == "DELETED" ? true : false;
-					bool activated = checkUser.STATUS_ == "Activated" ? true : false;
+					var staff = await (from s in _context.staff where s.StaffEmail.Equals(userModel.EMAIL.ToLower()) select s).FirstOrDefaultAsync();
+                    string errMsg = $"User details with '{userModel.EMAIL}' is already existing on the portal.";
 
-					string errMsg = $"User details with '{userModel.EMAIL}' is already existing on the portal.";
+                    if (staff != null)
+                    {
+                        bool deleted = checkUser.DELETED_STATUS == "DELETED" ? true : false;
+                        bool activated = checkUser.STATUS_ == "Activated" ? true : false;
 
-					if (deleted == true)
-						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been deleted on the portal, kindly restore account information.";
+                        if (deleted == true)
+                            errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been deleted on the portal, kindly restore account information.";
 
-					if (activated != true)
-						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been de-activated on the portal, kindly activate account information.";
+                        if (activated != true)
+                            errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been de-activated on the portal, kindly activate account information.";
+                        
+                    }
+					else
+					{
+                        staff = new staff()
+                        {
+                            AdminCompanyInfo_ID = checkUser.Id,
+                            StaffElpsID = userModel.ELPS_ID.ToString(),
+                            Staff_SBU = userModel.SBU_ID,
+                            RoleID = userModel.ROLE_ID,
+                            LocationID = 1,
+                            StaffEmail = checkUser.EMAIL,
+                            FirstName = userModel.NAME.Split(",")[0],
+                            LastName = userModel.NAME.Split(",").Count() > 1 ? userModel.NAME.Split(",")[0] : "",
+                            CreatedAt = DateTime.Now,
+                            ActiveStatus = true,
+                            DeleteStatus = false,
+                        };
 
-					return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
+                        await _context.staff.AddAsync(staff);
+                        int saved = await _context.SaveChangesAsync();
+                    }
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
 
 				}
 				else
