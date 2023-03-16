@@ -22,5 +22,8 @@
 		public int? DeletedBy { get; set; }
 		public bool? DeleteStatus { get; set; }
 		public DateTime? DeletedAt { get; set; }
+
+		//To track application processing stages
+		//public string ProcessingStage { get; set; } = null!;
 	}
 }

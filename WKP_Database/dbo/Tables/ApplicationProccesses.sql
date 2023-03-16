@@ -20,9 +20,3 @@
     CONSTRAINT [PK_WorkProccess_] PRIMARY KEY CLUSTERED ([ProccessID] ASC)
 );
 
-
-
-
-
-
-

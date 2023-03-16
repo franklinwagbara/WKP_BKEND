@@ -16,7 +16,3 @@
     CONSTRAINT [PK_Royalty] PRIMARY KEY CLUSTERED ([Royalty_ID] ASC)
 );
 
-
-
-
-

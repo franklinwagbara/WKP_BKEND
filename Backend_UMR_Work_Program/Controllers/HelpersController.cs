@@ -3,6 +3,8 @@ using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Models;
+using Backend_UMR_Work_Program.Models.Enurations;
+//using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -2819,34 +2821,27 @@ generate:
 		//	}
 		//}
 
-		public int RecordStaffDesks(int appID, staff staff, string companyEmail)
+		public int RecordStaffDesks(int appID, staff staff, int FromStaffID, int FromStaffSBU, int FromStaffRoleID, int processID)
 		{
 			try
 			{
 				//if (appProcess != null)
 				//{
+
 				MyDesk drop = new MyDesk()
-
 				{
-
-					//ProcessID = appProcess.ProccessID,
-
+					ProcessID = processID,
 					//Sort = (int)appProcess.Sort,
-
 					AppId = appID,
-
 					StaffID = staff.StaffID,
-
-					FromStaffID = companyEmail,
-
-					FromSBU = (int)staff.Staff_SBU,
-					FromRoleId=(int)staff.RoleID,
-					HasWork = false,
-
+					FromStaffID = FromStaffID,
+					FromSBU = FromStaffSBU,
+					FromRoleId= FromStaffRoleID,
+					HasWork = true,
 					HasPushed = false,
-
-					CreatedAt = DateTime.Now
-
+					CreatedAt = DateTime.Now,
+					ProcessStatus = STAFF_DESK_STATUS.SUBMISSION,
+					LastJobDate = DateTime.Now,
 				};
 				_context.MyDesks.Add(drop);
 
@@ -2929,6 +2924,209 @@ generate:
 			}
 		}
 
+		public async Task<staff> GetStaffByStaffId(int staffId)
+		{
+			try
+			{
+				var getStaff = await _context.staff.FirstOrDefaultAsync(x => x.StaffID==staffId);
+				if (getStaff ==null)
+				{
+					return null;
+				}
+				return getStaff;
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
+
+
+		public async Task<MyDesk> GetStaffMyDesks(List<int> staffIds, int appId)
+		{
+			try
+			{
+				var staffDesks = new List<MyDesk>();
+
+				foreach (var staffId in staffIds)
+				{
+					var desk = _context.MyDesks.Where(x => x.StaffID==staffId && x.AppId == appId && x.HasWork == false).FirstOrDefault();
+
+					if (desk !=null)
+					{
+						staffDesks.Add(desk);
+					}
+					else
+					{
+						var newDesk = new MyDesk
+						{
+							//save staff desk
+							StaffID = staffId,
+							AppId = appId,
+							HasPushed = false,
+							HasWork = false,
+							CreatedAt = DateTime.Now,
+							//UpdatedAt = DateTime.Now,
+							//Comment="",
+							//LastJobDate= DateTime.Now,
+						};
+
+						_context.MyDesks.Add(newDesk);
+
+						var savedDesk = await _context.SaveChangesAsync();
+
+						staffDesks.Add(newDesk);
+					}
+
+				}
+				return staffDesks.OrderByDescending(x => x.LastJobDate).FirstOrDefault();
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
+
+		public async Task<int> GetDeskIdByStaffIdAndAppId(int staffId, int appId)
+		{
+			try
+			{
+				var getDesk = await _context.MyDesks.Where(x => x.StaffID==staffId && x.AppId==appId).Select(x => x.DeskID).FirstOrDefaultAsync();
+				if (getDesk >0)
+				{
+					return getDesk;
+				}
+				return 0;
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
+
+		public async Task<int> DeleteDeskIdByDeskId(int deskId)
+		{
+			try
+			{
+				var getDesk = _context.MyDesks.Where(x => x.DeskID==deskId).FirstOrDefault();
+				if (getDesk !=null)
+				{
+
+					_context.MyDesks.Remove(getDesk);
+					var save = await _context.SaveChangesAsync();
+
+					if (save>0)
+					{
+						return 1;
+					}
+
+				}
+				return 0;
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
+
+		public async Task<MyDesk> UpdateDeskAfterPush(MyDesk desk, string? comment, string? processStatus)
+		{
+			try
+			{
+                desk.HasPushed = true;
+                desk.HasWork = false;
+                desk.UpdatedAt = DateTime.Now;
+                desk.Comment = comment;
+                desk.ProcessStatus = processStatus;
+
+				_context.MyDesks.Update(desk);
+
+				return desk;
+            }
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
+
+        public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
+        {
+            try
+            {
+                desk.HasPushed = false;
+                desk.HasWork = false;
+                desk.UpdatedAt = DateTime.Now;
+                desk.Comment = comment;
+                desk.ProcessStatus = processStatus;
+
+                _context.MyDesks.Update(desk);
+
+                return desk;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public async Task<MyDesk> UpdateDeskAfterMove(MyDesk desk, string? comment, string? processStatus)
+        {
+            try
+            {
+                desk.HasPushed = false;
+                desk.HasWork = false;
+                desk.UpdatedAt = DateTime.Now;
+                desk.Comment = comment;
+                desk.ProcessStatus = processStatus;
+
+                _context.MyDesks.Update(desk);
+
+                return desk;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public async Task<List<int>> GetStaffByTargetRoleAndSBU(int targetedToRole, int targetedToSBU)
+		{
+			try
+			{
+				var getstaffs = await _context.staff.Where(x => x.RoleID==targetedToRole && x.Staff_SBU==targetedToSBU && x.DeleteStatus !=true).Select(x => x.StaffID).ToListAsync();
+
+				return getstaffs;
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+		}
+
+		public async Task<List<ApplicationProccess>> GetApplicationProccessBySBUAndRole(string processAction, int triggeredByRole = 0, int triggeredBySBU = 0)
+		{
+			try
+			{
+
+				var applicationProcess = await _context.ApplicationProccesses.Where(x => x.TriggeredByRole==triggeredByRole && x.TriggeredBySBU==triggeredBySBU && x.ProcessAction==processAction && x.DeleteStatus !=true).ToListAsync();
+
+				return applicationProcess;
+
+			}
+			catch (Exception e)
+			{
+				throw e;
+			}
+		}
+
 		public async Task<List<staff>> GetReviewerStafff(List<ApplicationProccess> applicationProccesses)
 		{
 			try
@@ -2936,7 +3134,44 @@ generate:
 				var staffLists = new List<staff>();
 				foreach (var item in applicationProccesses)
 				{
-					staffLists=_context.staff.Where(x => x.Staff_SBU==item.TargetedToSBU && x.RoleID==item.TargetedToRole).ToList();
+                    //var temp = await _context.staff.Where(x => x.Staff_SBU==item.TargetedToSBU && x.RoleID==item.TargetedToRole).FirstOrDefaultAsync();
+                    var staffs = await _context.staff.Where(x => x.Staff_SBU == item.TargetedToSBU && x.RoleID == item.TargetedToRole).ToListAsync();
+
+					if(staffs.Count <= 0)
+					{
+						break;
+					}
+
+					var isFound = false;
+					var choosenStaff = staffs.Count > 0? staffs[0]: new staff();
+					var choosenDesk = new MyDesk()
+					{
+						LastJobDate = DateTime.Now,
+					};
+
+					foreach(var staff in staffs)
+					{
+                        //var desk = (from stf in _context.staff
+                        //            join dsk in _context.MyDesks on stf.StaffID equals dsk.StaffID
+                        //            where stf.Staff_SBU == item.TargetedToSBU && stf.RoleID == item.TargetedToRole
+                        //            select dsk).OrderBy(d => d.LastJobDate).FirstOrDefault();
+
+						var desk = await _context.MyDesks.Where<MyDesk>(d => d.StaffID == staff.StaffID && d.HasWork == true).FirstOrDefaultAsync();
+
+						if(desk == null)
+						{
+							staffLists.Add(staff);
+							isFound = true;
+							break;
+						}
+
+						choosenStaff = desk.LastJobDate < choosenDesk.LastJobDate ? staff : choosenStaff;
+                    }
+
+					if (!isFound)
+					{
+						staffLists.Add(choosenStaff);
+					}
 				}
 				return staffLists;
 			}
@@ -3070,9 +3305,10 @@ generate:
 				//StaffEmail = getStaff.StaffEmail,
 				AppId = appid,
 				StaffID = staffid,
-				Comment = comment,
+				Comment = comment == null ? "": comment,
 				Status = status,
-				CreatedAt = DateTime.Now
+				CreatedAt = DateTime.Now,
+				ActionDate = DateTime.Now,
 			};
 
 			_context.ApplicationDeskHistories.Add(appDeskHistory);
@@ -3089,7 +3325,8 @@ generate:
 				StaffID = staffid,
 				Comment = comment,
 				Status = status,
-				CreatedAt = DateTime.Now
+				CreatedAt = DateTime.Now,
+				ActionDate = DateTime.Now,
 			};
 
 			_context.ApplicationDeskHistories.Add(appDeskHistory);

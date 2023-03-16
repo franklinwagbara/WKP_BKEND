@@ -415,6 +415,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 		
 		//Added by Musa
+		[AllowAnonymous]
 		[HttpPost("CREATE_USER_NEW")]
 		public async Task<WebApiResponse> CreateUserNew([FromBody] ADMIN_COMPANY_INFORMATION_Model userModel)
 		{
@@ -507,7 +508,7 @@ repeat:
 							LocationID = 1,
 							StaffEmail = data.EMAIL,
 							FirstName = userModel.NAME.Split(",")[0],
-							LastName = userModel.NAME.Split(",")[1],
+							LastName = userModel.NAME.Split(",").Count() > 1 ? userModel.NAME.Split(",")[0] : "",
 							CreatedAt = DateTime.Now,
 							ActiveStatus = true,
 							DeleteStatus = false,
@@ -821,7 +822,103 @@ repeat:
 			}
 		}
 
-		[HttpPost("UPDATE_COMPANY_INFORMATION_BY_ACCESSCODE")]
+        [HttpGet("GET_STAFF_SBU_ROLE")]
+        public async Task<WebApiResponse> GET_STAFF_SBU_ROLE(string email)
+        {
+            try
+            {
+				var result = await (from staff in _context.staff
+                                   join sbu in _context.StrategicBusinessUnits on staff.Staff_SBU equals sbu.Id
+                                   join role in _context.Roles on staff.RoleID equals role.id
+                                   where staff.StaffEmail == email && staff.DeleteStatus != true
+                                   select new StaffSBURoleModel
+                                   {
+                                       Staff = staff,
+									   SBU = sbu,
+                                       Role = role,
+                                   }).FirstOrDefaultAsync();
+
+                if (result != null)
+                {
+					//var data = _mapper.Map<StaffSBURoleModel>(result);
+
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Success", Data = result, StatusCode = ResponseCodes.Success };
+                }
+				else
+                {
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = $"Error: User information was not found.", StatusCode = ResponseCodes.Failure };
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        [HttpGet("GET_STAFFS")]
+        public async Task<WebApiResponse> GET_STAFFS(string email)
+        {
+            try
+            {
+                var result = await (from staff in _context.staff
+                                    join sbu in _context.StrategicBusinessUnits on staff.Staff_SBU equals sbu.Id
+                                    join role in _context.Roles on staff.RoleID equals role.id
+                                    where staff.DeleteStatus != true
+                                    select new StaffSBURoleModel
+                                    {
+                                        Staff = staff,
+                                        SBU = sbu,
+                                        Role = role,
+                                    }).ToListAsync();
+
+                if (result != null)
+                {
+                    //var data = _mapper.Map<StaffSBURoleModel>(result);
+
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Success", Data = result, StatusCode = ResponseCodes.Success };
+                }
+                else
+                {
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = $"Error: User information was not found.", StatusCode = ResponseCodes.Failure };
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        [HttpGet("GET_STAFFS_BY_SBU_ROLE")]
+        public async Task<WebApiResponse> GET_STAFFS_BY_SBU_ROLE(int SBU_ID, int RoleID)
+        {
+            try
+            {
+                var result = await _context.staff.Where<staff>(s => s.Staff_SBU == SBU_ID && s.RoleID == RoleID && s.DeleteStatus != true).ToListAsync();
+
+                if (result != null)
+                {
+                    //var data = _mapper.Map<StaffSBURoleModel>(result);
+
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Success", Data = result, StatusCode = ResponseCodes.Success };
+                }
+                else
+                {
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = $"Error: User information was not found.", StatusCode = ResponseCodes.Failure };
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        [HttpPost("UPDATE_COMPANY_INFORMATION_BY_ACCESSCODE")]
 		public async Task<ADMIN_COMPANY_INFORMATION> UPDATE_COMPANY_INFORMATION_BY_ACCESSCODE(ADMIN_COMPANY_CODE companyCode)
 		{
 			try

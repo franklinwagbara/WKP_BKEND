@@ -19,6 +19,7 @@
     [DeletedAt]        DATETIME       NULL,
     [FlowStageId]      INT            NULL,
     [CurrentUserEmail] NVARCHAR (100) NULL,
+    [ProcessingStage]  NCHAR (100)    NULL,
     CONSTRAINT [PK_Applications] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

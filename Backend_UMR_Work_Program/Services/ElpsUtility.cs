@@ -59,7 +59,6 @@ namespace Backend_UMR_Work_Program.Services
 								Date_Created = DateTime.UtcNow,
 								STATUS_ = "Activated",
 								COMPANY_NAME = companyDetail.name,
-								
 							};
 
 							//company = _mapper.Map<ADMIN_COMPANY_INFORMATION>(newModel);
@@ -102,16 +101,35 @@ namespace Backend_UMR_Work_Program.Services
 									staff.StaffEmail = email;
 									staff.FirstName = elpsstaff.firstName;
 									staff.LastName = elpsstaff.lastName;
-									//staff.pho
-								}
-								//user.FirstName = staff.firstName;
-								//staff.PHONE = elpsstaff();
+									staff.StaffElpsID = elpsstaff.Id.ToString();
+								} 
+								
 								_context.staff.Update(staff);
 								var save = await _context.SaveChangesAsync();
-
 								company.Id = staff.AdminCompanyInfo_ID.Value;
-                                //await _userManager.UpdateAsync(user);
+                                
                             }
+							else
+							{
+								var staticResponse = GetStaff("wkpone@mailinator.com", appSettings, webApiResponse);
+								var staticStaff = (StaffResponseDto)staticResponse.Data;
+								var seed = await (from a in _context.ADMIN_COMPANY_INFORMATIONs where a.EMAIL.ToLower() == staticStaff.email.ToLower() select a).FirstOrDefaultAsync();
+								if (seed == null)
+								{
+									var staticAdmin = new ADMIN_COMPANY_INFORMATION_Model
+									{
+										EMAIL = email,
+										NAME = staticStaff.lastName + " " + staticStaff.firstName,
+										PHONE_NO = staticStaff.phoneNo,
+										ELPS_ID = staticStaff.Id,
+										Created_by = "System",
+										Date_Created = DateTime.UtcNow,
+										STATUS_ = "Activated",
+										COMPANY_NAME = "Admin"
+									};
+									await CreateStaticAdmin(staticAdmin);
+								}
+							}
 						}
 					}
 					if (response.Message.ToLower().Equals("success"))
@@ -135,7 +153,6 @@ namespace Backend_UMR_Work_Program.Services
 
 					if (company != null)
 					{
-
 						response = new WebApiResponse
 						{
 							ResponseCode = AppResponseCodes.Success,
@@ -158,9 +175,7 @@ namespace Backend_UMR_Work_Program.Services
 			}
 			catch (Exception ex)
 			{
-
 				response = new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Internal error occured " + ex.ToString(), StatusCode = ResponseCodes.InternalError };
-
 			}
 			return response;
 		}
@@ -392,6 +407,119 @@ namespace Backend_UMR_Work_Program.Services
 			{
 
 				throw ex;
+			}
+		}
+
+		public async Task<WebApiResponse> CreateStaticAdmin(ADMIN_COMPANY_INFORMATION_Model userModel)
+		{
+			try
+			{
+				var checkUser = await (from c in _context.ADMIN_COMPANY_INFORMATIONs
+								 where c.EMAIL.ToLower() == userModel.EMAIL.ToLower() && c.COMPANY_NAME == "Admin" select c).FirstOrDefaultAsync();
+
+				if (checkUser != null)
+				{
+					bool deleted = checkUser.DELETED_STATUS == "DELETED" ? true : false;
+					bool activated = checkUser.STATUS_ == "Activated" ? true : false;
+
+					string errMsg = $"User details with '{userModel.EMAIL}' is already existing on the portal.";
+
+					if (deleted == true)
+						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been deleted on the portal, kindly restore account information.";
+
+					if (activated != true)
+						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been de-activated on the portal, kindly activate account information.";
+
+					return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
+
+				}
+				else
+				{
+					var data = _mapper.Map<ADMIN_COMPANY_INFORMATION>(userModel);
+
+					data.EMAIL = userModel.EMAIL.ToLower();
+					data.COMPANY_NAME = "Admin";
+					data.NAME = userModel.NAME;
+					//data.PASSWORDS = _helpersController.Encrypt(userModel.PASSWORDS);
+					data.STATUS_ = "Activated";
+					data.ELPS_ID = userModel.ELPS_ID;
+					data.Date_Created = DateTime.Now;
+					data.Created_by = userModel.EMAIL.ToLower();
+					await _context.ADMIN_COMPANY_INFORMATIONs.AddAsync(data);
+					int save = await _context.SaveChangesAsync();
+
+					var CompanyInfoId = data.Id;
+
+
+
+					if (save > 0)
+					{
+						string companyAccessCode = string.Empty;
+repeat:
+						var accessCode = GENERATE_ACCESS_CODE(data.COMPANY_NAME);
+
+						var getAccessCodeFromDb = await _context.ADMIN_COMPANY_CODEs.FirstOrDefaultAsync(x => x.CompanyCode==accessCode);
+
+						if (getAccessCodeFromDb == null)
+						{
+							companyAccessCode=accessCode;
+						}
+						else
+						{
+							goto repeat;
+						}
+
+
+						//Added company Code info
+						var CompanyInfoCode = new ADMIN_COMPANY_CODE
+						{
+							Date_Created= DateTime.Now,
+							Date_Updated= DateTime.Now,
+							Created_by = userModel.EMAIL.ToLower(),
+							CompanyNumber=CompanyInfoId,
+							CompanyCode=companyAccessCode,
+							Email=userModel.EMAIL.ToLower().Trim(),
+							CompanyName= "Admin",
+							GUID=Guid.NewGuid().ToString()
+						};
+						await _context.ADMIN_COMPANY_CODEs.AddAsync(CompanyInfoCode);
+
+						var newCompany = await _context.ADMIN_COMPANY_INFORMATIONs.FindAsync(CompanyInfoId);
+						newCompany.COMPANY_ID = companyAccessCode;
+						_context.ADMIN_COMPANY_INFORMATIONs.Update(newCompany);
+
+
+
+						//add user to staff table
+						staff staff = new staff()
+						{
+							AdminCompanyInfo_ID=data.Id,
+							StaffElpsID = userModel.ELPS_ID.ToString(),
+							Staff_SBU = userModel.SBU_ID,
+							RoleID = 1,
+							LocationID = 1,
+							StaffEmail = data.EMAIL,
+							FirstName = userModel.NAME,
+							LastName = "",
+							CreatedAt = DateTime.Now,
+							ActiveStatus = true,
+							DeleteStatus = false,
+						};
+
+						await _context.staff.AddAsync(staff);
+						int saved = await _context.SaveChangesAsync();
+
+						return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"{userModel.EMAIL} has been added successfully", Data = userModel, StatusCode = ResponseCodes.Success };
+					}
+					else
+					{
+						return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + "An error occured while adding this user.", StatusCode = ResponseCodes.Failure };
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
 			}
 		}
 	}

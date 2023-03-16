@@ -427,7 +427,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     else
                     {
-                        return BadRequest(new { message = "Error : No report summary has been configured yet." });
+                        return new ADMIN_WORK_PROGRAM_REPORTs_Model();
                     }
                 }
                 else

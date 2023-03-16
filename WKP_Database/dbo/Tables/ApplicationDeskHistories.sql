@@ -17,7 +17,3 @@
     CONSTRAINT [PK_ApplicationDeskHistories] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
-
-
-
-
