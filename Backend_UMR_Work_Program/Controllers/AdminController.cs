@@ -463,7 +463,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         int saved = await _context.SaveChangesAsync();
                     }
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
-                }
+
+				}
 				else
 				{
 					var data = _mapper.Map<ADMIN_COMPANY_INFORMATION>(userModel);
