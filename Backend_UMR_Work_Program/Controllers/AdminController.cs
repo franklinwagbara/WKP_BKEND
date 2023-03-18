@@ -427,18 +427,42 @@ namespace Backend_UMR_Work_Program.Controllers
 
 				if (checkUser != null)
 				{
-					bool deleted = checkUser.DELETED_STATUS == "DELETED" ? true : false;
-					bool activated = checkUser.STATUS_ == "Activated" ? true : false;
+					var staff = await (from s in _context.staff where s.StaffEmail.Equals(userModel.EMAIL.ToLower()) select s).FirstOrDefaultAsync();
+                    string errMsg = $"User details with '{userModel.EMAIL}' is already existing on the portal.";
 
-					string errMsg = $"User details with '{userModel.EMAIL}' is already existing on the portal.";
+                    if (staff != null)
+                    {
+                        bool deleted = checkUser.DELETED_STATUS == "DELETED" ? true : false;
+                        bool activated = checkUser.STATUS_ == "Activated" ? true : false;
 
-					if (deleted == true)
-						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been deleted on the portal, kindly restore account information.";
+                        if (deleted == true)
+                            errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been deleted on the portal, kindly restore account information.";
 
-					if (activated != true)
-						errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been de-activated on the portal, kindly activate account information.";
+                        if (activated != true)
+                            errMsg = $"User details with '{userModel.EMAIL}' is already existing, but the account has been de-activated on the portal, kindly activate account information.";
+                        
+                    }
+					else
+					{
+                        staff = new staff()
+                        {
+                            AdminCompanyInfo_ID = checkUser.Id,
+                            StaffElpsID = userModel.ELPS_ID.ToString(),
+                            Staff_SBU = userModel.SBU_ID,
+                            RoleID = userModel.ROLE_ID,
+                            LocationID = 1,
+                            StaffEmail = checkUser.EMAIL,
+                            FirstName = userModel.NAME.Split(",")[0],
+                            LastName = userModel.NAME.Split(",").Count() > 1 ? userModel.NAME.Split(",")[0] : "",
+                            CreatedAt = DateTime.Now,
+                            ActiveStatus = true,
+                            DeleteStatus = false,
+                        };
 
-					return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
+                        await _context.staff.AddAsync(staff);
+                        int saved = await _context.SaveChangesAsync();
+                    }
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
 
 				}
 				else
@@ -458,28 +482,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
 					var CompanyInfoId = data.Id;
 
-
-
 					if (save > 0)
 					{
 						string companyAccessCode = string.Empty;
-repeat:
+						repeat:
 						var accessCode = GENERATE_ACCESS_CODE(data.COMPANY_NAME);
 
 						var getAccessCodeFromDb = await _context.ADMIN_COMPANY_CODEs.FirstOrDefaultAsync(x => x.CompanyCode==accessCode);
 
 						if (getAccessCodeFromDb == null)
-						{
-							companyAccessCode=accessCode;
-						}
-						else
-						{
-							goto repeat;
-						}
+                            companyAccessCode = accessCode;
+                        else
+                            goto repeat;
 
-
-						//Added company Code info
-						var CompanyInfoCode = new ADMIN_COMPANY_CODE
+                        //Added company Code info
+                        var CompanyInfoCode = new ADMIN_COMPANY_CODE
 						{
 							Date_Created= DateTime.Now,
 							Date_Updated= DateTime.Now,
@@ -495,7 +512,6 @@ repeat:
 						var newCompany = await _context.ADMIN_COMPANY_INFORMATIONs.FindAsync(CompanyInfoId);
 						newCompany.COMPANY_ID = companyAccessCode;
 						_context.ADMIN_COMPANY_INFORMATIONs.Update(newCompany);
-
 
 
 						//add user to staff table
@@ -520,18 +536,16 @@ repeat:
 						return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"{userModel.EMAIL} has been added successfully", Data = userModel, StatusCode = ResponseCodes.Success };
 					}
 					else
-					{
-						return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + "An error occured while adding this user.", StatusCode = ResponseCodes.Failure };
-					}
-				}
-			}
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + "An error occured while adding this user.", StatusCode = ResponseCodes.Failure };
+
+                }
+            }
 			catch (Exception e)
 			{
 				return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
 
 			}
 		}
-
 
         ////Added by Musa
         //[HttpPost("CREATE_USER_NEW")]
@@ -647,9 +661,6 @@ repeat:
 
         //    }
         //}
-
-
-
 
         [HttpPost("CREATE_USER")]
 		public async Task<WebApiResponse> CreateUser([FromBody] ADMIN_COMPANY_INFORMATION_Model userModel)

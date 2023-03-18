@@ -13,7 +13,7 @@
     [Comment]       VARCHAR (MAX)  NULL,
     [FromRoleId]    INT            NULL,
     [LastJobDate]   DATETIME2 (7)  CONSTRAINT [DF_MyDesks_LastJobDate] DEFAULT (getdate()) NOT NULL,
-    [ProcessStatus] NVARCHAR (100) NULL,
+    [ProcessStatus] NVARCHAR (500) NULL,
     CONSTRAINT [PK_MyDesk_UT] PRIMARY KEY CLUSTERED ([DeskID] ASC)
 );
 
