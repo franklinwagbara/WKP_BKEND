@@ -27,6 +27,10 @@ public partial class HSE_ENVIRONMENTAL_STUDIES_NEW
 
     public string? Status_ { get; set; }
 
+    public string? Field_Name { get; set; }
+
+    public string? NUPRC_Approval_Status { get; set; }
+
     public string? If_Ongoing { get; set; }
 
     public string? Created_by { get; set; }
