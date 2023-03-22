@@ -21,6 +21,8 @@
     [COMPANY_ID]                VARCHAR (100)  NULL,
     [CompanyNumber]             INT            NULL,
     [Field_ID]                  INT            NULL,
+    [Field_Name] NVARCHAR(MAX) NULL, 
+    [NUPRC_Approval_Status] NVARCHAR(100) NULL, 
     CONSTRAINT [PK_HSE_ENVIRONMENTAL_STUDIES_NEW] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

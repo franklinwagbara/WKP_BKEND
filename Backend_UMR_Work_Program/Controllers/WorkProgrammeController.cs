@@ -1333,7 +1333,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSEClimateChange = await (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSESafetyCulture = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEOccupationalHealth = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    //  var HSEWasteManagementSystems = await (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    var HSEWasteManagementSystems = await (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEWastManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEEnvironmentalManagementSystems = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     //Added by Musa
@@ -1387,7 +1387,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         HSEClimateChange = HSEClimateChange,
                         HSESafetyCulture = HSESafetyCulture,
                         HSEOccupationalHealth = HSEOccupationalHealth,
-                        //   HSEWasteManagementSystems = HSEWasteManagementSystems,
+                        HSEWasteManagementSystems = HSEWasteManagementSystems,
                         HSEEnvironmentalManagementSystems = HSEEnvironmentalManagementSystems,
                         HSEOperationSafetyCases = HSEOPERATIONSSAFETYCASEs,
                         HSEEnvironmentalManagementPlans = HSEEnvironmentalMgtPlans,
@@ -2429,7 +2429,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         //added by Musa
-        [HttpPost("POST_HSE_OPERATIONS_SAFETY_CASE")]
+        [HttpPost("POST_HSE_OPERATIONS_SAFETY_CASE"), DisableRequestSizeLimit]
         public async Task<object> POST_HSE_OPERATIONS_SAFETY_CASE([FromForm] HSE_OPERATIONS_SAFETY_CASE operations_Sefety_Case_model, string omlName, string fieldName, string year, string actionToDo = null)
         {
 
@@ -2462,6 +2462,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     operations_Sefety_Case_model.Field_ID = concessionField?.Field_ID ?? null;
                     //operations_Sefety_Case_model.Actual_year = year;
                     //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
+
+                    #region file section
+                    var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                    var blobname1 = blobService.Filenamer(file1);
+
+                    if (file1 != null)
+                    {
+                        string docName = "Evidence of Operations Safety Case Approval";
+                        operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                        if (operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval == null)
+                            return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                        else
+                            operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = blobname1;
+                    }
+                    #endregion
 
                     if (action == GeneralModel.Insert)
                     {
@@ -7734,7 +7749,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpPost("POST_HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEW")]
         public async Task<object> POST_HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEW([FromBody] HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEW hse_technical_safety_model,
-            string omlName, string fieldName, string year, string id, string actionToDo)
+            string omlName, string fieldName, string year, int id, string actionToDo)
         {
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
@@ -7743,9 +7758,9 @@ namespace Backend_UMR_Work_Program.Controllers
             try
             {
 
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
-                    var getData = (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.Id == id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.Remove(getData);
@@ -7753,15 +7768,17 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else if (hse_technical_safety_model != null)
                 {
-                    List<HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEW> getData;
-                    if (concessionField?.Field_Name != null)
-                    {
-                        getData = await (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    }
-                    else
-                    {
-                        getData = await (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    }
+                    //List<HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEW> getData;
+                    //if (concessionField?.Field_Name != null)
+                    //{
+                    //    getData = await (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    //}
+                    //else
+                    //{
+                    //    getData = await (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    //}
+
+                    var getData = id > 0 ? _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.Where(x => x.Id == id).FirstOrDefault(): null;
 
 
                     hse_technical_safety_model.Companyemail = WKPCompanyEmail;
@@ -7778,9 +7795,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         //if (getData.Count() <= 0)
                         //{
-                        hse_technical_safety_model.Date_Created = DateTime.Now;
-                        hse_technical_safety_model.Created_by = WKPCompanyId;
-                        await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.AddAsync(hse_technical_safety_model);
+                        if (getData == null)
+                        {
+                            hse_technical_safety_model.Date_Created = DateTime.Now;
+                            hse_technical_safety_model.Created_by = WKPCompanyId;
+                            await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.AddAsync(hse_technical_safety_model);
+                        }
+                        else
+                        {
+                            hse_technical_safety_model.Date_Created = DateTime.Now;
+                            hse_technical_safety_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.Remove(getData);
+                            await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.AddAsync(hse_technical_safety_model);
+                        }
+
                         //}
                         //else
                         //{
@@ -7803,7 +7832,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     var All_Data = await (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                 }
@@ -10836,11 +10865,11 @@ namespace Backend_UMR_Work_Program.Controllers
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
-                if (!string.IsNullOrEmpty(id))
+                if (!string.IsNullOrEmpty(id) && action == GeneralModel.Delete)
                 {
                     var getData = (from c in _context.HSE_MANAGEMENT_POSITIONs where c.Id == int.Parse(id) select c).FirstOrDefault();
 
-                    if (action == GeneralModel.Delete)
+                    if (action == GeneralModel.Delete.ToLower())
                         _context.HSE_MANAGEMENT_POSITIONs.Remove(getData);
                     save += _context.SaveChanges();
                     //Added By Musa
@@ -10853,15 +10882,17 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (hse_management_model != null)
                 {
-                    List<HSE_MANAGEMENT_POSITION> getData;
-                    if (concessionField.Field_Name != null)
-                    {
-                        getData = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    }
-                    else
-                    {
-                        getData = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    }
+                    //List<HSE_MANAGEMENT_POSITION> getData;
+                    //if (concessionField.Field_Name != null)
+                    //{
+                    //    getData = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    //}
+                    //else
+                    //{
+                    //    getData = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    //}
+
+                    HSE_MANAGEMENT_POSITION getData = _context.HSE_MANAGEMENT_POSITIONs.Where(x => x.Id == int.Parse(id)).FirstOrDefault();
 
                     hse_management_model.Companyemail = WKPCompanyEmail;
                     hse_management_model.CompanyName = WKPCompanyName;
@@ -10904,9 +10935,23 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         // if (getData.Count <= 0)
                         // {
-                        hse_management_model.Date_Created = DateTime.Now;
-                        hse_management_model.Created_by = WKPCompanyId;
-                        await _context.HSE_MANAGEMENT_POSITIONs.AddAsync(hse_management_model);
+
+                        if(getData == null)
+                        {
+                            hse_management_model.Date_Created = DateTime.Now;
+                            hse_management_model.Created_by = WKPCompanyId;
+
+                            await _context.HSE_MANAGEMENT_POSITIONs.AddAsync(hse_management_model);
+                        }
+                        else
+                        {
+                            hse_management_model.Date_Created = DateTime.Now;
+                            hse_management_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_MANAGEMENT_POSITIONs.Remove(getData);
+                            await _context.HSE_MANAGEMENT_POSITIONs.AddAsync(hse_management_model);
+                        }
+                        
                         // }
                         // else
                         // {
@@ -10935,7 +10980,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(int.Parse(id) > 0 && action != GeneralModel.Delete ? GeneralModel.Update: action);
                     //var All_Data = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
@@ -10952,7 +10997,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_SAFETY_CULTURE_TRAINING"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_SAFETY_CULTURE_TRAINING([FromForm] HSE_SAFETY_CULTURE_TRAINING hse_safety_culture_model, string year, string omlName, string fieldName, string id, string actionToDo)
+        public async Task<object> POST_HSE_SAFETY_CULTURE_TRAINING([FromForm] HSE_SAFETY_CULTURE_TRAINING hse_safety_culture_model, string year, string omlName, string fieldName, int id, string actionToDo)
         {
 
             int save = 0;
@@ -10961,9 +11006,9 @@ namespace Backend_UMR_Work_Program.Controllers
             try
             {
 
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
-                    var getData = (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.Id == id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_SAFETY_CULTURE_TRAININGs.Remove(getData);
@@ -10971,15 +11016,18 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else if (hse_safety_culture_model != null)
                 {
-                    List<HSE_SAFETY_CULTURE_TRAINING> getData;
-                    if (concessionField.Field_Name != null)
-                    {
-                        getData = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    }
-                    else
-                    {
-                        getData = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    }
+                    //List<HSE_SAFETY_CULTURE_TRAINING> getData;
+                    //if (concessionField.Field_Name != null)
+                    //{
+                    //    getData = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    //}
+                    //else
+                    //{
+                    //    getData = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    //}
+
+                    var getData = id > 0 ? _context.HSE_SAFETY_CULTURE_TRAININGs.Where(x => x.Id == id).FirstOrDefault() : null;
+
 
                     hse_safety_culture_model.Companyemail = WKPCompanyEmail;
                     hse_safety_culture_model.CompanyName = WKPCompanyName;
@@ -11075,9 +11123,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         // if (getData.Count <= 0)
                         // {
-                        hse_safety_culture_model.Date_Created = DateTime.Now;
-                        hse_safety_culture_model.Created_by = WKPCompanyId;
-                        await _context.HSE_SAFETY_CULTURE_TRAININGs.AddAsync(hse_safety_culture_model);
+
+                        if(getData == null)
+                        {
+                            hse_safety_culture_model.Date_Created = DateTime.Now;
+                            hse_safety_culture_model.Created_by = WKPCompanyId;
+                            await _context.HSE_SAFETY_CULTURE_TRAININGs.AddAsync(hse_safety_culture_model);
+                        }
+                        else
+                        {
+                            hse_safety_culture_model.Date_Created = DateTime.Now;
+                            hse_safety_culture_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_SAFETY_CULTURE_TRAININGs.Remove(getData);
+                            await _context.HSE_SAFETY_CULTURE_TRAININGs.AddAsync(hse_safety_culture_model);
+                        }
                         // }
                         // else
                         // {
@@ -11107,7 +11167,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
@@ -11432,17 +11492,18 @@ namespace Backend_UMR_Work_Program.Controllers
         // }
 
         [HttpPost("POST_HSE_OCCUPATIONAL_HEALTH_MANAGEMENT"), DisableRequestSizeLimit]
-        public async Task<WebApiResponse> POST_HSE_OCCUPATIONAL_HEALTH_MANAGEMENT([FromForm] HSE_OCCUPATIONAL_HEALTH_MANAGEMENT hse_occupational_model, string omlName, string fieldName, string year, string id, string actionToDo)
+        public async Task<WebApiResponse> POST_HSE_OCCUPATIONAL_HEALTH_MANAGEMENT([FromForm] HSE_OCCUPATIONAL_HEALTH_MANAGEMENT hse_occupational_model, string omlName, string fieldName, string year, int id, string actionToDo)
         {
 
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
-                    var getData = (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.Id == id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.Remove(getData);
@@ -11450,15 +11511,17 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else if (hse_occupational_model != null)
                 {
-                    HSE_OCCUPATIONAL_HEALTH_MANAGEMENT getData;
-                    if (concessionField.Field_Name != null)
-                    {
-                        getData = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
-                    else
-                    {
-                        getData = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
+                    //HSE_OCCUPATIONAL_HEALTH_MANAGEMENT getData;
+                    //if (concessionField.Field_Name != null)
+                    //{
+                    //    getData = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    //}
+                    //else
+                    //{
+                    //    getData = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    //}
+
+                    var getData = id > 0 ? _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.Where(x => x.Id == id).FirstOrDefault() : null;
 
                     hse_occupational_model.Companyemail = WKPCompanyEmail;
                     hse_occupational_model.CompanyName = WKPCompanyName;
@@ -11509,9 +11572,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         //if (getData == null)
                         //{
-                        hse_occupational_model.Date_Created = DateTime.Now;
-                        hse_occupational_model.Created_by = WKPCompanyId;
-                        await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.AddAsync(hse_occupational_model);
+
+                        if(getData == null)
+                        {
+                            hse_occupational_model.Date_Created = DateTime.Now;
+                            hse_occupational_model.Created_by = WKPCompanyId;
+                            await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.AddAsync(hse_occupational_model);
+                        }
+                        else
+                        {
+                            hse_occupational_model.Date_Created = DateTime.Now;
+                            hse_occupational_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.Remove(getData);
+                            await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.AddAsync(hse_occupational_model);
+                        }
                         //}
                         //else
                         //{
@@ -11532,7 +11607,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }

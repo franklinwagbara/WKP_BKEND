@@ -51,7 +51,8 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection("Server=tcp:staging-servers.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=serveradmin;Password=*123*brandonetech#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
+                var dell = _configuration["Data:Wkpconnect:ConnectionString"];
+                using (SqlConnection conn = new SqlConnection(_configuration["Data:Wkpconnect:ConnectionString"]))
                 {
                     await conn.OpenAsync();
                     string query0 = $"SELECT * FROM {tableName};";
@@ -76,17 +77,16 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-
-
         [HttpGet("AddData")]
         public async Task<string> AddSql()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection("Server=tcp:staging-servers.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=serveradmin;Password=*123*brandonetech#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
+                var dell = _configuration["Data:Wkpconnect:ConnectionString"];
+                using (SqlConnection conn = new SqlConnection(_configuration["Data:Wkpconnect:ConnectionString"]))
                 {
                     await conn.OpenAsync();
-                    string query0 = $"INSERT INTO [dbo].[ApplicationCategories] ([Name], [DeleteStatus]) VALUES('Old', 0);";
+                    string query0 = $"DELETE FROM dbo.MyDesks;";
                     SqlCommand cmd0 = new SqlCommand(query0, conn);
                     var reader = await cmd0.ExecuteReaderAsync();
 
@@ -100,6 +100,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
             }
         }
+
     }
 
 
