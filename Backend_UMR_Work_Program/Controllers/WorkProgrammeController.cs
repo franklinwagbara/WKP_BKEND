@@ -11184,17 +11184,18 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_QUALITY_CONTROL"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_QUALITY_CONTROL([FromForm] HSE_QUALITY_CONTROL hse_quality_model, string omlName, string fieldName, string year, string id, string actionToDo)
+        public async Task<object> POST_HSE_QUALITY_CONTROL([FromForm] HSE_QUALITY_CONTROL hse_quality_model, string omlName, string fieldName, string year, int id, string actionToDo)
         {
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
 
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
-                    var getData = (from c in _context.HSE_QUALITY_CONTROLs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_QUALITY_CONTROLs where c.Id == id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_QUALITY_CONTROLs.Remove(getData);
@@ -11202,15 +11203,17 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else if (hse_quality_model != null)
                 {
-                    HSE_QUALITY_CONTROL getData;
-                    if (concessionField.Field_Name != null)
-                    {
-                        getData = await (from c in _context.HSE_QUALITY_CONTROLs where c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
-                    else
-                    {
-                        getData = await (from c in _context.HSE_QUALITY_CONTROLs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
+                    //HSE_QUALITY_CONTROL getData;
+                    //if (concessionField.Field_Name != null)
+                    //{
+                    //    getData = await (from c in _context.HSE_QUALITY_CONTROLs where c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    //}
+                    //else
+                    //{
+                    //    getData = await (from c in _context.HSE_QUALITY_CONTROLs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    //}
+
+                    var getData = id > 0 ? _context.HSE_QUALITY_CONTROLs.Where(x => x.Id == id).FirstOrDefault() : null;
 
                     hse_quality_model.Companyemail = WKPCompanyEmail;
                     hse_quality_model.CompanyName = WKPCompanyName;
@@ -11223,8 +11226,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_quality_model.Field_ID = concessionField?.Field_ID ?? null;
 
                     #region file section
-                    var file1 = Request.Form.Files[0];
-                    var blobname1 = blobService.Filenamer(file1);
+                    var file1 = Request.Form.Files.Count > 0 ? Request.Form.Files[0] : null;
+                    var blobname1 = file1 != null? blobService.Filenamer(file1): null;
 
                     if (file1 != null)
                     {
@@ -11241,9 +11244,22 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         // if (getData == null)
                         // {
-                        hse_quality_model.Date_Created = DateTime.Now;
-                        hse_quality_model.Created_by = WKPCompanyId;
-                        await _context.HSE_QUALITY_CONTROLs.AddAsync(hse_quality_model);
+
+                        if(getData == null)
+                        {
+                            hse_quality_model.Date_Created = DateTime.Now;
+                            hse_quality_model.Created_by = WKPCompanyId;
+                            await _context.HSE_QUALITY_CONTROLs.AddAsync(hse_quality_model);
+                        }
+                        else
+                        {
+                            hse_quality_model.Date_Created = DateTime.Now;
+                            hse_quality_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_QUALITY_CONTROLs.Remove(getData);
+                            await _context.HSE_QUALITY_CONTROLs.AddAsync(hse_quality_model);
+                        }
+                        
                         // }
                         // else
                         // {
@@ -11267,7 +11283,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_QUALITY_CONTROLs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
@@ -11285,7 +11301,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_CLIMATE_CHANGE_AND_AIR_QUALITY"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_CLIMATE_CHANGE_AND_AIR_QUALITY([FromForm] HSE_CLIMATE_CHANGE_AND_AIR_QUALITY hse_climate_model, string omlName, string fieldName, string year, string id, string actionToDo)
+        public async Task<object> POST_HSE_CLIMATE_CHANGE_AND_AIR_QUALITY([FromForm] HSE_CLIMATE_CHANGE_AND_AIR_QUALITY hse_climate_model, string omlName, string fieldName, string year, int id, string actionToDo)
         {
 
             int save = 0;
@@ -11294,9 +11310,9 @@ namespace Backend_UMR_Work_Program.Controllers
             try
             {
 
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
-                    var getData = (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.Id == id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.Remove(getData);
@@ -11304,15 +11320,17 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else if (hse_climate_model != null)
                 {
-                    HSE_CLIMATE_CHANGE_AND_AIR_QUALITY getData;
-                    if (concessionField.Field_Name != null)
-                    {
-                        getData = (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefault();
-                    }
-                    else
-                    {
-                        getData = (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefault();
-                    }
+                    //HSE_CLIMATE_CHANGE_AND_AIR_QUALITY getData;
+                    //if (concessionField.Field_Name != null)
+                    //{
+                    //    getData = (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefault();
+                    //}
+                    //else
+                    //{
+                    //    getData = (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefault();
+                    //}
+
+                    var getData = id > 0 ? _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.Where(x => x.Id == id).FirstOrDefault() : null;
 
                     hse_climate_model.Companyemail = WKPCompanyEmail;
                     hse_climate_model.CompanyName = WKPCompanyName;
@@ -11325,8 +11343,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_climate_model.Field_ID = concessionField?.Field_ID ?? null;
 
                     #region file section
-                    var file1 = Request.Form.Files[0];
-                    var blobname1 = blobService.Filenamer(file1);
+                    var file1 = Request.Form.Files.Count > 0 ? Request.Form.Files[0] : null;
+                    var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
 
                     if (file1 != null)
                     {
@@ -11343,9 +11361,22 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         // if (getData == null)
                         // {
-                        hse_climate_model.Date_Created = DateTime.Now;
-                        hse_climate_model.Created_by = WKPCompanyId;
-                        await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.AddAsync(hse_climate_model);
+
+                        if(getData == null)
+                        {
+                            hse_climate_model.Date_Created = DateTime.Now;
+                            hse_climate_model.Created_by = WKPCompanyId;
+                            await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.AddAsync(hse_climate_model);
+                        }
+                        else
+                        {
+                            hse_climate_model.Date_Created = DateTime.Now;
+                            hse_climate_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.Remove(getData);
+                            await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.AddAsync(hse_climate_model);
+                        }
+                        
                         // }
                         // else
                         // {
@@ -11367,7 +11398,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
