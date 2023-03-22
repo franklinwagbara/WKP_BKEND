@@ -1,0 +1,4 @@
+https://dev.azure.com/nuprcdevops/WorkProgram/_git/WorkProgramBackend
+https://dev.azure.com/nuprcdevops/WorkProgram/_git/WorkProgramFrontend
+
+<add name="App_ConnectionString" providerName="system.data.sqlclient" connectionString="data source=tcp:workprogram.database.windows.net,1433;initial catalog=workprogram;integrated security=false;user id=workprogram;password=Br@nd0ne;encrypt=true;trustservercertificate=false;multipleactiveresultsets=true" />
