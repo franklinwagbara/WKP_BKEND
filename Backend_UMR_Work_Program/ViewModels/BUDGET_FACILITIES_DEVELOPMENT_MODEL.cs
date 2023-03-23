@@ -21,6 +21,8 @@
 
         public string? UpgradE_MAINTENANCE_planned { get; set; }
 
+        public string? FeeD_planned{get;set;}
+
     }
 
 
