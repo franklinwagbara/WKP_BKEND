@@ -2435,7 +2435,9 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            int Id = operations_Sefety_Case_model.Id;
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
 
@@ -2465,8 +2467,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
 
                     #region file section
-                    var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = blobService.Filenamer(file1);
+                    var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                    var blobname1 = file1 != null? blobService.Filenamer(file1): null;
 
                     if (file1 != null)
                     {
@@ -2476,6 +2478,10 @@ namespace Backend_UMR_Work_Program.Controllers
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
                             operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = blobname1;
+                    }
+                    else
+                    {
+                        operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = null;
                     }
                     #endregion
 
@@ -2507,7 +2513,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (save > 0)
                     {
-                        string successMsg = Messager.ShowMessage(action);
+                        string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                         //var All_Data = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                     }
@@ -10245,7 +10251,7 @@ namespace Backend_UMR_Work_Program.Controllers
             try
             {
 
-                if (id > 0)
+                if (id > 0 && action == GeneralModel.Delete)
                 {
                     var getData = (from c in _context.HSE_REMEDIATION_FUNDs where c.Id == id select c).FirstOrDefault();
 
@@ -10296,14 +10302,34 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_remediation_fund.evidenceOfPaymentFilename = blobname;
                         }
+                        else
+                        {
+                            hse_remediation_fund.evidenceOfPaymentPath = null;
+                            hse_remediation_fund.evidenceOfPaymentFilename = null;
+
+                        }
                         #endregion
+                    }
+                    else
+                    {
+                        hse_remediation_fund.evidenceOfPaymentPath = null;
+                        hse_remediation_fund.evidenceOfPaymentFilename = null; 
+
                     }
 
                     if (action == GeneralModel.Insert)
                     {
                         // if (getData == null)
                         // {
-                        await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
+                        if(getData == null)
+                        {
+                            await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
+                        }
+                        else
+                        {
+                            _context.HSE_REMEDIATION_FUNDs.Remove(getData);
+                            await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
+                        }
                         // }
                         // else
                         // {
@@ -10328,7 +10354,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_ID == WKPCompanyId && c.Year_of_WP == year && c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
@@ -11808,20 +11834,19 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_WASTE_MANAGEMENT_SYSTEM"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_WASTE_MANAGEMENT_SYSTEM([FromForm] HSE_WASTE_MANAGEMENT_SYSTEM hse_waste_model, string omlName, string fieldName, string year, string id, string actionToDo)
+        public async Task<object> POST_HSE_WASTE_MANAGEMENT_SYSTEM([FromForm] HSE_WASTE_MANAGEMENT_SYSTEM hse_waste_model, string omlName, string fieldName, string year, int id, string actionToDo)
         {
 
             int save = 0;
-            int Id = hse_waste_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
 
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
-                    var getData = (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.Id == id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_WASTE_MANAGEMENT_SYSTEMs.Remove(getData);
@@ -11851,10 +11876,10 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_waste_model.Field_ID = concessionField?.Field_ID ?? null;
 
                     #region file section
-                    var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var file2 = Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
-                    var blobname1 = blobService.Filenamer(file1);
-                    var blobname2 = blobService.Filenamer(file2);
+                    var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                    var file2 = Request.Form.Files.Count > 1 && Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
+                    var blobname1 = file1 != null? blobService.Filenamer(file1): null;
+                    var blobname2 = file2 != null? blobService.Filenamer(file2): null;
 
                     if (file1 != null)
                     {
@@ -11908,7 +11933,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     var All_Data = await (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
