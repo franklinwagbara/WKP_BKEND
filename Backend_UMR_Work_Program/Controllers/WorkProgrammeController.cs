@@ -9913,6 +9913,9 @@ namespace Backend_UMR_Work_Program.Controllers
                         // 	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Remove(getData);
                         // 	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.AddAsync(hse_sustainable_model);
                         // }
+                        save += await _context.SaveChangesAsync();
+
+
                     }
                     else if (action == GeneralModel.Delete)
                     {
