@@ -9806,21 +9806,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
+                        if (getData == null)
+                        {
                         hse_sustainable_model.Date_Created = DateTime.Now;
                         hse_sustainable_model.Created_by = WKPCompanyId;
                         await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
-                        // }
-                        // else
-                        // {
-                        // 	hse_sustainable_model.Date_Created = getData.Date_Created;
-                        // 	hse_sustainable_model.Created_by = getData.Created_by;
-                        // 	hse_sustainable_model.Date_Updated = DateTime.Now;
-                        // 	hse_sustainable_model.Updated_by = WKPCompanyId;
-                        // 	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Remove(getData);
-                        // 	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
-                        // }
+                        }
+                        else
+                        {
+                        	hse_sustainable_model.Date_Created = getData.Date_Created;
+                        	hse_sustainable_model.Created_by = getData.Created_by;
+                        	hse_sustainable_model.Date_Updated = DateTime.Now;
+                        	hse_sustainable_model.Updated_by = WKPCompanyId;
+                        	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Remove(getData);
+                        	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
+                        }
                     }
                     else if (action == GeneralModel.Delete)
                     {
