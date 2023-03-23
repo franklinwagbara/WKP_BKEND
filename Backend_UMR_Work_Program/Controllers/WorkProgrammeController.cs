@@ -6264,7 +6264,9 @@ namespace Backend_UMR_Work_Program.Controllers
                 DETAILED_ENGINEERING_planned = facilities_model.DetaileD_ENGINEERING_planned,
                 INSTALLATION_planned = facilities_model.InstallatioN_planned,
                 PROCUREMENT_planned = facilities_model.ProcuremenT_planned,
-                UPGRADE_MAINTENANCE_planned = facilities_model.UpgradE_MAINTENANCE_planned
+                UPGRADE_MAINTENANCE_planned = facilities_model.UpgradE_MAINTENANCE_planned,
+                FEED_planned=facilities_model.FeeD_planned
+             
             };
 
 
@@ -6557,11 +6559,11 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (concessionField.Field_Name != null)
                     {
-                        getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_Proposed==oil_gas_facility_model.Actual_Proposed select c).ToListAsync();
                     }
                     else
                     {
-                        getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_Proposed==oil_gas_facility_model.Actual_Proposed select c).ToListAsync();
                     }
                     //var getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_Proposed == oil_gas_facility_model.Actual_Proposed select c).ToListAsync();
 
@@ -6569,13 +6571,13 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_gas_facility_model.CompanyName = WKPCompanyName;
                     oil_gas_facility_model.COMPANY_ID = WKPCompanyId;
                     oil_gas_facility_model.CompanyNumber = WKPCompanyNumber;
-                    oil_gas_facility_model.Date_Updated = DateTime.Now;
-                    oil_gas_facility_model.Updated_by = WKPCompanyId;
+                    // oil_gas_facility_model.Date_Updated = DateTime.Now;
+                    // oil_gas_facility_model.Updated_by = WKPCompanyId;
                     oil_gas_facility_model.Year_of_WP = year;
                     oil_gas_facility_model.OML_Name = omlName;
                     oil_gas_facility_model.Field_ID = concessionField?.Field_ID ?? null;
-                    oil_gas_facility_model.Actual_year = year;
-                    oil_gas_facility_model.Proposed_year = (int.Parse(year) + 1).ToString();
+                   // oil_gas_facility_model.Actual_year = year;
+                  //  oil_gas_facility_model.Proposed_year = (int.Parse(year) + 1).ToString();
 
                     if (action == GeneralModel.Insert)
                     {
@@ -6587,8 +6589,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            //oil_gas_facility_model.Date_Created = getData.Date_Created;
-                            //oil_gas_facility_model.Created_by = getData.Created_by;
+                            oil_gas_facility_model.Date_Created = getData[0].Date_Created;
+                            oil_gas_facility_model.Created_by = getData[0].Created_by;
                             oil_gas_facility_model.Date_Updated = DateTime.Now;
                             oil_gas_facility_model.Updated_by = WKPCompanyId;
                             _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.RemoveRange(getData);
