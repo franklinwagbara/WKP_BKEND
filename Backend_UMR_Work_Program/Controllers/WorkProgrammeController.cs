@@ -2842,6 +2842,13 @@ namespace Backend_UMR_Work_Program.Controllers
                                     ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
 
                             }
+                            else
+                            {
+                                ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                                ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+
+                            }
+
                             if (file2 != null)
                             {
                                 string docName = "LDR Certificate";
@@ -2851,7 +2858,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                     return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                                 else
                                     ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname2;
-
                             }
                             else
                             {
@@ -9841,21 +9847,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                        if (getData == null)
-                        {
+                        // if (getData == null)
+                        // {
                         hse_sustainable_model.Date_Created = DateTime.Now;
                         hse_sustainable_model.Created_by = WKPCompanyId;
                         await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
-                        }
-                        else
-                        {
-                        	hse_sustainable_model.Date_Created = getData.Date_Created;
-                        	hse_sustainable_model.Created_by = getData.Created_by;
-                        	hse_sustainable_model.Date_Updated = DateTime.Now;
-                        	hse_sustainable_model.Updated_by = WKPCompanyId;
-                        	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Remove(getData);
-                        	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
-                        }
+                        // }
+                        // else
+                        // {
+                        // 	hse_sustainable_model.Date_Created = getData.Date_Created;
+                        // 	hse_sustainable_model.Created_by = getData.Created_by;
+                        // 	hse_sustainable_model.Date_Updated = DateTime.Now;
+                        // 	hse_sustainable_model.Updated_by = WKPCompanyId;
+                        // 	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Remove(getData);
+                        // 	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
+                        // }
                     }
                     else if (action == GeneralModel.Delete)
                     {
@@ -11950,7 +11956,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (hse_waste_model.WasteManagementPlanFilePath == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
-                            hse_waste_model.WasteManagementPlanFilename = blobname1;
+                            hse_waste_model.WasteManagementPlanFilename = blobname2;
                     }
 
                     #endregion
@@ -12072,7 +12078,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (hse_EMS_model.AUDITFilePath == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
-                            hse_EMS_model.AUDITFilename = blobname1;
+                            hse_EMS_model.AUDITFilename = blobname2;
                     }
                     #endregion
 
