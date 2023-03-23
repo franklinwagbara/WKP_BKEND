@@ -23,6 +23,9 @@
     [COMPANY_ID]                       VARCHAR (100)  NULL,
     [CompanyNumber]                    INT            NULL,
     [Field_ID]                         INT            NULL,
+    [Budget_Ngn]                       VARCHAR (500)  NULL,
     CONSTRAINT [PK_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
