@@ -6254,7 +6254,9 @@ namespace Backend_UMR_Work_Program.Controllers
                 DETAILED_ENGINEERING_planned = facilities_model.DetaileD_ENGINEERING_planned,
                 INSTALLATION_planned = facilities_model.InstallatioN_planned,
                 PROCUREMENT_planned = facilities_model.ProcuremenT_planned,
-                UPGRADE_MAINTENANCE_planned = facilities_model.UpgradE_MAINTENANCE_planned
+                UPGRADE_MAINTENANCE_planned = facilities_model.UpgradE_MAINTENANCE_planned,
+                FEED_planned=facilities_model.FeeD_planned
+             
             };
 
 
