@@ -5647,17 +5647,31 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_MONTHLY_ACTIVITIES_PROPOSED")]
-        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_MONTHLY_ACTIVITIES_PROPOSED([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED oil_condensate_monthly_model, string omlName, string fieldName, string year, string actionToDo)
+        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_MONTHLY_ACTIVITIES_PROPOSED([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED oil_condensate_monthly_model, string omlName, string fieldName, string year, string actionToDo, int id)
         {
 
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            string action = (String.IsNullOrWhiteSpace(actionToDo)) ? GeneralModel.Insert : actionToDo.Trim().ToLower();
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED getData;
 
             try
             {
-                OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED getData;
+
+                if (action == "delete" && id != null && id != 0)
+                {
+                    getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where c.Id == id select c).FirstOrDefaultAsync();
+                    _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Remove(getData);
+
+
+                }
+
+
+
+
+
                 #region Saving OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED data
-                if (oil_condensate_monthly_model != null)
+               else if (oil_condensate_monthly_model != null)
                 {
                     if (concessionField?.Field_Name != null)
                     {
@@ -5700,6 +5714,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Remove(getData);
                     }
+                }
 
                     save += await _context.SaveChangesAsync();
 
@@ -5713,7 +5728,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
                     }
-                }
+                
 
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
@@ -7229,21 +7244,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     //legal_litigation_model.Field_ID = concessionField?.Field_ID ?? null;
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
+                         if (getData == null)
+                        {
                         legal_litigation_model.Date_Created = DateTime.Now;
                         legal_litigation_model.Created_by = WKPCompanyId;
                         await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
-                        // }
-                        // else
-                        // {
-                        //     legal_litigation_model.Date_Created = getData.Date_Created;
-                        //     legal_litigation_model.Created_by = getData.Created_by;
-                        //     legal_litigation_model.Date_Updated = DateTime.Now;
-                        //     legal_litigation_model.Updated_by = WKPCompanyId;
-                        //     _context.LEGAL_LITIGATIONs.Remove(getData);
-                        //     await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
-                        // }
+                        }
+                        else
+                        {
+                            legal_litigation_model.Date_Created = getData.Date_Created;
+                            legal_litigation_model.Created_by = getData.Created_by;
+                            legal_litigation_model.Date_Updated = DateTime.Now;
+                            legal_litigation_model.Updated_by = WKPCompanyId;
+                            _context.LEGAL_LITIGATIONs.Remove(getData);
+                            await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
+                        }
                     }
                     else if (action == GeneralModel.Delete)
                     {
@@ -7303,21 +7318,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
+                         if (getData == null)
+                        {
                         legal_arbitration_model.Date_Created = DateTime.Now;
                         legal_arbitration_model.Created_by = WKPCompanyId;
                         await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
-                        // }
-                        // else
-                        // {
-                        //     legal_arbitration_model.Date_Created = getData.Date_Created;
-                        //     legal_arbitration_model.Created_by = getData.Created_by;
-                        //     legal_arbitration_model.Date_Updated = DateTime.Now;
-                        //     legal_arbitration_model.Updated_by = WKPCompanyId;
-                        //     _context.LEGAL_ARBITRATIONs.Remove(getData);
-                        //     await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
-                        // }
+                         }
+                        else
+                        {
+                            legal_arbitration_model.Date_Created = getData.Date_Created;
+                            legal_arbitration_model.Created_by = getData.Created_by;
+                            legal_arbitration_model.Date_Updated = DateTime.Now;
+                            legal_arbitration_model.Updated_by = WKPCompanyId;
+                            _context.LEGAL_ARBITRATIONs.Remove(getData);
+                            await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
+                        }
                     }
                     else if (action == GeneralModel.Delete)
                     {
