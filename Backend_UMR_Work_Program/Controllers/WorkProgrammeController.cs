@@ -11512,6 +11512,11 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_safety_culture_model.EvidenceOfTrainingPlanFilename = blobname3;
                         }
+                        else
+                        {
+                            hse_safety_culture_model.EvidenceOfTrainingPlanPath = null;
+                            hse_safety_culture_model.EvidenceOfTrainingPlanFilename = null;
+                        }
                         if (file1 != null)
                         {
                             string docName = "Safety Current Year";
@@ -11521,6 +11526,12 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_safety_culture_model.SafetyCurrentYearFilename = blobname1;
                         }
+                        else
+                        {
+                            hse_safety_culture_model.SafetyCurrentYearFilePath = null;
+                            hse_safety_culture_model.SafetyCurrentYearFilename = null;
+                        }
+
                         if (file2 != null)
                         {
                             string docName = "Safety Last Two Years";
@@ -11530,8 +11541,13 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_safety_culture_model.SafetyLast2YearsFilename = blobname2;
                         }
+                        else
+                        {
+                            hse_safety_culture_model.SafetyLast2YearsFilePath = null;
+                            hse_safety_culture_model.SafetyLast2YearsFilename = null;
+                        }
                     }
-                    if (filesLength.Count == 2)
+                     else if (filesLength.Count == 2)
                     {
                         file1 = Request.Form.Files[0];
                         file2 = Request.Form.Files[1];
@@ -11548,6 +11564,12 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_safety_culture_model.SafetyCurrentYearFilename = blobname1;
                         }
+                        else
+                        {
+                            hse_safety_culture_model.SafetyCurrentYearFilePath = null;
+                            hse_safety_culture_model.SafetyCurrentYearFilename = null;
+                        }
+
                         if (file2 != null)
                         {
                             string docName = "Safety Last Two Years";
@@ -11557,7 +11579,23 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_safety_culture_model.SafetyLast2YearsFilename = blobname2;
                         }
+                        else
+                        {
+                            hse_safety_culture_model.SafetyLast2YearsFilePath = null;
+                            hse_safety_culture_model.SafetyLast2YearsFilename = null;
+                        }
 
+                        hse_safety_culture_model.EvidenceOfTrainingPlanPath = null;
+                        hse_safety_culture_model.EvidenceOfTrainingPlanFilename = null;
+                    }
+                    else
+                    {
+                        hse_safety_culture_model.SafetyCurrentYearFilePath = null;
+                        hse_safety_culture_model.SafetyCurrentYearFilename = null;
+                        hse_safety_culture_model.SafetyLast2YearsFilePath = null;
+                        hse_safety_culture_model.SafetyLast2YearsFilename = null;
+                        hse_safety_culture_model.EvidenceOfTrainingPlanPath = null;
+                        hse_safety_culture_model.EvidenceOfTrainingPlanFilename = null;
                     }
 
                     #endregion
