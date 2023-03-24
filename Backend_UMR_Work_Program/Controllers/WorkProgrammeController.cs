@@ -2974,7 +2974,9 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            int Id = host_Community_Devt_Model.Id;
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
 
@@ -3034,6 +3036,11 @@ namespace Backend_UMR_Work_Program.Controllers
                                     host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = blobname1;
 
                             }
+                            else
+                            {
+                                host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
+                                host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
+                            }
                         }
                         if (Request.Form.Files.Count == 2)
                         {
@@ -3052,6 +3059,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                     host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = blobname1;
 
                             }
+                            else
+                            {
+                                host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
+                                host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
+                            }
+
                             if (file2 != null)
                             {
                                 string docName = "Evidence Of Pay Trust Fund";
@@ -3063,7 +3076,19 @@ namespace Backend_UMR_Work_Program.Controllers
                                     host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = blobname2;
 
                             }
+                            else
+                            {
+                                host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
+                                host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
+                            }
+
                         }
+                        else
+                        {
+                            host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
+                            host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
+                        }
+
                         if (Request.Form.Files.Count > 2)
                         {
                             file1 = Request.Form.Files[0];
@@ -3083,6 +3108,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                     host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = blobname1;
 
                             }
+                            else
+                            {
+                                host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
+                                host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
+                            }
+
                             if (file2 != null)
                             {
                                 string docName = "Evidence Of Pay Trust Fund";
@@ -3094,6 +3125,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                     host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = blobname2;
 
                             }
+                            else
+                            {
+                                host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
+                                host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
+                            }
+
                             if (file3 != null)
                             {
                                 string docName = "Evidence Of Reg Trust Fund ";
@@ -3105,6 +3142,16 @@ namespace Backend_UMR_Work_Program.Controllers
                                     host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = blobname3;
 
                             }
+                            else
+                            {
+                                host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                                host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
+                            }
+                        }
+                        else
+                        {
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
                         }
                     }
 
@@ -3138,7 +3185,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (save > 0)
                     {
-                        string successMsg = Messager.ShowMessage(action);
+                        string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                         var All_Data = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                     }
@@ -9742,7 +9789,8 @@ namespace Backend_UMR_Work_Program.Controllers
                 else if (hse_sustainable_model != null)
                 {
                     HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW getData;
-                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+
+                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_Proposed_Year == hse_sustainable_model.Actual_Proposed_Year select c).FirstOrDefaultAsync();
 
                     hse_sustainable_model.Companyemail = WKPCompanyEmail;
                     hse_sustainable_model.CompanyName = WKPCompanyName;
@@ -9753,7 +9801,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_sustainable_model.Year_of_WP = year;
                     //hse_sustainable_model.OML_Name = omlName;
                     //hse_sustainable_model.Field_ID = concessionField?.Field_ID ?? null;
-                    hse_sustainable_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
+                    //hse_sustainable_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
                     if (action == GeneralModel.Insert)
                     {
@@ -10542,6 +10590,7 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
+            int Id = hSE_WASTE_MANAGEMENT_DZ.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
@@ -10612,6 +10661,11 @@ namespace Backend_UMR_Work_Program.Controllers
 
                             }
                         }
+                        else
+                        {
+                            hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Path = null;
+                            hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Filename = null;
+                        }
                         if (Request.Form.Files.Count == 2)
                         {
                             file1 = Request.Form.Files[0];
@@ -10629,6 +10683,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                     hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Filename = blobname1;
 
                             }
+                            else
+                            {
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Path = null;
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Filename = null;
+                            }
+
                             if (file2 != null)
                             {
                                 string docName = "Evidence Of Pay Trust Fund";
@@ -10640,7 +10700,18 @@ namespace Backend_UMR_Work_Program.Controllers
                                     hSE_WASTE_MANAGEMENT_DZ.Waste_Service_Permit_Filename = blobname2;
 
                             }
+                            else
+                            {
+                                hSE_WASTE_MANAGEMENT_DZ.Waste_Service_Permit_Path = null;
+                                hSE_WASTE_MANAGEMENT_DZ.Waste_Service_Permit_Filename = null;
+                            }
                         }
+                        else
+                        {
+                            hSE_WASTE_MANAGEMENT_DZ.Waste_Service_Permit_Path = null;
+                            hSE_WASTE_MANAGEMENT_DZ.Waste_Service_Permit_Filename = null;
+                        }
+
                         if (Request.Form.Files.Count > 2)
                         {
                             file1 = Request.Form.Files[0];
@@ -10660,6 +10731,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                     hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Filename = blobname1;
 
                             }
+                            else
+                            {
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Path = null;
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_EWD_Filename = null;
+                            }
+
                             if (file2 != null)
                             {
                                 string docName = "Evidence Of Pay of DDCPath";
@@ -10671,6 +10748,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                     hSE_WASTE_MANAGEMENT_DZ.Evidence_of_pay_of_DDCFilename = blobname2;
 
                             }
+                            else
+                            {
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_pay_of_DDCPath = null;
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_pay_of_DDCFilename = null;
+                            }
+
                             if (file3 != null)
                             {
                                 string docName = "Evidence Of Reinjection Permit ";
@@ -10682,6 +10765,11 @@ namespace Backend_UMR_Work_Program.Controllers
                                     hSE_WASTE_MANAGEMENT_DZ.Evidence_of_Reinjection_Permit_Filename = blobname3;
 
                             }
+                            else
+                            {
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_Reinjection_Permit_Path = null;
+                                hSE_WASTE_MANAGEMENT_DZ.Evidence_of_Reinjection_Permit_Filename = null;
+                            }
                         }
                     }
 
@@ -10691,9 +10779,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         // if (getData == null)
                         // {
-                        hSE_WASTE_MANAGEMENT_DZ.Date_Created = DateTime.Now;
-                        hSE_WASTE_MANAGEMENT_DZ.Created_by = WKPCompanyId;
-                        await _context.HSE_WASTE_MANAGEMENT_DZs.AddAsync(hSE_WASTE_MANAGEMENT_DZ);
+                        if(getData == null)
+                        {
+                            hSE_WASTE_MANAGEMENT_DZ.Date_Created = DateTime.Now;
+                            hSE_WASTE_MANAGEMENT_DZ.Created_by = WKPCompanyId;
+                            await _context.HSE_WASTE_MANAGEMENT_DZs.AddAsync(hSE_WASTE_MANAGEMENT_DZ);
+                        }
+                        else
+                        {
+                            hSE_WASTE_MANAGEMENT_DZ.Date_Created = DateTime.Now;
+                            hSE_WASTE_MANAGEMENT_DZ.Created_by = WKPCompanyId;
+
+                            _context.HSE_WASTE_MANAGEMENT_DZs.Remove(getData);
+                            await _context.HSE_WASTE_MANAGEMENT_DZs.AddAsync(hSE_WASTE_MANAGEMENT_DZ);
+                        }
+                        
                         // }
                         // else
                         // {
@@ -10714,7 +10814,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (save > 0)
                     {
-                        string successMsg = Messager.ShowMessage(action);
+                        string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                         var All_Data = _context.HSE_WASTE_MANAGEMENT_DZs.Where(a => a.Year_of_WP == year && a.Field_ID == concessionField.Field_ID && a.COMPANY_ID == WKPCompanyId && a.OML_Name == concessionField.Concession_Name).ToList();
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                     }
