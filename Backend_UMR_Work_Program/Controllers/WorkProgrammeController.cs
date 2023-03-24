@@ -2629,7 +2629,9 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            int Id = Effluenct_Monitoring_Complience_Mode.Id;
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
 
@@ -2637,14 +2639,14 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (Effluenct_Monitoring_Complience_Mode != null)
                 {
 
-                    HSE_EFFLUENT_MONITORING_COMPLIANCE getOperationSafetyCaseData;
+                    HSE_EFFLUENT_MONITORING_COMPLIANCE getData;
                     if (concessionField.Field_Name != null)
                     {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                     }
                     else
                     {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                     }
 
                     Effluenct_Monitoring_Complience_Mode.Companyemail = WKPCompanyEmail;
@@ -2680,12 +2682,22 @@ namespace Backend_UMR_Work_Program.Controllers
                                 Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = blobname1;
 
                         }
+                        else
+                        {
+                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                        }
+                    }
+                    else
+                    {
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
                     }
                     #endregion
 
                     if (action == GeneralModel.Insert)
                     {
-                        if (getOperationSafetyCaseData == null)
+                        if (getData == null)
                         {
                             Effluenct_Monitoring_Complience_Mode.Date_Created = DateTime.Now;
                             Effluenct_Monitoring_Complience_Mode.Created_by = WKPCompanyId;
@@ -2693,7 +2705,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getOperationSafetyCaseData);
+                            _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
 
                             Effluenct_Monitoring_Complience_Mode.Date_Created = Effluenct_Monitoring_Complience_Mode.Date_Created;
                             Effluenct_Monitoring_Complience_Mode.Created_by = Effluenct_Monitoring_Complience_Mode.Created_by;
@@ -2704,14 +2716,14 @@ namespace Backend_UMR_Work_Program.Controllers
                     }
                     else if (action == GeneralModel.Delete)
                     {
-                        _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getOperationSafetyCaseData);
+                        _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
                     }
 
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
                     {
-                        string successMsg = Messager.ShowMessage(action);
+                        string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                         var All_Data = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                     }
@@ -2745,6 +2757,7 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
+            int Id = ghg_Mgt_Plan_Model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
@@ -2800,6 +2813,16 @@ namespace Backend_UMR_Work_Program.Controllers
                                     ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
 
                             }
+                            else
+                            {
+                                ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                                ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+                            }
+                        }
+                        else
+                        {
+                            ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                            ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
                         }
 
                         if (Request.Form.Files.Count == 2)
@@ -2819,6 +2842,13 @@ namespace Backend_UMR_Work_Program.Controllers
                                     ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
 
                             }
+                            else
+                            {
+                                ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                                ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+
+                            }
+
                             if (file2 != null)
                             {
                                 string docName = "LDR Certificate";
@@ -2828,9 +2858,21 @@ namespace Backend_UMR_Work_Program.Controllers
                                     return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                                 else
                                     ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname2;
+                            }
+                            else
+                            {
+                                ghg_Mgt_Plan_Model.LDRCertificatePath = null;
+                                ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
 
                             }
                         }
+                        else
+                        {
+                            ghg_Mgt_Plan_Model.LDRCertificatePath = null;
+                            ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
+
+                        }
+
                         if (Request.Form.Files.Count > 2)
                         {
                             file1 = Request.Form.Files[0];
@@ -2905,14 +2947,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (save > 0)
                     {
-                        string successMsg = Messager.ShowMessage(action);
+                        string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                         var All_Data = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                     }
                     else
                     {
-                        return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
+                        string successMsg = "No update was made.";
+                        var All_Data = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                     }
                 }
 
@@ -5604,17 +5647,31 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_MONTHLY_ACTIVITIES_PROPOSED")]
-        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_MONTHLY_ACTIVITIES_PROPOSED([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED oil_condensate_monthly_model, string omlName, string fieldName, string year, string actionToDo)
+        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_MONTHLY_ACTIVITIES_PROPOSED([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED oil_condensate_monthly_model, string omlName, string fieldName, string year, string actionToDo, int id)
         {
 
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            string action = (String.IsNullOrWhiteSpace(actionToDo)) ? GeneralModel.Insert : actionToDo.Trim().ToLower();
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED getData;
 
             try
             {
-                OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED getData;
+
+                if (action == "delete" && id != null && id != 0)
+                {
+                    getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where c.Id == id select c).FirstOrDefaultAsync();
+                    _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Remove(getData);
+
+
+                }
+
+
+
+
+
                 #region Saving OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSED data
-                if (oil_condensate_monthly_model != null)
+               else if (oil_condensate_monthly_model != null)
                 {
                     if (concessionField?.Field_Name != null)
                     {
@@ -5657,6 +5714,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Remove(getData);
                     }
+                }
 
                     save += await _context.SaveChangesAsync();
 
@@ -5670,7 +5728,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
                     }
-                }
+                
 
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
@@ -6262,7 +6320,9 @@ namespace Backend_UMR_Work_Program.Controllers
                 DETAILED_ENGINEERING_planned = facilities_model.DetaileD_ENGINEERING_planned,
                 INSTALLATION_planned = facilities_model.InstallatioN_planned,
                 PROCUREMENT_planned = facilities_model.ProcuremenT_planned,
-                UPGRADE_MAINTENANCE_planned = facilities_model.UpgradE_MAINTENANCE_planned
+                UPGRADE_MAINTENANCE_planned = facilities_model.UpgradE_MAINTENANCE_planned,
+                FEED_planned=facilities_model.FeeD_planned
+             
             };
 
 
@@ -6567,13 +6627,13 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_gas_facility_model.CompanyName = WKPCompanyName;
                     oil_gas_facility_model.COMPANY_ID = WKPCompanyId;
                     oil_gas_facility_model.CompanyNumber = WKPCompanyNumber;
-                    oil_gas_facility_model.Date_Updated = DateTime.Now;
-                    oil_gas_facility_model.Updated_by = WKPCompanyId;
+                    // oil_gas_facility_model.Date_Updated = DateTime.Now;
+                    // oil_gas_facility_model.Updated_by = WKPCompanyId;
                     oil_gas_facility_model.Year_of_WP = year;
                     oil_gas_facility_model.OML_Name = omlName;
                     oil_gas_facility_model.Field_ID = concessionField?.Field_ID ?? null;
-                    oil_gas_facility_model.Actual_year = year;
-                    oil_gas_facility_model.Proposed_year = (int.Parse(year) + 1).ToString();
+                   // oil_gas_facility_model.Actual_year = year;
+                  //  oil_gas_facility_model.Proposed_year = (int.Parse(year) + 1).ToString();
 
                     if (action == GeneralModel.Insert)
                     {
@@ -6585,8 +6645,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            //oil_gas_facility_model.Date_Created = getData.Date_Created;
-                            //oil_gas_facility_model.Created_by = getData.Created_by;
+                            oil_gas_facility_model.Date_Created = getData[0].Date_Created;
+                            oil_gas_facility_model.Created_by = getData[0].Created_by;
                             oil_gas_facility_model.Date_Updated = DateTime.Now;
                             oil_gas_facility_model.Updated_by = WKPCompanyId;
                             _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.RemoveRange(getData);
@@ -7184,21 +7244,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     //legal_litigation_model.Field_ID = concessionField?.Field_ID ?? null;
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
+                         if (getData == null)
+                        {
                         legal_litigation_model.Date_Created = DateTime.Now;
                         legal_litigation_model.Created_by = WKPCompanyId;
                         await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
-                        // }
-                        // else
-                        // {
-                        //     legal_litigation_model.Date_Created = getData.Date_Created;
-                        //     legal_litigation_model.Created_by = getData.Created_by;
-                        //     legal_litigation_model.Date_Updated = DateTime.Now;
-                        //     legal_litigation_model.Updated_by = WKPCompanyId;
-                        //     _context.LEGAL_LITIGATIONs.Remove(getData);
-                        //     await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
-                        // }
+                        }
+                        else
+                        {
+                            legal_litigation_model.Date_Created = getData.Date_Created;
+                            legal_litigation_model.Created_by = getData.Created_by;
+                            legal_litigation_model.Date_Updated = DateTime.Now;
+                            legal_litigation_model.Updated_by = WKPCompanyId;
+                            _context.LEGAL_LITIGATIONs.Remove(getData);
+                            await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
+                        }
                     }
                     else if (action == GeneralModel.Delete)
                     {
@@ -7258,21 +7318,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
+                         if (getData == null)
+                        {
                         legal_arbitration_model.Date_Created = DateTime.Now;
                         legal_arbitration_model.Created_by = WKPCompanyId;
                         await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
-                        // }
-                        // else
-                        // {
-                        //     legal_arbitration_model.Date_Created = getData.Date_Created;
-                        //     legal_arbitration_model.Created_by = getData.Created_by;
-                        //     legal_arbitration_model.Date_Updated = DateTime.Now;
-                        //     legal_arbitration_model.Updated_by = WKPCompanyId;
-                        //     _context.LEGAL_ARBITRATIONs.Remove(getData);
-                        //     await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
-                        // }
+                         }
+                        else
+                        {
+                            legal_arbitration_model.Date_Created = getData.Date_Created;
+                            legal_arbitration_model.Created_by = getData.Created_by;
+                            legal_arbitration_model.Date_Updated = DateTime.Now;
+                            legal_arbitration_model.Updated_by = WKPCompanyId;
+                            _context.LEGAL_ARBITRATIONs.Remove(getData);
+                            await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
+                        }
                     }
                     else if (action == GeneralModel.Delete)
                     {
@@ -9681,19 +9741,20 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL")]
-        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL hse_sustainable_model, string year, string id, string actionToDo)
+        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL hse_sustainable_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
+            int Id = hse_sustainable_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
 
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0)
                 {
-                    var getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.Id == int.Parse(id) select c).FirstOrDefaultAsync();
+                    var getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.Id == id select c).FirstOrDefaultAsync();
 
                     if (action.ToLower() == GeneralModel.Delete.ToLower())
                     {
@@ -9722,9 +9783,23 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         // if (getData == null)
                         // {
-                        hse_sustainable_model.Date_Created = DateTime.Now;
-                        hse_sustainable_model.Created_by = WKPCompanyId;
-                        await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.AddAsync(hse_sustainable_model);
+
+                        if(getData == null)
+                        {
+                            hse_sustainable_model.Date_Created = DateTime.Now;
+                            hse_sustainable_model.Created_by = WKPCompanyId;
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.AddAsync(hse_sustainable_model);
+
+                        }
+                        else
+                        {
+                            hse_sustainable_model.Date_Created = DateTime.Now;
+                            hse_sustainable_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Remove(getData);
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.AddAsync(hse_sustainable_model);
+
+                        }
                         // }
                         // else
                         // {
@@ -9750,7 +9825,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
@@ -10193,7 +10268,17 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_point_source_registration.evidence_of_PSP_filename = blobname;
                         }
+                        else
+                        {
+                            hse_point_source_registration.evidence_of_PSP_path = null;
+                            hse_point_source_registration.evidence_of_PSP_filename = null;
+                        }
                         #endregion
+                    }
+                    else
+                    {
+                        hse_point_source_registration.evidence_of_PSP_path = null;
+                        hse_point_source_registration.evidence_of_PSP_filename = null;
                     }
 
 
@@ -10227,13 +10312,15 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     var All_Data = await (from c in _context.HSE_POINT_SOURCE_REGISTRATIONs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
                 else
                 {
-                    return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
+                    string successMsg = "No update was made.";
+                    var All_Data = await (from c in _context.HSE_POINT_SOURCE_REGISTRATIONs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
 
             }
@@ -10363,7 +10450,9 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
+                    string successMsg = "No Changes was made.";
+                    var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_ID == WKPCompanyId && c.Year_of_WP == year && c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName select c).ToListAsync();
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
 
                 }
 
@@ -11419,6 +11508,11 @@ namespace Backend_UMR_Work_Program.Controllers
                         else
                             hse_quality_model.QualityControlFilename = blobname1;
                     }
+                    else
+                    {
+                        hse_quality_model.QualityControlFilePath = null;
+                        hse_quality_model.QualityControlFilename = null;
+                    }
                     #endregion
 
                     if (action == GeneralModel.Insert)
@@ -11764,6 +11858,12 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_occupational_model.OHMplanCommunicationFilename = blobname1;
                         }
+                        else
+                        {
+                            hse_occupational_model.OHMplanCommunicationFilePath = null;
+                            hse_occupational_model.OHMplanCommunicationFilename = null;
+                        }
+
                         if (files.Count == 2)
                         {
                             var file2 = Request.Form?.Files[1];
@@ -11775,6 +11875,18 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_occupational_model.OHMplanFilename = blobname2;
                         }
+                        else
+                        {
+                            hse_occupational_model.OHMplanFilePath = null;
+                            hse_occupational_model.OHMplanFilename = null;
+                        }
+                    }
+                    else
+                    {
+                        hse_occupational_model.OHMplanCommunicationFilePath = null;
+                        hse_occupational_model.OHMplanCommunicationFilename = null;
+                        hse_occupational_model.OHMplanFilePath = null;
+                        hse_occupational_model.OHMplanFilename = null;
                     }
 
 
@@ -11887,20 +11999,20 @@ namespace Backend_UMR_Work_Program.Controllers
                     if (file1 != null)
                     {
                         string docName = "Decom Certificate";
-                        hse_waste_model.DecomCertificateFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"DecomCertificateDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-                        if (hse_waste_model.DecomCertificateFilePath == null)
-                            return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                        else
-                            hse_waste_model.DecomCertificateFilename = blobname1;
-                    }
-                    if (file2 != null)
-                    {
-                        string docName = "Waste Management Plan";
-                        hse_waste_model.WasteManagementPlanFilePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"WasteManagementPlanDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                        hse_waste_model.WasteManagementPlanFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"DecomCertificateDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                         if (hse_waste_model.WasteManagementPlanFilePath == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
                             hse_waste_model.WasteManagementPlanFilename = blobname1;
+                    }
+                    if (file2 != null)
+                    {
+                        string docName = "Waste Management Plan";
+                        hse_waste_model.DecomCertificateFilePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"WasteManagementPlanDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                        if (hse_waste_model.DecomCertificateFilePath == null)
+                            return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                        else
+                            hse_waste_model.DecomCertificateFilename = blobname2;
                     }
 
                     #endregion
@@ -12022,7 +12134,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (hse_EMS_model.AUDITFilePath == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
-                            hse_EMS_model.AUDITFilename = blobname1;
+                            hse_EMS_model.AUDITFilename = blobname2;
                     }
                     #endregion
 
