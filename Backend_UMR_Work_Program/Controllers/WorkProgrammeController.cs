@@ -7263,14 +7263,14 @@ namespace Backend_UMR_Work_Program.Controllers
                 #region Saving LEGAL_LITIGATIONs data
                 if (legal_litigation_model != null)
                 {
-                    var getData = await (from c in _context.LEGAL_LITIGATIONs where c.Companyemail == WKPCompanyEmail && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    var getData = await (from c in _context.LEGAL_LITIGATIONs where c.Companyemail == WKPCompanyEmail && c.Year_of_WP == year && c.Id==legal_litigation_model.Id select c).FirstOrDefaultAsync();
 
                     legal_litigation_model.Companyemail = WKPCompanyEmail;
                     legal_litigation_model.CompanyName = WKPCompanyName;
                     legal_litigation_model.COMPANY_ID = WKPCompanyId;
                     legal_litigation_model.CompanyNumber = WKPCompanyNumber;
-                    legal_litigation_model.Date_Updated = DateTime.Now;
-                    legal_litigation_model.Updated_by = WKPCompanyId;
+                    //legal_litigation_model.Date_Updated = DateTime.Now;
+                    //legal_litigation_model.Updated_by = WKPCompanyId;
                     legal_litigation_model.Year_of_WP = year;
                     //legal_litigation_model.OML_Name = omlName;
                     //legal_litigation_model.Field_ID = concessionField?.Field_ID ?? null;
@@ -7336,14 +7336,14 @@ namespace Backend_UMR_Work_Program.Controllers
                 #region Saving LEGAL_ARBITRATIONs data
                 if (legal_arbitration_model != null)
                 {
-                    var getData = await (from c in _context.LEGAL_ARBITRATIONs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    var getData = await (from c in _context.LEGAL_ARBITRATIONs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id == legal_arbitration_model.Id select c).FirstOrDefaultAsync();
 
                     legal_arbitration_model.Companyemail = WKPCompanyEmail;
                     legal_arbitration_model.CompanyName = WKPCompanyName;
                     legal_arbitration_model.COMPANY_ID = WKPCompanyId;
                     legal_arbitration_model.CompanyNumber = WKPCompanyNumber;
-                    legal_arbitration_model.Date_Updated = DateTime.Now;
-                    legal_arbitration_model.Updated_by = WKPCompanyId;
+                   // legal_arbitration_model.Date_Updated = DateTime.Now;
+                    l//egal_arbitration_model.Updated_by = WKPCompanyId;
                     legal_arbitration_model.Year_of_WP = year;
                     //legal_arbitration_model.OML_Name = omlName;
                     //legal_arbitration_model.Field_ID = concessionField?.Field_ID ?? null;
