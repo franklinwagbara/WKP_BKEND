@@ -8,7 +8,7 @@ namespace Backend_UMR_Work_Program.Models
         public string Actual_capital_expenditure_Current_year_USD { get; set; }
         public string Challenges { get; set; }
         public string Comment_ { get; set; }
-        public string CompanyNumber { get; set; }
+        public int CompanyNumber { get; set; }
         public string Completion_Status { get; set; }
 
         public string Has_it_been_adopted_by_DPR_ { get; set; }

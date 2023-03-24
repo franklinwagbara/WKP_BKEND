@@ -6596,8 +6596,23 @@ namespace Backend_UMR_Work_Program.Controllers
 
             OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT oil_gas_facility_model = new OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT()
             {
-
+                Actual_Proposed = _oil_gas_facility_model.Actual_Proposed,
+                Actual_capital_expenditure_Current_year_NGN = _oil_gas_facility_model.Actual_capital_expenditure_Current_year_NGN,
+                Actual_capital_expenditure_Current_year_USD = _oil_gas_facility_model.Actual_capital_expenditure_Current_year_USD,
+                Challenges = _oil_gas_facility_model.Challenges,
+                Comment_ = _oil_gas_facility_model.Comment_,
+                Completion_Status = _oil_gas_facility_model.
+                Has_it_been_adopted_by_DPR_ = _oil_gas_facility_model.Has_it_been_adopted_by_DPR_,
+                New_Technology_ = _oil_gas_facility_model.New_Technology_,
+                Nigerian_Content_Value = _oil_gas_facility_model.Nigerian_Content_Value,
+                Planned_ongoing_and_routine_maintenance = _oil_gas_facility_model.Planned_ongoing_and_routine_maintenance,
+                Project_Stage = _oil_gas_facility_model.Project_Stage,
+                Project_Timeline = _oil_gas_facility_model.Project_Timeline,
+                Proposed_Capital_Expenditure_NGN = _oil_gas_facility_model.Proposed_Capital_Expenditure_NGN,
+                Proposed_Capital_Expenditure_USD = _oil_gas_facility_model.Proposed_Capital_Expenditure_USD
+      
             };
+            
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
