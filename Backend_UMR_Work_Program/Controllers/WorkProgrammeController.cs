@@ -7201,21 +7201,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     //legal_litigation_model.Field_ID = concessionField?.Field_ID ?? null;
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
+                         if (getData == null)
+                        {
                         legal_litigation_model.Date_Created = DateTime.Now;
                         legal_litigation_model.Created_by = WKPCompanyId;
                         await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
-                        // }
-                        // else
-                        // {
-                        //     legal_litigation_model.Date_Created = getData.Date_Created;
-                        //     legal_litigation_model.Created_by = getData.Created_by;
-                        //     legal_litigation_model.Date_Updated = DateTime.Now;
-                        //     legal_litigation_model.Updated_by = WKPCompanyId;
-                        //     _context.LEGAL_LITIGATIONs.Remove(getData);
-                        //     await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
-                        // }
+                        }
+                        else
+                        {
+                            legal_litigation_model.Date_Created = getData.Date_Created;
+                            legal_litigation_model.Created_by = getData.Created_by;
+                            legal_litigation_model.Date_Updated = DateTime.Now;
+                            legal_litigation_model.Updated_by = WKPCompanyId;
+                            _context.LEGAL_LITIGATIONs.Remove(getData);
+                            await _context.LEGAL_LITIGATIONs.AddAsync(legal_litigation_model);
+                        }
                     }
                     else if (action == GeneralModel.Delete)
                     {
@@ -7275,21 +7275,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
+                         if (getData == null)
+                        {
                         legal_arbitration_model.Date_Created = DateTime.Now;
                         legal_arbitration_model.Created_by = WKPCompanyId;
                         await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
-                        // }
-                        // else
-                        // {
-                        //     legal_arbitration_model.Date_Created = getData.Date_Created;
-                        //     legal_arbitration_model.Created_by = getData.Created_by;
-                        //     legal_arbitration_model.Date_Updated = DateTime.Now;
-                        //     legal_arbitration_model.Updated_by = WKPCompanyId;
-                        //     _context.LEGAL_ARBITRATIONs.Remove(getData);
-                        //     await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
-                        // }
+                         }
+                        else
+                        {
+                            legal_arbitration_model.Date_Created = getData.Date_Created;
+                            legal_arbitration_model.Created_by = getData.Created_by;
+                            legal_arbitration_model.Date_Updated = DateTime.Now;
+                            legal_arbitration_model.Updated_by = WKPCompanyId;
+                            _context.LEGAL_ARBITRATIONs.Remove(getData);
+                            await _context.LEGAL_ARBITRATIONs.AddAsync(legal_arbitration_model);
+                        }
                     }
                     else if (action == GeneralModel.Delete)
                     {
