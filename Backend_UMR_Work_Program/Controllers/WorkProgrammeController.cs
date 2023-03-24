@@ -7310,8 +7310,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     legal_arbitration_model.CompanyName = WKPCompanyName;
                     legal_arbitration_model.COMPANY_ID = WKPCompanyId;
                     legal_arbitration_model.CompanyNumber = WKPCompanyNumber;
-                    legal_arbitration_model.Date_Updated = DateTime.Now;
-                    legal_arbitration_model.Updated_by = WKPCompanyId;
+                   // legal_arbitration_model.Date_Updated = DateTime.Now;
+                    //egal_arbitration_model.Updated_by = WKPCompanyId;
                     legal_arbitration_model.Year_of_WP = year;
                     //legal_arbitration_model.OML_Name = omlName;
                     //legal_arbitration_model.Field_ID = concessionField?.Field_ID ?? null;
