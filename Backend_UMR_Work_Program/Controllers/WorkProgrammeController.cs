@@ -9726,19 +9726,20 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL")]
-        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL hse_sustainable_model, string year, string id, string actionToDo)
+        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL hse_sustainable_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
+            int Id = hse_sustainable_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
 
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0)
                 {
-                    var getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.Id == int.Parse(id) select c).FirstOrDefaultAsync();
+                    var getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.Id == id select c).FirstOrDefaultAsync();
 
                     if (action.ToLower() == GeneralModel.Delete.ToLower())
                     {
@@ -9767,9 +9768,23 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         // if (getData == null)
                         // {
-                        hse_sustainable_model.Date_Created = DateTime.Now;
-                        hse_sustainable_model.Created_by = WKPCompanyId;
-                        await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.AddAsync(hse_sustainable_model);
+
+                        if(getData == null)
+                        {
+                            hse_sustainable_model.Date_Created = DateTime.Now;
+                            hse_sustainable_model.Created_by = WKPCompanyId;
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.AddAsync(hse_sustainable_model);
+
+                        }
+                        else
+                        {
+                            hse_sustainable_model.Date_Created = DateTime.Now;
+                            hse_sustainable_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Remove(getData);
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.AddAsync(hse_sustainable_model);
+
+                        }
                         // }
                         // else
                         // {
@@ -9795,7 +9810,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
@@ -11475,6 +11490,11 @@ namespace Backend_UMR_Work_Program.Controllers
                         else
                             hse_quality_model.QualityControlFilename = blobname1;
                     }
+                    else
+                    {
+                        hse_quality_model.QualityControlFilePath = null;
+                        hse_quality_model.QualityControlFilename = null;
+                    }
                     #endregion
 
                     if (action == GeneralModel.Insert)
@@ -11820,6 +11840,12 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_occupational_model.OHMplanCommunicationFilename = blobname1;
                         }
+                        else
+                        {
+                            hse_occupational_model.OHMplanCommunicationFilePath = null;
+                            hse_occupational_model.OHMplanCommunicationFilename = null;
+                        }
+
                         if (files.Count == 2)
                         {
                             var file2 = Request.Form?.Files[1];
@@ -11831,6 +11857,18 @@ namespace Backend_UMR_Work_Program.Controllers
                             else
                                 hse_occupational_model.OHMplanFilename = blobname2;
                         }
+                        else
+                        {
+                            hse_occupational_model.OHMplanFilePath = null;
+                            hse_occupational_model.OHMplanFilename = null;
+                        }
+                    }
+                    else
+                    {
+                        hse_occupational_model.OHMplanCommunicationFilePath = null;
+                        hse_occupational_model.OHMplanCommunicationFilename = null;
+                        hse_occupational_model.OHMplanFilePath = null;
+                        hse_occupational_model.OHMplanFilename = null;
                     }
 
 
@@ -11943,20 +11981,20 @@ namespace Backend_UMR_Work_Program.Controllers
                     if (file1 != null)
                     {
                         string docName = "Decom Certificate";
-                        hse_waste_model.DecomCertificateFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"DecomCertificateDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-                        if (hse_waste_model.DecomCertificateFilePath == null)
+                        hse_waste_model.WasteManagementPlanFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"DecomCertificateDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                        if (hse_waste_model.WasteManagementPlanFilePath == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
-                            hse_waste_model.DecomCertificateFilename = blobname1;
+                            hse_waste_model.WasteManagementPlanFilename = blobname1;
                     }
                     if (file2 != null)
                     {
                         string docName = "Waste Management Plan";
-                        hse_waste_model.WasteManagementPlanFilePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"WasteManagementPlanDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-                        if (hse_waste_model.WasteManagementPlanFilePath == null)
+                        hse_waste_model.DecomCertificateFilePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"WasteManagementPlanDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                        if (hse_waste_model.DecomCertificateFilePath == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
-                            hse_waste_model.WasteManagementPlanFilename = blobname2;
+                            hse_waste_model.DecomCertificateFilename = blobname2;
                     }
 
                     #endregion
