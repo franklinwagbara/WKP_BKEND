@@ -2693,6 +2693,16 @@ namespace Backend_UMR_Work_Program.Controllers
                         Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
                         Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
                     }
+
+                    if(Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling.ToLower() == "yes")
+                    {
+                        Effluenct_Monitoring_Complience_Mode.ReasonForNoEvidenceSampling = null;
+                    }
+                    else
+                    {
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                    }
                     #endregion
 
                     if (action == GeneralModel.Insert)
@@ -2758,7 +2768,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
             int save = 0;
             int Id = ghg_Mgt_Plan_Model.Id;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
 
@@ -2915,6 +2926,26 @@ namespace Backend_UMR_Work_Program.Controllers
 
                             }
                         }
+                    }
+
+                    if(ghg_Mgt_Plan_Model.DoYouHaveGHG.ToLower() == "yes")
+                    {
+                        ghg_Mgt_Plan_Model.ReasonForNoGHG = null;
+                    }
+                    else
+                    {
+                        ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                        ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+                    }
+
+                    if(ghg_Mgt_Plan_Model.DoYouHaveLDRCertificate.ToLower() == "yes")
+                    {
+                        ghg_Mgt_Plan_Model.ReasonForNoLDR = null;
+                    }
+                    else
+                    {
+                        ghg_Mgt_Plan_Model.LDRCertificatePath = null;
+                        ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
                     }
 
                     #endregion
@@ -11838,7 +11869,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var file1 = Request.Form.Files.Count > 0 ? Request.Form.Files[0] : null;
                     var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
 
-                    if (file1 != null)
+                    if (file1 != null && hse_climate_model.DoyouhaveGHG.ToLower() == "yes")
                     {
                         string docName = "GHG";
                         hse_climate_model.GHGFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
@@ -11846,6 +11877,11 @@ namespace Backend_UMR_Work_Program.Controllers
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
                             hse_climate_model.GHGFilename = blobname1;
+                    }
+                    else
+                    {
+                        hse_climate_model.GHGFilePath = null;
+                        hse_climate_model.GHGFilename = null;
                     }
 
                     #endregion
