@@ -23,6 +23,9 @@
     [COMPANY_ID]                       VARCHAR (100)  NULL,
     [CompanyNumber]                    INT            NULL,
     [Field_ID]                         INT            NULL,
+    [Budget_NGN]                       NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
