@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Backend_UMR_Work_Program.DataModels
+namespace Backend_UMR_Work_Program.DataModels;
+
+public partial class WP_Total_E_and_P_company
 {
-    public partial class WP_Total_E_and_P_company
-    {
-        public int? E_and_P_companies { get; set; }
-        public string? Year { get; set; }
-    }
+    public int? E_and_P_companies { get; set; }
+
+    public string? Year { get; set; }
 }

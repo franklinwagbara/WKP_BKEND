@@ -7,6 +7,7 @@
     [DateCreated]  DATETIME      NULL,
     [DateUpdated]  DATETIME      NULL,
     [Staff_ID]     INT           NULL,
-    [SBU_Tables]   VARCHAR (MAX) NULL
+    [SBU_Tables]   VARCHAR (MAX) NULL,
+    CONSTRAINT [PK_SBU_ApplicationComments] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

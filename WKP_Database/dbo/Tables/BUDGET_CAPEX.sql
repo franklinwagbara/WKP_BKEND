@@ -27,6 +27,7 @@
     [Updated_by]                VARCHAR (300)  NULL,
     [Date_Created]              DATETIME       NULL,
     [Date_Updated]              DATETIME       NULL,
+    [Field_ID]                  INT            NULL,
     CONSTRAINT [PK_BUDGET_CAPEX] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
 

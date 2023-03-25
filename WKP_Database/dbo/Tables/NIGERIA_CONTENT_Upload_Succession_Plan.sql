@@ -25,5 +25,3 @@
     CONSTRAINT [PK_NIGERIA_CONTENT_Upload_Succession_Plan] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
-
-

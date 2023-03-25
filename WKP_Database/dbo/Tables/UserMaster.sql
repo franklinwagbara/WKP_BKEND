@@ -20,3 +20,7 @@
     CONSTRAINT [PK_UserMaster] PRIMARY KEY CLUSTERED ([UserId] ASC)
 );
 
+
+
+
+

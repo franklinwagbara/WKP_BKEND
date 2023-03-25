@@ -22,8 +22,7 @@
     [COMPANY_ID]                  VARCHAR (100)  NULL,
     [CompanyNumber]               INT            NULL,
     [Field_ID]                    INT            NULL,
+    [Actual_Budget_Total_Naira] NVARCHAR(500) NULL, 
     CONSTRAINT [PK_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
-
-
 
