@@ -11869,7 +11869,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var file1 = Request.Form.Files.Count > 0 ? Request.Form.Files[0] : null;
                     var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
 
-                    if (file1 != null)
+                    if (file1 != null && hse_climate_model.DoyouhaveGHG.ToLower() == "yes")
                     {
                         string docName = "GHG";
                         hse_climate_model.GHGFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
@@ -11877,6 +11877,11 @@ namespace Backend_UMR_Work_Program.Controllers
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                         else
                             hse_climate_model.GHGFilename = blobname1;
+                    }
+                    else
+                    {
+                        hse_climate_model.GHGFilePath = null;
+                        hse_climate_model.GHGFilename = null;
                     }
 
                     #endregion
