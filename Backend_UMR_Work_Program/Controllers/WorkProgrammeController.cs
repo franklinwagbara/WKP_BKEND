@@ -2693,6 +2693,16 @@ namespace Backend_UMR_Work_Program.Controllers
                         Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
                         Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
                     }
+
+                    if(Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling.ToLower() == "yes")
+                    {
+                        Effluenct_Monitoring_Complience_Mode.ReasonForNoEvidenceSampling = null;
+                    }
+                    else
+                    {
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                    }
                     #endregion
 
                     if (action == GeneralModel.Insert)
@@ -2758,7 +2768,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
             int save = 0;
             int Id = ghg_Mgt_Plan_Model.Id;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
 
@@ -2915,6 +2926,26 @@ namespace Backend_UMR_Work_Program.Controllers
 
                             }
                         }
+                    }
+
+                    if(ghg_Mgt_Plan_Model.DoYouHaveGHG.ToLower() == "yes")
+                    {
+                        ghg_Mgt_Plan_Model.ReasonForNoGHG = null;
+                    }
+                    else
+                    {
+                        ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                        ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+                    }
+
+                    if(ghg_Mgt_Plan_Model.DoYouHaveLDRCertificate.ToLower() == "yes")
+                    {
+                        ghg_Mgt_Plan_Model.ReasonForNoLDR = null;
+                    }
+                    else
+                    {
+                        ghg_Mgt_Plan_Model.LDRCertificatePath = null;
+                        ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
                     }
 
                     #endregion
