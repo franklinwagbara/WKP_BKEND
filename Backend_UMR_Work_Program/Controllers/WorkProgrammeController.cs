@@ -6293,12 +6293,23 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_BUDGET_PERFORMANCE_PRODUCTION_COST")]
-        public async Task<object> POST_BUDGET_PERFORMANCE_PRODUCTION_COST([FromBody] BUDGET_PERFORMANCE_PRODUCTION_COST budget_performance_model, string omlName, string fieldName, string year, string id, string actionToDo)
+        public async Task<object> POST_BUDGET_PERFORMANCE_PRODUCTION_COST([FromBody] Budget_Performance_Model _budget_performance_model, string omlName, string fieldName, string year, string id, string actionToDo)
         {
 
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+
+            BUDGET_PERFORMANCE_PRODUCTION_COST budget_performance_model = new BUDGET_PERFORMANCE_PRODUCTION_COST
+            {
+              
+               DIRECT_COST_Actual= _budget_performance_model.DirecT_COST_Actual,
+                DIRECT_COST_planned = _budget_performance_model.DirecT_COST_planned,
+                INDIRECT_COST_Actual = _budget_performance_model.IndirecT_COST_Actual,
+                INDIRECT_COST_planned = _budget_performance_model.IndirecT_COST_planned
+            };
+
+
             List<BUDGET_PERFORMANCE_PRODUCTION_COST> getData;
             try
             {
