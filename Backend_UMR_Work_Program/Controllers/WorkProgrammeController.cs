@@ -10014,7 +10014,7 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (!string.IsNullOrEmpty(id))
                 {
-                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions where c.Id == hse_sustainable_model.Id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Remove(getData);
@@ -10023,7 +10023,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 else if (hse_sustainable_model != null)
                 {
                     HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition getData;
-                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions where c.Actual_proposed == hse_sustainable_model.Actual_proposed && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions where c.Actual_proposed == hse_sustainable_model.Actual_proposed && c.COMPANY_ID == WKPCompanyId && c.Id == hse_sustainable_model.Id && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
                     hse_sustainable_model.Companyemail = WKPCompanyEmail;
                     hse_sustainable_model.CompanyName = WKPCompanyName;
@@ -10097,7 +10097,7 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (!string.IsNullOrEmpty(id))
                 {
-                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs where c.Id == hse_sustainable_model.Id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Remove(getData);
@@ -10107,7 +10107,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEME getData;
 
-                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs where c.COMPANY_ID == WKPCompanyId && c.Id == hse_sustainable_model.Id && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
                     hse_sustainable_model.Companyemail = WKPCompanyEmail;
                     hse_sustainable_model.CompanyName = WKPCompanyName;
@@ -11253,7 +11253,8 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (!string.IsNullOrEmpty(id))
                 {
-                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    //int.Parse(id)
+                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.Id == hse_scholarship_model.Id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.Remove(getData);
@@ -11262,7 +11263,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 else if (hse_scholarship_model != null)
                 {
                     HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME getData;
-                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.COMPANY_ID == WKPCompanyId && c.id == hse_scholarship_model.Id && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
                     hse_scholarship_model.Companyemail = WKPCompanyEmail;
                     hse_scholarship_model.CompanyName = WKPCompanyName;
