@@ -20,6 +20,7 @@ public partial class HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_N
     public string? CSR_ { get; set; }
 
     public string? Budget_ { get; set; }
+    public string? Budget_Ngn{ get; set; }
 
     public string? Actual_Spent { get; set; }
 

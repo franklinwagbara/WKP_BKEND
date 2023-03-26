@@ -26,6 +26,7 @@ public partial class HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAIN
     public string? ComponentOfTraining { get; set; }
 
     public string? Actual_Budget_Total_Dollars { get; set; }
+    public string? Actual_Budget_Total_Naira { get; set; }
 
     public string? StatusOfTraining { get; set; }
 
