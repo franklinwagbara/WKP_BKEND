@@ -10133,8 +10133,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     //hse_sustainable_model.Field_ID = concessionField?.Field_ID ?? null;
 
                     #region file section
-                    var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = blobService.Filenamer(file1);
+                    var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                    var blobname1 = file1 != null? blobService.Filenamer(file1): null;
 
                     if (file1 != null)
                     {
@@ -10143,6 +10143,10 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (hse_sustainable_model.TSUploadFilePath == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
 
+                    }
+                    else
+                    {
+                        hse_sustainable_model.TSUploadFilePath = null;
                     }
                     #endregion
                     if (action == GeneralModel.Insert)
