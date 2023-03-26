@@ -11264,7 +11264,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 else if (hse_scholarship_model != null)
                 {
                     HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME getData;
-                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.COMPANY_ID == WKPCompanyId && c.id == hse_scholarship_model.Id && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.COMPANY_ID == WKPCompanyId && c.Id == hse_scholarship_model.Id && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
                     hse_scholarship_model.Companyemail = WKPCompanyEmail;
                     hse_scholarship_model.CompanyName = WKPCompanyName;
