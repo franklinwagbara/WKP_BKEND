@@ -12475,18 +12475,19 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECT"), DisableRequestSizeLimit]
-        public async Task<object> POST_PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECT([FromForm] PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECT picture_upload_model, string year, string id, string actionToDo)
+        public async Task<object> POST_PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECT([FromForm] PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECT picture_upload_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
+            int Id = picture_upload_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
-                    var getData = (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.Id == id select c).FirstOrDefault();
 
                     if (action == GeneralModel.Delete)
                         _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Remove(getData);
@@ -12508,8 +12509,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     //picture_upload_model.Field_ID = concessionField?.Field_ID ?? null;
 
                     #region file section
-                    var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = blobService.Filenamer(file1);
+                    var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                    var blobname1 = file1 != null ? blobService.Filenamer(file1) : null ;
 
                     if (file1 != null)
                     {
@@ -12518,15 +12519,32 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (picture_upload_model.uploaded_presentation == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                     }
+                    else
+                    {
+                        picture_upload_model.uploaded_presentation = null;
+                    }
                     #endregion
 
                     if (action == GeneralModel.Insert)
                     {
                         // if (getData == null)
                         // {
-                        picture_upload_model.Date_Created = DateTime.Now;
-                        picture_upload_model.Created_by = WKPCompanyId;
-                        await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
+
+                        if(getData == null)
+                        {
+                            picture_upload_model.Date_Created = DateTime.Now;
+                            picture_upload_model.Created_by = WKPCompanyId;
+                            await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
+                        }
+                        else
+                        {
+                            picture_upload_model.Date_Created = DateTime.Now;
+                            picture_upload_model.Created_by = WKPCompanyId;
+
+                            _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Remove(getData);
+                            await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
+                        }
+                        
                         // }
                         // else
                         // {
@@ -12551,7 +12569,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
