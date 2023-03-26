@@ -7198,7 +7198,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     nigeria_content_succession_model.Year_of_WP = year;
                     nigeria_content_succession_model.OML_Name = omlName;
                     nigeria_content_succession_model.Field_ID = concessionField?.Field_ID ?? null;
-                    nigeria_content_succession_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
+                    //nigeria_content_succession_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
                     if (action == GeneralModel.Insert)
                     {
