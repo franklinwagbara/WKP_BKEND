@@ -12507,7 +12507,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 else if (picture_upload_model != null)
                 {
                     PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECT getData;
-                    getData = await (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                    getData = await (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id ==picture_upload_model.Id select c).FirstOrDefaultAsync();
 
                     picture_upload_model.Companyemail = WKPCompanyEmail;
                     picture_upload_model.CompanyName = WKPCompanyName;
@@ -12538,34 +12538,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                        // if (getData == null)
-                        // {
-
-                        if(getData == null)
-                        {
-                            picture_upload_model.Date_Created = DateTime.Now;
-                            picture_upload_model.Created_by = WKPCompanyId;
-                            await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
+                         if (getData == null)
+                         {
+                        picture_upload_model.Date_Created = DateTime.Now;
+                        picture_upload_model.Created_by = WKPCompanyId;
+                        await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
                         }
                         else
                         {
-                            picture_upload_model.Date_Created = DateTime.Now;
-                            picture_upload_model.Created_by = WKPCompanyId;
-
+                            picture_upload_model.Date_Created = getData.Date_Created;
+                            picture_upload_model.Created_by = getData.Created_by;
+                            picture_upload_model.Date_Updated = DateTime.Now;
+                            picture_upload_model.Updated_by = WKPCompanyId;
                             _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Remove(getData);
                             await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
                         }
-                        
-                        // }
-                        // else
-                        // {
-                        // 	picture_upload_model.Date_Created = getData.Date_Created;
-                        // 	picture_upload_model.Created_by = getData.Created_by;
-                        // 	picture_upload_model.Date_Updated = DateTime.Now;
-                        // 	picture_upload_model.Updated_by = WKPCompanyId;
-                        // 	_context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Remove(getData);
-                        // 	await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
-                        // }
                     }
                     else if (action == GeneralModel.Delete)
                     {
