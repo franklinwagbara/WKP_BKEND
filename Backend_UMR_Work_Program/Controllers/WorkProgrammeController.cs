@@ -6588,7 +6588,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_NEW_TECHNOLOGY_CONFORMITY_ASSESSMENT")]
-        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment oil_condensate_assessment_model, string omlName, string fieldName, string year, string id, string actionToDo)
+        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment([FromForm] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment oil_condensate_assessment_model, string omlName, string fieldName, string year, string id, string actionToDo)
         {
 
             int save = 0;
@@ -6629,8 +6629,43 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_condensate_assessment_model.OML_Name = omlName;
                     oil_condensate_assessment_model.Field_ID = concessionField?.Field_ID ?? null;
 
+
+
+
                     if (action == GeneralModel.Insert)
                     {
+
+                         #region file section
+                            if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                            {
+
+                                var files = Request.Form.Files;
+                                if (files.Count >= 1)
+                                {
+                                    var file1 = Request.Form.Files[0];
+                                    //var file2 = Request.Form.Files[1];
+                                    var blobname1 = blobService.Filenamer(file1);
+                                    //var blobname2 = blobService.Filenamer(file2);
+
+                                    if (file1 != null)
+                                    {
+                                        string docName = "Evidence of Inspection And Ugrade Main";
+                                        oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                        if (oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath == null)
+                                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
+                                        else
+                                            oil_condensate_assessment_model.EvidenceOfInspectionAndUgradeFilename = blobname1;
+                                    }
+
+                                }
+                            }
+
+                            #endregion
+                        
+                      
+
+
+
                         if (getData == null || getData.Count == 0)
                         {
                             oil_condensate_assessment_model.Date_Created = DateTime.Now;
