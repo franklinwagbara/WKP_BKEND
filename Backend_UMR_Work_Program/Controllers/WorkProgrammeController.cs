@@ -6758,7 +6758,10 @@ namespace Backend_UMR_Work_Program.Controllers
                         Project_Stage = _oil_gas_facility_model.Project_Stage,
                         Project_Timeline = _oil_gas_facility_model.Project_Timeline,
                         Proposed_Capital_Expenditure_NGN = _oil_gas_facility_model.Proposed_Capital_Expenditure_NGN,
-                        Proposed_Capital_Expenditure_USD = _oil_gas_facility_model.Proposed_Capital_Expenditure_USD
+                        Proposed_Capital_Expenditure_USD = _oil_gas_facility_model.Proposed_Capital_Expenditure_USD,
+                        Facility_Name = _oil_gas_facility_model.Facility_Name,
+                        Facility_Type = _oil_gas_facility_model.Facility_Type,
+                        Proposed_Projects = _oil_gas_facility_model.Proposed_Projects
                     };
 
 

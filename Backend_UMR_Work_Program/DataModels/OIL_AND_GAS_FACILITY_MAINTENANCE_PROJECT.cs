@@ -96,4 +96,9 @@ public partial class OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT
     public int? CompanyNumber { get; set; }
 
     public int? Field_ID { get; set; }
+
+     public string? Facility_Name { get; set; }
+        public string? Facility_Type { get; set; }
+
+        public string? Proposed_Projects { get; set; }
 }
