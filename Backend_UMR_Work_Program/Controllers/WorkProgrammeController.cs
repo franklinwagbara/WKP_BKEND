@@ -2476,8 +2476,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                         if (operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval == null)
                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                        else
-                            operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = blobname1;
+                        //else
+                        //    operations_Sefety_Case_model. = blobname1;
                     }
                     else
                     {
@@ -10053,16 +10053,17 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition")]
-        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition hse_sustainable_model, string year, string id, string actionToDo)
+        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition hse_sustainable_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
+            int Id = hse_sustainable_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
                     var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions where c.Id == hse_sustainable_model.Id select c).FirstOrDefault();
 
@@ -10089,10 +10090,20 @@ namespace Backend_UMR_Work_Program.Controllers
                     if (action == GeneralModel.Insert)
                     {
                         if (getData == null)
-                            //{
+                        {
                             hse_sustainable_model.Date_Created = DateTime.Now;
-                        hse_sustainable_model.Created_by = WKPCompanyId;
-                        await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
+                            hse_sustainable_model.Created_by = WKPCompanyId;
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
+                        }
+                        else
+                        {
+                            hse_sustainable_model.Date_Created = DateTime.Now;
+                            hse_sustainable_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Remove(getData);
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.AddAsync(hse_sustainable_model);
+                        }
+                        //{
                         // }
                         // else
                         // {
@@ -10118,7 +10129,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
@@ -11311,16 +11322,17 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME([FromForm] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME hse_scholarship_model, string year, string id, string actionToDo)
+        public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME([FromForm] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME hse_scholarship_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
+            int Id = hse_scholarship_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             // var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (!string.IsNullOrEmpty(id))
+                if (id > 0 && action == GeneralModel.Delete)
                 {
                     //int.Parse(id)
                     var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.Id == hse_scholarship_model.Id select c).FirstOrDefault();
@@ -11345,8 +11357,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     //hse_scholarship_model.Field_ID = concessionField?.Field_ID ?? null;
 
                     #region file section
-                    var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = blobService.Filenamer(file1);
+                    var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                    var blobname1 = file1 != null? blobService.Filenamer(file1): null;
 
                     if (file1 != null)
                     {
@@ -11357,15 +11369,32 @@ namespace Backend_UMR_Work_Program.Controllers
                         else
                             hse_scholarship_model.SSUploadFilename = blobname1;
                     }
+                    else
+                    {
+                        hse_scholarship_model.SSUploadFilePath = null;
+                        hse_scholarship_model.SSUploadFilename = null;
+                    }
 
                     #endregion
                     if (action == GeneralModel.Insert)
                     {
                         //if (getData == null)
                         //{
-                        hse_scholarship_model.Date_Created = DateTime.Now;
-                        hse_scholarship_model.Created_by = WKPCompanyId;
-                        await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.AddAsync(hse_scholarship_model);
+                        if(getData == null)
+                        {
+                            hse_scholarship_model.Date_Created = DateTime.Now;
+                            hse_scholarship_model.Created_by = WKPCompanyId;
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.AddAsync(hse_scholarship_model);
+                        }
+                        else
+                        {
+                            hse_scholarship_model.Date_Created = DateTime.Now;
+                            hse_scholarship_model.Created_by = WKPCompanyId;
+
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.Remove(getData);
+                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.AddAsync(hse_scholarship_model);
+                        }
+
                         // }
                         // else
                         // {
@@ -11389,7 +11418,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 if (save > 0)
                 {
-                    string successMsg = Messager.ShowMessage(action);
+                    string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
                     //var All_Data = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
