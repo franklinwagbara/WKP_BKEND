@@ -2040,6 +2040,82 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+        [HttpPost("POST_DECOMMISSIONING_ABANDONMENT")]
+        public async Task<object> POST_DECOMMISSIONING_ABANDONMENT([FromBody] DECOMMISSIONING_ABANDONMENT decomAban_model, string year, string omlName, string fieldName, string actionToDo)
+        {
+            int save = 0;
+
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
+
+            DECOMMISSIONING_ABANDONMENT myDecomAban;
+            try
+            {
+                if (concessionField?.Field_Name != null)
+                {
+                    myDecomAban = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.FieldId == concessionField.Field_ID && c.WpYear == year select c).FirstOrDefaultAsync();
+                }
+                else
+                {
+                    myDecomAban = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.WpYear == year select c).FirstOrDefaultAsync();
+   }
+ 
+                if (action == GeneralModel.Insert)
+                {
+                    if (decomAban_model == null)
+                    {
+
+                        decomAban_model.CompanyEmail = WKPCompanyEmail;
+                        decomAban_model.OmlId = concessionField?.Concession_ID ?? null;
+                        decomAban_model.FieldId = concessionField?.Field_ID ?? null;
+                        decomAban_model.WpYear = year;
+
+
+
+                        decomAban_model.DateUpdated = DateTime.Now;
+                        decomAban_model.CreatedBy = WKPCompanyEmail;
+                        await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
+                    }
+                    else
+                    {
+
+                        _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
+                        decomAban_model.DateCreated = DateTime.Now;
+                        decomAban_model.CreatedBy = WKPCompanyEmail;
+                        await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
+                    }
+                }
+                else if (action == GeneralModel.Delete)
+                {
+                    _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
+                }
+                save += await _context.SaveChangesAsync();
+                // }
+                // else
+                // {
+                // 	return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
+                // }
+
+
+                if (save > 0)
+                {
+                    string successMsg = Messager.ShowMessage(action);
+                    var All_Data = decomAban_model;
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
+                }
+                else
+                {
+                    return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
+                }
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + e.Message, StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+
+
         [HttpPost("POST_ROYALTY")]
         public async Task<object> POST_ROYALTY([FromBody] Royalty royalty_model, string year, string omlName, string fieldName, string actionToDo)
         {
@@ -2118,7 +2194,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + e.Message, StatusCode = ResponseCodes.InternalError };
             }
         }
-
 
 
 
