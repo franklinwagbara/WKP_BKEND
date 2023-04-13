@@ -226,6 +226,8 @@ public partial class WKP_DBContext : DbContext
 
     public virtual DbSet<Contract_Type> Contract_Types { get; set; }
 
+    public virtual DbSet<DECOMMISSIONING_ABANDONMENT> DECOMMISSIONING_ABANDONMENTs { get; set; }
+
     public virtual DbSet<DRILLING_EACH_WELL_COST> DRILLING_EACH_WELL_COSTs { get; set; }
 
     public virtual DbSet<DRILLING_EACH_WELL_COST_PROPOSED> DRILLING_EACH_WELL_COST_PROPOSEDs { get; set; }

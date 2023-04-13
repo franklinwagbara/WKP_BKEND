@@ -1,13 +1,3 @@
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\bin\Debug\WKP_Database.dacpac
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\bin\Debug\WKP_Database.dll
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\bin\Debug\WKP_Database.pdb
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\WKP_Database.sqlproj.AssemblyReference.cache
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\Model.xml
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\refactor.xml
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\postdeploy.sql
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\predeploy.sql
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\WKP_Database.dll
-C:\Users\Kenisank\tempo\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\WKP_Database.pdb
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dacpac
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dll
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.pdb
