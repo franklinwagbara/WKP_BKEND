@@ -2062,7 +2062,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (action == GeneralModel.Insert)
                 {
-                    if (decomAban_model != null)
+                    if (myDecomAban == null)
                     {
 
                         decomAban_model.CompanyEmail = WKPCompanyEmail;
@@ -2076,11 +2076,12 @@ namespace Backend_UMR_Work_Program.Controllers
                     else
                     {
 
-                        _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
+                       
                         decomAban_model.DateCreated = myDecomAban.DateCreated;
                         decomAban_model.CreatedBy = myDecomAban.CreatedBy;
-                        decomAban_model.DateCreated = DateTime.Now;
-                        decomAban_model.CreatedBy = WKPCompanyEmail;
+                        decomAban_model.DateUpdated = DateTime.Now;
+                        decomAban_model.UpdatedBy = WKPCompanyEmail;
+                         _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
                         await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
                     }
                 }
