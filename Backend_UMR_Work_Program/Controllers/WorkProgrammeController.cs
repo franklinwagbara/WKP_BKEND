@@ -2100,7 +2100,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (save > 0)
                 {
                     string successMsg = Messager.ShowMessage(action);
-                    var All_Data = await _context.DECOMMISSIONING_ABANDONMENTs.ToListAsync();
+                    var All_Data = await _context.DECOMMISSIONING_ABANDONMENTs.FirstOrDefaultAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                 }
                 else
