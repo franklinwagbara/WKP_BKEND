@@ -2972,8 +2972,10 @@ namespace Backend_UMR_Work_Program.Controllers
 							var HSEOccupationalHealth = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var HSEWasteManagementSystems = await (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var HSEEnvironmentalManagementSystems = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseEnvironmentalManagementPlans = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseRemediationFunds = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_Number == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
-							return new
+                            return new
 							{
 								HSERequirement = HSERequirement,
 								HSETechnicalSafety = HSETechnicalSafety,
@@ -3010,7 +3012,9 @@ namespace Backend_UMR_Work_Program.Controllers
 								HSEOccupationalHealth = HSEOccupationalHealth,
 								HSEWasteManagementSystems = HSEWasteManagementSystems,
 								HSEEnvironmentalManagementSystems = HSEEnvironmentalManagementSystems,
-							};
+                                hseEnvironmentalManagementPlans = hseEnvironmentalManagementPlans,
+                                hseRemediationFunds = hseRemediationFunds,
+                            };
 							break;
 
 						default:
