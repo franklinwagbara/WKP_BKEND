@@ -4,6 +4,7 @@ using Backend_UMR_Work_Program.DataModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    partial class WKP_DBContextModelSnapshot : ModelSnapshot
+    [Migration("20230403073537_AddDecomAba")]
+    partial class AddDecomAba
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -6152,11 +6155,13 @@ namespace Backend_UMR_Work_Program.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("AnnualObigationUsd")
-                        .HasColumnType("float");
+                    b.Property<string>("AnnualObigationUsd")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("ApprovalCostUsd")
-                        .HasColumnType("float");
+                    b.Property<string>("ApprovalCostUsd")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ApprovalStatus")
                         .IsRequired()
