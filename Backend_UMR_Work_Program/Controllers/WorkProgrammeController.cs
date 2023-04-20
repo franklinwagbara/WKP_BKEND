@@ -2058,30 +2058,30 @@ namespace Backend_UMR_Work_Program.Controllers
                 else
                 {
                     myDecomAban = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.WpYear == year select c).FirstOrDefaultAsync();
-   }
- 
+                }
+
                 if (action == GeneralModel.Insert)
                 {
-                    if (decomAban_model == null)
+                    if (myDecomAban == null)
                     {
 
                         decomAban_model.CompanyEmail = WKPCompanyEmail;
-                        decomAban_model.OmlId = concessionField?.Concession_ID ?? null;
+                        decomAban_model.OmlId = concessionField.Concession_ID ?? null;
                         decomAban_model.FieldId = concessionField?.Field_ID ?? null;
                         decomAban_model.WpYear = year;
-
-
-
-                        decomAban_model.DateUpdated = DateTime.Now;
+                        decomAban_model.DateCreated = DateTime.Now;
                         decomAban_model.CreatedBy = WKPCompanyEmail;
                         await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
                     }
                     else
                     {
 
-                        _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
-                        decomAban_model.DateCreated = DateTime.Now;
-                        decomAban_model.CreatedBy = WKPCompanyEmail;
+                       
+                        decomAban_model.DateCreated = myDecomAban.DateCreated;
+                        decomAban_model.CreatedBy = myDecomAban.CreatedBy;
+                        decomAban_model.DateUpdated = DateTime.Now;
+                        decomAban_model.UpdatedBy = WKPCompanyEmail;
+                         _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
                         await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
                     }
                 }
@@ -2100,7 +2100,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (save > 0)
                 {
                     string successMsg = Messager.ShowMessage(action);
-                    var All_Data = decomAban_model;
+                    var All_Data = await _context.DECOMMISSIONING_ABANDONMENTs.FirstOrDefaultAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                 }
                 else
@@ -6072,7 +6072,7 @@ namespace Backend_UMR_Work_Program.Controllers
             BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENT getData;
             BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENT budget_proposal_model = new BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENT()
             {
-                
+
                 Budget_for_Direct_Exploration_and_Production_Activities_Dollars = budgetProposal_model.Budget_for_Direct_Exploration_and_Production_Activities_Dollars,
                 Budget_for_Direct_Exploration_and_Production_Activities_Naira = budgetProposal_model.Budget_for_Direct_Exploration_and_Production_Activities_Naira,
                 Budget_for_other_Activities_Dollars = budgetProposal_model.Budget_for_other_Activities_Dollars,
@@ -6377,8 +6377,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
             BUDGET_PERFORMANCE_PRODUCTION_COST budget_performance_model = new BUDGET_PERFORMANCE_PRODUCTION_COST
             {
-              
-               DIRECT_COST_Actual= _budget_performance_model.DirecT_COST_Actual,
+
+                DIRECT_COST_Actual = _budget_performance_model.DirecT_COST_Actual,
                 DIRECT_COST_planned = _budget_performance_model.DirecT_COST_planned,
                 INDIRECT_COST_Actual = _budget_performance_model.IndirecT_COST_Actual,
                 INDIRECT_COST_planned = _budget_performance_model.IndirecT_COST_planned
@@ -6710,34 +6710,34 @@ namespace Backend_UMR_Work_Program.Controllers
                     if (action == GeneralModel.Insert)
                     {
 
-                         #region file section
-                            if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                        #region file section
+                        if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                        {
+
+                            var files = Request.Form.Files;
+                            if (files.Count >= 1)
                             {
+                                var file1 = Request.Form.Files[0];
+                                //var file2 = Request.Form.Files[1];
+                                var blobname1 = blobService.Filenamer(file1);
+                                //var blobname2 = blobService.Filenamer(file2);
 
-                                var files = Request.Form.Files;
-                                if (files.Count >= 1)
+                                if (file1 != null)
                                 {
-                                    var file1 = Request.Form.Files[0];
-                                    //var file2 = Request.Form.Files[1];
-                                    var blobname1 = blobService.Filenamer(file1);
-                                    //var blobname2 = blobService.Filenamer(file2);
-
-                                    if (file1 != null)
-                                    {
-                                        string docName = "Evidence of Inspection And Ugrade Main";
-                                        oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-                                        if (oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath == null)
-                                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
-                                        else
-                                            oil_condensate_assessment_model.EvidenceOfInspectionAndUgradeFilename = blobname1;
-                                    }
-
+                                    string docName = "Evidence of Inspection And Ugrade Main";
+                                    oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath == null)
+                                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
+                                    else
+                                        oil_condensate_assessment_model.EvidenceOfInspectionAndUgradeFilename = blobname1;
                                 }
-                            }
 
-                            #endregion
-                        
-                      
+                            }
+                        }
+
+                        #endregion
+
+
 
 
 
@@ -10258,7 +10258,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     #region file section
                     var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = file1 != null? blobService.Filenamer(file1): null;
+                    var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
 
                     if (file1 != null)
                     {
@@ -10278,7 +10278,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         // if (getData == null)
                         // {
 
-                        if(getData == null)
+                        if (getData == null)
                         {
                             hse_sustainable_model.Date_Created = DateTime.Now;
                             hse_sustainable_model.Created_by = WKPCompanyId;
@@ -10293,7 +10293,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.AddAsync(hse_sustainable_model);
                         }
 
-                       
+
                         // }
                         // else
                         // {
@@ -10376,7 +10376,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         //if (getData == null)
                         //{
 
-                        if(getData == null)
+                        if (getData == null)
                         {
                             hse_sustainable_model.Date_Created = DateTime.Now;
                             hse_sustainable_model.Created_by = WKPCompanyId;
@@ -10576,6 +10576,10 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_point_source_registration.Year_of_WP = year;
                     hse_point_source_registration.Company_ID = WKPCompanyId;
                     hse_point_source_registration.CompanyName = WKPCompanyName;
+
+                    hse_point_source_registration.Company_Email = WKPCompanyEmail;
+
+                    hse_point_source_registration.Company_Number = WKPCompanyNumber.ToString();
 
 
 
@@ -11446,7 +11450,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     #region file section
                     var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = file1 != null? blobService.Filenamer(file1): null;
+                    var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
 
                     if (file1 != null)
                     {
@@ -11468,7 +11472,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         //if (getData == null)
                         //{
-                        if(getData == null)
+                        if (getData == null)
                         {
                             hse_scholarship_model.Date_Created = DateTime.Now;
                             hse_scholarship_model.Created_by = WKPCompanyId;
@@ -12651,7 +12655,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 else if (picture_upload_model != null)
                 {
                     PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECT getData;
-                    getData = await (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id ==picture_upload_model.Id select c).FirstOrDefaultAsync();
+                    getData = await (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id == picture_upload_model.Id select c).FirstOrDefaultAsync();
 
                     picture_upload_model.Companyemail = WKPCompanyEmail;
                     picture_upload_model.CompanyName = WKPCompanyName;
@@ -12665,7 +12669,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     #region file section
                     var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = file1 != null ? blobService.Filenamer(file1) : null ;
+                    var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
 
                     if (file1 != null)
                     {
@@ -12682,11 +12686,11 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                         if (getData == null)
-                         {
-                        picture_upload_model.Date_Created = DateTime.Now;
-                        picture_upload_model.Created_by = WKPCompanyId;
-                        await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
+                        if (getData == null)
+                        {
+                            picture_upload_model.Date_Created = DateTime.Now;
+                            picture_upload_model.Created_by = WKPCompanyId;
+                            await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.AddAsync(picture_upload_model);
                         }
                         else
                         {
