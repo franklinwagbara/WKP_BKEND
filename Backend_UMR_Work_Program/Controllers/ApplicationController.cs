@@ -50,36 +50,37 @@ namespace Backend_UMR_Work_Program.Controllers
         private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
         private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
 
-        [HttpGet("GetDashboardStuff")]
-        public async Task<object> GetDashboardStuff()
-        {
-            try
-            {
-                var deskCount = 0;
-                var getStaff = (from stf in _context.staff
-                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-                                where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
-                                select stf).FirstOrDefault();
-                if (getStaff != null)
-                {
-                    deskCount = await _context.MyDesks.Where(x => x.StaffID == getStaff.StaffID && x.HasWork != true).CountAsync();
+		[HttpGet("GetDashboardStuff")]
+		public async Task<object> GetDashboardStuff()
+		{
+			try
+			{
+				var deskCount = 0;
+				var getStaff = (from stf in _context.staff
+								join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+								where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
+								select stf).FirstOrDefault();
+				if (getStaff != null)
+				{
+					//deskCount = await _context.MyDesks.Where(x => x.StaffID == getStaff.StaffID && x.HasWork != true).CountAsync();
+					deskCount = await _context.MyDesks.Where(x => x.StaffID == getStaff.StaffID && x.HasWork == true).CountAsync();
                 }
-                var allApplicationsCount = await _context.Applications.Where(x => x.Status == GeneralModel.Processing).CountAsync();
-                var allProcessingCount = await _context.Applications.CountAsync();
-                var allApprovalsCount = await _context.PermitApprovals.CountAsync();
-                return new
-                {
-                    deskCount = deskCount,
-                    allApplicationsCount = allApplicationsCount,
-                    allProcessingCount = allProcessingCount,
-                    allApprovalsCount = allApprovalsCount
-                };
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { message = "Error : " + e.Message });
-            }
-        }
+				var allApplicationsCount = await _context.Applications.Where(x => x.Status == GeneralModel.Processing).CountAsync();
+				var allProcessingCount = await _context.Applications.CountAsync();
+				var allApprovalsCount = await _context.PermitApprovals.CountAsync();
+				return new
+				{
+					deskCount = deskCount,
+					allApplicationsCount = allApplicationsCount,
+					allProcessingCount = allProcessingCount,
+					allApprovalsCount = allApprovalsCount
+				};
+			}
+			catch (Exception e)
+			{
+				return BadRequest(new { message = "Error : " + e.Message });
+			}
+		}
 
         [HttpGet("GetAppsOnMyDesk")]
         public async Task<object> GetAppsOnMyDesk()
