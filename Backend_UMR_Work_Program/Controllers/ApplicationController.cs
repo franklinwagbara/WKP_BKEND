@@ -3130,7 +3130,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             var HSECausesOfSpill = await (from c in _context.HSE_CAUSES_OF_SPILLs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var HSESustainableDevMOU = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
-                            var HSESustainableDevProgramCsr = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSESustainableDevProgramCsr1 = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
 							var HSESustainableDevScheme = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var HSEManagementPosition = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
@@ -3165,7 +3165,7 @@ namespace Backend_UMR_Work_Program.Controllers
 								HSEOSPRegistrations = HSEOSPRegistrations,
 								HSEAccidentIncidenceType = HSEAccidentIncidenceType,
 								HSECommunityDisturbance = HSECommunityDisturbance,
-								HSESustainableDevProjProgramCsr = HSESustainableDevProgramCsr,
+								HSESustainableDevProjProgramCsr = HSESustainableDevProgramCsr1,
 
 								HSEQuestion = HSEQuestion,
 								HSEFatality = HSEFatality,
