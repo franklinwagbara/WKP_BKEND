@@ -2,6 +2,7 @@
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Models.Enurations;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 //using LinqToDB;
@@ -2845,6 +2846,7 @@ namespace Backend_UMR_Work_Program.Controllers
 		[HttpGet("GetSBU_Report")]
 		public async Task<object> GetSBU_Report(int appID)
 		{
+			string[] Item_types = { "Capex", "Opex" };
 
 			try
 			{
@@ -2875,7 +2877,11 @@ namespace Backend_UMR_Work_Program.Controllers
 							var drillEachCost = await (from d in _context.DRILLING_EACH_WELL_COSTs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
 							var drillEachCostProposed = await (from d in _context.DRILLING_EACH_WELL_COST_PROPOSEDs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
 							var drillOperationCategoriesWell = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
-							return new { geoActivitiesAcquisition = geoActivitiesAcquisition, geoActivitiesProcessing = geoActivitiesProcessing, drillEachCost = drillEachCost, drillEachCostProposed = drillEachCostProposed, drillOperationCategoriesWell = drillOperationCategoriesWell };
+							var BudgetCapex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[0] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var BudgetOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[1] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+
+
+                            return new { BudgetCapex = BudgetCapex, BudgetOpex = BudgetOpex, geoActivitiesAcquisition = geoActivitiesAcquisition, geoActivitiesProcessing = geoActivitiesProcessing, drillEachCost = drillEachCost, drillEachCostProposed = drillEachCostProposed, drillOperationCategoriesWell = drillOperationCategoriesWell };
 
 							break;
 						case "E&AM": //Planning
@@ -2887,9 +2893,11 @@ namespace Backend_UMR_Work_Program.Controllers
 							var BudgetPerformanceProductionCost = await (from c in _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var BudgetPerformanceFacilityDevProjects = await (from c in _context.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-							var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var geoActivitiesAcquisitions = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
+                            var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
+                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
 
-							return new
+                            return new
 							{
 								PlanningRequirement = PlanningRequirement,
 								BudgetActualExpenditure = BudgetActualExpenditure,
@@ -2898,8 +2906,12 @@ namespace Backend_UMR_Work_Program.Controllers
 								BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
 								BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
 								BudgetProposalComponents = BudgetProposalComponents,
-								BudgetCapexOpex = BudgetCapexOpex
-							};
+								//BudgetCapex = BudgetCapex,
+								//BudgetOpex = BudgetOpex,
+                                geoActivitiesAcquisitions = geoActivitiesAcquisitions,
+                                geoActivitiesProcessings = geoActivitiesProcessings,
+                                concessionSituations = concessionSituations,
+                            };
 
 
 						case "D & P":
@@ -2919,14 +2931,14 @@ namespace Backend_UMR_Work_Program.Controllers
 
 						case "CS & A":
 
-							var HSESustainableDevProgramCsr = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+							var HSESustainableDevProgramCsr_1 = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var NigeriaContent = await (from c in _context.NIGERIA_CONTENT_Trainings where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var NigeriaContentUploadSuccession = await (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var NigeriaContentQuestion = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 
 							return new
 							{
-								HSESustainableDevProgramCsr = HSESustainableDevProgramCsr,
+								HSESustainableDevProgramCsr = HSESustainableDevProgramCsr_1,
 								NigeriaContent = NigeriaContent,
 								NigeriaContentUploadSuccession = NigeriaContentUploadSuccession,
 								NigeriaContentQuestion = NigeriaContentQuestion
@@ -3010,6 +3022,7 @@ namespace Backend_UMR_Work_Program.Controllers
 							var hsePointSourceRegistrations = await (from c in _context.HSE_POINT_SOURCE_REGISTRATIONs where c.Company_Number == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var hseHostCommunitiesDevelopments = await (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.CompanyNumber == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var hseGHGManagementPlans = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseOperationSafetyCases = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
                             return new
 							{
@@ -3055,6 +3068,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 hseGHGManagementPlans = hseGHGManagementPlans,
                                 hseHostCommunitiesDevelopments = hseHostCommunitiesDevelopments,
                                 hsePointSourceRegistrations = hsePointSourceRegistrations,
+                                hseOperationSafetyCases = hseOperationSafetyCases,
                             };
 							break;
 
