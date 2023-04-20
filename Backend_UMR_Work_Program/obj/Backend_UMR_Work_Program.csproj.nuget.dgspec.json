@@ -1,35 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj": {}
+    "C:\\Sandbox\\WorkProgram_BEnd - Copy (6)\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj": {}
   },
   "projects": {
-    "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj": {
+    "C:\\Sandbox\\WorkProgram_BEnd - Copy (6)\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
+        "projectUniqueName": "C:\\Sandbox\\WorkProgram_BEnd - Copy (6)\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
         "projectName": "Backend_UMR_Work_Program",
-        "projectPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
-        "packagesPath": "C:\\Users\\BrandOneTech\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\obj\\",
+        "projectPath": "C:\\Sandbox\\WorkProgram_BEnd - Copy (6)\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
+        "packagesPath": "C:\\Users\\suppo\\.nuget\\packages\\",
+        "outputPath": "C:\\Sandbox\\WorkProgram_BEnd - Copy (6)\\Backend_UMR_Work_Program\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-<<<<<<< HEAD
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
           "C:\\Users\\suppo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
-=======
-          "C:\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
-        "configFilePaths": [
-          "C:\\Users\\BrandOneTech\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
->>>>>>> 1b8cab0c29c57cabf37fe71ec9eb445721a95eb8
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -178,11 +168,7 @@
               "privateAssets": "all"
             }
           },
-<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
-=======
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.103\\RuntimeIdentifierGraph.json"
->>>>>>> 1b8cab0c29c57cabf37fe71ec9eb445721a95eb8
         }
       }
     }
