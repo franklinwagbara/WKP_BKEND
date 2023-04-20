@@ -60,8 +60,9 @@ namespace Backend_UMR_Work_Program.Controllers
 								select stf).FirstOrDefault();
 				if (getStaff != null)
 				{
-					deskCount = await _context.MyDesks.Where(x => x.StaffID == getStaff.StaffID && x.HasWork != true).CountAsync();
-				}
+					//deskCount = await _context.MyDesks.Where(x => x.StaffID == getStaff.StaffID && x.HasWork != true).CountAsync();
+					deskCount = await _context.MyDesks.Where(x => x.StaffID == getStaff.StaffID && x.HasWork == true).CountAsync();
+                }
 				var allApplicationsCount = await _context.Applications.Where(x => x.Status == GeneralModel.Processing).CountAsync();
 				var allProcessingCount = await _context.Applications.CountAsync();
 				var allApprovalsCount = await _context.PermitApprovals.CountAsync();
