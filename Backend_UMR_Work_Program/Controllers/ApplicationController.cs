@@ -2931,14 +2931,14 @@ namespace Backend_UMR_Work_Program.Controllers
 
 						case "CS & A":
 
-							var HSESustainableDevProgramCsr = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+							var HSESustainableDevProgramCsr_1 = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var NigeriaContent = await (from c in _context.NIGERIA_CONTENT_Trainings where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var NigeriaContentUploadSuccession = await (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var NigeriaContentQuestion = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 
 							return new
 							{
-								HSESustainableDevProgramCsr = HSESustainableDevProgramCsr,
+								HSESustainableDevProgramCsr = HSESustainableDevProgramCsr_1,
 								NigeriaContent = NigeriaContent,
 								NigeriaContentUploadSuccession = NigeriaContentUploadSuccession,
 								NigeriaContentQuestion = NigeriaContentQuestion
