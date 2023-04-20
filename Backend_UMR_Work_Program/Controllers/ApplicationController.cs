@@ -2972,8 +2972,15 @@ namespace Backend_UMR_Work_Program.Controllers
 							var HSEOccupationalHealth = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var HSEWasteManagementSystems = await (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 							var HSEEnvironmentalManagementSystems = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseEnvironmentalManagementPlans = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseRemediationFunds = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_Number == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseEffluentCompliances = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.CompanyNumber == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseWasteManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hsePointSourceRegistrations = await (from c in _context.HSE_POINT_SOURCE_REGISTRATIONs where c.Company_Number == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseHostCommunitiesDevelopments = await (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.CompanyNumber == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseGHGManagementPlans = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
-							return new
+                            return new
 							{
 								HSERequirement = HSERequirement,
 								HSETechnicalSafety = HSETechnicalSafety,
@@ -3010,7 +3017,14 @@ namespace Backend_UMR_Work_Program.Controllers
 								HSEOccupationalHealth = HSEOccupationalHealth,
 								HSEWasteManagementSystems = HSEWasteManagementSystems,
 								HSEEnvironmentalManagementSystems = HSEEnvironmentalManagementSystems,
-							};
+                                hseEnvironmentalManagementPlans = hseEnvironmentalManagementPlans,
+                                hseRemediationFunds = hseRemediationFunds,
+                                hseWasteManagementDZs = hseWasteManagementDZs,
+                                hseEffluentCompliances = hseEffluentCompliances,
+                                hseGHGManagementPlans = hseGHGManagementPlans,
+                                hseHostCommunitiesDevelopments = hseHostCommunitiesDevelopments,
+                                hsePointSourceRegistrations = hsePointSourceRegistrations,
+                            };
 							break;
 
 						default:
