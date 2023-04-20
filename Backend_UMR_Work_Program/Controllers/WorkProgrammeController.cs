@@ -10577,6 +10577,10 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_point_source_registration.Company_ID = WKPCompanyId;
                     hse_point_source_registration.CompanyName = WKPCompanyName;
 
+                    hse_point_source_registration.Company_Email = WKPCompanyEmail;
+
+                    hse_point_source_registration.Company_Number = WKPCompanyNumber.ToString();
+
 
 
                     if (hse_point_source_registration.are_there_point_source_permit == "YES")

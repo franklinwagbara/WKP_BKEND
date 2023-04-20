@@ -2844,10 +2844,11 @@ namespace Backend_UMR_Work_Program.Controllers
 
         #endregion
 
-        #region SBU Report
-        [HttpGet("GetSBU_Report")]
-        public async Task<object> GetSBU_Report(int appID)
-        {
+		#region SBU Report
+		[HttpGet("GetSBU_Report")]
+		public async Task<object> GetSBU_Report(int appID)
+		{
+			string[] Item_types = { "Capex", "Opex" };
 
             try
             {
@@ -2894,10 +2895,30 @@ namespace Backend_UMR_Work_Program.Controllers
                                 royalty = royalty
 
                             };
+							var geoActivitiesAcquisition = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
+							var geoActivitiesProcessing = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
+							var drillEachCost = await (from d in _context.DRILLING_EACH_WELL_COSTs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
+							var drillEachCostProposed = await (from d in _context.DRILLING_EACH_WELL_COST_PROPOSEDs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
+							var drillOperationCategoriesWell = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
+							var BudgetCapex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[0] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var BudgetOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[1] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
-                            break;
-                        case "E&AM": //Planning
 
+                            return new { BudgetCapex = BudgetCapex, BudgetOpex = BudgetOpex, geoActivitiesAcquisition = geoActivitiesAcquisition, geoActivitiesProcessing = geoActivitiesProcessing, drillEachCost = drillEachCost, drillEachCostProposed = drillEachCostProposed, drillOperationCategoriesWell = drillOperationCategoriesWell };
+
+							break;
+						case "E&AM": //Planning
+
+							var PlanningRequirement = await (from c in _context.Planning_MinimumRequirements where c.CompanyNumber == application.CompanyID && c.Year.ToString() == year select c).FirstOrDefaultAsync();
+							var BudgetActualExpenditure = await (from c in _context.BUDGET_ACTUAL_EXPENDITUREs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var BudgetPerformanceExploratory = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var BudgetPerformanceDevelopment = await (from c in _context.BUDGET_PERFORMANCE_DEVELOPMENT_DRILLING_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var BudgetPerformanceProductionCost = await (from c in _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var BudgetPerformanceFacilityDevProjects = await (from c in _context.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var geoActivitiesAcquisitions = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
+                            var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
+                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
                             var PlanningRequirement = await (from c in _context.Planning_MinimumRequirements where c.CompanyNumber == application.CompanyID && c.Year.ToString() == year select c).FirstOrDefaultAsync();
                             var BudgetActualExpenditure = await (from c in _context.BUDGET_ACTUAL_EXPENDITUREs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var BudgetPerformanceExploratory = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
@@ -2908,6 +2929,52 @@ namespace Backend_UMR_Work_Program.Controllers
                             var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var categoriesProposedWell = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
+                            return new
+							{
+								PlanningRequirement = PlanningRequirement,
+								BudgetActualExpenditure = BudgetActualExpenditure,
+								BudgetPerformanceExploratory = BudgetPerformanceExploratory,
+								BudgetPerformanceDevelopment = BudgetPerformanceDevelopment,
+								BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
+								BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
+								BudgetProposalComponents = BudgetProposalComponents,
+								//BudgetCapex = BudgetCapex,
+								//BudgetOpex = BudgetOpex,
+                                geoActivitiesAcquisitions = geoActivitiesAcquisitions,
+                                geoActivitiesProcessings = geoActivitiesProcessings,
+                                concessionSituations = concessionSituations,
+                            };
+
+
+						case "D & P":
+
+							var OilCondensateProduction = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var OilCondensateProductionMonthly = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+							var OilCondensateProductionMonthlyProposed = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+							var OilCondensateFiveYears = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+
+							return new
+							{
+								OilCondensateProduction = OilCondensateProduction,
+								OilCondensateProductionMonthly = OilCondensateProductionMonthly,
+								OilCondensateProductionMonthlyProposed = OilCondensateProductionMonthlyProposed,
+								OilCondensateFiveYears = OilCondensateFiveYears
+							};
+
+						case "CS & A":
+
+							var HSESustainableDevProgramCsr_1 = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+							var NigeriaContent = await (from c in _context.NIGERIA_CONTENT_Trainings where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+							var NigeriaContentUploadSuccession = await (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+							var NigeriaContentQuestion = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+
+							return new
+							{
+								HSESustainableDevProgramCsr = HSESustainableDevProgramCsr_1,
+								NigeriaContent = NigeriaContent,
+								NigeriaContentUploadSuccession = NigeriaContentUploadSuccession,
+								NigeriaContentQuestion = NigeriaContentQuestion
+							};
                             return new
                             {
                                 PlanningRequirement = PlanningRequirement,
@@ -3074,54 +3141,70 @@ namespace Backend_UMR_Work_Program.Controllers
 
                             var HSESustainableDevProgramCsr = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
-                            var HSESustainableDevScheme = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var HSEManagementPosition = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var HSEQualityControl = await (from c in _context.HSE_QUALITY_CONTROLs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var HSEClimateChange = await (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var HSESafetyCulture = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var HSEOccupationalHealth = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var HSEWasteManagementSystems = await (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var HSEEnvironmentalManagementSystems = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSESustainableDevScheme = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSEManagementPosition = await (from c in _context.HSE_MANAGEMENT_POSITIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSEQualityControl = await (from c in _context.HSE_QUALITY_CONTROLs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSEClimateChange = await (from c in _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSESafetyCulture = await (from c in _context.HSE_SAFETY_CULTURE_TRAININGs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSEOccupationalHealth = await (from c in _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSEWasteManagementSystems = await (from c in _context.HSE_WASTE_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var HSEEnvironmentalManagementSystems = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseEnvironmentalManagementPlans = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseRemediationFunds = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_Number == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseEffluentCompliances = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.CompanyNumber == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseWasteManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hsePointSourceRegistrations = await (from c in _context.HSE_POINT_SOURCE_REGISTRATIONs where c.Company_Number == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseHostCommunitiesDevelopments = await (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.CompanyNumber == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseGHGManagementPlans = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+							var hseOperationSafetyCases = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
                             return new
-                            {
-                                HSERequirement = HSERequirement,
-                                HSETechnicalSafety = HSETechnicalSafety,
-                                HSESafetyStudies = HSESafetyStudies,
-                                HSEQualityControl = HSEQualityControl,
-                                HSEInspectionMaintenance = HSEInspectionMaintenance,
-                                HSEAssetRegister = HSEAssetRegister,
-                                HSEOilSpill = HSEOilSpill,
-                                HSECausesOfSpill = HSECausesOfSpill,
-                                HSEAssetRegisterRBI = HSEAssetRegisterRBI,
-                                HSEAccidentModel = accidentModel,
-                                HSEAccidentIncidence = HSEAccidentIncidence,
-                                HSEOSPRegistrations = HSEOSPRegistrations,
-                                HSEAccidentIncidenceType = HSEAccidentIncidenceType,
-                                HSECommunityDisturbance = HSECommunityDisturbance,
-                                HSESustainableDevProjProgramCsr = HSESustainableDevProgramCsr,
+							{
+								HSERequirement = HSERequirement,
+								HSETechnicalSafety = HSETechnicalSafety,
+								HSESafetyStudies = HSESafetyStudies,
+								HSEQualityControl = HSEQualityControl,
+								HSEInspectionMaintenance = HSEInspectionMaintenance,
+								HSEAssetRegister = HSEAssetRegister,
+								HSEOilSpill = HSEOilSpill,
+								HSECausesOfSpill = HSECausesOfSpill,
+								HSEAssetRegisterRBI = HSEAssetRegisterRBI,
+								HSEAccidentModel = accidentModel,
+								HSEAccidentIncidence = HSEAccidentIncidence,
+								HSEOSPRegistrations = HSEOSPRegistrations,
+								HSEAccidentIncidenceType = HSEAccidentIncidenceType,
+								HSECommunityDisturbance = HSECommunityDisturbance,
+								HSESustainableDevProjProgramCsr = HSESustainableDevProgramCsr,
 
-                                HSEQuestion = HSEQuestion,
-                                HSEFatality = HSEFatality,
-                                HSEDesignSafety = HSEDesignSafety,
-                                HSEInspectionMaintenanceFacility = HSEInspectionMaintenanceFacility,
-                                HSEEnvironmentalStudies = HSEEnvironmentalStudies,
-                                HSEWasteManagement = HSEWasteManagement,
-                                HSEWasteManagementType = HSEWasteManagementType,
-                                HSEProducedWaterMgt = HSEProducedWaterMgt,
-                                HSEEnvironmentalCompliance = HSEEnvironmentalCompliance,
-                                HSEEnvironmentalFiveYears = HSEEnvironmentalFiveYears,
-                                HSEEnvironmentalStudiesUpdated = HSEEnvironmentalStudiesUpdated,
-                                HSEProducedWaterMgtUpdated = HSEProducedWaterMgtUpdated,
-                                HSEEnvironmentalComplianceChemical = HSEEnvironmentalComplianceChemical,
-                                HSEManagementPosition = HSEManagementPosition,
-                                HSEClimateChange = HSEClimateChange,
-                                HSESafetyCulture = HSESafetyCulture,
-                                HSEOccupationalHealth = HSEOccupationalHealth,
-                                HSEWasteManagementSystems = HSEWasteManagementSystems,
-                                HSEEnvironmentalManagementSystems = HSEEnvironmentalManagementSystems,
+								HSEQuestion = HSEQuestion,
+								HSEFatality = HSEFatality,
+								HSEDesignSafety = HSEDesignSafety,
+								HSEInspectionMaintenanceFacility = HSEInspectionMaintenanceFacility,
+								HSEEnvironmentalStudies = HSEEnvironmentalStudies,
+								HSEWasteManagement = HSEWasteManagement,
+								HSEWasteManagementType = HSEWasteManagementType,
+								HSEProducedWaterMgt = HSEProducedWaterMgt,
+								HSEEnvironmentalCompliance = HSEEnvironmentalCompliance,
+								HSEEnvironmentalFiveYears = HSEEnvironmentalFiveYears,
+								HSEEnvironmentalStudiesUpdated = HSEEnvironmentalStudiesUpdated,
+								HSEProducedWaterMgtUpdated = HSEProducedWaterMgtUpdated,
+								HSEEnvironmentalComplianceChemical = HSEEnvironmentalComplianceChemical,
+								HSEManagementPosition = HSEManagementPosition,
+								HSEClimateChange = HSEClimateChange,
+								HSESafetyCulture = HSESafetyCulture,
+								HSEOccupationalHealth = HSEOccupationalHealth,
+								HSEWasteManagementSystems = HSEWasteManagementSystems,
+								HSEEnvironmentalManagementSystems = HSEEnvironmentalManagementSystems,
+                                hseEnvironmentalManagementPlans = hseEnvironmentalManagementPlans,
+                                hseRemediationFunds = hseRemediationFunds,
+                                hseWasteManagementDZs = hseWasteManagementDZs,
+                                hseEffluentCompliances = hseEffluentCompliances,
+                                hseGHGManagementPlans = hseGHGManagementPlans,
+                                hseHostCommunitiesDevelopments = hseHostCommunitiesDevelopments,
+                                hsePointSourceRegistrations = hsePointSourceRegistrations,
+                                hseOperationSafetyCases = hseOperationSafetyCases,
                             };
-                            break;
+							break;
 
                         default:
                             return BadRequest(new { message = "Error : User SBU was not specified." });
