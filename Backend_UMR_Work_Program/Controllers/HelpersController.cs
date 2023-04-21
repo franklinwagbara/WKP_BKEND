@@ -2952,8 +2952,13 @@ generate:
 				foreach (var staffId in staffIds)
 				{
 					var desk = _context.MyDesks.Where(x => x.StaffID==staffId && x.AppId == appId && x.HasWork == false).FirstOrDefault();
+					var desk_conflict = _context.MyDesks.Where(x => x.StaffID==staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
 
-					if (desk !=null)
+					if(desk_conflict != null)
+					{
+						throw new Exception("This application has already been push to this desk.");
+                    }
+                    else if (desk != null)
 					{
 						staffDesks.Add(desk);
 					}
