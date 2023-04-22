@@ -2936,22 +2936,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                 concessionSituations = concessionSituations,
                             };
 
-
-						case "D & P":
-
-							var OilCondensateProduction = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-							var OilCondensateProductionMonthly = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
-							var OilCondensateProductionMonthlyProposed = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
-							var OilCondensateFiveYears = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
-
-							return new
-							{
-								OilCondensateProduction = OilCondensateProduction,
-								OilCondensateProductionMonthly = OilCondensateProductionMonthly,
-								OilCondensateProductionMonthlyProposed = OilCondensateProductionMonthlyProposed,
-								OilCondensateFiveYears = OilCondensateFiveYears
-							};
-
 						case "CS & A":
 
 							var HSESustainableDevProgramCsr_1 = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
@@ -3013,6 +2997,10 @@ namespace Backend_UMR_Work_Program.Controllers
                             var fieldDevelopmentPlan = await (from c in _context.FIELD_DEVELOPMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Field_ID==application.FieldID && c.Year_of_WP == year select c).ToListAsync();
                             var _categoriesProposedWell = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID==application.FieldID && c.Year_of_WP == year select c).ToListAsync();
 
+                            var OilCondensateProduction = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var OilCondensateProductionMonthly = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var OilCondensateProductionMonthlyProposed = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var OilCondensateFiveYears = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 
 
                             return new
@@ -3035,9 +3023,12 @@ namespace Backend_UMR_Work_Program.Controllers
                                 unitization = unitization,
                                 expectedReserves = expectedReserves,
                                 fieldDevelopmentPlan = fieldDevelopmentPlan,
-                                _categoriesProposedWell = _categoriesProposedWell
+                                _categoriesProposedWell = _categoriesProposedWell,
 
-
+                                OilCondensateProduction = OilCondensateProduction,
+                                OilCondensateProductionMonthly = OilCondensateProductionMonthly,
+                                OilCondensateProductionMonthlyProposed = OilCondensateProductionMonthlyProposed,
+                                OilCondensateFiveYears = OilCondensateFiveYears
                             };
 
                         case "CS&A": //SBU
@@ -3073,8 +3064,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 capitalProjects = capitalProjects,
                                 projectDetails = projectDetails,
                                 mOUInformation = mOUInformation,
-                                sustainableDevelopmentCommunityProjectProgram = sustainableDevelopmentCommunityProjectProgram
-                        };
+                                sustainableDevelopmentCommunityProjectProgram = sustainableDevelopmentCommunityProjectProgram,
+                            };
 
 
 
