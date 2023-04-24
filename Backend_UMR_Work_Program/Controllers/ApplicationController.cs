@@ -3026,7 +3026,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 unitization = unitization,
                                 expectedReserves = expectedReserves,
                                 fieldDevelopmentPlan = fieldDevelopmentPlan,
-                                _categoriesProposedWell = _categoriesProposedWell,
+                                categoriesProposedWells = _categoriesProposedWell,
 
                                 OilCondensateProduction = OilCondensateProduction,
                                 OilCondensateProductionMonthly = OilCondensateProductionMonthly,
