@@ -2919,7 +2919,10 @@ namespace Backend_UMR_Work_Program.Controllers
                             
                             var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var categoriesProposedWell = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-
+                            var drillingOperations = await (from c in _context.Drilling_Operations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var geophysicalActivities = await (from c in _context.Geophysical_Activities where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var concessionSituation = await (from c in _context.ConcessionSituations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var budgetPerformance = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefault();
                             return new
 							{
 								PlanningRequirement = PlanningRequirement,
@@ -2934,6 +2937,10 @@ namespace Backend_UMR_Work_Program.Controllers
                                 geoActivitiesAcquisitions = geoActivitiesAcquisitions,
                                 geoActivitiesProcessings = geoActivitiesProcessings,
                                 concessionSituations = concessionSituations,
+                                drillingOperations = drillingOperations,
+                                geoPhysical = geophysicalActivities,
+                                concessionSituation = concessionSituation,
+                                budgetPerformance = budgetPerformance
                             };
 
 
@@ -2943,13 +2950,16 @@ namespace Backend_UMR_Work_Program.Controllers
 							var OilCondensateProductionMonthly = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var OilCondensateProductionMonthlyProposed = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
 							var OilCondensateFiveYears = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var fiveYearProd = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
 							return new
 							{
 								OilCondensateProduction = OilCondensateProduction,
 								OilCondensateProductionMonthly = OilCondensateProductionMonthly,
 								OilCondensateProductionMonthlyProposed = OilCondensateProductionMonthlyProposed,
-								OilCondensateFiveYears = OilCondensateFiveYears
+								OilCondensateFiveYears = OilCondensateFiveYears,
+                                concessionSituation = concessionSituation,
+                                fiveYearProductionForcast = fiveYearProd
 							};
 
 						case "CS & A":
