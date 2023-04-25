@@ -2933,6 +2933,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 BudgetProposalComponents = BudgetProposalComponents,
                                 //BudgetCapex = BudgetCapex,
                                 //BudgetOpex = BudgetOpex,
+                                categoriesProposedWell = categoriesProposedWell,
                                 geoActivitiesAcquisitions = geoActivitiesAcquisitions,
                                 geoActivitiesProcessings = geoActivitiesProcessings,
                                 concessionSituations = concessionSituations,
