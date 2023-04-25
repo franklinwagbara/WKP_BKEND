@@ -3067,6 +3067,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 reserveDecline = reserveDecline,
                                 reserveAddition = reserveAddition,
                                 fiveYearReservesProjection = fiveYearReservesProjection,
+                                concessionSituation = concessionSituation,
                                 //fiveYearReservesProjectionTerrain = fiveYearReservesProjection,
                                 concessionReservesPrecedingYearJanuary = concessionReservesPrecedingYearJanuary,
                                 reservesUpdateConcessionReservesJanuary= reservesUpdateConcessionReservesJanuary,
