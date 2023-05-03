@@ -2918,9 +2918,9 @@ namespace Backend_UMR_Work_Program.Controllers
 
                             //var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var categoriesProposedWell = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year select c).ToListAsync();
-                            var drillingOperations = await (from c in _context.Drilling_Operations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            //var drillingOperations = await (from c in _context.Drilling_Operations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var geophysicalActivities = await (from c in _context.Geophysical_Activities where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var concessionSituation = await (from c in _context.ConcessionSituations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            //var concessionSituation = await (from c in _context.ConcessionSituations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var budgetPerformance = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             return new
                             {
@@ -2937,9 +2937,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                 geoActivitiesAcquisitions = geoActivitiesAcquisitions,
                                 geoActivitiesProcessings = geoActivitiesProcessings,
                                 concessionSituations = concessionSituations,
-                                drillingOperations = drillingOperations,
+                                //drillingOperations = drillingOperations,
                                 geoPhysical = geophysicalActivities,
-                                concessionSituation = concessionSituation,
+                                concessionSituation = concessionSituations,
                                 budgetPerformance = budgetPerformance
                             };
 
@@ -2981,7 +2981,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             var projectDetails = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
                             var mOUInformation = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
                             var sustainableDevelopmentCommunityProjectProgram = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
-                            var BudgetCapexOpex = await (from c in _context.ADMIN_BUDGET_CAPEX_OPEXes where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            //var BudgetCapexOpex = await (from c in _context.ADMIN_BUDGET_CAPEX_OPEXes where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
                             return new
                             {
@@ -2989,15 +2989,15 @@ namespace Backend_UMR_Work_Program.Controllers
                                 NigeriaContent = NigeriaContent,
                                 NigeriaContentUploadSuccession = NigeriaContentUploadSuccession,
                                 NigeriaContentQuestion = NigeriaContentQuestion,
-                                PlanningRequirement = PlanningRequirement,
-                                BudgetActualExpenditure = BudgetActualExpenditure,
-                                BudgetPerformanceExploratory = BudgetPerformanceExploratory,
-                                BudgetPerformanceDevelopment = BudgetPerformanceDevelopment,
-                                BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
-                                BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
-                                BudgetProposalComponents = BudgetProposalComponents,
-                                BudgetCapexOpex = BudgetCapexOpex,
-                                categoriesProposedWell = categoriesProposedWell,
+                                //PlanningRequirement = PlanningRequirement,
+                                //BudgetActualExpenditure = BudgetActualExpenditure,
+                                //BudgetPerformanceExploratory = BudgetPerformanceExploratory,
+                                //BudgetPerformanceDevelopment = BudgetPerformanceDevelopment,
+                                //BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
+                                //BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
+                                //BudgetProposalComponents = BudgetProposalComponents,
+                                //BudgetCapexOpex = BudgetCapexOpex,
+                                //categoriesProposedWell = categoriesProposedWell,
                                 _strategicPlans = _strategicPlans,
                                 successPlans = successPlans,
                                 seniorManagementStaff = seniorManagementStaff,
@@ -3067,7 +3067,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 reserveDecline = reserveDecline,
                                 reserveAddition = reserveAddition,
                                 fiveYearReservesProjection = fiveYearReservesProjection,
-                                concessionSituation = concessionSituation,
+                                //concessionSituation = concessionSituations,
                                 //fiveYearReservesProjectionTerrain = fiveYearReservesProjection,
                                 concessionReservesPrecedingYearJanuary = concessionReservesPrecedingYearJanuary,
                                 reservesUpdateConcessionReservesJanuary= reservesUpdateConcessionReservesJanuary,
