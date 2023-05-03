@@ -2618,7 +2618,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_HSE_ENVIRONMENTAL_MANAGEMENT_PLAN")]
-        public async Task<object> POST_HSE_ENVIRONMENTAL_MANAGEMENT_PLAN([FromBody] HSE_ENVIRONMENTAL_MANAGEMENT_PLAN environment_Management_Plan_model, string omlName, string fieldName, string year, string actionToDo = null)
+        public async Task<object> POST_HSE_ENVIRONMENTAL_MANAGEMENT_PLAN([FromForm] HSE_ENVIRONMENTAL_MANAGEMENT_PLAN environment_Management_Plan_model, string omlName, string fieldName, string year, string actionToDo = null)
         {
 
             int save = 0;
