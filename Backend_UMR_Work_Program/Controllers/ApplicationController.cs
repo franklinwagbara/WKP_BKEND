@@ -3054,6 +3054,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             var OilCondensateProductionMonthlyProposed = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
                             var OilCondensateFiveYears = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
                             var fiveYearProd = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var _concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
 
                             return new
                             {
@@ -3084,7 +3085,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 OilCondensateProductionMonthly = OilCondensateProductionMonthly,
                                 OilCondensateProductionMonthlyProposed = OilCondensateProductionMonthlyProposed,
                                 OilCondensateFiveYears = OilCondensateFiveYears,
-                                fiveYearProductionForcast = fiveYearProd
+                                fiveYearProductionForcast = fiveYearProd,
+                                concessionSituations= _concessionSituations
                             };
 
                             //case "CS&A": //SBU
