@@ -2916,24 +2916,32 @@ namespace Backend_UMR_Work_Program.Controllers
                             var geoActivitiesAcquisitions = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
-                            
-                            var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var categoriesProposedWell = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
+                            //var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var categoriesProposedWells = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year orderby c.QUATER select c).ToListAsync();
+                            //var drillingOperations = await (from c in _context.Drilling_Operations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var geophysicalActivities = await (from c in _context.Geophysical_Activities where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            //var concessionSituation = await (from c in _context.ConcessionSituations where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var budgetPerformance = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             return new
-							{
-								PlanningRequirement = PlanningRequirement,
-								BudgetActualExpenditure = BudgetActualExpenditure,
-								BudgetPerformanceExploratory = BudgetPerformanceExploratory,
-								BudgetPerformanceDevelopment = BudgetPerformanceDevelopment,
-								BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
-								BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
-								BudgetProposalComponents = BudgetProposalComponents,
-								//BudgetCapex = BudgetCapex,
-								//BudgetOpex = BudgetOpex,
+                            {
+                                PlanningRequirement = PlanningRequirement,
+                                BudgetActualExpenditure = BudgetActualExpenditure,
+                                BudgetPerformanceExploratory = BudgetPerformanceExploratory,
+                                BudgetPerformanceDevelopment = BudgetPerformanceDevelopment,
+                                BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
+                                BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
+                                BudgetProposalComponents = BudgetProposalComponents,
+                                //BudgetCapex = BudgetCapex,
+                                //BudgetOpex = BudgetOpex,
+                                categoriesProposedWells = categoriesProposedWells,
                                 geoActivitiesAcquisitions = geoActivitiesAcquisitions,
                                 geoActivitiesProcessings = geoActivitiesProcessings,
                                 concessionSituations = concessionSituations,
+                                //drillingOperations = drillingOperations,
+                                geoPhysical = geophysicalActivities,
+                                concessionSituation = concessionSituations,
+                                budgetPerformance = budgetPerformance
                             };
 
 
@@ -2954,35 +2962,59 @@ namespace Backend_UMR_Work_Program.Controllers
 
 						case "CS & A":
 
-							var HSESustainableDevProgramCsr_1 = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
-							var NigeriaContent = await (from c in _context.NIGERIA_CONTENT_Trainings where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
-							var NigeriaContentUploadSuccession = await (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
-							var NigeriaContentQuestion = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var HSESustainableDevProgramCsr_1 = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var NigeriaContent = await (from c in _context.NIGERIA_CONTENT_Trainings where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var NigeriaContentUploadSuccession = await (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var NigeriaContentQuestion = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var _strategicPlans = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var successPlans = await (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var seniorManagementStaff = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var staffDisposition = await (from c in _context.NIGERIA_CONTENT_Trainings where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var picturesCommunityDevelopmentProjects = await (from c in _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var trainingDetails = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var trainingsSkillAcquisition = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var scholarshipSchemes = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var scholarships = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var capitalProjects = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var projectDetails = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var mOUInformation = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var sustainableDevelopmentCommunityProjectProgram = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            //var BudgetCapexOpex = await (from c in _context.ADMIN_BUDGET_CAPEX_OPEXes where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
-							return new
-							{
-								HSESustainableDevProgramCsr = HSESustainableDevProgramCsr_1,
-								NigeriaContent = NigeriaContent,
-								NigeriaContentUploadSuccession = NigeriaContentUploadSuccession,
-								NigeriaContentQuestion = NigeriaContentQuestion
-							};
                             return new
                             {
-                                PlanningRequirement = PlanningRequirement,
-                                BudgetActualExpenditure = BudgetActualExpenditure,
-                                BudgetPerformanceExploratory = BudgetPerformanceExploratory,
-                                BudgetPerformanceDevelopment = BudgetPerformanceDevelopment,
-                                BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
-                                BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
-                                BudgetProposalComponents = BudgetProposalComponents,
-                                BudgetCapexOpex = BudgetCapexOpex,
-                                categoriesProposedWell= categoriesProposedWell
+                                HSESustainableDevProgramCsr = HSESustainableDevProgramCsr_1,
+                                NigeriaContent = NigeriaContent,
+                                NigeriaContentUploadSuccession = NigeriaContentUploadSuccession,
+                                NigeriaContentQuestion = NigeriaContentQuestion,
+                                //PlanningRequirement = PlanningRequirement,
+                                //BudgetActualExpenditure = BudgetActualExpenditure,
+                                //BudgetPerformanceExploratory = BudgetPerformanceExploratory,
+                                //BudgetPerformanceDevelopment = BudgetPerformanceDevelopment,
+                                //BudgetPerformanceProductionCost = BudgetPerformanceProductionCost,
+                                //BudgetPerformanceFacilityDevProjects = BudgetPerformanceFacilityDevProjects,
+                                //BudgetProposalComponents = BudgetProposalComponents,
+                                //BudgetCapexOpex = BudgetCapexOpex,
+                                //categoriesProposedWell = categoriesProposedWell,
+                                _strategicPlans = _strategicPlans,
+                                successPlans = successPlans,
+                                seniorManagementStaff = seniorManagementStaff,
+                                staffDisposition = staffDisposition,
+                                picturesCommunityDevelopmentProjects = picturesCommunityDevelopmentProjects,
+                                trainingDetails = trainingDetails,
+                                trainingsSkillAcquisition = trainingsSkillAcquisition,
+                                scholarshipSchemes = scholarshipSchemes,
+                                scholarships = scholarships,
+                                capitalProjects = capitalProjects,
+                                projectDetails = projectDetails,
+                                mOUInformation = mOUInformation,
+                                sustainableDevelopmentCommunityProjectProgram = sustainableDevelopmentCommunityProjectProgram
                             };
 
                         case "LGL": //Legal
 
-                            var LegalLitigation = await (from c in _context.LEGAL_LITIGATIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var LegalArbitration = await (from c in _context.LEGAL_ARBITRATIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var LegalLitigation = await (from c in _context.LEGAL_LITIGATIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var LegalArbitration = await (from c in _context.LEGAL_ARBITRATIONs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
                             return new
                             {
                                 LegalLitigation = LegalLitigation,
@@ -2993,25 +3025,26 @@ namespace Backend_UMR_Work_Program.Controllers
 
                         case "D&P": //SBU
 
-                            var strategicPlans = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var facilitiesProjectPerformance = await (from c in _context.FACILITIES_PROJECT_PERFORMANCEs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var conformityAssuranceAssetIntegrity = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var facilityDevelopmentProjects = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var lifeIndex_years = await (from c in _context.RESERVES_UPDATES_LIFE_INDices where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var depletionRate = await (from c in _context.RESERVES_UPDATES_DEPLETION_RATEs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var fiveYearTrendConcessionReserveReplacementRatio = await (from c in _context.RESERVES_REPLACEMENT_RATIOs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var reserveDecline = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var reserveAddition = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var fiveYearReservesProjection = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_Fiveyear_Projections where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var reservesUpdateConcessionReservesJanuary = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year && c.FLAG1 == "COMPANY_CURRENT_RESERVE" select c).FirstOrDefaultAsync();
-                            var concessionReservesPrecedingYearJanuary = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year && c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR" select c).FirstOrDefaultAsync();
-                            var wellType = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var workoverRecompletionJobsQuaterlyBasis = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var initialWellCompletionJobsQuaterlyBasis = await (from c in _context.INITIAL_WELL_COMPLETION_JOBs1 where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var unitization = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var expectedReserves = await (from c in _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var fieldDevelopmentPlan = await (from c in _context.FIELD_DEVELOPMENT_PLANs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
-                            var _categoriesProposedWell = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID  && c.Year_of_WP == year select c).ToListAsync();
+                            var strategicPlans = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var facilitiesProjectPerformance = await (from c in _context.FACILITIES_PROJECT_PERFORMANCEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var conformityAssuranceAssetIntegrity = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var facilityDevelopmentProjects = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var lifeIndex_years = await (from c in _context.RESERVES_UPDATES_LIFE_INDices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var depletionRate = await (from c in _context.RESERVES_UPDATES_DEPLETION_RATEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var fiveYearTrendConcessionReserveReplacementRatio = await (from c in _context.RESERVES_REPLACEMENT_RATIOs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var reserveDecline = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var reserveAddition = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var fiveYearReservesProjection = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_Fiveyear_Projections where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var reservesUpdateConcessionReservesJanuary = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year && c.FLAG1 == "COMPANY_CURRENT_RESERVE" select c).ToListAsync();
+                            var concessionReservesPrecedingYearJanuary = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year && c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR" select c).ToListAsync();
+                            var wellType_oil = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var wellType_gas = await (from c in _context.GAS_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var workoverRecompletionJobsQuaterlyBasis = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year select c).ToListAsync();
+                            var initialWellCompletionJobsQuaterlyBasis = await (from c in _context.INITIAL_WELL_COMPLETION_JOBs1 where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year select c).ToListAsync();
+                            var unitization = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year select c).ToListAsync();
+                            var expectedReserves = await (from c in _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year select c).ToListAsync();
+                            var fieldDevelopmentPlan = await (from c in _context.FIELD_DEVELOPMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year select c).ToListAsync();
+                            var _categoriesProposedWell = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year orderby c.QUATER select c).ToListAsync();
 
 
 
@@ -3026,7 +3059,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 fiveYearTrendConcessionReserveReplacementRatio = fiveYearTrendConcessionReserveReplacementRatio,
                                 reserveDecline = reserveDecline,
                                 reserveAddition = reserveAddition,
-                                fiveYearReservesProjection= fiveYearReservesProjection,
+                                fiveYearReservesProjection = fiveYearReservesProjection,
+                                //concessionSituation = concessionSituations,
                                 //fiveYearReservesProjectionTerrain = fiveYearReservesProjection,
                                 concessionReservesPrecedingYearJanuary = concessionReservesPrecedingYearJanuary,
                                 wellType = wellType,
