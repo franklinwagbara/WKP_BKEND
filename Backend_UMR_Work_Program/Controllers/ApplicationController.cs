@@ -3267,7 +3267,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             var _BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var _geoActivitiesAcquisitions = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var _geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
-                            var _concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
+                            var __concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
 
 
                             //var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
@@ -3427,10 +3427,10 @@ namespace Backend_UMR_Work_Program.Controllers
                                 categoriesProposedWells = _categoriesProposedWells,
                                 geoActivitiesAcquisitions = _geoActivitiesAcquisitions,
                                 geoActivitiesProcessings = _geoActivitiesProcessings,
-                                concessionSituations = _concessionSituations,
+                                concessionSituations = __concessionSituations,
                                 //drillingOperations = _drillingOperations,
                                 geoPhysical = _geophysicalActivities,
-                                concessionSituation = _concessionSituations,
+                                concessionSituation = __concessionSituations,
                                 budgetPerformance = _budgetPerformance,
 
 
