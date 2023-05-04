@@ -2887,6 +2887,10 @@ namespace Backend_UMR_Work_Program.Controllers
                             var BudgetCapex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[0] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var BudgetOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[1] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
 
+                            var ___hseEnvironmentalManagementPlans = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+
+                            var ___hseRemediationFunds = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_Number == application.CompanyID.ToString() && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+
 
                             return new
                             {
@@ -2899,8 +2903,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                 budgetProposalNairaDollar = budgetProposalNairaDollar,
                                 royalty = royalty,
                                 budgetCapex = BudgetCapex,
-                                budgetOpex = BudgetOpex
-
+                                budgetOpex = BudgetOpex,
+                                hseEnvironmentalManagementPlans = ___hseEnvironmentalManagementPlans,
+                                hseRemediationFunds = ___hseRemediationFunds
                             };
 
                         case "E&AM": //Planning
