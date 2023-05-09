@@ -1055,20 +1055,25 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    var DecommissioningAbadonment = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.FieldId == concessionField.Field_ID && c.CompanyEmail == WKPCompanyEmail && c.WpYear == year select c).FirstOrDefaultAsync();
                     return new
                     {
                         BudgetProposalComponents = BudgetProposalComponents,
-                        BudgetCapexOpex = BudgetCapexOpex
+                        BudgetCapexOpex = BudgetCapexOpex,
+                        DecommissioningAbadonment = DecommissioningAbadonment
                     };
                 }
                 else
                 {
                     var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).ToListAsync();
                     var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).ToListAsync();
+                    var DecommissioningAbadonment = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.WpYear == year select c).FirstOrDefaultAsync();
+
                     return new
                     {
                         BudgetProposalComponents = BudgetProposalComponents,
-                        BudgetCapexOpex = BudgetCapexOpex
+                        BudgetCapexOpex = BudgetCapexOpex,
+                        DecommissioningAbadonment = DecommissioningAbadonment
                     };
                 }
             }
@@ -2062,13 +2067,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (action == GeneralModel.Insert)
                 {
+                    decomAban_model.CompanyEmail = WKPCompanyEmail;
+                    decomAban_model.OmlId = concessionField.Concession_ID ?? null;
+                    decomAban_model.FieldId = concessionField?.Field_ID ?? null;
+                    decomAban_model.WpYear = year;
+
                     if (myDecomAban == null)
                     {
 
-                        decomAban_model.CompanyEmail = WKPCompanyEmail;
-                        decomAban_model.OmlId = concessionField.Concession_ID ?? null;
-                        decomAban_model.FieldId = concessionField?.Field_ID ?? null;
-                        decomAban_model.WpYear = year;
+
                         decomAban_model.DateCreated = DateTime.Now;
                         decomAban_model.CreatedBy = WKPCompanyEmail;
                         await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
@@ -2076,12 +2083,12 @@ namespace Backend_UMR_Work_Program.Controllers
                     else
                     {
 
-                       
+
                         decomAban_model.DateCreated = myDecomAban.DateCreated;
                         decomAban_model.CreatedBy = myDecomAban.CreatedBy;
                         decomAban_model.DateUpdated = DateTime.Now;
                         decomAban_model.UpdatedBy = WKPCompanyEmail;
-                         _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
+                        _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
                         await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
                     }
                 }
@@ -2115,6 +2122,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
 
+        
 
         [HttpPost("POST_ROYALTY")]
         public async Task<object> POST_ROYALTY([FromBody] Royalty royalty_model, string year, string omlName, string fieldName, string actionToDo)
@@ -2374,7 +2382,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     geophysical_activities_acquisition_model.Field_ID = concessionField?.Field_ID ?? null;
                     geophysical_activities_acquisition_model.Actual_year = year;
                     geophysical_activities_acquisition_model.proposed_year = (int.Parse(year) + 1).ToString();
-                    geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString(); 
+                    geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString();
 
                     if (action == GeneralModel.Insert)
                     {
