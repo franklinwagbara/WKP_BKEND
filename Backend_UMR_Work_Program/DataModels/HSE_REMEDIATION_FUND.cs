@@ -25,6 +25,10 @@ public partial class HSE_REMEDIATION_FUND
 
     public string? evidenceOfPaymentPath { get; set; }
 
+    public string? evidenceOfPreviousYearsPaymentFilename { get; set; }
+
+    public string? evidenceOfPreviousYearsPaymentPath { get; set; }
+
     public string? reasonForNoRemediation { get; set; }
 
     public string? areThereRemediationFund { get; set; }

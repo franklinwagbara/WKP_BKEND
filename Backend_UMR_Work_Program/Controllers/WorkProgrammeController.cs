@@ -10712,22 +10712,41 @@ namespace Backend_UMR_Work_Program.Controllers
                     if (hse_remediation_fund.areThereRemediationFund == "YES")
                     {
                         #region Fileregion
-                        var file = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                        var blobname = blobService.Filenamer(file);
+                        var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                        var file2 = Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
 
-                        if (file != null)
+                        var blobname1 = blobService.Filenamer(file1);
+                        var blobname2 = blobService.Filenamer(file2);
+
+                        if (file1 != null)
                         {
                             string docName = "Evidence of Payment";
-                            hse_remediation_fund.evidenceOfPaymentPath = await blobService.UploadFileBlobAsync("documents", file.OpenReadStream(), file.ContentType, $"Remediation Documents/{blobname}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            hse_remediation_fund.evidenceOfPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPaymentPath == null)
                                 return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                             else
-                                hse_remediation_fund.evidenceOfPaymentFilename = blobname;
+                                hse_remediation_fund.evidenceOfPaymentFilename = blobname1;
                         }
                         else
                         {
                             hse_remediation_fund.evidenceOfPaymentPath = null;
                             hse_remediation_fund.evidenceOfPaymentFilename = null;
+
+                        }
+
+                        if (file2 != null)
+                        {
+                            string docName = "Evidence of Payment";
+                            hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"Remediation Documents/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
+                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                            else
+                                hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = blobname2;
+                        }
+                        else
+                        {
+                            hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = null;
+                            hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = null;
 
                         }
                         #endregion
@@ -10736,6 +10755,27 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         hse_remediation_fund.evidenceOfPaymentPath = null;
                         hse_remediation_fund.evidenceOfPaymentFilename = null;
+
+
+                        var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+
+                        var blobname1 = blobService.Filenamer(file1);
+
+                        if (file1 != null)
+                        {
+                            string docName = "Evidence of Payment";
+                            hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
+                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                            else
+                                hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = blobname1;
+                        }
+                        else
+                        {
+                            hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = null;
+                            hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = null;
+
+                        }
 
                     }
 
@@ -11817,6 +11857,27 @@ namespace Backend_UMR_Work_Program.Controllers
 
                         hse_safety_culture_model.EvidenceOfTrainingPlanPath = null;
                         hse_safety_culture_model.EvidenceOfTrainingPlanFilename = null;
+                    }
+                    else if (filesLength.Count == 1)
+                    {
+                        file1 = Request.Form.Files[0];
+
+                        blobname1 = blobService.Filenamer(file1);
+
+                        if (file1 != null)
+                        {
+                            string docName = "Safety Current Year";
+                            hse_safety_culture_model.EvidenceOfTrainingPlanPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"SafetyCurrentYearDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            if (hse_safety_culture_model.EvidenceOfTrainingPlanPath == null)
+                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                            else
+                                hse_safety_culture_model.EvidenceOfTrainingPlanFilename = blobname1;
+                        }
+                        else
+                        {
+                            hse_safety_culture_model.EvidenceOfTrainingPlanPath = null;
+                            hse_safety_culture_model.EvidenceOfTrainingPlanFilename = null;
+                        }
                     }
                     else
                     {
