@@ -1055,20 +1055,25 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    var DecommissioningAbadonment = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.FieldId == concessionField.Field_ID && c.CompanyEmail == WKPCompanyEmail && c.WpYear == year select c).FirstOrDefaultAsync();
                     return new
                     {
                         BudgetProposalComponents = BudgetProposalComponents,
-                        BudgetCapexOpex = BudgetCapexOpex
+                        BudgetCapexOpex = BudgetCapexOpex,
+                        DecommissioningAbadonment = DecommissioningAbadonment
                     };
                 }
                 else
                 {
                     var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).ToListAsync();
                     var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).ToListAsync();
+                    var DecommissioningAbadonment = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.WpYear == year select c).FirstOrDefaultAsync();
+
                     return new
                     {
                         BudgetProposalComponents = BudgetProposalComponents,
-                        BudgetCapexOpex = BudgetCapexOpex
+                        BudgetCapexOpex = BudgetCapexOpex,
+                        DecommissioningAbadonment = DecommissioningAbadonment
                     };
                 }
             }
@@ -2062,13 +2067,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (action == GeneralModel.Insert)
                 {
+                    decomAban_model.CompanyEmail = WKPCompanyEmail;
+                    decomAban_model.OmlId = concessionField.Concession_ID ?? null;
+                    decomAban_model.FieldId = concessionField?.Field_ID ?? null;
+                    decomAban_model.WpYear = year;
+
                     if (myDecomAban == null)
                     {
 
-                        decomAban_model.CompanyEmail = WKPCompanyEmail;
-                        decomAban_model.OmlId = concessionField.Concession_ID ?? null;
-                        decomAban_model.FieldId = concessionField?.Field_ID ?? null;
-                        decomAban_model.WpYear = year;
+
                         decomAban_model.DateCreated = DateTime.Now;
                         decomAban_model.CreatedBy = WKPCompanyEmail;
                         await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
@@ -2076,12 +2083,12 @@ namespace Backend_UMR_Work_Program.Controllers
                     else
                     {
 
-                       
+
                         decomAban_model.DateCreated = myDecomAban.DateCreated;
                         decomAban_model.CreatedBy = myDecomAban.CreatedBy;
                         decomAban_model.DateUpdated = DateTime.Now;
                         decomAban_model.UpdatedBy = WKPCompanyEmail;
-                         _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
+                        _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
                         await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
                     }
                 }
@@ -2115,6 +2122,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
 
+        
 
         [HttpPost("POST_ROYALTY")]
         public async Task<object> POST_ROYALTY([FromBody] Royalty royalty_model, string year, string omlName, string fieldName, string actionToDo)
@@ -2374,7 +2382,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     geophysical_activities_acquisition_model.Field_ID = concessionField?.Field_ID ?? null;
                     geophysical_activities_acquisition_model.Actual_year = year;
                     geophysical_activities_acquisition_model.proposed_year = (int.Parse(year) + 1).ToString();
-                    geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString(); 
+                    geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString();
 
                     if (action == GeneralModel.Insert)
                     {
@@ -4315,7 +4323,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_WORKOVERS_RECOMPLETION_JOB")]
-        public async Task<object> POST_WORKOVERS_RECOMPLETION_JOB([FromBody] WORKOVERS_RECOMPLETION_JOB1 workovers_recompletion_model, string omlName, string fieldName, string year, string actionToDo)
+        public async Task<object> POST_WORKOVERS_RECOMPLETION_JOB([FromBody] WORKOVERS_RECOMPLETION_JOB1 workovers_recompletion_model, string omlName, string fieldName, string year, string actionToDo, int? id)
         {
 
             int save = 0;
@@ -4323,56 +4331,71 @@ namespace Backend_UMR_Work_Program.Controllers
 
             WORKOVERS_RECOMPLETION_JOB1 getData;
 
+           
+
             try
             {
-                #region Saving FDP data
-                if (workovers_recompletion_model != null)
+                if (id > 0 || workovers_recompletion_model != null)
                 {
-                    if (concessionField?.Field_Name != null)
-                    {
-                        getData = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.QUATER == workovers_recompletion_model.QUATER select c).FirstOrDefaultAsync();
 
-                    }
-                    else
+                    if (id > 0 && workovers_recompletion_model.Id==0)
                     {
-                        getData = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.QUATER == workovers_recompletion_model.QUATER select c).FirstOrDefaultAsync();
+                        getData = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.Id == id select c).FirstOrDefaultAsync();
 
+                        _context.WORKOVERS_RECOMPLETION_JOBs1.Remove(getData);
+                        action = GeneralModel.Delete;
                     }
 
-                    workovers_recompletion_model.Companyemail = WKPCompanyEmail;
-                    workovers_recompletion_model.CompanyName = WKPCompanyName;
-                    workovers_recompletion_model.COMPANY_ID = WKPCompanyId;
-                    workovers_recompletion_model.CompanyNumber = WKPCompanyNumber;
-                    workovers_recompletion_model.Year_of_WP = year;
-                    workovers_recompletion_model.OML_Name = omlName.ToUpper();
-                    workovers_recompletion_model.Field_ID = concessionField?.Field_ID ?? null;
-                    //workovers_recompletion_model.Actual_year = year;
-                    //	workovers_recompletion_model.proposed_year = (int.Parse(year) + 1).ToString();
-                    workovers_recompletion_model.proposed_year = year;
-
-                    if (action == GeneralModel.Insert)
+                    #region Saving FDP data
+                    else if (workovers_recompletion_model != null)
                     {
-                        if (getData == null)
+                        if (concessionField?.Field_Name != null)
                         {
-                            workovers_recompletion_model.Date_Created = DateTime.Now;
-                            workovers_recompletion_model.Created_by = WKPCompanyId;
-                            await _context.WORKOVERS_RECOMPLETION_JOBs1.AddAsync(workovers_recompletion_model);
+                            getData = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.CompletionWellName.ToUpper().Trim() == workovers_recompletion_model.CompletionWellName.ToUpper().Trim() && c.Year_of_WP == year && c.QUATER == workovers_recompletion_model.QUATER select c).FirstOrDefaultAsync();
+
                         }
                         else
                         {
-                            workovers_recompletion_model.Date_Created = getData.Date_Created;
-                            workovers_recompletion_model.Created_by = getData.Created_by;
-                            workovers_recompletion_model.Date_Updated = DateTime.Now;
-                            workovers_recompletion_model.Updated_by = WKPCompanyId;
-                            _context.WORKOVERS_RECOMPLETION_JOBs1.Remove(getData);
-                            await _context.WORKOVERS_RECOMPLETION_JOBs1.AddAsync(workovers_recompletion_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.WORKOVERS_RECOMPLETION_JOBs1.Remove(getData);
-                    }
+                            getData = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.CompletionWellName.ToUpper().Trim() == workovers_recompletion_model.CompletionWellName.ToUpper().Trim() && c.Year_of_WP == year && c.QUATER == workovers_recompletion_model.QUATER select c).FirstOrDefaultAsync();
 
+                        }
+
+                        workovers_recompletion_model.Companyemail = WKPCompanyEmail;
+                        workovers_recompletion_model.CompanyName = WKPCompanyName;
+                        workovers_recompletion_model.COMPANY_ID = WKPCompanyId;
+                        workovers_recompletion_model.CompanyNumber = WKPCompanyNumber;
+                        workovers_recompletion_model.Year_of_WP = year;
+                        workovers_recompletion_model.OML_Name = omlName.ToUpper();
+                        workovers_recompletion_model.Field_ID = concessionField?.Field_ID ?? null;
+                        //workovers_recompletion_model.Actual_year = year;
+                        //	workovers_recompletion_model.proposed_year = (int.Parse(year) + 1).ToString();
+                        workovers_recompletion_model.proposed_year = year;
+
+                        if (action == GeneralModel.Insert)
+                        {
+                            if (getData == null)
+                            {
+                                workovers_recompletion_model.Date_Created = DateTime.Now;
+                                workovers_recompletion_model.Created_by = WKPCompanyId;
+                                await _context.WORKOVERS_RECOMPLETION_JOBs1.AddAsync(workovers_recompletion_model);
+                            }
+                            else
+                            {
+                                workovers_recompletion_model.Date_Created = getData.Date_Created;
+                                workovers_recompletion_model.Created_by = getData.Created_by;
+                                workovers_recompletion_model.Date_Updated = DateTime.Now;
+                                workovers_recompletion_model.Updated_by = WKPCompanyId;
+                                _context.WORKOVERS_RECOMPLETION_JOBs1.Remove(getData);
+                                await _context.WORKOVERS_RECOMPLETION_JOBs1.AddAsync(workovers_recompletion_model);
+                            }
+                        }
+                        else if (action == GeneralModel.Delete)
+                        {
+                            _context.WORKOVERS_RECOMPLETION_JOBs1.Remove(getData);
+                        }
+
+
+                    }
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
@@ -4387,8 +4410,9 @@ namespace Backend_UMR_Work_Program.Controllers
                         return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
 
                     }
-                }
 
+
+                }
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
 
