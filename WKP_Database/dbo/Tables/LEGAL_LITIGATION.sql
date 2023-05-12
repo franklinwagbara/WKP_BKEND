@@ -24,6 +24,8 @@
     [CompanyNumber]                       INT            NULL,
     [Field_ID]                            INT            NULL,
     [Year]                                NVARCHAR (MAX) NULL,
+    [Any_subsisting_orders_of_court] VARCHAR(3000) NULL, 
+    [Order_of_the_court] VARCHAR(MAX) NULL, 
     CONSTRAINT [PK_LEGAL_LITIGATION] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
