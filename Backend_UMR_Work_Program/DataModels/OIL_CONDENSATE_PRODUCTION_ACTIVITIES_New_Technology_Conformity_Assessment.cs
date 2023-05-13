@@ -53,7 +53,7 @@ public partial class OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conform
 
     public int? Field_ID { get; set; }
 
-     public int? Inspection_Regime { get; set; }
+     public string? Inspection_Regime { get; set; }
 
       public string? EvidenceOfInspectionAndUgradePath { get; set; }
 
