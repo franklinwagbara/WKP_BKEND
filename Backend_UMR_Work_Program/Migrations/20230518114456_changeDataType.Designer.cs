@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    [Migration("20230325054417_PlanedBudgetNgn")]
-    partial class PlanedBudgetNgn
+    [Migration("20230518114456_changeDataType")]
+    partial class changeDataType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -6145,6 +6145,55 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.HasKey("Contract_TypeId");
 
                     b.ToTable("Contract_Type", (string)null);
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.DECOMMISSIONING_ABANDONMENT", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("AnnualObigationUsd")
+                        .HasColumnType("float");
+
+                    b.Property<double>("ApprovalCostUsd")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ApprovalStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FieldId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OmlId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WpYear")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DECOMMISSIONING_ABANDONMENTs");
                 });
 
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.DRILLING_EACH_WELL_COST", b =>
@@ -13576,7 +13625,7 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(500)");
 
-                    b.Property<string>("Budget_NGN")
+                    b.Property<string>("Budget_Ngn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("COMPANY_ID")
@@ -17070,6 +17119,12 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(500)");
 
+                    b.Property<string>("Facility_Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Facility_Type")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("Field_ID")
                         .HasColumnType("int");
 
@@ -17145,6 +17200,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasMaxLength(500)
                         .IsUnicode(false)
                         .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Proposed_Projects")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Proposed_year")
                         .HasMaxLength(500)
@@ -17519,12 +17577,21 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Property<DateTime?>("Date_Updated")
                         .HasColumnType("datetime");
 
+                    b.Property<string>("EvidenceOfInspectionAndUgradeFilename")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EvidenceOfInspectionAndUgradePath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Existing_Alternatives")
                         .HasMaxLength(500)
                         .IsUnicode(false)
                         .HasColumnType("varchar(500)");
 
                     b.Property<int?>("Field_ID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Inspection_Regime")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
