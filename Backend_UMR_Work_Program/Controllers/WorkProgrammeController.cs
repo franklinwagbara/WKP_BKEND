@@ -292,6 +292,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             companyConcession.Area = ADMIN_CONCESSIONS_INFORMATION_model.Area;
                             companyConcession.Comment = ADMIN_CONCESSIONS_INFORMATION_model.Comment;
                             companyConcession.ConcessionName = ADMIN_CONCESSIONS_INFORMATION_model.ConcessionName;
+                            companyConcession.Concession_Held = ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held;
                             companyConcession.Consession_Type = ADMIN_CONCESSIONS_INFORMATION_model.Consession_Type;
                             companyConcession.Contract_Type = ADMIN_CONCESSIONS_INFORMATION_model.Contract_Type;
                             companyConcession.Terrain = ADMIN_CONCESSIONS_INFORMATION_model.Terrain;
