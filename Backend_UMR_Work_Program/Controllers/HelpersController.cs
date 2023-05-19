@@ -4,9 +4,12 @@ using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Models.Enurations;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 //using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Mail;
@@ -2825,13 +2828,9 @@ generate:
 		{
 			try
 			{
-				//if (appProcess != null)
-				//{
-
 				MyDesk drop = new MyDesk()
 				{
 					ProcessID = processID,
-					//Sort = (int)appProcess.Sort,
 					AppId = appID,
 					StaffID = staff.StaffID,
 					FromStaffID = FromStaffID,
@@ -2849,7 +2848,7 @@ generate:
 				{
 					return 1;
 				}
-				//}
+
 				return 0;
 			}
 			catch (Exception e)
@@ -3129,6 +3128,30 @@ generate:
 			catch (Exception e)
 			{
 				throw e;
+			}
+		}
+
+		public async Task<bool> hasApplicationBeenSubmittedBefore(int yearID, COMPANY_FIELD field, ADMIN_CONCESSIONS_INFORMATION concession)
+		{
+			var app = new Application();
+
+			try
+			{
+				if (field != null)
+				{
+					app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id && a.FieldID == field.Field_ID).FirstOrDefaultAsync();
+				}
+				else
+				{
+					app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id).FirstOrDefaultAsync();
+				}
+
+				if (app != null) return true;
+				else return false;
+			}
+			catch(Exception ex)
+			{
+				throw ex;
 			}
 		}
 

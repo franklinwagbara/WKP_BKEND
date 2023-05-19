@@ -566,35 +566,30 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
+                //Get Year, Concession, field and configured application processes
                 int yearID = Convert.ToInt32(year);
-
                 var concession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Concession_Held.ToLower() == omlName.ToLower() select d).FirstOrDefaultAsync();
-
                 var field = await (from d in _context.COMPANY_FIELDs where d.Field_Name.ToLower() == fieldName.ToLower() || d.Field_ID.ToString() == fieldName select d).FirstOrDefaultAsync();
-
                 var applicationProcesses = await _helpersController.GetApplicationProccessByAction(GeneralModel.Submit);
+                var app = new Application();
 
 
                 if (applicationProcesses.Count <= 0)
                 {
-
-                    return BadRequest(new { message = "An error occured while trying to get process flow for this application." });
+                    return BadRequest(new { message = "An error occured while trying to get process flow for this application. No, application process was configured." });
                 }
 
-                var app = new Application();
+                //if (field != null)
+                //{
+                //    app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id && a.FieldID == field.Field_ID).FirstOrDefaultAsync();
+                //}
+                //else
+                //{
+                //    app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id).FirstOrDefaultAsync();
 
+                //}
 
-                if (field != null)
-                {
-                    app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id && a.FieldID == field.Field_ID).FirstOrDefaultAsync();
-                }
-                else
-                {
-                    app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id).FirstOrDefaultAsync();
-
-                }
-
-                if (app != null)
+                if (await _helpersController.hasApplicationBeenSubmittedBefore(yearID, field, concession))
                 {
 
                     return BadRequest(new { message = $"Error : An application for the Concession {omlName}, and Field Name {field.Field_Name} for the year {year} has already been submitted." });
@@ -602,20 +597,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 Application application = new Application();
                 application.ReferenceNo = _helpersController.Generate_Reference_Number();
-
                 application.YearOfWKP = yearID;
-
                 application.ConcessionID = concession.Consession_Id;
                 application.FieldID = field?.Field_ID ?? null;
                 application.CompanyID = (int)WKPCompanyNumber;
                 application.CurrentUserEmail = WKPCompanyEmail;
-
                 application.CategoryID = _context.ApplicationCategories.Where(x => x.Name == GeneralModel.New).FirstOrDefault().Id;
                 application.Status = GeneralModel.Processing;
                 application.PaymentStatus = GeneralModel.PaymentPending;
-
                 application.CurrentDesk = applicationProcesses.FirstOrDefault().RoleID; //to change
-
                 application.Submitted = true;
                 application.CreatedAt = DateTime.Now;
                 application.SubmittedAt = DateTime.Now;
@@ -628,15 +618,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     //Disribute to Reviewers
                     string subject2 = $"{year} submission of WORK PROGRAM application for {WKPCompanyName} field - {field?.Field_Name} : {application.ReferenceNo}";
                     var staffLists = new List<staff>();
-                    //var reviewerStaff = new List<staff>();
-
 
                     var staffList = await _helpersController.GetReviewerStafff(applicationProcesses);
 
-                    //foreach (var item in applicationProcesses)
-                    //{
-                    //	staffLists=_context.staff.Where(x => x.Staff_SBU==item.TargetedToSBU && x.RoleID==item.TargetedToRole).ToList();
-                    //}
                     foreach (var staff in staffList)
                     {
                         //Get The process Flow
@@ -653,25 +637,18 @@ namespace Backend_UMR_Work_Program.Controllers
                             _helpersController.SaveHistory(application.Id, staff.StaffID, "Submitted", "Application submitted and landed on staff desk");
 
                             //send mail to staff
-                            //var getStaff = (from stf in _context.staff where stf.StaffID == staff.StaffId select stf).FirstOrDefault();
                             var getStaff = (from stf in _context.staff
                                             join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
                                             where stf.StaffID == staff.StaffID && stf.DeleteStatus != true
                                             select stf).FirstOrDefault();
 
-
-
                             string content2 = $"{WKPCompanyName} have submitted their WORK PROGRAM application for year {year}.";
 
                             var emailMsg2 = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject2, content2, "Staff");
 
-
-
                             var sendEmail2 = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg2, null);
-
-
+                            
                             _helpersController.LogMessages("Submission of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
-
                         }
                         else
                         {
@@ -680,20 +657,11 @@ namespace Backend_UMR_Work_Program.Controllers
                     }
                     //send mail to company
                     string subject = $"{year} submission of WORK PROGRAM application for field - {field?.Field_Name} : {application.ReferenceNo}";
-
-
-
                     string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
                     var emailMsg = _helpersController.SaveMessage(application.Id, (int)WKPCompanyNumber, subject, content, "Company");
 
-
-
                     var sendEmail = _helpersController.SendEmailMessage(WKPCompanyEmail, WKPCompanyName, emailMsg, null);
-
-
-
-                    var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.";
-
+                    var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
 
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
 
@@ -736,12 +704,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         var Company = _context.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
 
                         var concession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
-
-                        //if (application.FieldID != null)
-                        //{
-                        //	var field = _context.COMPANY_FIELDs.Where(p => p.Field_ID == application.FieldID).FirstOrDefault();
-                        //}
-
 
                         var getStaffById = await _helpersController.GetStaffByStaffId(staffDesk.StaffID);
 
@@ -2918,7 +2880,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             //var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var geoActivitiesAcquisitions = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
-                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
+                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Year == year select d).ToListAsync();
 
                             //var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var categoriesProposedWells = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year orderby c.QUATER select c).ToListAsync();
@@ -3697,14 +3659,14 @@ namespace Backend_UMR_Work_Program.Controllers
                             };
 
                         case "E&AM": //Planning
-                            var BudgetPerformanceExploratory = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            //var BudgetPerformanceExploratory = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
-                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
+                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Year == year select d).ToListAsync();
                             var categoriesProposedWells = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year orderby c.QUATER select c).ToListAsync();
                           
                             return new
                             {
-                                BudgetPerformanceExploratory = BudgetPerformanceExploratory,
+                                //BudgetPerformanceExploratory = BudgetPerformanceExploratory,
                                 categoriesProposedWells = categoriesProposedWells,
                                 geoActivitiesProcessings = geoActivitiesProcessings,
                                 concessionSituations = concessionSituations,
