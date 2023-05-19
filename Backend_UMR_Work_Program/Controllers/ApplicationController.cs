@@ -2808,7 +2808,6 @@ namespace Backend_UMR_Work_Program.Controllers
         #endregion
 
         #region SBU Report
-        [AllowAnonymous]
         [HttpGet("GetSBU_Report")]
         public async Task<object> GetSBU_Report(int appID)
         {
@@ -2827,8 +2826,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     }
                     var getStaffSBU = (from stf in _context.staff
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
-                                       where stf.StaffEmail == //WKPCompanyEmail
-                                       "franlin.wagbara@brandonetech.com"
+                                       where stf.StaffEmail == WKPCompanyEmail
+                                       //"franlin.wagbara@brandonetech.com"
                                        select sbu).FirstOrDefault();
 
                     string year = application.YearOfWKP.ToString();
@@ -3598,7 +3597,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         #region SBU Minimum Requirement Report
-        [AllowAnonymous]
         [HttpGet("GetSBU_Minimum_Requirement_Report")]
         public async Task<object> GetSBU_Minimum_Requirement_Report(int appID)
         {
@@ -3617,8 +3615,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     }
                     var getStaffSBU = (from stf in _context.staff
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
-                                       where stf.StaffEmail == //WKPCompanyEmail
-                                       "supervisorsupervisord@mailinator.com"
+                                       where stf.StaffEmail == WKPCompanyEmail
+                                       //"supervisorsupervisord@mailinator.com"
                                        select sbu).FirstOrDefault();
 
                     string year = application.YearOfWKP.ToString();
