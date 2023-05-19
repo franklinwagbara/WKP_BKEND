@@ -2880,7 +2880,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             //var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var geoActivitiesAcquisitions = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
-                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Year == year select d).ToListAsync();
+                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
 
                             //var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var categoriesProposedWells = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year orderby c.QUATER select c).ToListAsync();
@@ -3661,7 +3661,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         case "E&AM": //Planning
                             //var BudgetPerformanceExploratory = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
-                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Year == year select d).ToListAsync();
+                            var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
                             var categoriesProposedWells = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year orderby c.QUATER select c).ToListAsync();
                           
                             return new
