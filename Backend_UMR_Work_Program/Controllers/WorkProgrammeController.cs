@@ -1479,7 +1479,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     var HSEHostComms = (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
 
-                    var HSEGHGs = (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.OmL_Name == omlName && c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
+                    var HSEGHGPlans = (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.OmL_Name == omlName && c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSERemediationFund = (from c in _context.HSE_REMEDIATION_FUNDs where c.CompanyName == WKPCompanyName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     return new
                     {
@@ -1522,7 +1522,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         HSEEnvironmentalMgtPlans = HSEEnvironmentalMgtPlans,
                         HSEEFluenceCompliences = HSEEFluenceCompliences,
                         HSEHostComms = HSEHostComms,
-                        HSEGHGs = HSEGHGs,
+                        HSEGHGPlans = HSEGHGPlans,
                         HSERemediationFund = HSERemediationFund
 
                     };
@@ -2123,7 +2123,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
 
-        
+
 
         [HttpPost("POST_ROYALTY")]
         public async Task<object> POST_ROYALTY([FromBody] Royalty royalty_model, string year, string omlName, string fieldName, string actionToDo)
@@ -2517,82 +2517,95 @@ namespace Backend_UMR_Work_Program.Controllers
 
         //added by Musa
         [HttpPost("POST_HSE_OPERATIONS_SAFETY_CASE"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_OPERATIONS_SAFETY_CASE([FromForm] HSE_OPERATIONS_SAFETY_CASE operations_Sefety_Case_model, string omlName, string fieldName, string year, string actionToDo = null)
+        public async Task<object> POST_HSE_OPERATIONS_SAFETY_CASE([FromForm] HSE_OPERATIONS_SAFETY_CASE operations_Sefety_Case_model, string omlName, string fieldName, string year, string actionToDo = null, int id = 0)
         {
 
             int save = 0;
             int Id = operations_Sefety_Case_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            HSE_OPERATIONS_SAFETY_CASE getOperationSafetyCaseData;
             try
             {
 
                 #region Saving Operation Safety Case
-                if (operations_Sefety_Case_model != null)
+                if (id > 0 || operations_Sefety_Case_model != null)
                 {
-                    HSE_OPERATIONS_SAFETY_CASE getOperationSafetyCaseData;
-                    if (concessionField.Field_Name != null)
-                    {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
-                    else
-                    {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
 
-                    operations_Sefety_Case_model.Companyemail = WKPCompanyEmail;
-                    operations_Sefety_Case_model.CompanyName = WKPCompanyName;
-                    operations_Sefety_Case_model.COMPANY_ID = WKPCompanyId;
-                    operations_Sefety_Case_model.CompanyNumber = WKPCompanyNumber;
-                    operations_Sefety_Case_model.Date_Updated = DateTime.Now;
-                    operations_Sefety_Case_model.Updated_by = WKPCompanyId;
-                    operations_Sefety_Case_model.Year_of_WP = year;
-                    operations_Sefety_Case_model.OML_Name = omlName;
-                    operations_Sefety_Case_model.Field_ID = concessionField?.Field_ID ?? null;
-                    //operations_Sefety_Case_model.Actual_year = year;
-                    //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
-
-                    #region file section
-                    var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                    var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
-
-                    if (file1 != null)
+                    if (id > 0)
                     {
-                        string docName = "Evidence of Operations Safety Case Approval";
-                        operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-                        if (operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval == null)
-                            return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                        //else
-                        //    operations_Sefety_Case_model. = blobname1;
-                    }
-                    else
-                    {
-                        operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = null;
-                    }
-                    #endregion
+                        getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.Id == id select c).FirstOrDefaultAsync();
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getOperationSafetyCaseData == null)
+                        if (getOperationSafetyCaseData != null)
                         {
-                            operations_Sefety_Case_model.Date_Created = DateTime.Now;
-                            operations_Sefety_Case_model.Created_by = WKPCompanyId;
-                            await _context.HSE_OPERATIONS_SAFETY_CASEs.AddAsync(operations_Sefety_Case_model);
+                            _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
+                        }
+                    }
+                    else
+                    {
+                        if (concessionField.Field_Name != null)
+                        {
+                            getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                         }
                         else
                         {
-                            _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
-
-                            operations_Sefety_Case_model.Date_Created = operations_Sefety_Case_model.Date_Created;
-                            operations_Sefety_Case_model.Created_by = operations_Sefety_Case_model.Created_by;
-                            operations_Sefety_Case_model.Date_Updated = DateTime.Now;
-                            operations_Sefety_Case_model.Updated_by = WKPCompanyId;
-                            await _context.HSE_OPERATIONS_SAFETY_CASEs.AddAsync(operations_Sefety_Case_model);
+                            getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                         }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
+
+                        operations_Sefety_Case_model.Companyemail = WKPCompanyEmail;
+                        operations_Sefety_Case_model.CompanyName = WKPCompanyName;
+                        operations_Sefety_Case_model.COMPANY_ID = WKPCompanyId;
+                        operations_Sefety_Case_model.CompanyNumber = WKPCompanyNumber;
+                        operations_Sefety_Case_model.Date_Updated = DateTime.Now;
+                        operations_Sefety_Case_model.Updated_by = WKPCompanyId;
+                        operations_Sefety_Case_model.Year_of_WP = year;
+                        operations_Sefety_Case_model.OML_Name = omlName;
+                        operations_Sefety_Case_model.Field_ID = concessionField?.Field_ID ?? null;
+                        //operations_Sefety_Case_model.Actual_year = year;
+                        //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
+
+                        #region file section
+                        var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                        var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
+
+                        if (file1 != null)
+                        {
+                            string docName = "Evidence of Operations Safety Case Approval";
+                            operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            if (operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval == null)
+                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                            //else
+                            //    operations_Sefety_Case_model. = blobname1;
+                        }
+                        else
+                        {
+                            operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = null;
+                        }
+                        #endregion
+
+                        if (action == GeneralModel.Insert)
+                        {
+                            if (getOperationSafetyCaseData == null)
+                            {
+                                operations_Sefety_Case_model.Date_Created = DateTime.Now;
+                                operations_Sefety_Case_model.Created_by = WKPCompanyId;
+                                await _context.HSE_OPERATIONS_SAFETY_CASEs.AddAsync(operations_Sefety_Case_model);
+                            }
+                            else
+                            {
+                                _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
+
+                                operations_Sefety_Case_model.Date_Created = operations_Sefety_Case_model.Date_Created;
+                                operations_Sefety_Case_model.Created_by = operations_Sefety_Case_model.Created_by;
+                                operations_Sefety_Case_model.Date_Updated = DateTime.Now;
+                                operations_Sefety_Case_model.Updated_by = WKPCompanyId;
+                                await _context.HSE_OPERATIONS_SAFETY_CASEs.AddAsync(operations_Sefety_Case_model);
+                            }
+                        }
+                        else if (action == GeneralModel.Delete)
+                        {
+                            _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
+                        }
                     }
 
                     save += await _context.SaveChangesAsync();
@@ -2711,110 +2724,123 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_EFFLUENT_MONITORING_COMPLIANCE"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_EFFLUENT_MONITORING_COMPLIANCE([FromForm] HSE_EFFLUENT_MONITORING_COMPLIANCE Effluenct_Monitoring_Complience_Mode, string omlName, string fieldName, string year, string actionToDo = null)
+        public async Task<object> POST_HSE_EFFLUENT_MONITORING_COMPLIANCE([FromForm] HSE_EFFLUENT_MONITORING_COMPLIANCE Effluenct_Monitoring_Complience_Mode, string omlName, string fieldName, string year, string actionToDo = null, int id = 0)
         {
 
             int save = 0;
             int Id = Effluenct_Monitoring_Complience_Mode.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            HSE_EFFLUENT_MONITORING_COMPLIANCE getData;
+
+
             try
             {
 
                 #region Saving Operation Safety Case
-                if (Effluenct_Monitoring_Complience_Mode != null)
+                if (id > 0 || Effluenct_Monitoring_Complience_Mode != null)
                 {
 
-                    HSE_EFFLUENT_MONITORING_COMPLIANCE getData;
-                    if (concessionField.Field_Name != null)
+                    if (id > 0)
                     {
-                        getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.Id == id select c).FirstOrDefaultAsync();
+                        _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
+
                     }
+
                     else
                     {
-                        getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
-
-                    Effluenct_Monitoring_Complience_Mode.Companyemail = WKPCompanyEmail;
-                    Effluenct_Monitoring_Complience_Mode.CompanyName = WKPCompanyName;
-                    Effluenct_Monitoring_Complience_Mode.COMPANY_ID = WKPCompanyId;
-                    Effluenct_Monitoring_Complience_Mode.CompanyNumber = WKPCompanyNumber.ToString();
-                    Effluenct_Monitoring_Complience_Mode.Date_Updated = DateTime.Now;
-                    Effluenct_Monitoring_Complience_Mode.Updated_by = WKPCompanyId;
-                    Effluenct_Monitoring_Complience_Mode.Year_of_WP = year;
-                    Effluenct_Monitoring_Complience_Mode.OML_Name = omlName;
-                    Effluenct_Monitoring_Complience_Mode.Field_ID = concessionField?.Field_ID ?? null;
-                    //operations_Sefety_Case_model.Actual_year = year;
-                    //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
 
 
-
-                    #region File processing
-                    var files = Request.Form.Files;
-
-                    if (files.Count >= 1)
-                    {
-                        var file1 = Request.Form.Files[0];
-                        var blobname1 = blobService.Filenamer(file1);
-
-                        if (file1 != null)
+                        if (concessionField.Field_Name != null)
                         {
-                            string docName = "Effluent Monitoring Complience";
-                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EffluenceMonitoringDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        }
+                        else
+                        {
+                            getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        }
 
-                            if (Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath == null)
-                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                        Effluenct_Monitoring_Complience_Mode.Companyemail = WKPCompanyEmail;
+                        Effluenct_Monitoring_Complience_Mode.CompanyName = WKPCompanyName;
+                        Effluenct_Monitoring_Complience_Mode.COMPANY_ID = WKPCompanyId;
+                        Effluenct_Monitoring_Complience_Mode.CompanyNumber = WKPCompanyNumber.ToString();
+                        Effluenct_Monitoring_Complience_Mode.Date_Updated = DateTime.Now;
+                        Effluenct_Monitoring_Complience_Mode.Updated_by = WKPCompanyId;
+                        Effluenct_Monitoring_Complience_Mode.Year_of_WP = year;
+                        Effluenct_Monitoring_Complience_Mode.OML_Name = omlName;
+                        Effluenct_Monitoring_Complience_Mode.Field_ID = concessionField?.Field_ID ?? null;
+                        //operations_Sefety_Case_model.Actual_year = year;
+                        //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
+
+
+
+                        #region File processing
+                        var files = Request.Form.Files;
+
+                        if (files.Count >= 1)
+                        {
+                            var file1 = Request.Form.Files[0];
+                            var blobname1 = blobService.Filenamer(file1);
+
+                            if (file1 != null)
+                            {
+                                string docName = "Effluent Monitoring Complience";
+                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EffluenceMonitoringDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+
+                                if (Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath == null)
+                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                else
+                                    Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = blobname1;
+
+                            }
                             else
-                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = blobname1;
-
+                            {
+                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                            }
                         }
                         else
                         {
                             Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
                             Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
                         }
-                    }
-                    else
-                    {
-                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
-                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
-                    }
 
-                    if (Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling.ToLower() == "yes")
-                    {
-                        Effluenct_Monitoring_Complience_Mode.ReasonForNoEvidenceSampling = null;
-                    }
-                    else
-                    {
-                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
-                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
-                    }
-                    #endregion
-
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null)
+                        if (Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling.ToLower() == "yes")
                         {
-                            Effluenct_Monitoring_Complience_Mode.Date_Created = DateTime.Now;
-                            Effluenct_Monitoring_Complience_Mode.Created_by = WKPCompanyId;
-                            await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.AddAsync(Effluenct_Monitoring_Complience_Mode);
+                            Effluenct_Monitoring_Complience_Mode.ReasonForNoEvidenceSampling = null;
                         }
                         else
                         {
-                            _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
+                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                        }
+                        #endregion
 
-                            Effluenct_Monitoring_Complience_Mode.Date_Created = Effluenct_Monitoring_Complience_Mode.Date_Created;
-                            Effluenct_Monitoring_Complience_Mode.Created_by = Effluenct_Monitoring_Complience_Mode.Created_by;
-                            Effluenct_Monitoring_Complience_Mode.Date_Updated = DateTime.Now;
-                            Effluenct_Monitoring_Complience_Mode.Updated_by = WKPCompanyId;
-                            await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.AddAsync(Effluenct_Monitoring_Complience_Mode);
+                        if (action == GeneralModel.Insert)
+                        {
+                            if (getData == null)
+                            {
+                                Effluenct_Monitoring_Complience_Mode.Date_Created = DateTime.Now;
+                                Effluenct_Monitoring_Complience_Mode.Created_by = WKPCompanyId;
+                                await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.AddAsync(Effluenct_Monitoring_Complience_Mode);
+                            }
+                            else
+                            {
+                                _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
+
+                                Effluenct_Monitoring_Complience_Mode.Date_Created = Effluenct_Monitoring_Complience_Mode.Date_Created;
+                                Effluenct_Monitoring_Complience_Mode.Created_by = Effluenct_Monitoring_Complience_Mode.Created_by;
+                                Effluenct_Monitoring_Complience_Mode.Date_Updated = DateTime.Now;
+                                Effluenct_Monitoring_Complience_Mode.Updated_by = WKPCompanyId;
+                                await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.AddAsync(Effluenct_Monitoring_Complience_Mode);
+                            }
+                        }
+                        else if (action == GeneralModel.Delete)
+                        {
+                            _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
                         }
                     }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
-                    }
-
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
@@ -2849,112 +2875,134 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_HSE_GHG_MANAGEMENT_PLAN"), DisableRequestSizeLimit]
-        public async Task<object> POST_HSE_GHG_MANAGEMENT_PLAN([FromForm] HSE_GHG_MANAGEMENT_PLAN ghg_Mgt_Plan_Model, string omlName, string fieldName, string year, string actionToDo = null)
+        public async Task<object> POST_HSE_GHG_MANAGEMENT_PLAN([FromForm] HSE_GHG_MANAGEMENT_PLAN ghg_Mgt_Plan_Model, string omlName, string fieldName, string year, string actionToDo = null, int id = 0)
         {
 
             int save = 0;
             int Id = ghg_Mgt_Plan_Model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+            HSE_GHG_MANAGEMENT_PLAN getOperationSafetyCaseData;
             try
             {
 
+
                 #region Saving Operation Safety Case
-                if (ghg_Mgt_Plan_Model != null)
+                if (ghg_Mgt_Plan_Model != null || id > 0)
                 {
-                    HSE_GHG_MANAGEMENT_PLAN getOperationSafetyCaseData;
-                    if (concessionField.Field_Name != null)
+
+                    if (id > 0 && action == GeneralModel.Delete)
                     {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanY_ID == WKPCompanyId && c.OmL_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getOperationSafetyCaseData = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.Id == id select c).FirstOrDefaultAsync();
+
+                        if (getOperationSafetyCaseData != null)
+                        {
+                            _context.HSE_GHG_MANAGEMENT_PLANs.Remove(getOperationSafetyCaseData);
+                        }
+
                     }
                     else
                     {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanY_ID == WKPCompanyId && c.OmL_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
-                    ghg_Mgt_Plan_Model.companyemail = WKPCompanyEmail;
-                    ghg_Mgt_Plan_Model.CompanyName = WKPCompanyName;
-                    ghg_Mgt_Plan_Model.CompanY_ID = WKPCompanyId;
-                    ghg_Mgt_Plan_Model.CompanyNumber = WKPCompanyNumber;
-                    ghg_Mgt_Plan_Model.Date_Updated = DateTime.Now;
-                    ghg_Mgt_Plan_Model.Updated_by = WKPCompanyId;
-                    ghg_Mgt_Plan_Model.Year_of_WP = year;
-                    ghg_Mgt_Plan_Model.OmL_Name = omlName;
-                    ghg_Mgt_Plan_Model.Field_ID = concessionField?.Field_ID ?? null;
-                    //operations_Sefety_Case_model.Actual_year = year;
-                    //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
 
-                    #region File processing
-                    //var files = Request.Form.Files;
-
-                    if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
-                    {
-
-                        IFormFile? file1 = null;
-                        string blobname1 = string.Empty;
-                        IFormFile? file2 = null;
-                        string blobname2 = string.Empty;
-                        IFormFile? file3 = null;
-                        string blobname3 = string.Empty;
-                        if (Request.Form.Files.Count == 1)
+                        if (concessionField.Field_Name != null)
                         {
-                            file1 = Request.Form.Files[0];
-                            blobname1 = blobService.Filenamer(file1);
-                            if (file1 != null)
-                            {
-                                string docName = "GHG Approval";
-                                ghg_Mgt_Plan_Model.GHGApprovalPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGApprovalDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-
-                                if (ghg_Mgt_Plan_Model.GHGApprovalPath == null)
-                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                                else
-                                    ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
-
-                            }
-                            else
-                            {
-                                ghg_Mgt_Plan_Model.GHGApprovalPath = null;
-                                ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
-                            }
+                            getOperationSafetyCaseData = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanY_ID == WKPCompanyId && c.OmL_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                         }
                         else
                         {
-                            ghg_Mgt_Plan_Model.GHGApprovalPath = null;
-                            ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+                            getOperationSafetyCaseData = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.CompanY_ID == WKPCompanyId && c.OmL_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                         }
+                        ghg_Mgt_Plan_Model.companyemail = WKPCompanyEmail;
+                        ghg_Mgt_Plan_Model.CompanyName = WKPCompanyName;
+                        ghg_Mgt_Plan_Model.CompanY_ID = WKPCompanyId;
+                        ghg_Mgt_Plan_Model.CompanyNumber = WKPCompanyNumber;
+                        ghg_Mgt_Plan_Model.Date_Updated = DateTime.Now;
+                        ghg_Mgt_Plan_Model.Updated_by = WKPCompanyId;
+                        ghg_Mgt_Plan_Model.Year_of_WP = year;
+                        ghg_Mgt_Plan_Model.OmL_Name = omlName;
+                        ghg_Mgt_Plan_Model.Field_ID = concessionField?.Field_ID ?? null;
+                        //operations_Sefety_Case_model.Actual_year = year;
+                        //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
 
-                        if (Request.Form.Files.Count == 2)
+                        #region File processing
+                        //var files = Request.Form.Files;
+
+                        if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
                         {
-                            file1 = Request.Form.Files[0];
-                            file2 = Request.Form.Files[1];
-                            blobname1 = blobService.Filenamer(file1);
-                            blobname2 = blobService.Filenamer(file2);
-                            if (file1 != null)
+
+                            IFormFile? file1 = null;
+                            string blobname1 = string.Empty;
+                            IFormFile? file2 = null;
+                            string blobname2 = string.Empty;
+                            IFormFile? file3 = null;
+                            string blobname3 = string.Empty;
+                            if (Request.Form.Files.Count == 1)
                             {
-                                string docName = "GHG Approval";
-                                ghg_Mgt_Plan_Model.GHGApprovalPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGApprovalDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                file1 = Request.Form.Files[0];
+                                blobname1 = blobService.Filenamer(file1);
+                                if (file1 != null)
+                                {
+                                    string docName = "GHG Approval";
+                                    ghg_Mgt_Plan_Model.GHGApprovalPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGApprovalDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
 
-                                if (ghg_Mgt_Plan_Model.GHGApprovalPath == null)
-                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    if (ghg_Mgt_Plan_Model.GHGApprovalPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
+
+                                }
                                 else
-                                    ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
-
+                                {
+                                    ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                                    ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+                                }
                             }
                             else
                             {
                                 ghg_Mgt_Plan_Model.GHGApprovalPath = null;
                                 ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
-
                             }
 
-                            if (file2 != null)
+                            if (Request.Form.Files.Count == 2)
                             {
-                                string docName = "LDR Certificate";
-                                ghg_Mgt_Plan_Model.LDRCertificatePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"LDRCertificateDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                file1 = Request.Form.Files[0];
+                                file2 = Request.Form.Files[1];
+                                blobname1 = blobService.Filenamer(file1);
+                                blobname2 = blobService.Filenamer(file2);
+                                if (file1 != null)
+                                {
+                                    string docName = "GHG Approval";
+                                    ghg_Mgt_Plan_Model.GHGApprovalPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGApprovalDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
 
-                                if (ghg_Mgt_Plan_Model.LDRCertificatePath == null)
-                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    if (ghg_Mgt_Plan_Model.GHGApprovalPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
+
+                                }
                                 else
-                                    ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname2;
+                                {
+                                    ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                                    ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+
+                                }
+
+                                if (file2 != null)
+                                {
+                                    string docName = "LDR Certificate";
+                                    ghg_Mgt_Plan_Model.LDRCertificatePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"LDRCertificateDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+
+                                    if (ghg_Mgt_Plan_Model.LDRCertificatePath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname2;
+                                }
+                                else
+                                {
+                                    ghg_Mgt_Plan_Model.LDRCertificatePath = null;
+                                    ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
+
+                                }
                             }
                             else
                             {
@@ -2962,102 +3010,96 @@ namespace Backend_UMR_Work_Program.Controllers
                                 ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
 
                             }
+
+                            if (Request.Form.Files.Count > 2)
+                            {
+                                file1 = Request.Form.Files[0];
+                                file2 = Request.Form.Files[1];
+                                file3 = Request.Form.Files[2];
+                                blobname1 = blobService.Filenamer(file1);
+                                blobname2 = blobService.Filenamer(file2);
+                                blobname3 = blobService.Filenamer(file3);
+                                if (file1 != null)
+                                {
+                                    string docName = "GHG Approval";
+                                    ghg_Mgt_Plan_Model.GHGApprovalPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGApprovalDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+
+                                    if (ghg_Mgt_Plan_Model.GHGApprovalPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
+
+                                }
+                                if (file2 != null)
+                                {
+                                    string docName = "LDR Certificate";
+                                    ghg_Mgt_Plan_Model.LDRCertificatePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"LDRCertificateDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+
+                                    if (ghg_Mgt_Plan_Model.LDRCertificatePath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname2;
+
+                                }
+                                if (file3 != null)
+                                {
+                                    string docName = "LDR Certificate";
+                                    ghg_Mgt_Plan_Model.LDRCertificatePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"LDRCertificateDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+
+                                    if (ghg_Mgt_Plan_Model.LDRCertificatePath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname3;
+
+                                }
+                            }
+                        }
+
+                        if (ghg_Mgt_Plan_Model.DoYouHaveGHG.ToLower() == "yes")
+                        {
+                            ghg_Mgt_Plan_Model.ReasonForNoGHG = null;
+                        }
+                        else
+                        {
+                            ghg_Mgt_Plan_Model.GHGApprovalPath = null;
+                            ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
+                        }
+
+                        if (ghg_Mgt_Plan_Model.DoYouHaveLDRCertificate.ToLower() == "yes")
+                        {
+                            ghg_Mgt_Plan_Model.ReasonForNoLDR = null;
                         }
                         else
                         {
                             ghg_Mgt_Plan_Model.LDRCertificatePath = null;
                             ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
-
                         }
 
-                        if (Request.Form.Files.Count > 2)
+                        #endregion
+
+                        if (action == GeneralModel.Insert)
                         {
-                            file1 = Request.Form.Files[0];
-                            file2 = Request.Form.Files[1];
-                            file3 = Request.Form.Files[2];
-                            blobname1 = blobService.Filenamer(file1);
-                            blobname2 = blobService.Filenamer(file2);
-                            blobname3 = blobService.Filenamer(file3);
-                            if (file1 != null)
+                            if (getOperationSafetyCaseData == null)
                             {
-                                string docName = "GHG Approval";
-                                ghg_Mgt_Plan_Model.GHGApprovalPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"GHGApprovalDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-
-                                if (ghg_Mgt_Plan_Model.GHGApprovalPath == null)
-                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                                else
-                                    ghg_Mgt_Plan_Model.GHGApprovalFilename = blobname1;
-
+                                ghg_Mgt_Plan_Model.Date_Created = DateTime.Now;
+                                ghg_Mgt_Plan_Model.Created_by = WKPCompanyId;
+                                await _context.HSE_GHG_MANAGEMENT_PLANs.AddAsync(ghg_Mgt_Plan_Model);
                             }
-                            if (file2 != null)
+                            else
                             {
-                                string docName = "LDR Certificate";
-                                ghg_Mgt_Plan_Model.LDRCertificatePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"LDRCertificateDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                _context.HSE_GHG_MANAGEMENT_PLANs.Remove(getOperationSafetyCaseData);
 
-                                if (ghg_Mgt_Plan_Model.LDRCertificatePath == null)
-                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                                else
-                                    ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname2;
-
-                            }
-                            if (file3 != null)
-                            {
-                                string docName = "LDR Certificate";
-                                ghg_Mgt_Plan_Model.LDRCertificatePath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"LDRCertificateDocuments/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-
-                                if (ghg_Mgt_Plan_Model.LDRCertificatePath == null)
-                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                                else
-                                    ghg_Mgt_Plan_Model.LDRCertificateFilename = blobname3;
-
+                                ghg_Mgt_Plan_Model.Date_Created = ghg_Mgt_Plan_Model.Date_Created;
+                                ghg_Mgt_Plan_Model.Created_by = ghg_Mgt_Plan_Model.Created_by;
+                                ghg_Mgt_Plan_Model.Date_Updated = DateTime.Now;
+                                ghg_Mgt_Plan_Model.Updated_by = WKPCompanyId;
+                                await _context.HSE_GHG_MANAGEMENT_PLANs.AddAsync(ghg_Mgt_Plan_Model);
                             }
                         }
-                    }
-
-                    if (ghg_Mgt_Plan_Model.DoYouHaveGHG.ToLower() == "yes")
-                    {
-                        ghg_Mgt_Plan_Model.ReasonForNoGHG = null;
-                    }
-                    else
-                    {
-                        ghg_Mgt_Plan_Model.GHGApprovalPath = null;
-                        ghg_Mgt_Plan_Model.GHGApprovalFilename = null;
-                    }
-
-                    if (ghg_Mgt_Plan_Model.DoYouHaveLDRCertificate.ToLower() == "yes")
-                    {
-                        ghg_Mgt_Plan_Model.ReasonForNoLDR = null;
-                    }
-                    else
-                    {
-                        ghg_Mgt_Plan_Model.LDRCertificatePath = null;
-                        ghg_Mgt_Plan_Model.LDRCertificateFilename = null;
-                    }
-
-                    #endregion
-
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getOperationSafetyCaseData == null)
+                        else if (action == GeneralModel.Delete)
                         {
-                            ghg_Mgt_Plan_Model.Date_Created = DateTime.Now;
-                            ghg_Mgt_Plan_Model.Created_by = WKPCompanyId;
-                            await _context.HSE_GHG_MANAGEMENT_PLANs.AddAsync(ghg_Mgt_Plan_Model);
+                            _context.HSE_GHG_MANAGEMENT_PLANs.Remove(ghg_Mgt_Plan_Model);
                         }
-                        else
-                        {
-                            _context.HSE_GHG_MANAGEMENT_PLANs.Remove(getOperationSafetyCaseData);
-
-                            ghg_Mgt_Plan_Model.Date_Created = ghg_Mgt_Plan_Model.Date_Created;
-                            ghg_Mgt_Plan_Model.Created_by = ghg_Mgt_Plan_Model.Created_by;
-                            ghg_Mgt_Plan_Model.Date_Updated = DateTime.Now;
-                            ghg_Mgt_Plan_Model.Updated_by = WKPCompanyId;
-                            await _context.HSE_GHG_MANAGEMENT_PLANs.AddAsync(ghg_Mgt_Plan_Model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_GHG_MANAGEMENT_PLANs.Remove(ghg_Mgt_Plan_Model);
                     }
 
                     save += await _context.SaveChangesAsync();
@@ -4332,14 +4374,14 @@ namespace Backend_UMR_Work_Program.Controllers
 
             WORKOVERS_RECOMPLETION_JOB1 getData;
 
-           
+
 
             try
             {
                 if (id > 0 || workovers_recompletion_model != null)
                 {
 
-                    if (id > 0 && workovers_recompletion_model.Id==0)
+                    if (id > 0 && workovers_recompletion_model.Id == 0)
                     {
                         getData = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.Id == id select c).FirstOrDefaultAsync();
 
