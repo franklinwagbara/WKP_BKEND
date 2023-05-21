@@ -3456,11 +3456,11 @@ namespace Backend_UMR_Work_Program.Controllers
                             //var _drillEachCost = await (from d in _context.DRILLING_EACH_WELL_COSTs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
                             //var _drillEachCostProposed = await (from d in _context.DRILLING_EACH_WELL_COST_PROPOSEDs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
                             var _drillOperationCategoriesWell = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
-                            var _capexOpexItems = await (from d in _context.BUDGET_CAPEX_OPices where d.CompanyNumber == application.CompanyID && d.Field_ID == fieldID && d.Year_of_WP == year select d).ToListAsync();
+                            var _capexOpexItems = await (from d in _context.BUDGET_CAPEX_OPices where d.CompanyNumber == application.CompanyID && d.Field_ID == fieldID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
                             var _budgetProposalNairaDollar = await (from d in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where d.CompanyNumber == application.CompanyID && d.Field_ID == fieldID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
                             var _royalty = await (from d in _context.Royalties where d.CompanyNumber == application.CompanyID && d.Concession_ID == application.ConcessionID && d.Field_ID == fieldID && d.Year == year select d).FirstOrDefaultAsync();
-                            var _BudgetCapex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[0] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                            var _BudgetOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[1] && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            var _BudgetCapex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[0] && c.Year_of_WP == year select c).ToListAsync();
+                            var _BudgetOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[1] && c.Year_of_WP == year select c).ToListAsync();
                                 
                             //var _PlanningRequirement = await (from c in _context.Planning_MinimumRequirements where c.CompanyNumber == application.CompanyID && c.Year.ToString() == year select c).FirstOrDefaultAsync();
                             //var _BudgetActualExpenditure = await (from c in _context.BUDGET_ACTUAL_EXPENDITUREs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
@@ -4202,7 +4202,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             var _BudgetCapex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[0] && c.Year_of_WP == year select c).ToListAsync();
                             var _BudgetOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[1] && c.Year_of_WP == year select c).ToListAsync();
                                 
-                            var _BudgetPerformanceExploratory = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                            //var _BudgetPerformanceExploratory = await (from c in _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                             var _geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var __concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
                             var _categoriesProposedWells = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.CompanyNumber == application.CompanyID && c.Field_ID == application.FieldID && c.Year_of_WP == year orderby c.QUATER select c).ToListAsync();
@@ -4254,7 +4254,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 budgetOpex = _BudgetOpex,
 
 
-                                BudgetPerformanceExploratory = _BudgetPerformanceExploratory,
+                                //BudgetPerformanceExploratory = _BudgetPerformanceExploratory,
                                 categoriesProposedWells = _categoriesProposedWells,
                                 geoActivitiesProcessings = _geoActivitiesProcessings,
                                 concessionSituations = __concessionSituations,

@@ -772,8 +772,51 @@ namespace Backend_UMR_Work_Program.Controllers
 
 			}
 		}
-		//Create a method to Generate AccessCode
-		[HttpGet("GENERATE_ACCESS_CODE")]
+
+
+        [HttpPut("EDIT_STAFF")]
+        public async Task<WebApiResponse> editStaff(int staffId, string staffEmail, int sbuId, int roleId, bool activated)
+        {
+
+            try
+            {
+				//var checkUser = (from c in _context.ADMIN_COMPANY_INFORMATIONs
+				//                 where c.EMAIL.ToLower() == userModel.EMAIL.ToLower()
+				//                 select c).FirstOrDefault();
+
+				var foundStaff = _context.staff.Where(s => s.StaffID == staffId).FirstOrDefault();
+				var foundUser = _context.ADMIN_COMPANY_INFORMATIONs.Where(u => u.EMAIL.ToLower() == staffEmail.ToLower()).FirstOrDefault();
+
+                if (foundStaff == null || foundUser == null)
+                {
+                    string errMsg = $" This staff can not be found on the portal.";
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error: " + errMsg, StatusCode = ResponseCodes.Failure };
+                }
+                else
+                {
+					foundStaff.Staff_SBU = sbuId;
+					foundStaff.RoleID = roleId;
+					foundStaff.ActiveStatus= activated;
+
+                    foundUser.STATUS_ = activated == true? GeneralModel.Activated: GeneralModel.Deactivated;
+
+                    _context.ADMIN_COMPANY_INFORMATIONs.Update(foundUser);
+					_context.staff.Update(foundStaff);
+
+                    int save = await _context.SaveChangesAsync();
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Staff Details has been updated successfully", Data = foundStaff, StatusCode = ResponseCodes.Success };
+                }
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+            }
+        }
+
+
+        //Create a method to Generate AccessCode
+        [HttpGet("GENERATE_ACCESS_CODE")]
 		public string GENERATE_ACCESS_CODE(string companyName)
 		{
 			try
