@@ -813,6 +813,138 @@ namespace Backend_UMR_Work_Program.Controllers
 
         }
 
+        public async Task<object> PushApplication_Main(int deskID, string comment, string[] selectedApps)
+        {
+            try
+            {
+                if (selectedApps != null)
+                {
+                    foreach (var b in selectedApps)
+                    {
+                        string appID = b.Replace('[', ' ').Replace(']', ' ').Trim();
+                        int appId = int.Parse(appID);
+                        //get current staff desk
+                        var get_CurrentStaff = (from stf in _context.staff
+                                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                                                where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
+                                                select stf).FirstOrDefault();
+
+                        var staffDesk = _context.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
+
+                        var application = _context.Applications.Where(a => a.Id == appId).FirstOrDefault();
+
+                        var Company = _context.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+
+                        var concession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
+
+                        var getStaffById = await _helpersController.GetStaffByStaffId(staffDesk.StaffID);
+
+                        var staffId = getStaffById?.StaffID;
+                        var staffRoleId = getStaffById?.RoleID;
+                        var staffSBUId = getStaffById?.Staff_SBU;
+                        var getApplicationProcess = await _helpersController.GetApplicationProccessBySBUAndRole(GeneralModel.Push, (int)staffRoleId, (int)staffSBUId);
+
+                        if (getApplicationProcess.Count > 0)
+                        {
+                            foreach (var processFlow in getApplicationProcess)
+                            {
+                                var getStaffByTargetedRoleAndSBUs = await _helpersController.GetStaffByTargetRoleAndSBU((int)processFlow.TargetedToRole, (int)processFlow.TargetedToSBU);
+
+                                var deskTemp = await _helpersController.GetStaffMyDesks(getStaffByTargetedRoleAndSBUs, appId);
+
+                                if (deskTemp != null)
+                                {
+                                    deskTemp.FromRoleId = processFlow.TriggeredByRole;
+                                    deskTemp.FromSBU = (int)processFlow.TriggeredBySBU;
+                                    deskTemp.FromStaffID = get_CurrentStaff.StaffID;
+                                    deskTemp.ProcessID = processFlow.ProccessID;
+                                    deskTemp.AppId = appId;
+                                    deskTemp.HasPushed = false;
+                                    deskTemp.HasWork = true;
+                                    deskTemp.CreatedAt = DateTime.Now;
+                                    deskTemp.UpdatedAt = DateTime.Now;
+                                    deskTemp.Comment = comment;
+                                    deskTemp.LastJobDate = DateTime.Now;
+                                    deskTemp.ProcessStatus = STAFF_DESK_STATUS.APPROVED;
+
+                                    _context.Update(deskTemp);
+                                }
+                                else
+                                {
+                                    var desk = new MyDesk
+                                    {
+                                        //save staff desk
+                                        StaffID = deskTemp.StaffID,
+                                        FromRoleId = processFlow.TriggeredByRole,
+                                        FromSBU = (int)processFlow.TriggeredBySBU,
+                                        FromStaffID = get_CurrentStaff.StaffID,
+                                        ProcessID = processFlow.ProccessID,
+                                        AppId = appId,
+                                        HasPushed = false,
+                                        HasWork = true,
+                                        CreatedAt = DateTime.Now,
+                                        UpdatedAt = DateTime.Now,
+                                        Comment = comment,
+                                        LastJobDate = DateTime.Now,
+                                        ProcessStatus = STAFF_DESK_STATUS.APPROVED,
+
+                                    };
+
+                                    _context.MyDesks.Add(desk);
+                                }
+
+                                var save = await _context.SaveChangesAsync();
+                                if (save > 0)
+                                {
+                                    //var trigeredbyDeskId = await _helpersController.GetDeskIdByStaffIdAndAppId((int)staffId, appId);
+                                    //var result = await _helpersController.DeleteDeskIdByDeskId(trigeredbyDeskId);
+
+                                    //update records of approval status coming in from each SBU for workprogram team consumption
+                                    if (processFlow.ProcessAction == GeneralModel.Approve) ;
+
+
+                                    await _helpersController.UpdateDeskAfterPush(staffDesk, comment, STAFF_DESK_STATUS.APPROVED);
+                                }
+
+                                _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Approval", comment);
+
+
+                                //send mail to staff
+                                var getStaff = (from stf in _context.staff
+                                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                                                where stf.StaffID == deskTemp.StaffID && stf.DeleteStatus != true
+                                                select stf).FirstOrDefault();
+
+                                string subject = $"Push for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
+                                string content = $"{WKPCompanyName} have submitted their WORK PROGRAM application for year {application.YearOfWKP}.";
+                                var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
+                                var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
+
+                                _helpersController.LogMessages("Submission of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
+                                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been pushed successfully.", StatusCode = ResponseCodes.Success };
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new { message = "An error occured while trying to get process flow for this application." });
+                        }
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { message = "Error: No application ID was passed for this action to be completed." });
+                }
+
+                return BadRequest(new { message = "Error: No application ID was passed for this action to be completed." });
+            }
+            catch (Exception x)
+            {
+                _helpersController.LogMessages($"Approve Error:: {x.Message.ToString()}");
+                return BadRequest(new { message = $"An error occured while pushing application to staff." + x.Message.ToString() });
+            }
+
+        }
+
         [HttpPost("MoveApplication")]
         public async Task<object> MoveApplication(int sourceStaffID, int targetStaffID, string[] selectedApps)
         {
@@ -2354,7 +2486,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                             Id = tab.TableId,
                                             TableName = tab.TableName,
                                             Role = tab.TableSchema,
-                                            SBU = sbu.SBU_Name
+                                            SBU = sbu.SBU_Name,
+                                            SBU_ID = sbu.Id
                                         }).ToListAsync();
                 var SBUs = await _context.StrategicBusinessUnits.ToListAsync();
 
@@ -2405,7 +2538,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                                        Id = tab.TableId,
                                                        TableName = tab.TableName,
                                                        Role = tab.TableSchema,
-                                                       SBU = sbu.SBU_Name
+                                                       SBU = sbu.SBU_Name,
+                                                       SBU_ID = sbu.Id
                                                    }).ToListAsync();
                         var SBUs = await _context.StrategicBusinessUnits.ToListAsync();
 
@@ -2459,7 +2593,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                                        Id = tab.TableId,
                                                        TableName = tab.TableName,
                                                        Role = tab.TableSchema,
-                                                       SBU = sbu.SBU_Name
+                                                       SBU = sbu.SBU_Name,
+                                                       SBU_ID = sbu.Id
                                                    }).ToListAsync();
                         var SBUs = await _context.StrategicBusinessUnits.ToListAsync();
 
@@ -2504,7 +2639,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                                        Id = tab.TableId,
                                                        TableName = tab.TableName,
                                                        Role = tab.TableSchema,
-                                                       SBU = sbu.SBU_Name
+                                                       SBU = sbu.SBU_Name,
+                                                       SBU_ID = sbu.Id
                                                    }).ToListAsync();
                         var SBUs = await _context.StrategicBusinessUnits.ToListAsync();
 

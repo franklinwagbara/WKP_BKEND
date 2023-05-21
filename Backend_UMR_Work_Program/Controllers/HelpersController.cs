@@ -2971,9 +2971,9 @@ generate:
 							HasPushed = false,
 							HasWork = false,
 							CreatedAt = DateTime.Now,
-							//UpdatedAt = DateTime.Now,
+							UpdatedAt = DateTime.Now,
 							//Comment="",
-							//LastJobDate= DateTime.Now,
+							LastJobDate = DateTime.Now,
 						};
 
 						_context.MyDesks.Add(newDesk);
@@ -2993,7 +2993,58 @@ generate:
 			}
 		}
 
-		public async Task<int> GetDeskIdByStaffIdAndAppId(int staffId, int appId)
+        public async Task<MyDesk> GetNextStaffDesk(List<int> staffIds, int appId)
+        {
+            try
+            {
+                var staffDesks = new List<MyDesk>();
+
+                foreach (var staffId in staffIds)
+                {
+                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == false).FirstOrDefault();
+                    var desk_conflict = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
+
+                    if (desk_conflict != null)
+                    {
+                        throw new Exception("This application has already been push to this desk.");
+                    }
+                    else if (desk != null)
+                    {
+                        staffDesks.Add(desk);
+                    }
+                    else
+                    {
+                        var newDesk = new MyDesk
+                        {
+                            //save staff desk
+                            StaffID = staffId,
+                            AppId = appId,
+                            HasPushed = false,
+                            HasWork = false,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            //Comment="",
+                            LastJobDate = DateTime.Now,
+                        };
+
+                        _context.MyDesks.Add(newDesk);
+
+                        var savedDesk = await _context.SaveChangesAsync();
+
+                        staffDesks.Add(newDesk);
+                    }
+
+                }
+                return staffDesks.OrderByDescending(x => x.LastJobDate).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public async Task<int> GetDeskIdByStaffIdAndAppId(int staffId, int appId)
 		{
 			try
 			{
