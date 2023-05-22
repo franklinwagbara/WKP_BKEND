@@ -59,7 +59,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpGet("GETCOMPLETEDPAGES")]
-        public async Task<object> GETCOMPLETEDPAGES(string omlname, string year)
+        public async Task<object> GETCOMPLETEDPAGES(string omlname, string year, string fieldname)
         {
             bool isStep1;
             bool isStep2;
@@ -67,20 +67,24 @@ namespace Backend_UMR_Work_Program.Controllers
             bool isStep4;
             bool isStep5;
 
+
+
             var step1 = await (from a in _context.CONCESSION_SITUATIONs
                                join b in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs on a.OML_Name equals b.OML_Name
                                join c in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs on a.OML_Name equals c.OML_Name
                                join d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs on a.OML_Name equals d.OML_Name
-                               where a.OML_Name == omlname
+                               where a.OML_Name == omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname
                                select new
                                {
-                                   noOfFields = a.No_of_field_producing,
-                                   geoData = b.Geo_acquired_geophysical_data,
-                                   geoDataProcessed = c.Geo_Any_Ongoing_Processing_Project,
-                                   wellType = d.well_type
+                                   concessionCreated = a,
+                                   geoData = b,
+                                   geoDataProcessed = c,
+                                   wellType = d
+
 
                                }).FirstOrDefaultAsync();
-            if (step1?.geoData != null && step1?.geoDataProcessed != null && step1?.wellType != null && step1?.noOfFields != null)
+           // var _step1 = _context.CONCESSION_SITUATIONs.Where(a => a.OML_Name == omlname);
+            if (step1?.geoData != null && step1?.geoDataProcessed != null && step1?.wellType != null && step1?.concessionCreated != null)
             {
                 isStep1 = true;
             }
@@ -95,15 +99,16 @@ namespace Backend_UMR_Work_Program.Controllers
                                join d in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs on a.OML_Name equals d.OML_Name
                                join e in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs on a.OML_Name equals e.OML_Name
                                join f in _context.FIELD_DEVELOPMENT_PLANs on a.OML_Name equals f.OML_Name
-                               where a.OML_Name == omlname
+                               where a.OML_Name == omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname
+
                                select new
                                {
-                                   currentdata = a.Current_year_Actual_Number,
-                                   approvalWorkover = b.Do_you_have_approval_for_the_workover_recompletion,
-                                   gasRoyalty = c.Gas_Sales_Royalty_Payment,
-                                   oilRoyalty = d.Oil_Royalty_Payment,
-                                   oilReserve = e.Company_Reserves_Oil,
-                                   wellDrilled = f.No_of_wells_drilled_in_current_year
+                                   currentdata = a,
+                                   approvalWorkover = b,
+                                   gasRoyalty = c,
+                                   oilRoyalty = d,
+                                   oilReserve = e,
+                                   wellDrilled = f
                                }).FirstOrDefaultAsync();
             if (step2?.currentdata != null && step2?.approvalWorkover != null && step2?.gasRoyalty != null && step2?.oilRoyalty != null && step2?.oilReserve != null && step2?.wellDrilled != null)
             {
@@ -117,7 +122,7 @@ namespace Backend_UMR_Work_Program.Controllers
             var step3 = await (from a in _context.BUDGET_ACTUAL_EXPENDITUREs
                                join b in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs on a.OML_Name equals b.OML_Name
                                join c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs on a.OML_Name equals c.OML_Name
-                               where a.OML_Name == omlname
+                               where a.OML_Name == omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname
                                select new
                                {
                                    exploratoryBudget = a.Budget_for_Direct_Exploration_and_Production_Activities_USD,
