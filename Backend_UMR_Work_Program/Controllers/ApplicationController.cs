@@ -508,22 +508,38 @@ namespace Backend_UMR_Work_Program.Controllers
                                             Date = his.ActionDate
                                         }).ToListAsync();
 
-                var staffDesk = await (from dsk in _context.MyDesks
+                var currentDesks = await (from dsk in _context.MyDesks
                                        join stf in _context.staff on dsk.StaffID equals stf.StaffID
-                                       join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                                       //join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
                                        join rol in _context.Roles on stf.RoleID equals rol.id
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
-                                       //where admin.Id == WKPCompanyNumber && dsk.AppId == appID && dsk.HasWork != true && stf.ActiveStatus != false && stf.DeleteStatus != true
-                                       where admin.Id == WKPCompanyNumber && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
+                                       //where admin.Id == WKPCompanyNumber && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
+                                       where dsk.HasWork == true && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
                                        select new Staff_Model
                                        {
                                            Desk_ID = dsk.DeskID,
+                                           Staff_Name = stf.LastName + ", " + stf.FirstName,
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
                                            //Sort = (int)dsk.Sort
                                        }).ToListAsync();
 
+                var staffDesk = await (from dsk in _context.MyDesks
+                                       join stf in _context.staff on dsk.StaffID equals stf.StaffID
+                                       join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                                       join rol in _context.Roles on stf.RoleID equals rol.id
+                                       join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
+                                       where admin.Id == WKPCompanyNumber && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
+                                          select new Staff_Model
+                                       {
+                                           Desk_ID = dsk.DeskID,
+                                           Staff_Name = stf.LastName + ", " + stf.FirstName,
+                                           Staff_Email = stf.StaffEmail,
+                                           Staff_SBU = sbu.SBU_Name,
+                                           Staff_Role = rol.RoleName,
+                                           //Sort = (int)dsk.Sort
+                                       }).ToListAsync();
 
 
                 var documents = await _context.SubmittedDocuments.Where(x => x.CreatedBy == application.CompanyID.ToString() && x.YearOfWKP == application.YearOfWKP).Take(10).ToListAsync();
@@ -543,6 +559,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     Concession = concession,
                     Company = company,
                     Staff = staffDesk,
+                    currentDesks = currentDesks,
                     Application_History = appHistory.OrderByDescending(x => x.ID).ToList(),
                     Document = documents,
                     SBU_TableDetails = getSBU_TablesToDisplay,
@@ -650,7 +667,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
                     var emailMsg = _helpersController.SaveMessage(application.Id, (int)WKPCompanyNumber, subject, content, "Company");
 
-                    //var sendEmail = _helpersController.SendEmailMessage(WKPCompanyEmail, WKPCompanyName, emailMsg, null);
+                    var sendEmail = _helpersController.SendEmailMessage(WKPCompanyEmail, WKPCompanyName, emailMsg, null);
                     var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
 
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
@@ -820,6 +837,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         var staffRoleId = getStaffById?.RoleID;
                         var staffSBUId = getStaffById?.Staff_SBU;
                         var getApplicationProcess = await _helpersController.GetApplicationProccessBySBUAndRole(GeneralModel.Push, (int)staffRoleId, (int)staffSBUId);
+                        var getApplicationProcessEC = await _helpersController.GetApplicationProccessBySBUAndRole(GeneralModel.ApprovedByEC, (int)staffRoleId, (int)staffSBUId);
 
                         if (getApplicationProcess.Count > 0)
                         {
@@ -885,6 +903,90 @@ namespace Backend_UMR_Work_Program.Controllers
                                 }
 
                                 _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Approval", comment);
+
+
+                                //send mail to staff
+                                var getStaff = (from stf in _context.staff
+                                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                                                where stf.StaffID == deskTemp.StaffID && stf.DeleteStatus != true
+                                                select stf).FirstOrDefault();
+
+                                string subject = $"Push for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
+                                string content = $"{WKPCompanyName} have submitted their WORK PROGRAM application for year {application.YearOfWKP}.";
+                                var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
+                                var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
+
+                                _helpersController.LogMessages("Submission of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
+                                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been pushed successfully.", StatusCode = ResponseCodes.Success };
+                            }
+                        }
+                        else if (getApplicationProcessEC.Count > 0)
+                        {
+                            foreach (var processFlow in getApplicationProcessEC)
+                            {
+                                var getStaffByTargetedRoleAndSBUs = await _helpersController.GetStaffByTargetRoleAndSBU((int)processFlow.TargetedToRole, (int)processFlow.TargetedToSBU);
+
+                                var deskTemp = await _helpersController.GetNextStaffDesk_EC(getStaffByTargetedRoleAndSBUs, appId);
+
+                                if (deskTemp != null)
+                                {
+                                    deskTemp.FromRoleId = processFlow.TriggeredByRole;
+                                    deskTemp.FromSBU = (int)processFlow.TriggeredBySBU;
+                                    deskTemp.FromStaffID = get_CurrentStaff.StaffID;
+                                    deskTemp.ProcessID = processFlow.ProccessID;
+                                    deskTemp.AppId = appId;
+                                    deskTemp.HasPushed = false;
+                                    deskTemp.HasWork = true;
+                                    deskTemp.CreatedAt = DateTime.Now;
+                                    deskTemp.UpdatedAt = DateTime.Now;
+                                    deskTemp.Comment = comment;
+                                    deskTemp.LastJobDate = DateTime.Now;
+                                    deskTemp.ProcessStatus = STAFF_DESK_STATUS.APPROVED;
+
+                                    _context.Update(deskTemp);
+                                }
+                                else
+                                {
+                                    //var desk = new MyDesk
+                                    //{
+                                    //    //save staff desk
+                                    //    StaffID = deskTemp.StaffID,
+                                    //    FromRoleId = processFlow.TriggeredByRole,
+                                    //    FromSBU = (int)processFlow.TriggeredBySBU,
+                                    //    FromStaffID = get_CurrentStaff.StaffID,
+                                    //    ProcessID = processFlow.ProccessID,
+                                    //    AppId = appId,
+                                    //    HasPushed = false,
+                                    //    HasWork = true,
+                                    //    CreatedAt = DateTime.Now,
+                                    //    UpdatedAt = DateTime.Now,
+                                    //    Comment = comment,
+                                    //    LastJobDate = DateTime.Now,
+                                    //    ProcessStatus = STAFF_DESK_STATUS.APPROVED,
+
+                                    //};
+
+                                    //_context.MyDesks.Add(desk);
+
+                                    deskTemp = _context.MyDesks.Where(x => x.AppId == appId && x.HasWork == true).FirstOrDefault();
+                                }
+
+                                var save = await _context.SaveChangesAsync();
+                                //if (save > 0)
+                                //{
+                                    //var trigeredbyDeskId = await _helpersController.GetDeskIdByStaffIdAndAppId((int)staffId, appId);
+                                    //var result = await _helpersController.DeleteDeskIdByDeskId(trigeredbyDeskId);
+
+                                //update records of approval status coming in from each SBU for workprogram team consumption
+                                if (processFlow.ProcessAction == GeneralModel.Approve) ;
+
+
+                                await _helpersController.UpdateDeskAfterPush(staffDesk, comment, STAFF_DESK_STATUS.APPROVED);
+                                //}
+
+                                _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Approval", comment);
+
+                                //Todo: Update EC Approvals Table
 
 
                                 //send mail to staff
@@ -2312,7 +2414,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 var roles = await _context.Roles.ToListAsync();
                 var SBUs = await _context.StrategicBusinessUnits.ToListAsync();
 
-                var processActions = new string[] { GeneralModel.Submit, GeneralModel.Reject, GeneralModel.Approve, GeneralModel.Push, GeneralModel.Delegate, GeneralModel.FinalApproval };
+                var processActions = new string[] { GeneralModel.Submit, GeneralModel.Reject, GeneralModel.Approve, GeneralModel.Push, GeneralModel.ApprovedByEC, GeneralModel.Delegate, GeneralModel.FinalApproval };
                 var processStatuses = new string[] { GeneralModel.Processing, GeneralModel.Submitted, GeneralModel.Rejected, GeneralModel.Approved };
                 return new
                 {

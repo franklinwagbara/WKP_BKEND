@@ -5348,16 +5348,11 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-
                 if (action == "delete" && id != null && id != 0)
                 {
                     getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.Id == id select c).FirstOrDefaultAsync();
                     _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.Remove(getData);
-
-
                 }
-
-
 
                 #region Saving OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION data
                 else if (oil_condensate_fiveyears_model != null)
@@ -5440,12 +5435,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
-
-
-
-
-
-
             }
             catch (Exception e)
             {
