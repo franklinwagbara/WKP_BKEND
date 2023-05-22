@@ -65,6 +65,8 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Supervisor = "Supervisor";
 		public static string Approval = "Approving Authority";
 		public static string FinalApprovalAuthority = "Final Approving Authority";
+		public static string Activated = "Activated";
+		public static string Deactivated = "Deactivated";
 
 
 

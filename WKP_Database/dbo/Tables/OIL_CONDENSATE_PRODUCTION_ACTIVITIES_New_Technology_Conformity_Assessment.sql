@@ -25,9 +25,11 @@
     [Field_ID]                              INT            NULL,
     [EvidenceOfInspectionAndUgradeFilename] NVARCHAR (MAX) NULL,
     [EvidenceOfInspectionAndUgradePath]     NVARCHAR (MAX) NULL,
-    [Inspection_Regime]                     VARCHAR(MAX)            NULL,
+    [Inspection_Regime]                     VARCHAR (MAX)  NULL,
     CONSTRAINT [PK_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 
