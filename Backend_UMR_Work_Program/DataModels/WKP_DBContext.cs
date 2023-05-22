@@ -17,6 +17,7 @@ public partial class WKP_DBContext : DbContext
         _configuration = configuration;
     }
 
+    public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals { get; set; }
     public virtual DbSet<SBU_Submission> SBU_Submissions { get; set; }
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSEs { get; set; }
 

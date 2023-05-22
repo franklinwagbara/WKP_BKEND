@@ -5426,12 +5426,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
-
-
-
-
-
-
             }
             catch (Exception e)
             {
