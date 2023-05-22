@@ -47,7 +47,7 @@ namespace Backend_UMR_Work_Program.Controllers
         private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
 
         [HttpGet("GETWORKPROGRAMYEARS")]
-        public async Task<object> GETWORKPROGRAMYEARS()
+        public object GETWORKPROGRAMYEARS()
         {
             var now = DateTime.UtcNow.Year + 1;
             var yearlist = new List<int>();
@@ -5330,22 +5330,14 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
 
-
-
-
-
-
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION")]
-        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION([FromForm] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION oil_condensate_fiveyears_model, string omlName, string fieldName, string year, string actionToDo, int id)
+        public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION oil_condensate_fiveyears_model, string omlName, string fieldName, string year, string actionToDo, int id)
         {
 
             int save = 0;
             string action = (String.IsNullOrWhiteSpace(actionToDo)) ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION getData;
-
-
-
             try
             {
                 if (action == "delete" && id != null && id != 0)
@@ -5353,7 +5345,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs where c.Id == id select c).FirstOrDefaultAsync();
                     _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.Remove(getData);
                 }
-
                 #region Saving OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTION data
                 else if (oil_condensate_fiveyears_model != null)
                 {
