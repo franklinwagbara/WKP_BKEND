@@ -10,5 +10,6 @@
         public DateTime? CreatedDate { get; set; } = default(DateTime?);
         public DateTime? UpdatedDate { get; set; }  
         public string? AppAction { get; set; }
+        public int? DeskID { get; set; }
     }
 }
