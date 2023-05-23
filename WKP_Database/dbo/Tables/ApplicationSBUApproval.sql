@@ -7,5 +7,6 @@
     [Status] NVARCHAR(50) NULL, 
     [CreatedDate] DATETIME NULL, 
     [UpdatedDate] DATETIME NULL, 
-    [AppAction] NVARCHAR(50) NULL
+    [AppAction] NVARCHAR(50) NULL, 
+    [DeskID] INT NULL
 )
