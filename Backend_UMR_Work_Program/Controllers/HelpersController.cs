@@ -3001,7 +3001,7 @@ generate:
 
                 foreach (var staffId in staffIds)
                 {
-                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId).FirstOrDefault();
+                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
 					var mostRecentJob = _context.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
                     //var desk_conflict = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
 
@@ -3197,6 +3197,7 @@ generate:
                 desk.ProcessStatus = processStatus;
 
 				_context.MyDesks.Update(desk);
+				_context.SaveChanges();
 
 				return desk;
             }
@@ -3206,6 +3207,53 @@ generate:
 				throw ex;
 			}
 		}
+
+        public async Task<ApplicationSBUApproval> UpdateApprovalTable(int appId, string? comment, int? staffId, int? deskId, string? processStatus)
+        {
+            try
+            {
+				//var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId && x.DeskID == deskId).FirstOrDefault();
+				var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId).FirstOrDefault();
+
+				if (foundApproval != null)
+				{
+					foundApproval.AppId = appId;
+					foundApproval.StaffID = staffId;
+					foundApproval.Status = processStatus;
+					foundApproval.Comment = comment;
+					foundApproval.UpdatedDate = DateTime.Now;
+					foundApproval.DeskID = deskId;
+
+					_context.ApplicationSBUApprovals.Update(foundApproval);
+                    _context.SaveChanges();
+                }
+				else
+				{
+					var newApproval = new ApplicationSBUApproval()
+					{
+                        AppId = appId,
+						StaffID = staffId,
+						Status = processStatus,
+						Comment = comment,
+						UpdatedDate = DateTime.Now,
+						DeskID = deskId
+					};
+
+                    _context.ApplicationSBUApprovals.Add(newApproval);
+                    _context.SaveChanges();
+
+                    return newApproval;
+                }
+
+
+                return foundApproval;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
 
         public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
         {
