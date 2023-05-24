@@ -5370,7 +5370,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_condensate_fiveyears_model.Actual_year = year;
                     oil_condensate_fiveyears_model.proposed_year = (int.Parse(year) + 1).ToString();
 
-
                     #region file section
                     //var file1 = Request.Form.Files[0];
                     //var blobname1 = blobService.Filenamer(file1);
