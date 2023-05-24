@@ -3558,11 +3558,12 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (application != null)
                 {
-                    int? fieldID = 0;
+                    int? fieldID = null;
                     if (application.FieldID != null)
                     {
                         fieldID = (int)application.FieldID;
                     }
+
                     var getStaffSBU = (from stf in _context.staff
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
                                        where stf.StaffEmail == WKPCompanyEmail
