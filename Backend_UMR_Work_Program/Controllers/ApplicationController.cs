@@ -1635,45 +1635,15 @@ namespace Backend_UMR_Work_Program.Controllers
                             {
                                 foreach (var desk in ecsDesks)
                                 {
-                                    //prevDesk = (from dsk in _context.MyDesks
-                                    //            join stf in _context.staff on dsk.StaffID equals stf.StaffID
-                                    //            where stf.StaffID == staffDesk.FromStaffID && dsk.AppId == appId && stf.Staff_SBU == SBU && dsk.FromSBU == staffDesk.FromSBU && stf.DeleteStatus != true
-                                    //            select dsk).FirstOrDefault();
-
-                                    //if (prevDesk != null)
-                                    //{
                                     desk.HasPushed = false;
                                     desk.HasWork = true;
                                     desk.UpdatedAt = DateTime.Now;
                                     desk.Comment = comment;
                                     desk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
                                     _context.SaveChanges();
-                                    //}
-                                    //else
-                                    //{
-                                    //    var desk = new MyDesk()
-                                    //    {
-                                    //        StaffID = (int)staffDesk.FromStaffID,
-                                    //        AppId = appId,
-                                    //        HasWork = true,
-                                    //        HasPushed = true,
-                                    //        FromStaffID = staffDesk.FromStaffID,
-                                    //        FromSBU = staffDesk.FromSBU,
-                                    //        FromRoleId = staffDesk.FromRoleId,
-                                    //        CreatedAt = DateTime.Now,
-                                    //        UpdatedAt = DateTime.Now,
-                                    //        Comment = comment,
-                                    //        LastJobDate = DateTime.Now,
-                                    //        ProcessStatus = STAFF_DESK_STATUS.REJECTED,
-                                    //    };
-
-                                    //    await _context.MyDesks.AddAsync(desk);
-                                    //}
-
-
+                                   
                                     //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
                                     await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
-
 
                                     _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Rejection", comment);
 
@@ -1703,11 +1673,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            //var prevDesk = (from dsk in _context.MyDesks
-                            //                join stf in _context.staff on dsk.StaffID equals stf.StaffID
-                            //                where stf.StaffID == staffDesk.FromStaffID && stf.Staff_SBU == get_CurrentStaff.Staff_SBU && dsk.FromSBU == staffDesk.FromSBU && stf.DeleteStatus != true
-                            //                select dsk).FirstOrDefault();
-
                             var prevDesk = await _context.MyDesks.Where<MyDesk>(d => d.StaffID == staffDesk.FromStaffID && d.AppId == appId).FirstOrDefaultAsync();
 
                             if (SBU_IDs_int != null && SBU_IDs_int.Length > 0)
@@ -1720,18 +1685,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                                     join stf in _context.staff on dsk.StaffID equals stf.StaffID
                                                     where stf.StaffID == staffDesk.FromStaffID && dsk.AppId == appId && stf.Staff_SBU == SBU && dsk.FromSBU == staffDesk.FromSBU && stf.DeleteStatus != true
                                                     select dsk).FirstOrDefault();
-
-
-                                        //}
-                                        //if (prevDesk != null)
-                                        //{
-                                        //update staff desk
-                                        //staffDesk.HasPushed = true;
-                                        //staffDesk.HasWork = true;
-                                        //staffDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
-                                        //staffDesk.UpdatedAt = DateTime.Now;
-                                        //_context.SaveChanges();
-
 
                                         if (prevDesk != null)
                                         {
@@ -1788,22 +1741,10 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been rejected successfully.", StatusCode = ResponseCodes.Success };
                                     }
-                                    //else
-                                    //{
-                                    //    return BadRequest(new { message = "An error occured while trying to reject this application." });
-                                    //}
                                 }
                             }
                             else
                             {
-                                //if (prevDesk != null)
-                                //{
-                                //update staff desk
-                                //staffDesk.HasPushed = true;
-                                //staffDesk.HasWork = true;
-                                //staffDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
-                                //staffDesk.UpdatedAt = DateTime.Now;
-
                                 if (prevDesk != null)
                                 {
                                     prevDesk.HasPushed = false;
