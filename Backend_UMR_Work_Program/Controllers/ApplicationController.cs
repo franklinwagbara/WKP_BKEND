@@ -928,24 +928,24 @@ namespace Backend_UMR_Work_Program.Controllers
                             {
                                 var getStaffByTargetedRoleAndSBUs = await _helpersController.GetStaffByTargetRoleAndSBU((int)processFlow.TargetedToRole, (int)processFlow.TargetedToSBU);
 
-                                var deskTemp = await _helpersController.GetNextStaffDesk_EC(getStaffByTargetedRoleAndSBUs, appId);
+                                var deskTemp1 = await _helpersController.GetNextStaffDesk_EC(getStaffByTargetedRoleAndSBUs, appId);
 
-                                if (deskTemp != null)
+                                if (deskTemp1 != null)
                                 {
-                                    deskTemp.FromRoleId = processFlow.TriggeredByRole;
-                                    deskTemp.FromSBU = (int)processFlow.TriggeredBySBU;
-                                    deskTemp.FromStaffID = get_CurrentStaff.StaffID;
-                                    deskTemp.ProcessID = processFlow.ProccessID;
-                                    deskTemp.AppId = appId;
-                                    deskTemp.HasPushed = false;
-                                    deskTemp.HasWork = true;
-                                    deskTemp.CreatedAt = DateTime.Now;
-                                    deskTemp.UpdatedAt = DateTime.Now;
-                                    deskTemp.Comment = comment;
-                                    deskTemp.LastJobDate = DateTime.Now;
-                                    deskTemp.ProcessStatus = STAFF_DESK_STATUS.APPROVED;
+                                    deskTemp1.FromRoleId = processFlow.TriggeredByRole;
+                                    deskTemp1.FromSBU = (int)processFlow.TriggeredBySBU;
+                                    deskTemp1.FromStaffID = get_CurrentStaff.StaffID;
+                                    deskTemp1.ProcessID = processFlow.ProccessID;
+                                    deskTemp1.AppId = appId;
+                                    deskTemp1.HasPushed = false;
+                                    deskTemp1.HasWork = true;
+                                    deskTemp1.CreatedAt = DateTime.Now;
+                                    deskTemp1.UpdatedAt = DateTime.Now;
+                                    deskTemp1.Comment = comment;
+                                    deskTemp1.LastJobDate = DateTime.Now;
+                                    deskTemp1.ProcessStatus = STAFF_DESK_STATUS.APPROVED;
 
-                                    _context.Update(deskTemp);
+                                    _context.Update(deskTemp1);
                                 }
                                 else
                                 {
@@ -970,7 +970,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                     //_context.MyDesks.Add(desk);
 
-                                    deskTemp = _context.MyDesks.Where(x => x.AppId == appId && x.HasWork == true).FirstOrDefault();
+                                    deskTemp1 = _context.MyDesks.Where(x => x.AppId == appId && x.HasWork == true).FirstOrDefault();
                                 }
 
                                 var save = await _context.SaveChangesAsync();
@@ -989,13 +989,13 @@ namespace Backend_UMR_Work_Program.Controllers
                                 _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Approval", comment);
 
                                 //Todo: Update EC Approvals Table
-                                await _helpersController.UpdateApprovalTable(application.Id, comment, deskTemp.StaffID, deskTemp.DeskID, "Approval");
+                                await _helpersController.UpdateApprovalTable(application.Id, comment, deskTemp1.StaffID, deskTemp1.DeskID, "Approval");
 
 
                                 //send mail to staff
                                 var getStaff = (from stf in _context.staff
                                                 join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-                                                where stf.StaffID == deskTemp.StaffID && stf.DeleteStatus != true
+                                                where stf.StaffID == deskTemp1.StaffID && stf.DeleteStatus != true
                                                 select stf).FirstOrDefault();
 
                                 string subject = $"Push for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
