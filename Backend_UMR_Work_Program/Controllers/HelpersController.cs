@@ -3213,7 +3213,7 @@ generate:
             try
             {
 				//var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId && x.DeskID == deskId).FirstOrDefault();
-				var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId).FirstOrDefault();
+				var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId).FirstOrDefault();
 
 				if (foundApproval != null)
 				{
