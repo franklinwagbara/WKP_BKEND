@@ -886,6 +886,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                     };
 
+                                    deskTemp = desk;
+
                                     _context.MyDesks.Add(desk);
                                 }
 
@@ -987,7 +989,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Approval", comment);
 
                                 //Todo: Update EC Approvals Table
-                                await _helpersController.UpdateApprovalTable(application.Id, comment, staffDesk.StaffID, staffDesk.DeskID, "Approval");
+                                await _helpersController.UpdateApprovalTable(application.Id, comment, deskTemp.StaffID, deskTemp.DeskID, "Approval");
 
 
                                 //send mail to staff
@@ -1618,18 +1620,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else if(fromWPAReviewer == true)
                         {
-                            //var prevDesk = await _context.MyDesks.Where<MyDesk>(d => d.StaffID == staffDesk.FromStaffID && d.AppId == appId).FirstOrDefaultAsync();
-
-                            //var ecsDesks = await (from ap in _context.ApplicationSBUApprovals
-                            //                      join desk in _context.MyDesks on ap.AppId equals desk.AppId
-                            //                      where ap.AppId == appId
-                            //                      select desk).ToListAsync();
-
-                            //var ecsDesks = await (from ap in _context.ApplicationSBUApprovals
-                            //                      join desk in _context.MyDesks on ap.AppId equals desk.AppId
-                            //                      where ap.AppId == appId
-                            //                      select desk).ToListAsync();
-
                             var aSA = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId).ToList();
 
                             var ecsDesks = new List<MyDesk>();
