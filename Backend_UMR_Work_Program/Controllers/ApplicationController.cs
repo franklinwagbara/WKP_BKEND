@@ -930,7 +930,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                 var deskTemp1 = await _helpersController.GetNextStaffDesk_EC(getStaffByTargetedRoleAndSBUs, appId);
 
-                                if (deskTemp1 != null)
+                                if (deskTemp1.DeskID != -1)
                                 {
                                     deskTemp1.FromRoleId = processFlow.TriggeredByRole;
                                     deskTemp1.FromSBU = (int)processFlow.TriggeredBySBU;
@@ -970,7 +970,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                     //_context.MyDesks.Add(desk);
 
-                                    deskTemp1 = _context.MyDesks.Where(x => x.AppId == appId && x.HasWork == true).FirstOrDefault();
+                                    deskTemp1 = _context.MyDesks.Where(x => x.StaffID == deskTemp1.StaffID && x.AppId == deskTemp1.AppId && x.HasWork == true).FirstOrDefault();
                                 }
 
                                 var save = await _context.SaveChangesAsync();
@@ -989,7 +989,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Approval", comment);
 
                                 //Todo: Update EC Approvals Table
-                                await _helpersController.UpdateApprovalTable(application.Id, comment, deskTemp1.StaffID, deskTemp1.DeskID, "Approval");
+                                await _helpersController.UpdateApprovalTable(application.Id, comment, staffDesk.StaffID, staffDesk.DeskID, "Approval");
 
 
                                 //send mail to staff
@@ -1647,6 +1647,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                     _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Rejection", comment);
 
+                                    _helpersController.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, GeneralModel.Rejected);
+
                                     //send mail to staff
                                     var getStaff = (from stf in _context.staff
                                                     join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
@@ -1662,9 +1664,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                     var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
 
                                     _helpersController.LogMessages("Rejection of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
-
-                                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been rejected successfully.", StatusCode = ResponseCodes.Success };
                                 }
+
+                                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been rejected successfully.", StatusCode = ResponseCodes.Success };
                             }
                             else
                             {
@@ -1716,10 +1718,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                             await _context.MyDesks.AddAsync(desk);
                                         }
 
-
                                         //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
-                                        await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
+                                        await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
                                         _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Rejection", comment);
 
@@ -1739,9 +1740,9 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                         _helpersController.LogMessages("Rejection of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
 
-                                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been rejected successfully.", StatusCode = ResponseCodes.Success };
                                     }
                                 }
+                                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been rejected successfully.", StatusCode = ResponseCodes.Success };
                             }
                             else
                             {
@@ -1780,7 +1781,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                 //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
                                 await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
-
                                 _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, "Rejection", comment);
 
                                 //send mail to staff
@@ -1800,11 +1800,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                 _helpersController.LogMessages("Rejection of application with REF : " + application.ReferenceNo, WKPCompanyEmail);
 
                                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been rejected successfully.", StatusCode = ResponseCodes.Success };
-                                //}
-                                //else
-                                //{
-                                //    return BadRequest(new { message = "An error occured while trying to reject this application." });
-                                //}
                             }
                         }
 
@@ -4289,7 +4284,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (application != null)
                 {
-                    int? fieldID = 0;
+                    int? fieldID = null;
                     if (application.FieldID != null)
                     {
                         fieldID = (int)application.FieldID;

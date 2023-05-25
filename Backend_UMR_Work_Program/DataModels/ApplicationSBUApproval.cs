@@ -1,7 +1,12 @@
-﻿namespace Backend_UMR_Work_Program.DataModels
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace Backend_UMR_Work_Program.DataModels
 {
     public partial class ApplicationSBUApproval
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int AppId { get; set; }
         public int? StaffID { get; set; } 
