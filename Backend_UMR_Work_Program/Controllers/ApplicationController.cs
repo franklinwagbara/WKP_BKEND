@@ -552,7 +552,16 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 var getSBU_TablesToDisplay = await _context.Table_Details.Where(x => x.SBU_ID.Contains(getStaffSBU.Id.ToString())).ToListAsync();
 
-                var sbuApprovals = await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
+                var sbuApprovals = new List<ApplicationSBUApproval>();
+                
+                if(getStaffSBU.Tier == 2)
+                {
+                    await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
+                }
+                else
+                {
+                    sbuApprovals = null;
+                }
 
                 var appDetails = new ApplicationDetailsModel
                 {
@@ -569,6 +578,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     SBUApprovals = sbuApprovals,
                     staffs = staffs,
                 };
+
                 return new WebApiResponse { Data = appDetails, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
 
             }
