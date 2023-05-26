@@ -541,6 +541,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                            //Sort = (int)dsk.Sort
                                        }).ToListAsync();
 
+                var staffs = await _context.staff.ToListAsync();
 
                 var documents = await _context.SubmittedDocuments.Where(x => x.CreatedBy == application.CompanyID.ToString() && x.YearOfWKP == application.YearOfWKP).Take(10).ToListAsync();
 
@@ -551,6 +552,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 var getSBU_TablesToDisplay = await _context.Table_Details.Where(x => x.SBU_ID.Contains(getStaffSBU.Id.ToString())).ToListAsync();
 
+                var sbuApprovals = await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
 
                 var appDetails = new ApplicationDetailsModel
                 {
@@ -563,7 +565,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     Application_History = appHistory.OrderByDescending(x => x.ID).ToList(),
                     Document = documents,
                     SBU_TableDetails = getSBU_TablesToDisplay,
-                    SBU = await _context.StrategicBusinessUnits.ToListAsync()
+                    SBU = await _context.StrategicBusinessUnits.ToListAsync(),
+                    SBUApprovals = sbuApprovals,
+                    staffs = staffs,
                 };
                 return new WebApiResponse { Data = appDetails, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
 
@@ -929,7 +933,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 var getStaffByTargetedRoleAndSBUs = await _helpersController.GetStaffByTargetRoleAndSBU((int)processFlow.TargetedToRole, (int)processFlow.TargetedToSBU);
 
                                 var deskTemp1 = await _helpersController.GetNextStaffDesk_EC(getStaffByTargetedRoleAndSBUs, appId);
-
+                                 
                                 if (deskTemp1.DeskID != -1)
                                 {
                                     deskTemp1.FromRoleId = processFlow.TriggeredByRole;
