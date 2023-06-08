@@ -25,7 +25,9 @@
         public string Planned_ongoing_and_routine_maintenance { get; set; }
 
         public string Project_Stage { get; set; }
-        public string Project_Timeline { get; set; }
+        public DateTime? Project_Timeline_StartDate { get; set; }
+        public DateTime? Project_Timeline_EndDate { get; set; }
+
         public string Proposed_Capital_Expenditure_NGN { get; set; }
         public string Proposed_Capital_Expenditure_USD { get; set; }
 

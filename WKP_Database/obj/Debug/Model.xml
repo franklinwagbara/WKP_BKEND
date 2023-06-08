@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<DataSchemaModel FileFormatVersion="1.2" SchemaVersion="3.3" DspName="Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider" CollationLcid="1033" CollationCaseSensitive="False" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+<DataSchemaModel FileFormatVersion="1.2" SchemaVersion="2.4" DspName="Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider" CollationLcid="1033" CollationCaseSensitive="False" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
 	<Header>
 		<CustomData Category="AnsiNulls">
 			<Metadata Name="AnsiNulls" Value="True" />
@@ -12,7 +12,7 @@
 		</CustomData>
 		<CustomData Category="Reference" Type="Assembly">
 			<Metadata Name="LogicalName" Value="WKP_Database.dll" />
-			<Metadata Name="FileName" Value="C:\USERS\BRANDONETECH\SOURCE\REPOS\WORKPROGRAMBACKEND\WORKPROGRAM_BEND\WKP_DATABASE\OBJ\DEBUG\WKP_DATABASE.DLL" />
+			<Metadata Name="FileName" Value="C:\PROJECT\BRANDONE\REPOS\WORKPROGRAM_BEND\WKP_DATABASE\OBJ\DEBUG\WKP_DATABASE.DLL" />
 			<Metadata Name="AssemblyName" Value="WKP_Database" />
 			<Metadata Name="PermissionSet" Value="SAFE" />
 			<Metadata Name="Owner" Value="" />
@@ -20,7 +20,7 @@
 			<Metadata Name="IsVisible" Value="True" />
 			<Metadata Name="IsModelAware" Value="True" />
 			<Metadata Name="SkipCreationIfEmpty" Value="True" />
-			<Metadata Name="AssemblySymbolsName" Value="C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb" />
+			<Metadata Name="AssemblySymbolsName" Value="C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb" />
 		</CustomData>
 		<CustomData Category="SqlCmdVariables" Type="SqlCmdVariable" />
 	</Header>
@@ -37,10 +37,6 @@
 			<Property Name="PageVerifyMode" Value="3" />
 			<Property Name="DefaultLanguage" Value="" />
 			<Property Name="DefaultFullTextLanguage" Value="" />
-			<Property Name="QueryStoreDesiredState" Value="0" />
-			<Property Name="QueryStoreCaptureMode" Value="1" />
-			<Property Name="QueryStoreStaleQueryThreshold" Value="367" />
-			<Property Name="MaxDop" Value="0" />
 		</Element>
 		<Element Type="SqlDefaultConstraint">
 			<Property Name="DefaultExpressionScript">
@@ -56967,14 +56963,28 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					</Element>
 				</Entry>
 				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[dbo].[OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS].[Project_Timeline]">
+					<Element Type="SqlSimpleColumn" Name="[dbo].[OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS].[Project_Timeline_StartDate]">
 						<Relationship Name="TypeSpecifier">
 							<Entry>
 								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="500" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
+											<References ExternalSource="BuiltIns" Name="[datetime]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS].[Project_Timeline_EndDate]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[datetime]" />
 										</Entry>
 									</Relationship>
 								</Element>

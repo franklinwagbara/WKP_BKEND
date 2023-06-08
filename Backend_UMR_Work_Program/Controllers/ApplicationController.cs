@@ -701,6 +701,7 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+        [HttpPost("SubmitApplication_Main")]
         public async Task<object> SubmitApplication_Main(string year, string omlName, string fieldName)
         {
 
@@ -1042,6 +1043,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
         }
 
+        [HttpPost("PushApplication_Main")]
         public async Task<object> PushApplication_Main(int deskID, string comment, string[] selectedApps)
         {
             try
@@ -1835,6 +1837,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
         }
 
+        [HttpPost("RejectApplication_Main")]
         public async Task<object> RejectApplication_Main(/*[FromBody] ActionModel model,*/ int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables)
         {
             try

@@ -5258,8 +5258,8 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> POST_RESERVES_UPDATES_OIL_CONDENSATE_FIVEYEARS_PROJECTION([FromBody] RESERVES_UPDATES_OIL_CONDENSATE_Fiveyear_Projection reserves_condensate_status_model, string omlName, string fieldName, string year, string actionToDo)
         {
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
                 RESERVES_UPDATES_OIL_CONDENSATE_Fiveyear_Projection getData;
@@ -6866,10 +6866,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else if (_oil_gas_facility_model != null)
                 {
-
-
-
-
                     var oil_gas_facility_model = new OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT()
                     {
                         Id = _oil_gas_facility_model.Id,
@@ -6884,7 +6880,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         Nigerian_Content_Value = _oil_gas_facility_model.Nigerian_Content_Value,
                         Planned_ongoing_and_routine_maintenance = _oil_gas_facility_model.Planned_ongoing_and_routine_maintenance,
                         Project_Stage = _oil_gas_facility_model.Project_Stage,
-                        Project_Timeline = _oil_gas_facility_model.Project_Timeline,
+                        Project_Timeline_StartDate = _oil_gas_facility_model.Project_Timeline_StartDate,
+                        Project_Timeline_EndDate = _oil_gas_facility_model.Project_Timeline_EndDate,
                         Proposed_Capital_Expenditure_NGN = _oil_gas_facility_model.Proposed_Capital_Expenditure_NGN,
                         Proposed_Capital_Expenditure_USD = _oil_gas_facility_model.Proposed_Capital_Expenditure_USD,
                         Facility_Name = _oil_gas_facility_model.Facility_Name,
