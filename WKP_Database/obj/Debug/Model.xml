@@ -56812,14 +56812,28 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					</Element>
 				</Entry>
 				<Entry>
-					<Element Type="SqlSimpleColumn" Name="[dbo].[OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS].[Project_Timeline]">
+					<Element Type="SqlSimpleColumn" Name="[dbo].[OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS].[Project_Timeline_StartDate]">
 						<Relationship Name="TypeSpecifier">
 							<Entry>
 								<Element Type="SqlTypeSpecifier">
-									<Property Name="Length" Value="500" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[varchar]" />
+											<References ExternalSource="BuiltIns" Name="[datetime]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS].[Project_Timeline_EndDate]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[datetime]" />
 										</Entry>
 									</Relationship>
 								</Element>
