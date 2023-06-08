@@ -50,6 +50,7 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Completed = "Completed";
 		public static string Submit = "Submit";
 		public static string Push = "Push";
+		public static string ApprovedByEC = "Approved By EC";
 		public static string FinalApproval = "FinalApproval";
 		public static string Approve = "Approve";
 		public static string Reject = "Reject";
@@ -346,6 +347,9 @@ namespace Backend_UMR_Work_Program.Models
 			public List<SubmittedDocument> Document { get; set; }
 			public List<StrategicBusinessUnit> SBU { get; set; }
 			public List<Table_Detail> SBU_TableDetails { get; set; }
+			public List<Staff_Model> currentDesks { get; set; }
+			public List<ApplicationSBUApproval> SBUApprovals { get; set; }	
+			public List<staff> staffs { get; set; }
 		}
 		public class Staff_Model
 		{

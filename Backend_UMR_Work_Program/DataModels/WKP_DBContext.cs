@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Backend_UMR_Work_Program.DataModels;
 
@@ -17,6 +18,7 @@ public partial class WKP_DBContext : DbContext
         _configuration = configuration;
     }
 
+    public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals { get; set; }
     public virtual DbSet<SBU_Submission> SBU_Submissions { get; set; }
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSEs { get; set; }
 
@@ -940,6 +942,23 @@ public partial class WKP_DBContext : DbContext
     //"Server=tcp:workprogram.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=workprogram;Password=Br@nd0ne;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ApplicationSBUApproval>(entity =>
+        {
+            entity.ToTable("ApplicationSBUApproval");
+
+            //entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.Property(e => e.AppId).HasColumnName("AppId");
+            entity.Property(e => e.StaffID).HasColumnName("StaffID");
+            entity.Property(e => e.Comment).HasColumnName("Comment");
+            entity.Property(e => e.Status).HasColumnName("Status");
+            entity.Property(e => e.AppAction).HasColumnName("AppAction");
+            entity.Property(e => e.DeskID).HasColumnName("DeskID");
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<SBU_Submission>(entity =>
         {
             entity.ToTable("SBU_Submission");

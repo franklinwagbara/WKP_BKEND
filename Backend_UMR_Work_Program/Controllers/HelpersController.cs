@@ -3001,7 +3001,7 @@ generate:
 
                 foreach (var staffId in staffIds)
                 {
-                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId).FirstOrDefault();
+                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
 					var mostRecentJob = _context.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
                     //var desk_conflict = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
 
@@ -3067,6 +3067,87 @@ generate:
             }
         }
 
+        public async Task<MyDesk> GetNextStaffDesk_EC(List<int> staffIds, int appId)
+        {
+            try
+            {
+                var staffDesks = new List<MyDesk>();
+
+                foreach (var staffId in staffIds)
+                {
+                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefault();
+                    var mostRecentJob = _context.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
+                    //var desk_conflict = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
+
+                    if (desk != null)
+                    {
+						var res = new MyDesk
+						{
+							DeskID = -1,
+							StaffID = staffId,
+							AppId = appId,
+						};
+						return res; 
+                    }
+                    else
+                    {
+                        if (mostRecentJob == null)
+                        {
+                            var tempDesk = new MyDesk
+                            {
+                                //save staff desk
+                                StaffID = staffId,
+                                AppId = appId,
+                                HasPushed = false,
+                                HasWork = false,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                //Comment="",
+                                LastJobDate = DateTime.Now,
+                            };
+
+                            _context.MyDesks.Add(tempDesk);
+
+                            await _context.SaveChangesAsync();
+
+                            return tempDesk;
+                        }
+                        else
+                        {
+                            staffDesks.Add(mostRecentJob);
+                        }
+                    }
+                }
+
+                var chosenDesk = staffDesks.OrderBy(x => x.LastJobDate).FirstOrDefault();
+
+                var newDesk = new MyDesk
+                {
+                    //save staff desk
+                    StaffID = chosenDesk.StaffID,
+                    AppId = appId,
+                    HasPushed = false,
+                    HasWork = false,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    //Comment="",
+                    LastJobDate = DateTime.Now,
+                };
+
+                _context.MyDesks.Add(newDesk);
+
+                await _context.SaveChangesAsync();
+
+                return newDesk;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+
         public async Task<int> GetDeskIdByStaffIdAndAppId(int staffId, int appId)
 		{
 			try
@@ -3122,6 +3203,7 @@ generate:
                 desk.ProcessStatus = processStatus;
 
 				_context.MyDesks.Update(desk);
+				_context.SaveChanges();
 
 				return desk;
             }
@@ -3131,6 +3213,53 @@ generate:
 				throw ex;
 			}
 		}
+
+        public async Task<ApplicationSBUApproval> UpdateApprovalTable(int appId, string? comment, int? staffId, int? deskId, string? processStatus)
+        {
+            try
+            {
+				//var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId && x.DeskID == deskId).FirstOrDefault();
+				var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId).FirstOrDefault();
+
+				if (foundApproval != null)
+				{
+					foundApproval.AppId = appId;
+					foundApproval.StaffID = staffId;
+					foundApproval.Status = processStatus;
+					foundApproval.Comment = comment;
+					foundApproval.UpdatedDate = DateTime.Now;
+					foundApproval.DeskID = deskId;
+
+					_context.ApplicationSBUApprovals.Update(foundApproval);
+                    _context.SaveChanges();
+                }
+				else
+				{
+					var newApproval = new ApplicationSBUApproval()
+					{
+                        AppId = appId,
+						StaffID = staffId,
+						Status = processStatus,
+						Comment = comment,
+						UpdatedDate = DateTime.Now,
+						DeskID = deskId
+					};
+
+                    _context.ApplicationSBUApprovals.Add(newApproval);
+                    _context.SaveChanges();
+
+                    return newApproval;
+                }
+
+
+                return foundApproval;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
 
         public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
         {
