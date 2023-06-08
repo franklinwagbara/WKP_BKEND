@@ -3075,13 +3075,19 @@ generate:
 
                 foreach (var staffId in staffIds)
                 {
-                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId).FirstOrDefault();
+                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefault();
                     var mostRecentJob = _context.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
                     //var desk_conflict = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
 
                     if (desk != null)
                     {
-						return null; 
+						var res = new MyDesk
+						{
+							DeskID = -1,
+							StaffID = staffId,
+							AppId = appId,
+						};
+						return res; 
                     }
                     else
                     {
@@ -3213,7 +3219,7 @@ generate:
             try
             {
 				//var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId && x.DeskID == deskId).FirstOrDefault();
-				var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId).FirstOrDefault();
+				var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId).FirstOrDefault();
 
 				if (foundApproval != null)
 				{

@@ -348,6 +348,8 @@ namespace Backend_UMR_Work_Program.Models
 			public List<StrategicBusinessUnit> SBU { get; set; }
 			public List<Table_Detail> SBU_TableDetails { get; set; }
 			public List<Staff_Model> currentDesks { get; set; }
+			public List<ApplicationSBUApproval> SBUApprovals { get; set; }	
+			public List<staff> staffs { get; set; }
 		}
 		public class Staff_Model
 		{

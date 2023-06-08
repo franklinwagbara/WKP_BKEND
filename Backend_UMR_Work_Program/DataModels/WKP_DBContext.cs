@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Backend_UMR_Work_Program.DataModels;
 
@@ -945,7 +946,9 @@ public partial class WKP_DBContext : DbContext
         {
             entity.ToTable("ApplicationSBUApproval");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            //entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
             entity.Property(e => e.AppId).HasColumnName("AppId");
             entity.Property(e => e.StaffID).HasColumnName("StaffID");
             entity.Property(e => e.Comment).HasColumnName("Comment");
