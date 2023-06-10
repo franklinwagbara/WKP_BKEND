@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Backend_UMR_Work_Program.Helpers
 {
-	public class MyUtils
+	public static class MyUtils
 	{
 		public static string GenerateSha512(string inputString)
 		{
@@ -19,5 +19,8 @@ namespace Backend_UMR_Work_Program.Helpers
 
 			return sb.ToString();
 		}
-	}
+
+		public static string ElpsHasher(string appemail, string appid) => GenerateSha512($"{appemail}{appid}");
+
+    }
 }
