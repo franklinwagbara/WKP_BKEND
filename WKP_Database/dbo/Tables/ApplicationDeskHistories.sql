@@ -14,6 +14,7 @@
     [TargetedToSBU]   INT            NULL,
     [TriggeredBySBU]  INT            NULL,
     [TargetedToRole]  INT            NULL,
+    [SelectedTables] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_ApplicationDeskHistories] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

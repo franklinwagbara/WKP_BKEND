@@ -68,6 +68,8 @@ namespace Backend_UMR_Work_Program.Models
 		public static string FinalApprovalAuthority = "Final Approving Authority";
 		public static string Activated = "Activated";
 		public static string Deactivated = "Deactivated";
+		public static string SentBackToCompany = "Sent Back To Company";
+		public static string SentBackToStaff = "Sent Back To Staff";
 
 
 

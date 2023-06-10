@@ -3527,7 +3527,7 @@ generate:
 		//}
 
 
-		public void SaveHistory(int appid, int staffid, string status, string comment)
+		public void SaveHistory(int appid, int staffid, string status, string comment , string selectedTables)
 		{
 			var getStaff = (from u in _context.staff where u.StaffID == staffid select u).FirstOrDefault();
 
@@ -3538,6 +3538,7 @@ generate:
 				StaffID = staffid,
 				Comment = comment == null ? "": comment,
 				Status = status,
+				SelectedTables = selectedTables,
 				CreatedAt = DateTime.Now,
 				ActionDate = DateTime.Now,
 			};
@@ -3545,6 +3546,7 @@ generate:
 			_context.ApplicationDeskHistories.Add(appDeskHistory);
 			_context.SaveChanges();
 		}
+
 		public void SaveHistory(int appid, int staffid, int triggeredFromRole, int targetedToRole, string status, string comment)
 		{
 			var getStaff = (from u in _context.staff where u.StaffID == staffid select u).FirstOrDefault();
@@ -3563,6 +3565,7 @@ generate:
 			_context.ApplicationDeskHistories.Add(appDeskHistory);
 			_context.SaveChanges();
 		}
+
 		public List<AppMessage> SaveMessage(int appID, int userID, string subject, string content, string type)
 		{
 
