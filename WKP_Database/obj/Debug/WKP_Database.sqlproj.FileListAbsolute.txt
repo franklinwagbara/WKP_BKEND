@@ -34,3 +34,7 @@ C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Datab
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.xml
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
