@@ -209,25 +209,26 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 var applications = await (from app in _context.Applications
                                           join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
-                                          join cmt in _context.SBU_ApplicationComments on app.Id equals cmt.AppID
-                                          join sbu in _context.StrategicBusinessUnits on cmt.SBU_ID equals sbu.Id
-                                          where app.DeleteStatus != true && cmt.ActionStatus == GeneralModel.Rejected
+                                          join appHistory in _context.ApplicationDeskHistories on app.Id equals appHistory.AppId
+                                          join stf in _context.staff on appHistory.StaffID equals stf.StaffID
+                                          join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
+                                          where app.DeleteStatus != true && appHistory.Status == GeneralModel.Rejected
                                           && app.CompanyID == WKPCompanyNumber
-                                          select new Application_Model
+                                          select new
                                           {
                                               Last_SBU = sbu.SBU_Name,
                                               Id = app.Id,
                                               FieldID = app.FieldID,
-                                              RejectId = cmt.Id,
                                               ConcessionID = app.ConcessionID,
                                               ConcessionName = _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
                                               FieldName = app.FieldID != null ? _context.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
-                                              SBU_Comment = cmt.SBU_Comment,
+                                              SBU_Comment = appHistory.Comment,
+                                              Comment = appHistory.Comment,
                                               ReferenceNo = app.ReferenceNo,
                                               CreatedAt = app.CreatedAt,
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
-                                              SBU_Tables = cmt.SBU_Tables,
+                                              SBU_Tables = appHistory.SelectedTables,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
                 return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
@@ -265,6 +266,94 @@ namespace Backend_UMR_Work_Program.Controllers
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
                                               SBU_Tables = appHistory.SelectedTables,
+                                              YearOfWKP = app.YearOfWKP
+                                          }).ToListAsync();
+                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = "Error : " + e.Message });
+            }
+        }
+
+        [HttpGet("GetProcessingApplications")]
+        public async Task<object> GetProcessingApplications()
+        {
+            try
+            {
+                var applications = await (from app in _context.Applications
+                                          join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                                          where app.DeleteStatus != true && app.Status == GeneralModel.Processing
+                                          && app.CompanyID == WKPCompanyNumber
+                                          select new
+                                          {
+                                              Id = app.Id,
+                                              FieldID = app.FieldID,
+                                              ConcessionID = app.ConcessionID,
+                                              ConcessionName = _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
+                                              FieldName = app.FieldID != null ? _context.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
+                                              ReferenceNo = app.ReferenceNo,
+                                              CreatedAt = app.CreatedAt,
+                                              SubmittedAt = app.SubmittedAt,
+                                              Status = app.Status,
+                                              YearOfWKP = app.YearOfWKP
+                                          }).ToListAsync();
+                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = "Error : " + e.Message });
+            }
+        }
+
+        [HttpGet("GetAllApplications")]
+        public async Task<object> GetAllApplications()
+        {
+            try
+            {
+                var applications = await (from app in _context.Applications
+                                          join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                                          where app.DeleteStatus != true && app.CompanyID == WKPCompanyNumber
+                                          select new
+                                          {
+                                              Id = app.Id,
+                                              FieldID = app.FieldID,
+                                              ConcessionID = app.ConcessionID,
+                                              ConcessionName = _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
+                                              FieldName = app.FieldID != null ? _context.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
+                                              ReferenceNo = app.ReferenceNo,
+                                              CreatedAt = app.CreatedAt,
+                                              SubmittedAt = app.SubmittedAt,
+                                              Status = app.Status,
+                                              YearOfWKP = app.YearOfWKP
+                                          }).ToListAsync();
+                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = "Error : " + e.Message });
+            }
+        }
+
+        [HttpGet("GetApprovedApplications")]
+        public async Task<object> GetApprovedApplications()
+        {
+            try
+            {
+                var applications = await (from app in _context.Applications
+                                          join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                                          where app.DeleteStatus != true && app.Status == GeneralModel.Approval && app.CompanyID == WKPCompanyNumber
+                                          select new
+                                          {
+                                              Id = app.Id,
+                                              FieldID = app.FieldID,
+                                              ConcessionID = app.ConcessionID,
+                                              ConcessionName = _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
+                                              FieldName = app.FieldID != null ? _context.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
+                                              ReferenceNo = app.ReferenceNo,
+                                              CreatedAt = app.CreatedAt,
+                                              SubmittedAt = app.SubmittedAt,
+                                              Status = app.Status,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
                 return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
