@@ -10711,7 +10711,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_REMEDIATION_FUND")]
-        public async Task<object> POST_HSE_REMEDIATION_FUND([FromForm] HSE_REMEDIATION_FUND hse_remediation_fund, string omlName, string fieldName, string year, int id, string actionToDo)
+        public async Task<object> POST_HSE_REMEDIATION_FUND([FromBody] HSE_REMEDIATION_FUND hse_remediation_fund, string omlName, string fieldName, string year, int id, string actionToDo)
         {
 
             int save = 0;
@@ -10763,11 +10763,9 @@ namespace Backend_UMR_Work_Program.Controllers
                         var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
                         var file2 = Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
 
-                        var blobname1 = blobService.Filenamer(file1);
-                        var blobname2 = blobService.Filenamer(file2);
-
                         if (file1 != null)
                         {
+                            var blobname1 = blobService.Filenamer(file1);
                             string docName = "Evidence of Payment";
                             hse_remediation_fund.evidenceOfPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPaymentPath == null)
@@ -10779,11 +10777,11 @@ namespace Backend_UMR_Work_Program.Controllers
                         {
                             hse_remediation_fund.evidenceOfPaymentPath = null;
                             hse_remediation_fund.evidenceOfPaymentFilename = null;
-
                         }
 
                         if (file2 != null)
                         {
+                            var blobname2 = blobService.Filenamer(file2);
                             string docName = "Evidence of Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"Remediation Documents/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
@@ -10795,7 +10793,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         {
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = null;
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = null;
-
                         }
                         #endregion
                     }
@@ -10804,13 +10801,11 @@ namespace Backend_UMR_Work_Program.Controllers
                         hse_remediation_fund.evidenceOfPaymentPath = null;
                         hse_remediation_fund.evidenceOfPaymentFilename = null;
 
-
                         var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-
-                        var blobname1 = blobService.Filenamer(file1);
 
                         if (file1 != null)
                         {
+                            var blobname1 = blobService.Filenamer(file1);
                             string docName = "Evidence of Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
@@ -10822,7 +10817,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         {
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = null;
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = null;
-
                         }
 
                     }
