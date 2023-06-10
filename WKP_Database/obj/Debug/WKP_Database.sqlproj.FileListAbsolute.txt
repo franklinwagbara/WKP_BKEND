@@ -22,10 +22,6 @@ C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.d
 C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dll
 C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.pdb
 C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.sqlproj.AssemblyReference.cache
-C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.xml
-C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
-C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
-C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
 C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.dll
 C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dacpac
