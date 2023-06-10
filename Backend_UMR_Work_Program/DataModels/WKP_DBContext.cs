@@ -9783,9 +9783,8 @@ public partial class WKP_DBContext : DbContext
             entity.Property(e => e.Project_Stage)
                 .HasMaxLength(500)
                 .IsUnicode(false);
-            entity.Property(e => e.Project_Timeline)
-                .HasMaxLength(500)
-                .IsUnicode(false);
+            entity.Property(e => e.Project_Timeline_StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Project_Timeline_EndDate).HasColumnType("datetime");
             entity.Property(e => e.Proposed_Capital_Expenditure_NGN)
                 .HasMaxLength(500)
                 .IsUnicode(false);

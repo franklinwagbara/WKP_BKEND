@@ -43,7 +43,8 @@ public partial class OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT
 
     public string? Challenges { get; set; }
 
-    public string? Project_Timeline { get; set; }
+    public DateTime? Project_Timeline_StartDate { get; set; }
+    public DateTime? Project_Timeline_EndDate { get; set; }
 
     public string? Conformity_Assessment { get; set; }
 
