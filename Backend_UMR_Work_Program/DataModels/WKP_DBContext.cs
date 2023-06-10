@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Backend_UMR_Work_Program.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -18,6 +19,8 @@ public partial class WKP_DBContext : DbContext
         _configuration = configuration;
     }
 
+    public virtual DbSet<TypeOfPayments> TypeOfPayments { get; set; }
+    public virtual DbSet<Payments> Payments { get; set; }
     public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals { get; set; }
     public virtual DbSet<SBU_Submission> SBU_Submissions { get; set; }
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSEs { get; set; }
