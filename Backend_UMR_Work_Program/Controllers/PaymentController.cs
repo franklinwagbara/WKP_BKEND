@@ -32,7 +32,7 @@ namespace Backend_UMR_Work_Program.Controllers
         private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
         private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
 
-        [HttpGet('GET_TYPE_OF_PAYMENTS')]
+        [HttpGet("GET_TYPE_OF_PAYMENTS")]
         public async Task<object> Get_Type_Of_Payments()
         {
             try

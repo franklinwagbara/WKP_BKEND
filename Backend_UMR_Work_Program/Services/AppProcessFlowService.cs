@@ -41,18 +41,45 @@ namespace Backend_UMR_Work_Program.Services
 
                 //update application status
                 app.Status = GeneralModel.SentBackToCompany;
+                app.PaymentStatus = GeneralModel.PaymentPending;
                 app.UpdatedAt= DateTime.Now;
 
-                _dbContext.Applications.Update(app);    
+                _dbContext.Applications.Update(app);   
 
                 await _dbContext.SaveChangesAsync();
-                _helpersController.SaveHistory(app.Id, staff.StaffID, GeneralModel.SentBackToCompany, comment);
 
                 return true;
             }
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public async Task<string> getTableNames(string[] tableIds)
+        {
+            try
+            {
+                string RejectedTables = "";
+                if (tableIds.Count() > 0)
+                {
+                    foreach (var id in tableIds)
+                    {
+                        int tableID = id != "undefined" ? int.Parse(id) : 0;
+
+                        var getSBU_TablesToDisplay = await _dbContext.Table_Details.Where(x => x.TableId == tableID).FirstOrDefaultAsync();
+
+                        if (getSBU_TablesToDisplay != null)
+                            RejectedTables = RejectedTables != "" ? $"{RejectedTables}|{getSBU_TablesToDisplay.TableName}" : getSBU_TablesToDisplay.TableName;
+
+                    }
+                }
+
+                return RejectedTables;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }
