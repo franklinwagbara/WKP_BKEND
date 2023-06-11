@@ -2534,14 +2534,45 @@ namespace Backend_UMR_Work_Program.Controllers
             {
 
                 #region Saving Operation Safety Case
-                if (id > 0 || operations_Sefety_Case_model != null)
+                if (operations_Sefety_Case_model != null)
                 {
 
                     if (id > 0)
                     {
                         getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.Id == id select c).FirstOrDefaultAsync();
 
-                        if (getOperationSafetyCaseData != null)
+                        if (getOperationSafetyCaseData != null && action == GeneralModel.Update)
+                        {
+                            getOperationSafetyCaseData.Companyemail = WKPCompanyEmail;
+                            getOperationSafetyCaseData.CompanyName = WKPCompanyName;
+                            getOperationSafetyCaseData.COMPANY_ID = WKPCompanyId;
+                            getOperationSafetyCaseData.CompanyNumber = WKPCompanyNumber;
+                            getOperationSafetyCaseData.Date_Updated = DateTime.Now;
+                            getOperationSafetyCaseData.Updated_by = WKPCompanyId;
+                            getOperationSafetyCaseData.Year_of_WP = year;
+                            getOperationSafetyCaseData.OML_Name = omlName;
+                            getOperationSafetyCaseData.Field_ID = concessionField?.Field_ID ?? null;
+                            //operations_Sefety_Case_model.Actual_year = year;
+                            //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
+
+                            #region file section
+                            var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+
+                            if (file1 != null)
+                            {
+                                var blobname1 = blobService.Filenamer(file1);
+                                string docName = "Evidence of Operations Safety Case Approval";
+                                getOperationSafetyCaseData.Evidence_of_Operations_Safety_Case_Approval = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                if (getOperationSafetyCaseData.Evidence_of_Operations_Safety_Case_Approval == null)
+                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                //else
+                                //    operations_Sefety_Case_model. = blobname1;
+                            }
+                            #endregion
+                            getOperationSafetyCaseData.Updated_by = WKPCompanyId;
+                            _context.HSE_OPERATIONS_SAFETY_CASEs.Update(operations_Sefety_Case_model);
+                        }
+                        else if (getOperationSafetyCaseData != null && action == GeneralModel.Delete)
                         {
                             _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
                         }
@@ -2571,10 +2602,10 @@ namespace Backend_UMR_Work_Program.Controllers
 
                         #region file section
                         var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                        var blobname1 = file1 != null ? blobService.Filenamer(file1) : null;
 
                         if (file1 != null)
                         {
+                            var blobname1 = blobService.Filenamer(file1);
                             string docName = "Evidence of Operations Safety Case Approval";
                             operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (operations_Sefety_Case_model.Evidence_of_Operations_Safety_Case_Approval == null)
@@ -2624,13 +2655,10 @@ namespace Backend_UMR_Work_Program.Controllers
                     else
                     {
                         return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
                     }
                 }
-
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
-
             }
             catch (Exception e)
             {
