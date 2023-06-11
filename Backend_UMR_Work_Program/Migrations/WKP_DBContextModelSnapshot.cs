@@ -6665,6 +6665,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("Core_Cost_Curreny")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Core_Cost_USD")
                         .HasMaxLength(20)
                         .IsUnicode(false)
@@ -6839,13 +6842,16 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(300)");
 
-                    b.Property<DateTime?>("spud_date")
-                        .HasColumnType("date");
+                    b.Property<string>("spud_date")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("well_cost")
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<string>("well_cost_currency")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("well_name")
                         .HasMaxLength(500)

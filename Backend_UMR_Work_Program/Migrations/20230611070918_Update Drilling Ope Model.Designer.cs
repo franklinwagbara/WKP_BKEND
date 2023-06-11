@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    [Migration("20230518114456_changeDataType")]
-    partial class changeDataType
+    [Migration("20230611070918_Update Drilling Ope Model")]
+    partial class UpdateDrillingOpeModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -4476,6 +4476,49 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.ToTable("ApplicationProccesses");
                 });
 
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ApplicationSBUApproval", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AppAction")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("AppAction");
+
+                    b.Property<int>("AppId")
+                        .HasColumnType("int")
+                        .HasColumnName("AppId");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Comment");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("DeskID")
+                        .HasColumnType("int")
+                        .HasColumnName("DeskID");
+
+                    b.Property<int?>("StaffID")
+                        .HasColumnType("int")
+                        .HasColumnName("StaffID");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Status");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApplicationSBUApproval", (string)null);
+                });
+
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.Appraisal_Drilling", b =>
                 {
                     b.Property<int>("Appraisal_DrillingId")
@@ -6625,6 +6668,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("Core_Cost_Curreny")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Core_Cost_USD")
                         .HasMaxLength(20)
                         .IsUnicode(false)
@@ -6799,13 +6845,16 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(300)");
 
-                    b.Property<DateTime?>("spud_date")
-                        .HasColumnType("date");
+                    b.Property<string>("spud_date")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("well_cost")
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<string>("well_cost_currency")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("well_name")
                         .HasMaxLength(500)
@@ -13016,6 +13065,12 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(max)");
 
+                    b.Property<string>("evidenceOfPreviousYearsPaymentFilename")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("evidenceOfPreviousYearsPaymentPath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("reasonForNoRemediation")
                         .IsUnicode(false)
                         .HasColumnType("varchar(max)");
@@ -15177,6 +15232,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(3000)");
 
+                    b.Property<string>("Any_subsisting_orders_of_court")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("COMPANY_ID")
                         .HasMaxLength(100)
                         .IsUnicode(false)
@@ -15248,6 +15306,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasMaxLength(200)
                         .IsUnicode(false)
                         .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Order_of_the_court")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Potential_outcome")
                         .HasMaxLength(3000)
@@ -17591,8 +17652,8 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Property<int?>("Field_ID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Inspection_Regime")
-                        .HasColumnType("int");
+                    b.Property<string>("Inspection_Regime")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(500)
