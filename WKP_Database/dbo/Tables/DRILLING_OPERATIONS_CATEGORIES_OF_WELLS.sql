@@ -54,11 +54,13 @@
     [WellName]                                    VARCHAR (2000) NULL,
     [CompanyNumber]                               INT            NULL,
     [Field_ID]                                    INT            NULL,
-    [spud_date]                                   NVARCHAR (MAX) NULL,
+    [spud_date]                                   DATETIME2 (7)  NULL,
     [Core_Cost_Currency]                          NVARCHAR (MAX) NULL,
     [well_cost_currency]                          NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_DRILLING_OPERATIONS_CATEGORIES_OF_WELLS] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 
