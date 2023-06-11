@@ -5262,8 +5262,8 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> POST_RESERVES_UPDATES_OIL_CONDENSATE_FIVEYEARS_PROJECTION([FromBody] RESERVES_UPDATES_OIL_CONDENSATE_Fiveyear_Projection reserves_condensate_status_model, string omlName, string fieldName, string year, string actionToDo)
         {
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
                 RESERVES_UPDATES_OIL_CONDENSATE_Fiveyear_Projection getData;
@@ -6870,10 +6870,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 }
                 else if (_oil_gas_facility_model != null)
                 {
-
-
-
-
                     var oil_gas_facility_model = new OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT()
                     {
                         Id = _oil_gas_facility_model.Id,
@@ -6888,7 +6884,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         Nigerian_Content_Value = _oil_gas_facility_model.Nigerian_Content_Value,
                         Planned_ongoing_and_routine_maintenance = _oil_gas_facility_model.Planned_ongoing_and_routine_maintenance,
                         Project_Stage = _oil_gas_facility_model.Project_Stage,
-                        Project_Timeline = _oil_gas_facility_model.Project_Timeline,
+                        Project_Timeline_StartDate = _oil_gas_facility_model.Project_Timeline_StartDate,
+                        Project_Timeline_EndDate = _oil_gas_facility_model.Project_Timeline_EndDate,
                         Proposed_Capital_Expenditure_NGN = _oil_gas_facility_model.Proposed_Capital_Expenditure_NGN,
                         Proposed_Capital_Expenditure_USD = _oil_gas_facility_model.Proposed_Capital_Expenditure_USD,
                         Facility_Name = _oil_gas_facility_model.Facility_Name,
@@ -10770,11 +10767,9 @@ namespace Backend_UMR_Work_Program.Controllers
                         var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
                         var file2 = Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
 
-                        var blobname1 = blobService.Filenamer(file1);
-                        var blobname2 = blobService.Filenamer(file2);
-
                         if (file1 != null)
                         {
+                            var blobname1 = blobService.Filenamer(file1);
                             string docName = "Evidence of Payment";
                             hse_remediation_fund.evidenceOfPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPaymentPath == null)
@@ -10786,11 +10781,11 @@ namespace Backend_UMR_Work_Program.Controllers
                         {
                             hse_remediation_fund.evidenceOfPaymentPath = null;
                             hse_remediation_fund.evidenceOfPaymentFilename = null;
-
                         }
 
                         if (file2 != null)
                         {
+                            var blobname2 = blobService.Filenamer(file2);
                             string docName = "Evidence of Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"Remediation Documents/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
@@ -10802,7 +10797,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         {
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = null;
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = null;
-
                         }
                         #endregion
                     }
@@ -10811,13 +10805,11 @@ namespace Backend_UMR_Work_Program.Controllers
                         hse_remediation_fund.evidenceOfPaymentPath = null;
                         hse_remediation_fund.evidenceOfPaymentFilename = null;
 
-
                         var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-
-                        var blobname1 = blobService.Filenamer(file1);
 
                         if (file1 != null)
                         {
+                            var blobname1 = blobService.Filenamer(file1);
                             string docName = "Evidence of Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
@@ -10829,7 +10821,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         {
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = null;
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = null;
-
                         }
 
                     }

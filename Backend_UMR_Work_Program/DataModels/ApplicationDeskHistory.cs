@@ -10,6 +10,7 @@
 		public DateTime CreatedAt { get; set; }
 		public string? AppAction { get; set; }
 		public DateTime ActionDate { get; set; }
+		public string? SelectedTables { get; set; }
 		public int? TriggeredBySBU { get; set; }
 		public int? TriggeredByRole { get; set; }
 		public string? Message { get; set; }

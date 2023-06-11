@@ -528,6 +528,8 @@
     <Build Include="dbo\Tables\SBU_Submission.sql" />
     <Build Include="dbo\Tables\DECOMMISSIONING_ABANDONMENTs.sql" />
     <Build Include="dbo\Tables\ApplicationSBUApproval.sql" />
+    <Build Include="dbo\Tables\Payments.sql" />
+    <Build Include="dbo\Tables\TypeOfPayments.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="WKP_Database.refactorlog" />
