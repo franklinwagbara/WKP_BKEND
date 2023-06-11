@@ -2527,7 +2527,6 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_OPERATIONS_SAFETY_CASE"), DisableRequestSizeLimit]
         public async Task<object> POST_HSE_OPERATIONS_SAFETY_CASE([FromForm] HSE_OPERATIONS_SAFETY_CASE operations_Sefety_Case_model, string omlName, string fieldName, string year, string actionToDo = null, int id = 0)
         {
-
             int save = 0;
             int Id = operations_Sefety_Case_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
@@ -2535,11 +2534,9 @@ namespace Backend_UMR_Work_Program.Controllers
             HSE_OPERATIONS_SAFETY_CASE getOperationSafetyCaseData;
             try
             {
-
                 #region Saving Operation Safety Case
                 if (operations_Sefety_Case_model != null)
                 {
-
                     if (id > 0)
                     {
                         getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.Id == id select c).FirstOrDefaultAsync();
@@ -2555,6 +2552,13 @@ namespace Backend_UMR_Work_Program.Controllers
                             getOperationSafetyCaseData.Year_of_WP = year;
                             getOperationSafetyCaseData.OML_Name = omlName;
                             getOperationSafetyCaseData.Field_ID = concessionField?.Field_ID ?? null;
+                            getOperationSafetyCaseData.Does_the_Facility_Have_a_Valid_Safety_Case = operations_Sefety_Case_model.Does_the_Facility_Have_a_Valid_Safety_Case;
+                            getOperationSafetyCaseData.Number_of_Facilities = operations_Sefety_Case_model.Number_of_Facilities;
+                            getOperationSafetyCaseData.Location_of_Facility = operations_Sefety_Case_model.Location_of_Facility;
+                            getOperationSafetyCaseData.Name_Of_Facility = operations_Sefety_Case_model.Name_Of_Facility;
+                            getOperationSafetyCaseData.OML_ID = operations_Sefety_Case_model.OML_ID;
+                            getOperationSafetyCaseData.Reason_If_No_Evidence = operations_Sefety_Case_model.Reason_If_No_Evidence;
+                            getOperationSafetyCaseData.Type_of_Facility = operations_Sefety_Case_model.Type_of_Facility;
                             //operations_Sefety_Case_model.Actual_year = year;
                             //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
 
@@ -2573,7 +2577,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             }
                             #endregion
                             getOperationSafetyCaseData.Updated_by = WKPCompanyId;
-                            _context.HSE_OPERATIONS_SAFETY_CASEs.Update(operations_Sefety_Case_model);
+                            _context.HSE_OPERATIONS_SAFETY_CASEs.Update(getOperationSafetyCaseData);
                         }
                         else if (getOperationSafetyCaseData != null && action == GeneralModel.Delete)
                         {
@@ -2669,72 +2673,135 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-
-
-
-
-
-
         [HttpPost("POST_HSE_ENVIRONMENTAL_MANAGEMENT_PLAN")]
         public async Task<object> POST_HSE_ENVIRONMENTAL_MANAGEMENT_PLAN([FromForm] HSE_ENVIRONMENTAL_MANAGEMENT_PLAN environment_Management_Plan_model, string omlName, string fieldName, string year, string actionToDo = null)
         {
-
             int save = 0;
             int Id = environment_Management_Plan_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
-
                 #region Saving Operation Safety Case
                 if (environment_Management_Plan_model != null)
                 {
                     HSE_ENVIRONMENTAL_MANAGEMENT_PLAN getOperationSafetyCaseData;
-                    if (concessionField.Field_Name != null)
+                    if (Id > 0)
                     {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getOperationSafetyCaseData = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.Id == Id select c).FirstOrDefaultAsync();
+
+                        if (getOperationSafetyCaseData != null && action == GeneralModel.Update)
+                        {
+                            getOperationSafetyCaseData.Companyemail = WKPCompanyEmail;
+                            getOperationSafetyCaseData.CompanyName = WKPCompanyName;
+                            getOperationSafetyCaseData.COMPANY_ID = WKPCompanyId;
+                            getOperationSafetyCaseData.CompanyNumber = WKPCompanyNumber;
+                            getOperationSafetyCaseData.Date_Updated = DateTime.Now;
+                            getOperationSafetyCaseData.Updated_by = WKPCompanyId;
+                            getOperationSafetyCaseData.Year_of_WP = year;
+                            getOperationSafetyCaseData.OML_Name = omlName;
+                            getOperationSafetyCaseData.Field_ID = concessionField?.Field_ID ?? null;
+                            getOperationSafetyCaseData.AreThereEMP = environment_Management_Plan_model.AreThereEMP;
+                            getOperationSafetyCaseData.FacilityLocation = environment_Management_Plan_model.FacilityLocation;
+                            getOperationSafetyCaseData.FacilityType = environment_Management_Plan_model.FacilityType;
+                            getOperationSafetyCaseData.OmL_ID = environment_Management_Plan_model.OmL_ID;
+                            getOperationSafetyCaseData.RemarkIfNoEMP = environment_Management_Plan_model.RemarkIfNoEMP;
+                            //operations_Sefety_Case_model.Actual_year = year;
+                            //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
+
+                            #region file section
+                            var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                            var file2 = Request.Form.Files.Count > 0 && Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
+
+                            if (file1 != null)
+                            {
+                                var blobname1 = blobService.Filenamer(file1);
+                                string docName = "Environmental management file";
+                                getOperationSafetyCaseData.eMUploadName = docName;
+                                getOperationSafetyCaseData.eMUploadPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                if (getOperationSafetyCaseData.eMUploadPath == null)
+                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                //else
+                                //    operations_Sefety_Case_model. = blobname1;
+                            }
+                            if (file2 != null)
+                            {
+                                var blobname1 = blobService.Filenamer(file2);
+                                string docName = "Environmental management file";
+                                getOperationSafetyCaseData.OSCPUploadName = docName;
+                                getOperationSafetyCaseData.OSCPUploadPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                if (getOperationSafetyCaseData.OSCPUploadPath == null)
+                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                //else
+                                //    operations_Sefety_Case_model. = blobname1;
+                            }
+                            #endregion
+                            getOperationSafetyCaseData.Updated_by = WKPCompanyId;
+                            _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Update(getOperationSafetyCaseData);
+                        }
+                        else if (getOperationSafetyCaseData != null && action == GeneralModel.Delete)
+                        {
+                            _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Remove(getOperationSafetyCaseData);
+                        }
                     }
                     else
                     {
-                        getOperationSafetyCaseData = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    }
-
-                    environment_Management_Plan_model.Companyemail = WKPCompanyEmail;
-                    environment_Management_Plan_model.CompanyName = WKPCompanyName;
-                    environment_Management_Plan_model.COMPANY_ID = WKPCompanyId;
-                    environment_Management_Plan_model.CompanyNumber = WKPCompanyNumber;
-                    environment_Management_Plan_model.Date_Updated = DateTime.Now;
-                    environment_Management_Plan_model.Updated_by = WKPCompanyId;
-                    environment_Management_Plan_model.Year_of_WP = year;
-                    environment_Management_Plan_model.OML_Name = omlName;
-                    environment_Management_Plan_model.Field_ID = concessionField?.Field_ID ?? null;
-                    //operations_Sefety_Case_model.Actual_year = year;
-                    //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
-
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getOperationSafetyCaseData == null)
+                        if (concessionField.Field_Name != null)
                         {
-                            environment_Management_Plan_model.Date_Created = DateTime.Now;
-                            environment_Management_Plan_model.Created_by = WKPCompanyId;
-                            await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.AddAsync(environment_Management_Plan_model);
+                            getOperationSafetyCaseData = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                         }
                         else
                         {
-                            _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Remove(getOperationSafetyCaseData);
-
-                            environment_Management_Plan_model.Date_Created = environment_Management_Plan_model.Date_Created;
-                            environment_Management_Plan_model.Created_by = environment_Management_Plan_model.Created_by;
-                            environment_Management_Plan_model.Date_Updated = DateTime.Now;
-                            environment_Management_Plan_model.Updated_by = WKPCompanyId;
-                            await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.AddAsync(environment_Management_Plan_model);
+                            getOperationSafetyCaseData = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
                         }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Remove(getOperationSafetyCaseData);
-                    }
 
+                        environment_Management_Plan_model.Companyemail = WKPCompanyEmail;
+                        environment_Management_Plan_model.CompanyName = WKPCompanyName;
+                        environment_Management_Plan_model.COMPANY_ID = WKPCompanyId;
+                        environment_Management_Plan_model.CompanyNumber = WKPCompanyNumber;
+                        environment_Management_Plan_model.Date_Updated = DateTime.Now;
+                        environment_Management_Plan_model.Updated_by = WKPCompanyId;
+                        environment_Management_Plan_model.Year_of_WP = year;
+                        environment_Management_Plan_model.OML_Name = omlName;
+                        environment_Management_Plan_model.Field_ID = concessionField?.Field_ID ?? null;
+                        //operations_Sefety_Case_model.Actual_year = year;
+                        //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
+
+
+                        #region file section
+                        var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                        var file2 = Request.Form.Files.Count > 0 && Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
+
+                        if (file1 != null)
+                        {
+                            var blobname1 = blobService.Filenamer(file1);
+                            string docName = "Environmental management file";
+                            getOperationSafetyCaseData.eMUploadName = docName;
+                            getOperationSafetyCaseData.eMUploadPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            if (getOperationSafetyCaseData.eMUploadPath == null)
+                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                            //else
+                            //    operations_Sefety_Case_model. = blobname1;
+                        }
+                        if (file2 != null)
+                        {
+                            var blobname1 = blobService.Filenamer(file2);
+                            string docName = "Environmental management file";
+                            getOperationSafetyCaseData.OSCPUploadName = docName;
+                            getOperationSafetyCaseData.OSCPUploadPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"HRDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                            if (getOperationSafetyCaseData.OSCPUploadPath == null)
+                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                            //else
+                            //    operations_Sefety_Case_model. = blobname1;
+                        }
+                        #endregion
+
+                        environment_Management_Plan_model.Date_Created = environment_Management_Plan_model.Date_Created;
+                        environment_Management_Plan_model.Created_by = environment_Management_Plan_model.Created_by;
+                        environment_Management_Plan_model.Date_Updated = DateTime.Now;
+                        environment_Management_Plan_model.Updated_by = WKPCompanyId;
+                        await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.AddAsync(environment_Management_Plan_model);
+                    }
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
