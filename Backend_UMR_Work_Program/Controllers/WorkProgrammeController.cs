@@ -3387,7 +3387,10 @@ namespace Backend_UMR_Work_Program.Controllers
                 //var getData = new DRILLING_OPERATIONS_CATEGORIES_OF_WELL();
                 if (drilling_operations_categories_of_well_model != null)
                 {
-                    if (concessionField?.Field_Name != null)
+
+                    if (action == GeneralModel.Insert)
+                    {
+                        if (concessionField?.Field_Name != null)
                     {
                         getData = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.QUATER == drilling_operations_categories_of_well_model.QUATER && c.spud_date == drilling_operations_categories_of_well_model.spud_date && c.Year_of_WP == year && c.well_name == drilling_operations_categories_of_well_model.well_name select c).FirstOrDefaultAsync();
                     }
@@ -3435,8 +3438,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     // }
                     // #endregion
 
-                    if (action == GeneralModel.Insert)
-                    {
                         if (getData == null)
                         {
                             drilling_operations_categories_of_well_model.Date_Created = DateTime.Now;
