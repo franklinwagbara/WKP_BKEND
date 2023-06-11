@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    [Migration("20230611070918_Update Drilling Ope Model")]
-    partial class UpdateDrillingOpeModel
+    [Migration("20230611072519_Good")]
+    partial class Good
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
