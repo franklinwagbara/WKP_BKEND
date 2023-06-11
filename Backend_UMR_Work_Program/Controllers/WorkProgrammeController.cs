@@ -505,7 +505,9 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (companyField != null)
                     {
-                        return BadRequest(new { message = $"Error : Field ({company_field_model.Field_Name}) is already existing and can not be duplicated." });
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.DuplicateUserDetails, Message = $"Error : Field ({company_field_model.Field_Name}) is already existing and can not be duplicated.", StatusCode = ResponseCodes.Duplicate };
+
+                       // return BadRequest(new { message = $"Error : Field ({company_field_model.Field_Name}) is already existing and can not be duplicated." });
                     }
                     else
                     {
@@ -2113,7 +2115,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (save > 0)
                 {
                     string successMsg = Messager.ShowMessage(action);
-                    var All_Data = await _context.DECOMMISSIONING_ABANDONMENTs.FirstOrDefaultAsync();
+                    var All_Data = await _context.DECOMMISSIONING_ABANDONMENTs.FirstOrDefaultAsync(c=> c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.WpYear == year);
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
                 }
                 else
@@ -3386,11 +3388,11 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     if (concessionField?.Field_Name != null)
                     {
-                        getData = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.QUATER == drilling_operations_categories_of_well_model.QUATER && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getData = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.QUATER == drilling_operations_categories_of_well_model.QUATER && c.spud_date==drilling_operations_categories_of_well_model.spud_date && c.Year_of_WP == year && c.well_name== drilling_operations_categories_of_well_model.well_name select c).FirstOrDefaultAsync();
                     }
                     else
                     {
-                        getData = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.QUATER == drilling_operations_categories_of_well_model.QUATER && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getData = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.QUATER == drilling_operations_categories_of_well_model.QUATER && c.Year_of_WP == year && c.WellName == drilling_operations_categories_of_well_model.WellName && c.spud_date == drilling_operations_categories_of_well_model.spud_date select c).FirstOrDefaultAsync();
                     }
 
 
@@ -3460,8 +3462,10 @@ namespace Backend_UMR_Work_Program.Controllers
                     if (save > 0)
                     {
                         string successMsg = Messager.ShowMessage(action);
-                        //var All_Data = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        // await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        List<DRILLING_OPERATIONS_CATEGORIES_OF_WELL> All_Data = await (from c in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.QUATER == drilling_operations_categories_of_well_model.QUATER && c.Year_of_WP == year select c).ToListAsync();
+
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success, Data=All_Data };
                     }
                     else
                     {
@@ -10711,7 +10715,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_HSE_REMEDIATION_FUND")]
-        public async Task<object> POST_HSE_REMEDIATION_FUND([FromBody] HSE_REMEDIATION_FUND hse_remediation_fund, string omlName, string fieldName, string year, int id, string actionToDo)
+        public async Task<object> POST_HSE_REMEDIATION_FUND([FromForm] HSE_REMEDIATION_FUND hse_remediation_fund, string omlName, string fieldName, string year, int id, string actionToDo)
         {
 
             int save = 0;

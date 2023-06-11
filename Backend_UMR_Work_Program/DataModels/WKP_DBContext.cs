@@ -4397,7 +4397,7 @@ public partial class WKP_DBContext : DbContext
             entity.Property(e => e.proposed_year)
                 .HasMaxLength(300)
                 .IsUnicode(false);
-            entity.Property(e => e.spud_date).HasColumnType("date");
+            //entity.Property(e => e.spud_date).HasColumnType("date");
             entity.Property(e => e.well_cost)
                 .HasMaxLength(50)
                 .IsUnicode(false);

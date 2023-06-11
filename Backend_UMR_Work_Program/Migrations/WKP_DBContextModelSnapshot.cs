@@ -4334,6 +4334,9 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SelectedTables")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("StaffID")
                         .HasColumnType("int");
 
@@ -6665,6 +6668,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("Core_Cost_Curreny")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Core_Cost_USD")
                         .HasMaxLength(20)
                         .IsUnicode(false)
@@ -6839,13 +6845,16 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(300)");
 
-                    b.Property<DateTime?>("spud_date")
-                        .HasColumnType("date");
+                    b.Property<string>("spud_date")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("well_cost")
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<string>("well_cost_currency")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("well_name")
                         .HasMaxLength(500)
@@ -17238,10 +17247,11 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(500)");
 
-                    b.Property<string>("Project_Timeline")
-                        .HasMaxLength(500)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(500)");
+                    b.Property<DateTime?>("Project_Timeline_EndDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("Project_Timeline_StartDate")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Proposed_Capital_Expenditure_NGN")
                         .HasMaxLength(500)
@@ -18886,6 +18896,23 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PRESENTATION_UPLOAD", (string)null);
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.PaymentType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentType");
                 });
 
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.PermitApproval", b =>
@@ -28898,6 +28925,97 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.ToTable("tbl_fruitanalysis", (string)null);
                 });
 
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.Payments", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AmountNGN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AmountUSD")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AppId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AppReceiptId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CompanyNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ConcessionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FieldId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RRR")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TXNMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TypeOfPaymentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeOfPaymentId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.TypeOfPayments", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TypeOfPayments");
+                });
+
             modelBuilder.Entity("RoleFunctionalityRef", b =>
                 {
                     b.Property<string>("RoleId")
@@ -28911,6 +29029,17 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.HasIndex("FuncId");
 
                     b.ToTable("RoleFunctionalityRef", (string)null);
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.Payments", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.PaymentType", "PaymentType")
+                        .WithMany()
+                        .HasForeignKey("TypeOfPaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PaymentType");
                 });
 
             modelBuilder.Entity("RoleFunctionalityRef", b =>
