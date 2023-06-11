@@ -19,7 +19,6 @@
     [Date_Updated]                                DATETIME       NULL,
     [well_type]                                   VARCHAR (50)   NULL,
     [well_trajectory]                             VARCHAR (50)   NULL,
-    [spud_date]                                   DATE           NULL,
     [well_cost]                                   VARCHAR (50)   NULL,
     [Number_of_Days_to_Total_Depth]               VARCHAR (50)   NULL,
     [Well_Status_and_Depth]                       VARCHAR (100)  NULL,
@@ -55,6 +54,11 @@
     [WellName]                                    VARCHAR (2000) NULL,
     [CompanyNumber]                               INT            NULL,
     [Field_ID]                                    INT            NULL,
+    [spud_date]                                   NVARCHAR (MAX) NULL,
+    [Core_Cost_Currency]                          NVARCHAR (MAX) NULL,
+    [well_cost_currency]                          NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_DRILLING_OPERATIONS_CATEGORIES_OF_WELLS] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 

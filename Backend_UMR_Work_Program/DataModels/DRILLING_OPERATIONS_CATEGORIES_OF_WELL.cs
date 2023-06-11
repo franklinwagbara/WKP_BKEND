@@ -72,7 +72,7 @@ public partial class DRILLING_OPERATIONS_CATEGORIES_OF_WELL
 
     public string? Core_Cost_USD { get; set; }
 
-    public string? Core_Cost_Curreny { get; set; }
+    public string? Core_Cost_Currency { get; set; }
 
     public string? Core_Depth_Interval { get; set; }
 
