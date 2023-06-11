@@ -48,6 +48,7 @@ public partial class DRILLING_OPERATIONS_CATEGORIES_OF_WELL
     public DateTime? spud_date { get; set; }
 
     public string? well_cost { get; set; }
+    public string? well_cost_currency { get; set; }
 
     public string? Number_of_Days_to_Total_Depth { get; set; }
 
@@ -70,6 +71,8 @@ public partial class DRILLING_OPERATIONS_CATEGORIES_OF_WELL
     public string? State_the_field_where_Discovery_was_made { get; set; }
 
     public string? Core_Cost_USD { get; set; }
+
+    public string? Core_Cost_Currency { get; set; }
 
     public string? Core_Depth_Interval { get; set; }
 
