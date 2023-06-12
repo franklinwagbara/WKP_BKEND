@@ -9,3 +9,5 @@
     CONSTRAINT [PK_Table_Details] PRIMARY KEY CLUSTERED ([TableId] ASC)
 );
 
+
+

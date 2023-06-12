@@ -6520,6 +6520,16 @@ public partial class WKP_DBContext : DbContext
             entity.Property(e => e.RemarkIfNoEMP)
                 .HasMaxLength(500)
                 .IsUnicode(false);
+            entity.Property(e => e.eMUploadName)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.eMUploadPath)
+                .IsUnicode(false);
+            entity.Property(e => e.OSCPUploadName)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.OSCPUploadPath)
+                .IsUnicode(false);
             entity.Property(e => e.Updated_by)
                 .HasMaxLength(100)
                 .IsUnicode(false);

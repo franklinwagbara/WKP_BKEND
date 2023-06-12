@@ -45,7 +45,7 @@ public partial class DRILLING_OPERATIONS_CATEGORIES_OF_WELL
 
     public string? well_trajectory { get; set; }
 
-    public string? spud_date { get; set; }
+    public DateTime? spud_date { get; set; }
 
     public string? well_cost { get; set; }
     public string? well_cost_currency { get; set; }
