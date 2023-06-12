@@ -9292,6 +9292,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         if (Id > 0)
                         {
+
                             var getData = (from c in _context.HSE_ENVIRONMENTAL_STUDIES_NEWs where c.Id == Id select c).FirstOrDefault();
                             hse_environmental_model.Date_Created = getData.Date_Created;
                             hse_environmental_model.Created_by = getData.Created_by;
