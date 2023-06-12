@@ -2756,8 +2756,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
                         #region file section
-                        var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
-                        var file2 = Request.Form.Files.Count > 0 && Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
+                        var file1 = Request.Form.Files.Count > 1 && Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
+                        var file2 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
 
                         if (file1 != null)
                         {
