@@ -2541,7 +2541,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.Id == id select c).FirstOrDefaultAsync();
 
-                        if (getOperationSafetyCaseData != null && action == GeneralModel.Update)
+                        if (getOperationSafetyCaseData != null)
                         {
                             getOperationSafetyCaseData.Companyemail = WKPCompanyEmail;
                             getOperationSafetyCaseData.CompanyName = WKPCompanyName;
@@ -2626,26 +2626,13 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         #endregion
 
-                        if (action == GeneralModel.Insert)
-                        {
-                            if (getOperationSafetyCaseData == null)
-                            {
-                                operations_Sefety_Case_model.Date_Created = DateTime.Now;
-                                operations_Sefety_Case_model.Created_by = WKPCompanyId;
-                                await _context.HSE_OPERATIONS_SAFETY_CASEs.AddAsync(operations_Sefety_Case_model);
-                            }
-                            else
-                            {
-                                _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
-
-                                operations_Sefety_Case_model.Date_Created = operations_Sefety_Case_model.Date_Created;
-                                operations_Sefety_Case_model.Created_by = operations_Sefety_Case_model.Created_by;
-                                operations_Sefety_Case_model.Date_Updated = DateTime.Now;
-                                operations_Sefety_Case_model.Updated_by = WKPCompanyId;
-                                await _context.HSE_OPERATIONS_SAFETY_CASEs.AddAsync(operations_Sefety_Case_model);
-                            }
-                        }
-                        else if (action == GeneralModel.Delete)
+                        operations_Sefety_Case_model.Date_Created = operations_Sefety_Case_model.Date_Created;
+                        operations_Sefety_Case_model.Created_by = operations_Sefety_Case_model.Created_by;
+                        operations_Sefety_Case_model.Date_Updated = DateTime.Now;
+                        operations_Sefety_Case_model.Updated_by = WKPCompanyId;
+                        await _context.HSE_OPERATIONS_SAFETY_CASEs.AddAsync(operations_Sefety_Case_model);
+                            
+                        if (action == GeneralModel.Delete)
                         {
                             _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
                         }
@@ -2690,7 +2677,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         getOperationSafetyCaseData = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.Id == Id select c).FirstOrDefaultAsync();
 
-                        if (getOperationSafetyCaseData != null && action == GeneralModel.Update)
+                        if (getOperationSafetyCaseData != null)
                         {
                             getOperationSafetyCaseData.Companyemail = WKPCompanyEmail;
                             getOperationSafetyCaseData.CompanyName = WKPCompanyName;
