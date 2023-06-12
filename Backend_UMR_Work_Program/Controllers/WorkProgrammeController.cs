@@ -4,6 +4,7 @@ using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.ViewModels;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office2010.Excel;
+//using LinqToDB;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ namespace Backend_UMR_Work_Program.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private BlobService blobService;
-
+        
         public WorkProgrammeController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper, BlobService blobservice)
         {
             _context = context;
@@ -7657,7 +7658,7 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
-            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
+            string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert.ToLower() : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
@@ -7666,7 +7667,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 #region Saving STRATEGIC_PLANS_ON_COMPANY_BASIs data
                 if (strategic_plans_model != null)
                 {
-                    var getData = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.ACTIVITIES == strategic_plans_model.ACTIVITIES select c).ToListAsync();
+                    var getData = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.ACTIVITIES == strategic_plans_model.ACTIVITIES select c).FirstOrDefaultAsync();
 
                     strategic_plans_model.Companyemail = WKPCompanyEmail;
                     strategic_plans_model.CompanyName = WKPCompanyName;
@@ -7677,25 +7678,25 @@ namespace Backend_UMR_Work_Program.Controllers
                     strategic_plans_model.Year_of_WP = year;
                     // strategic_plans_model.OML_Name = omlName;
                     // strategic_plans_model.Field_ID = concessionField?.Field_ID ?? null;
-                    if (action == GeneralModel.Insert)
+                    if (action == GeneralModel.Insert.ToLower())
                     {
-                        // if (getData == null || getData.Count == 0)
-                        // {
-                        strategic_plans_model.Date_Created = DateTime.Now;
-                        strategic_plans_model.Created_by = WKPCompanyId;
-                        await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
-                        // }
-                        // else
-                        // {
-                        //     //strategic_plans_model.Date_Created = getData.Date_Created;
-                        //     //strategic_plans_model.Created_by = getData.Created_by;
-                        //     strategic_plans_model.Date_Updated = DateTime.Now;
-                        //     strategic_plans_model.Updated_by = WKPCompanyId;
-                        //     _context.STRATEGIC_PLANS_ON_COMPANY_BAses.RemoveRange(getData);
-                        //     await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
-                        // }
+                        if (getData == null)
+                        {
+                            strategic_plans_model.Date_Created = DateTime.Now;
+                            strategic_plans_model.Created_by = WKPCompanyId;
+                            await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
+                        }
+                        else
+                        {
+                            //strategic_plans_model.date_created = getdata.date_created;
+                            //strategic_plans_model.created_by = getdata.created_by;
+                            strategic_plans_model.Date_Updated = DateTime.Now;
+                            strategic_plans_model.Updated_by = WKPCompanyId;
+                            _context.STRATEGIC_PLANS_ON_COMPANY_BAses.RemoveRange(getData);
+                            await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
+                        }
                     }
-                    else if (action == GeneralModel.Delete)
+                    else if (action == GeneralModel.Delete.ToLower())
                     {
                         _context.STRATEGIC_PLANS_ON_COMPANY_BAses.RemoveRange(getData);
                     }
