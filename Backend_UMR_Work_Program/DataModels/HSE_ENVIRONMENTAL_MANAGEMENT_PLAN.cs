@@ -30,6 +30,10 @@ public partial class HSE_ENVIRONMENTAL_MANAGEMENT_PLAN
     public string? FacilityLocation { get; set; }
 
     public string? RemarkIfNoEMP { get; set; }
+    public string? eMUploadName { get; set; }
+    public string? eMUploadPath { get; set; }
+    public string? OSCPUploadName { get; set; }
+    public string? OSCPUploadPath { get; set; }
 
     public DateTime? Date_Updated { get; set; }
 

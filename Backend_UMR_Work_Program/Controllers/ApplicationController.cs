@@ -2266,7 +2266,10 @@ namespace Backend_UMR_Work_Program.Controllers
                                         select new
                                         {
                                             Id = tab.TableId,
-                                            TableName = tab.TableName,
+                                            Step = tab.Step,
+                                            Section = tab.Section,
+                                            SubSection = tab.SubSection,
+                                            TableSchema = tab.TableSchema,
                                             Role = tab.TableSchema,
                                             SBU = sbu.SBU_Name,
                                             SBU_ID = sbu.Id
@@ -2285,17 +2288,17 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
         [HttpPost("CreateSBU_Tables")]
-        public async Task<object> CreateSBU_Tables(int sbuID, string TableName, string TableSchema)
+        public async Task<object> CreateSBU_Tables(int sbuID, string Step, string Section, string SubSection, string TableSchema)
         {
             try
             {
-                if (TableName == null || sbuID <= 0 || TableSchema == null)
+                if (Step == null || Section == null || SubSection == null || sbuID <= 0 || TableSchema == null)
                 {
                     return BadRequest(new { message = $"Error : Table name/schema/SBU ID was not passed correctly." });
                 }
 
                 var SBU_Tables = await (from tab in _context.Table_Details
-                                        where tab.TableName.ToLower() == TableName.ToLower() && tab.TableSchema.ToLower() == TableSchema.ToLower() && tab.SBU_ID == sbuID.ToString()/*tab.SBU_ID.Contains(sbuID.ToString())*/
+                                        where tab.SubSection.ToLower() == SubSection.ToLower() && tab.TableSchema.ToLower() == TableSchema.ToLower() && tab.SBU_ID == sbuID.ToString()/*tab.SBU_ID.Contains(sbuID.ToString())*/
                                         select tab).FirstOrDefaultAsync();
                 if (SBU_Tables != null)
                 {
@@ -2305,7 +2308,10 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     var nSBU_Tables = new Table_Detail()
                     {
-                        TableName = TableName,
+                        Step = Step,
+                        Section = Section,
+                        SubSection = SubSection,
+                        TableName = null,
                         TableSchema = TableSchema,
                         SBU_ID = sbuID.ToString()
                     };
@@ -2318,7 +2324,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                                    select new
                                                    {
                                                        Id = tab.TableId,
-                                                       TableName = tab.TableName,
+                                                       table = tab,
                                                        Role = tab.TableSchema,
                                                        SBU = sbu.SBU_Name,
                                                        SBU_ID = sbu.Id
@@ -2343,11 +2349,11 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
         [HttpPost("EditSBU_Tables")]
-        public async Task<object> EditSBU_Tables(int id, string TableName, int sbuID, string TableSchema)
+        public async Task<object> EditSBU_Tables(int id, int sbuID, string Step, string Section, string SubSection, string TableSchema)
         {
             try
             {
-                if (TableName == null || id <= 0 || sbuID <= 0 || TableSchema == null)
+                if (Step == null || Section == null || SubSection == null || id <= 0 || sbuID <= 0 || TableSchema == null)
                 {
                     return BadRequest(new { message = $"Error : Table ID/name/schema/SBU_ID was not passed correctly." });
                 }
@@ -2362,7 +2368,10 @@ namespace Backend_UMR_Work_Program.Controllers
                 else
                 {
 
-                    SBU_Tables.TableName = TableName;
+                    SBU_Tables.Step = Step;
+                    SBU_Tables.Section = Section;
+                    SBU_Tables.SubSection = SubSection;
+                    SBU_Tables.TableName = null;
                     SBU_Tables.TableSchema = TableSchema;
                     SBU_Tables.SBU_ID = sbuID.ToString();
 
@@ -2373,7 +2382,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                                    select new
                                                    {
                                                        Id = tab.TableId,
-                                                       TableName = tab.TableName,
+                                                       table = tab,
                                                        Role = tab.TableSchema,
                                                        SBU = sbu.SBU_Name,
                                                        SBU_ID = sbu.Id
