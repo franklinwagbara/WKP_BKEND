@@ -17,5 +17,8 @@
 		public int? TargetedToSBU { get; set; }
 		public int? TargetedToRole { get; }
 		public int? FlowStageId { get; }
+
+		public bool? ActionByCompany { get; set; }
+		public int? CompanyId { get; set; }
 	}
 }

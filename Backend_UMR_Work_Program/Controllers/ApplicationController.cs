@@ -33,6 +33,7 @@ namespace Backend_UMR_Work_Program.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private readonly AppProcessFlowService _appProcessFlowService;
+        private readonly ApplicationService _applicationService;
 
         public ApplicationController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper, IOptions<AppSettings> appsettings)
         {
@@ -41,6 +42,7 @@ namespace Backend_UMR_Work_Program.Controllers
             _mapper = mapper;
             _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
             _appProcessFlowService = new AppProcessFlowService(_mapper, configuration, context, helpersController, new PaymentService(mapper, context, configuration, _httpContextAccessor, appsettings));
+            _applicationService = new ApplicationService(_mapper, _configuration, context);
         }
         //private int? WKPCompanyNumber => 21;
         //private string? WKPCompanyId => "221";
@@ -4001,6 +4003,20 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         #endregion
+
+        [HttpGet("GET_SENDBACK_COMMENTS")]
+        public async Task<object> GET_SENDBACK_COMMENTS(int appId)
+        {
+            try
+            {
+                return await _applicationService.GetSendBackComments(appId);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new { message = "Error: " + ex.Message });
+            }
+        }
 
     }
 }
