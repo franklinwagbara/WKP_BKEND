@@ -10048,7 +10048,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                if (id > 0 && action == GeneralModel.Delete)
+                if (id > 0 && action == GeneralModel.Delete.ToLower())
                 {
                     var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs where c.Id == id select c).FirstOrDefault();
 
