@@ -2534,6 +2534,18 @@ namespace Backend_UMR_Work_Program.Controllers
             HSE_OPERATIONS_SAFETY_CASE getOperationSafetyCaseData;
             try
             {
+                if (Id > 0 && action == GeneralModel.Delete.ToLower())
+                {
+                    getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.Id == id select c).FirstOrDefaultAsync();
+                    string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                    if (getOperationSafetyCaseData != null)
+                    {
+                        _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
+                        save += await _context.SaveChangesAsync();
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = successMsg, StatusCode = ResponseCodes.Failure };
+                }
                 #region Saving Operation Safety Case
                 if (operations_Sefety_Case_model != null)
                 {
@@ -2578,10 +2590,6 @@ namespace Backend_UMR_Work_Program.Controllers
                             #endregion
                             getOperationSafetyCaseData.Updated_by = WKPCompanyId;
                             _context.HSE_OPERATIONS_SAFETY_CASEs.Update(getOperationSafetyCaseData);
-                        }
-                        else if (getOperationSafetyCaseData != null && action == GeneralModel.Delete)
-                        {
-                            _context.HSE_OPERATIONS_SAFETY_CASEs.Remove(getOperationSafetyCaseData);
                         }
                     }
                     else
@@ -2669,6 +2677,18 @@ namespace Backend_UMR_Work_Program.Controllers
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
+                if (Id > 0 && action == GeneralModel.Delete.ToLower())
+                {
+                    var getOperationSafetyCaseData = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.Id == Id select c).FirstOrDefaultAsync();
+                    string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                    if (getOperationSafetyCaseData != null)
+                    {
+                        _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Remove(getOperationSafetyCaseData);
+                        save += await _context.SaveChangesAsync();
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = successMsg, StatusCode = ResponseCodes.Failure };
+                }
                 #region Saving Operation Safety Case
                 if (environment_Management_Plan_model != null)
                 {
