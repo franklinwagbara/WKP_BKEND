@@ -1,4 +1,6 @@
-﻿namespace Backend_UMR_Work_Program.DataModels
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Backend_UMR_Work_Program.DataModels
 {
 	public partial class ApplicationDeskHistory
 	{
@@ -20,5 +22,10 @@
 
 		public bool? ActionByCompany { get; set; }
 		public int? CompanyId { get; set; }
-	}
+
+		public ADMIN_COMPANY_INFORMATION? Company { get; set; }
+
+		[ForeignKey(nameof(StaffID))]
+		public staff? Staff { get; set; }
+    }
 }

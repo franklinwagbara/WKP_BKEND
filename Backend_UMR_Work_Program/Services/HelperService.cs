@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
+using Backend_UMR_Work_Program.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend_UMR_Work_Program.Services
@@ -17,11 +18,12 @@ namespace Backend_UMR_Work_Program.Services
             _dbContext = dbContext;
         }
 
-        public async void SaveApplicationHistory(int appId, int staffId, string status, string comment, string selectedTables)
+        public async void SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action)
         {
             try
             {
-                var staff = await (from stf in _dbContext.staff where stf.StaffID == staffId select stf).FirstOrDefaultAsync();
+                //var staff = await (from stf in _dbContext.staff where stf.StaffID == staffId select stf).FirstOrDefaultAsync();
+                var app = _dbContext.Applications.Where(x => x.Id == appId).FirstOrDefault();
 
                 var appDeskHistory = new ApplicationDeskHistory()
                 {
@@ -31,14 +33,17 @@ namespace Backend_UMR_Work_Program.Services
                     SelectedTables = selectedTables,
                     CreatedAt = DateTime.Now,
                     ActionDate = DateTime.Now,
+                    ActionByCompany = actionByCompany,
+                    CompanyId = companyId,
+                    Status = status == null || status == "null" || status == ""? app.Status: status,
+                    AppAction = action,
                 };
 
-                await _dbContext.ApplicationDeskHistories.AddAsync(appDeskHistory);
-                await _dbContext.SaveChangesAsync();
+                _dbContext.ApplicationDeskHistories.Add(appDeskHistory);
+                _dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
