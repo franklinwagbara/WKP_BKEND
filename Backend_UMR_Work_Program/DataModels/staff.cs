@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend_UMR_Work_Program.DataModels;
 
@@ -42,4 +43,9 @@ public partial class staff
     public string? SignatureName { get; set; }
 
     public int? AdminCompanyInfo_ID { get; set; }
+
+    //[ForeignKey("Id")]
+    //public StrategicBusinessUnit? StrategicBusinessUnit { get; set; }
+
+    //public Role? Role { get; set; }
 }
