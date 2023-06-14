@@ -28,3 +28,13 @@ C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\Model.xml
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\refactor.xml
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\postdeploy.sql
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\predeploy.sql
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dacpac
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dll
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.pdb
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.sqlproj.AssemblyReference.cache
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.xml
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.dll
+C:\Users\admin\source\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb
