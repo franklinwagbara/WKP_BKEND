@@ -12,7 +12,11 @@
 		</CustomData>
 		<CustomData Category="Reference" Type="Assembly">
 			<Metadata Name="LogicalName" Value="WKP_Database.dll" />
+<<<<<<< HEAD
+			<Metadata Name="FileName" Value="C:\USERS\PRISC\SOURCE\REPOS\EMMA\WORKPROGRAM_BEND\WKP_DATABASE\OBJ\DEBUG\WKP_DATABASE.DLL" />
+=======
 			<Metadata Name="FileName" Value="C:\USERS\BRANDONETECH\SOURCE\REPOS\WORKPROGRAMBACKEND\WORKPROGRAM_BEND\WKP_DATABASE\OBJ\DEBUG\WKP_DATABASE.DLL" />
+>>>>>>> 8cd9e92ac584cb2cd3056f258c719952de1f6c6e
 			<Metadata Name="AssemblyName" Value="WKP_Database" />
 			<Metadata Name="PermissionSet" Value="SAFE" />
 			<Metadata Name="Owner" Value="" />
@@ -20,7 +24,11 @@
 			<Metadata Name="IsVisible" Value="True" />
 			<Metadata Name="IsModelAware" Value="True" />
 			<Metadata Name="SkipCreationIfEmpty" Value="True" />
+<<<<<<< HEAD
+			<Metadata Name="AssemblySymbolsName" Value="C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb" />
+=======
 			<Metadata Name="AssemblySymbolsName" Value="C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb" />
+>>>>>>> 8cd9e92ac584cb2cd3056f258c719952de1f6c6e
 		</CustomData>
 		<CustomData Category="SqlCmdVariables" Type="SqlCmdVariable" />
 	</Header>
