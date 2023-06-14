@@ -70,6 +70,10 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Deactivated = "Deactivated";
 		public static string SentBackToCompany = "Sent Back To Company";
 		public static string SentBackToStaff = "Sent Back To Staff";
+		public static string AddAComment = "Add a Comment";
+		public static string Move = "Move";
+		public static string SendBackToCompany = "Send Back To Company";
+		public static string SendBackToStaff = "Send Back To Staff";
 
 
 

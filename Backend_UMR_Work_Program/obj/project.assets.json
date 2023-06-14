@@ -9253,11 +9253,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\prisc\\source\\repos\\EMMA\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
+      "projectUniqueName": "c:\\Users\\prisc\\source\\repos\\EMMA\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
       "projectName": "Backend_UMR_Work_Program",
-      "projectPath": "C:\\Users\\prisc\\source\\repos\\EMMA\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
+      "projectPath": "c:\\Users\\prisc\\source\\repos\\EMMA\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
       "packagesPath": "C:\\Users\\prisc\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\prisc\\source\\repos\\EMMA\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\obj\\",
+      "outputPath": "c:\\Users\\prisc\\source\\repos\\EMMA\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
