@@ -355,7 +355,7 @@ namespace Backend_UMR_Work_Program.Controllers
 						Year_of_WP = year,
 						uploaded_presentation = uploadedDocument,
 						upload_extension = "." + document_FileExtension,
-						original_filemane = document.Name,
+						original_filemane = document.FileName.Split(".")[0].Trim(),
 						Created_by = WKPUserEmail,
 						Date_Created = DateTime.Now,
 					};
