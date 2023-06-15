@@ -23,11 +23,7 @@
     [COMPANY_ID]                          VARCHAR (100)  NULL,
     [CompanyNumber]                       INT            NULL,
     [Field_ID]                            INT            NULL,
-<<<<<<< HEAD
     [Year]                                NVARCHAR (MAX) NULL,
-=======
-    [Year] NVARCHAR(MAX) NULL, 
->>>>>>> 8cd9e92ac584cb2cd3056f258c719952de1f6c6e
     CONSTRAINT [PK_LEGAL_ARBITRATION] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
