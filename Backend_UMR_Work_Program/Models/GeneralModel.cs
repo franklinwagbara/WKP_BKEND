@@ -74,17 +74,23 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Move = "Move";
 		public static string SendBackToCompany = "Send Back To Company";
 		public static string SendBackToStaff = "Send Back To Staff";
+		public static string SubmissionFee = "Submission Fee";
+		public static string LateSubmissionFee = "Late Submission Fee";
+		public static string ModificationFee = "Modification Fee";
+		public static string MainPayment = "Main Payment";
+		public static string OtherPayment = "Other Payment";
+		public static string SecondaryPayment = "Secondary Payment";
 
 
 
-		//Added by Musa for Testing
-		//public static string CompanyId { get; set; }
-		//public static string WKPCompanyName { get; set; }
-		//public static string WKPCompanyEmail { get; set; }
-		//public static string WKUserRole { get; set; }
-		//public static string WKPCompanyNumber { get; set; }
+        //Added by Musa for Testing
+        //public static string CompanyId { get; set; }
+        //public static string WKPCompanyName { get; set; }
+        //public static string WKPCompanyEmail { get; set; }
+        //public static string WKUserRole { get; set; }
+        //public static string WKPCompanyNumber { get; set; }
 
-		public class ActionModel
+        public class ActionModel
 		{
 			public string[] selectedApps { get; set; }
 			public string[] SBU_IDs { get; set; }

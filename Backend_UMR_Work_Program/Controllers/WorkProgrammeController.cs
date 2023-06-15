@@ -2536,7 +2536,7 @@ namespace Backend_UMR_Work_Program.Controllers
             HSE_OPERATIONS_SAFETY_CASE getOperationSafetyCaseData;
             try
             {
-                if (Id > 0 && action == GeneralModel.Delete.ToLower())
+                if (action == GeneralModel.Delete.ToLower())
                 {
                     getOperationSafetyCaseData = await (from c in _context.HSE_OPERATIONS_SAFETY_CASEs where c.Id == id select c).FirstOrDefaultAsync();
                     string successMsg = Messager.ShowMessage(GeneralModel.Delete);
