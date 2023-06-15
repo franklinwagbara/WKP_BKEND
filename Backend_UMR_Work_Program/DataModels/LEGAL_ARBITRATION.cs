@@ -52,4 +52,5 @@ public partial class LEGAL_ARBITRATION
     public int? CompanyNumber { get; set; }
 
     public int? Field_ID { get; set; }
+    public string? Year { get; set; }
 }
