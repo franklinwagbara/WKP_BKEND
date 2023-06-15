@@ -19,5 +19,7 @@
     [Status] NVARCHAR(MAX) NULL, 
     [Currency] NVARCHAR(MAX) NULL, 
     [PaymentDate] NVARCHAR(MAX) NULL,
+    [RemitaRequest] NVARCHAR(MAX) NULL, 
+    [RemitaResponse] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_PAYMENTS] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
