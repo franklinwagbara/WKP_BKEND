@@ -7241,24 +7241,89 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_FACILITIES_PROJECT_PERFORMANCE")]
-        public async Task<object> POST_FACILITIES_PROJECT_PERFORMANCE([FromForm] FACILITIES_PROJECT_PERFORMANCE facilities_project_model, string omlName, string fieldName,
-                    string year, string id, string actionToDo, string evidenceOfDesignSafetyCaseApprovalPath, string evidenceOfDesignSafetyCaseApprovalFilename)
+        public async Task<object> POST_FACILITIES_PROJECT_PERFORMANCE([FromForm] FACILITIES_PROJECT_PERFORMANCE facilities_project_model, string omlName, string fieldName, string year, string id, string actionToDo, string evidenceOfDesignSafetyCaseApprovalPath, string evidenceOfDesignSafetyCaseApprovalFilename)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-
-                if (!string.IsNullOrEmpty(id))
+                var Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : facilities_project_model.Id;
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.FACILITIES_PROJECT_PERFORMANCEs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.FACILITIES_PROJECT_PERFORMANCEs where c.Id == Id select c).FirstOrDefault();
+                    if(getData != null) {
+                        if (action == GeneralModel.Delete)
+                        {
+                            _context.FACILITIES_PROJECT_PERFORMANCEs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(action);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            //facilities_project_model.OML_Name = facilities_project_model.OML_Name.ToUpper();
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.Actual_completion = facilities_project_model.Actual_completion;
+                            getData.Consession_Type = facilities_project_model.Consession_Type;
+                            getData.Contract_Type = facilities_project_model.Contract_Type;
+                            getData.FLAG = facilities_project_model.FLAG;
+                            getData.List_of_Projects = facilities_project_model.List_of_Projects;
+                            getData.OML_ID = facilities_project_model.OML_ID;
+                            getData.Planned_completion = facilities_project_model.Planned_completion;
+                            getData.reasonForNoEvidence = facilities_project_model.reasonForNoEvidence;
+                            getData.Terrain = facilities_project_model.Terrain;
 
-                    if (action == GeneralModel.Delete)
-                        _context.FACILITIES_PROJECT_PERFORMANCEs.Remove(getData);
-                    save += _context.SaveChanges();
+                            if (facilities_project_model.areThereEvidenceOfDesignSafetyCaseApproval == "Yes")
+                            {
+                                #region file section
+                                if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                                {
+
+                                    var files = Request.Form.Files;
+                                    if (files.Count >= 1)
+                                    {
+                                        var file1 = Request.Form.Files[0];
+                                        //var file2 = Request.Form.Files[1];
+                                        var blobname1 = blobService.Filenamer(file1);
+                                        //var blobname2 = blobService.Filenamer(file2);
+
+                                        if (file1 != null)
+                                        {
+                                            string docName = "Evidence of Design Safety Case Approval";
+                                            getData.evidenceOfDesignSafetyCaseApprovalPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceofDesignSafetyCaseApprovalDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                            if (getData.evidenceOfDesignSafetyCaseApprovalPath == null)
+                                                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
+                                            else
+                                                getData.evidenceOfDesignSafetyCaseApprovalFilename = blobname1;
+                                        }
+
+                                    }
+                                }
+
+                                #endregion
+                            }
+                            facilities_project_model.Date_Updated = DateTime.Now;
+                            facilities_project_model.Updated_by = WKPCompanyId;
+                            _context.FACILITIES_PROJECT_PERFORMANCEs.Update(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(action);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No content found for ID {Id}." });
+                    }
                 }
                 else if (facilities_project_model != null)
                 {
@@ -7276,8 +7341,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     facilities_project_model.CompanyName = WKPCompanyName;
                     facilities_project_model.COMPANY_ID = WKPCompanyId;
                     facilities_project_model.CompanyNumber = WKPCompanyNumber;
-                    facilities_project_model.Date_Updated = DateTime.Now;
-                    facilities_project_model.Updated_by = WKPCompanyId;
+                    facilities_project_model.Date_Created = DateTime.Now;
+                    facilities_project_model.Created_by = WKPCompanyId;
                     facilities_project_model.Year_of_WP = year;
                     //facilities_project_model.OML_Name = facilities_project_model.OML_Name.ToUpper();
                     facilities_project_model.OML_Name = omlName;
@@ -7561,13 +7626,10 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN")]
         public async Task<object> POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN([FromBody] NIGERIA_CONTENT_Upload_Succession_Plan nigeria_content_succession_model, string omlName, string fieldName, string year, string actionToDo)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
             try
             {
-
                 #region Saving NIGERIA_CONTENT_Upload_Succession_Plans data
                 if (nigeria_content_succession_model != null)
                 {
