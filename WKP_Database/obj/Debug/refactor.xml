@@ -7,4 +7,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Budget_Ngn" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="550ba51e-f0b0-4018-b287-a3f392d581ae" ChangeDateTime="06/13/2023 12:16:12" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[ApplicationDeskHistories].[ActionByStaff]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ApplicationDeskHistories]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ActionByCompany" />
+  </Operation>
 </Operations>
