@@ -10152,19 +10152,71 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
-            int Id = hse_sustainable_model.Id;
+            int Id = id == 0 ? (hse_sustainable_model != null ? hse_sustainable_model.Id : 0) : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (id > 0 && action == GeneralModel.Delete.ToLower())
+                if (id > 0)
                 {
                     var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs where c.Id == id select c).FirstOrDefault();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(action);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            if (hse_sustainable_model != null) {
+                                getData.Companyemail = WKPCompanyEmail;
+                                getData.CompanyName = WKPCompanyName;
+                                getData.COMPANY_ID = WKPCompanyId;
+                                getData.CompanyNumber = WKPCompanyNumber;
+                                getData.Date_Updated = DateTime.Now;
+                                getData.Updated_by = WKPCompanyId;
+                                getData.Year_of_WP = year;
 
-                    if (action == GeneralModel.Delete)
-                        _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Remove(getData);
-                    save += _context.SaveChanges();
+                                getData.Component_of_project = hse_sustainable_model.Component_of_project;
+                                getData.Actual_Budget_Total_Dollars = hse_sustainable_model.Actual_Budget_Total_Dollars;
+                                getData.Beneficiary_Community = hse_sustainable_model.Beneficiary_Community;
+                                getData.Consession_Type = hse_sustainable_model.Consession_Type;
+                                getData.Contract_Type = hse_sustainable_model.Contract_Type;
+                                getData.Field_ID = hse_sustainable_model.Field_ID;
+                                getData.OML_ID = hse_sustainable_model.OML_ID;
+                                getData.OML_Name = hse_sustainable_model.OML_Name;
+                                getData.Project_Location = hse_sustainable_model.Project_Location;
+                                getData.Status_Of_Project = hse_sustainable_model.Status_Of_Project;
+                                getData.Type_of_project_excuted = hse_sustainable_model.Type_of_project_excuted;
+                                getData.Year_GMou_was_signed = hse_sustainable_model.Year_GMou_was_signed;
+
+                                #region file section
+                                var file1 = Request.Form.Files.Count > 0 && Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+
+                                if (file1 != null)
+                                {
+                                    var blobname1 = blobService.Filenamer(file1);
+                                    string docName = "GMOU";
+                                    hse_sustainable_model.MOUUploadFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"MOUDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (hse_sustainable_model.MOUUploadFilePath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                }
+                                else
+                                {
+                                    hse_sustainable_model.MOUUploadFilePath = null;
+                                }
+                                #endregion
+                                _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Update(getData);
+                                save += _context.SaveChanges();
+                                string successMsg = Messager.ShowMessage(action);
+                                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                            }
+                        }
+                    }
                 }
                 else if (hse_sustainable_model != null)
                 {
@@ -10198,42 +10250,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (action == GeneralModel.Insert)
                     {
-                        //if (getData == null)
-                        //{
-
-                        if (getData == null)
-                        {
-                            hse_sustainable_model.Date_Created = DateTime.Now;
-                            hse_sustainable_model.Created_by = WKPCompanyId;
-                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.AddAsync(hse_sustainable_model);
-                        }
-                        else
-                        {
-                            hse_sustainable_model.Date_Created = DateTime.Now;
-                            hse_sustainable_model.Created_by = WKPCompanyId;
-
-                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Remove(getData);
-                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.AddAsync(hse_sustainable_model);
-                        }
-
-                        // }
-                        // else
-                        // {
-                        // 	hse_sustainable_model.Date_Created = getData.Date_Created;
-                        // 	hse_sustainable_model.Created_by = getData.Created_by;
-                        // 	hse_sustainable_model.Date_Updated = DateTime.Now;
-                        // 	hse_sustainable_model.Updated_by = WKPCompanyId;
-                        // 	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Remove(getData);
-                        // 	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.AddAsync(hse_sustainable_model);
-                        // }
+                        hse_sustainable_model.Date_Created = DateTime.Now;
+                        hse_sustainable_model.Created_by = WKPCompanyId;
+                        await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.AddAsync(hse_sustainable_model);
                     }
-                    else if (action == GeneralModel.Delete)
+                    else if (action == GeneralModel.Delete.ToLower())
                     {
                         _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Remove(getData);
                     }
-
                     save += await _context.SaveChangesAsync();
-
                 }
                 else
                 {
@@ -10242,7 +10267,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (save > 0)
                 {
                     string successMsg = Messager.ShowMessage(action);
-                    var All_Data = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
                 else
