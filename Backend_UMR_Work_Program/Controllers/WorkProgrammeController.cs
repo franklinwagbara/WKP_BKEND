@@ -9801,19 +9801,56 @@ namespace Backend_UMR_Work_Program.Controllers
         {
 
             int save = 0;
-            int Id = hse_compliance_model.Id;
+            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : hse_compliance_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (!string.IsNullOrEmpty(id))
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            hse_compliance_model.Companyemail = WKPCompanyEmail;
+                            hse_compliance_model.CompanyName = WKPCompanyName;
+                            hse_compliance_model.COMPANY_ID = WKPCompanyId;
+                            hse_compliance_model.CompanyNumber = WKPCompanyNumber;
+                            hse_compliance_model.Date_Updated = DateTime.Now;
+                            hse_compliance_model.Updated_by = WKPCompanyId;
+                            hse_compliance_model.Year_of_WP = year;
+                            hse_compliance_model.OML_Name = omlName;
+                            hse_compliance_model.Field_ID = concessionField?.Field_ID ?? null;
+                            hse_compliance_model.ACTUAL_year = year;
+                            hse_compliance_model.PROPOSED_year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Delete)
-                        _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
-                    save += _context.SaveChanges();
+                            hse_compliance_model.Date_Created = DateTime.Now;
+                            hse_compliance_model.Created_by = WKPCompanyId;
+                            await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
+
+                            if (action == GeneralModel.Delete)
+                            {
+                                _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
+                            }
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
                 }
                 else if (hse_compliance_model != null)
                 {
@@ -9839,42 +9876,14 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_compliance_model.ACTUAL_year = year;
                     hse_compliance_model.PROPOSED_year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        // if (getData == null)
-                        // {
+                    hse_compliance_model.Date_Created = DateTime.Now;
+                    hse_compliance_model.Created_by = WKPCompanyId;
+                    await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
 
-                        if (getData == null)
-                        {
-                            hse_compliance_model.Date_Created = DateTime.Now;
-                            hse_compliance_model.Created_by = WKPCompanyId;
-                            await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
-                        }
-                        else
-                        {
-                            hse_compliance_model.Date_Created = DateTime.Now;
-                            hse_compliance_model.Created_by = WKPCompanyId;
-
-                            _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
-                            await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
-                        }
-
-                        // }
-                        // else
-                        // {
-                        //     hse_compliance_model.Date_Created = getData.Date_Created;
-                        //     hse_compliance_model.Created_by = getData.Created_by;
-                        //     hse_compliance_model.Date_Updated = DateTime.Now;
-                        //     hse_compliance_model.Updated_by = WKPCompanyId;
-                        //     _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
-                        //     await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
-                        // }
-                    }
-                    else if (action == GeneralModel.Delete)
+                    if (action == GeneralModel.Delete)
                     {
                         _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
                     }
-
                     save += await _context.SaveChangesAsync();
                 }
                 else
