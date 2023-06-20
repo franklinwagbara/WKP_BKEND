@@ -7304,13 +7304,18 @@ namespace Backend_UMR_Work_Program.Controllers
                                             if (getData.evidenceOfDesignSafetyCaseApprovalPath == null)
                                                 return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
                                             else
-                                                getData.evidenceOfDesignSafetyCaseApprovalFilename = blobname1;
+                                                getData.evidenceOfDesignSafetyCaseApprovalFilename = docName;
                                         }
 
                                     }
                                 }
 
                                 #endregion
+                            }
+                            else
+                            {
+                                getData.evidenceOfDesignSafetyCaseApprovalPath = null;
+                                getData.evidenceOfDesignSafetyCaseApprovalFilename = null;
                             }
                             facilities_project_model.Date_Updated = DateTime.Now;
                             facilities_project_model.Updated_by = WKPCompanyId;
