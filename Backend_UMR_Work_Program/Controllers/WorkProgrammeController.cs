@@ -2816,7 +2816,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     if (save > 0)
                     {
                         string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
-                        //var All_Data = await (from c in _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                     }
                     else
@@ -2838,142 +2837,158 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_EFFLUENT_MONITORING_COMPLIANCE"), DisableRequestSizeLimit]
         public async Task<object> POST_HSE_EFFLUENT_MONITORING_COMPLIANCE([FromForm] HSE_EFFLUENT_MONITORING_COMPLIANCE Effluenct_Monitoring_Complience_Mode, string omlName, string fieldName, string year, string actionToDo = null, int id = 0)
         {
-
             int save = 0;
-            //int Id = Effluenct_Monitoring_Complience_Mode.Id;
-            int Id = Effluenct_Monitoring_Complience_Mode.Id != null ? Effluenct_Monitoring_Complience_Mode.Id : 0;
+            int Id = id == 0 ? Effluenct_Monitoring_Complience_Mode.Id : id;
 
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             HSE_EFFLUENT_MONITORING_COMPLIANCE getData;
-
-
             try
             {
-
                 #region Saving Operation Safety Case
-                if (id > 0 || Effluenct_Monitoring_Complience_Mode != null)
+                if (Id > 0)
                 {
-
-                    if (id > 0)
+                    getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
                     {
-                        getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.Id == id select c).FirstOrDefaultAsync();
-                        _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
+                            save += await _context.SaveChangesAsync();
 
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber.ToString();
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+
+                            getData.AreThereEvidentOfSampling = Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling;
+                            getData.OmL_ID = Effluenct_Monitoring_Complience_Mode.OmL_ID;
+                            getData.ReasonForNoEvidenceSampling = Effluenct_Monitoring_Complience_Mode.ReasonForNoEvidenceSampling;
+
+                            #region File processing
+                            var files = Request.Form.Files;
+
+                            if (files.Count >= 1)
+                            {
+                                var file1 = Request.Form.Files[0];
+                                if (file1 != null)
+                                {
+                                    var blobname1 = blobService.Filenamer(file1);
+                                    string docName = "Effluent Monitoring Complience";
+                                    getData.EvidenceOfSamplingPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EffluenceMonitoringDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (getData.EvidenceOfSamplingPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        getData.EvidenceOfSamplingFilename = docName;
+                                }
+                                else
+                                {
+                                    getData.EvidenceOfSamplingPath = null;
+                                    getData.EvidenceOfSamplingFilename = null;
+                                }
+                            }
+                            else
+                            {
+                                getData.EvidenceOfSamplingPath = null;
+                                getData.EvidenceOfSamplingFilename = null;
+                            }
+
+                            if (Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling.ToLower() == "yes")
+                            {
+                                getData.ReasonForNoEvidenceSampling = null;
+                            }
+                            else
+                            {
+                                getData.EvidenceOfSamplingPath = null;
+                                getData.EvidenceOfSamplingFilename = null;
+                            }
+                            #endregion
+                            _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
                     }
-
                     else
                     {
-
-
-                        //if (concessionField.Field_Name != null)
-                        //{
-                        //    getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                        //}
-                        //else
-                        //{
-                        //    getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                        //}
-
-                        Effluenct_Monitoring_Complience_Mode.Companyemail = WKPCompanyEmail;
-                        Effluenct_Monitoring_Complience_Mode.CompanyName = WKPCompanyName;
-                        Effluenct_Monitoring_Complience_Mode.COMPANY_ID = WKPCompanyId;
-                        Effluenct_Monitoring_Complience_Mode.CompanyNumber = WKPCompanyNumber.ToString();
-                        Effluenct_Monitoring_Complience_Mode.Date_Updated = DateTime.Now;
-                        Effluenct_Monitoring_Complience_Mode.Updated_by = WKPCompanyId;
-                        Effluenct_Monitoring_Complience_Mode.Year_of_WP = year;
-                        Effluenct_Monitoring_Complience_Mode.OML_Name = omlName;
-                        Effluenct_Monitoring_Complience_Mode.Field_ID = concessionField?.Field_ID ?? null;
-                        //operations_Sefety_Case_model.Actual_year = year;
-                        //operations_Sefety_Case_model.proposed_year = (int.Parse(year) + 1).ToString();
-
-
-
-                        #region File processing
-                        var files = Request.Form.Files;
-
-                        if (files.Count >= 1)
-                        {
-                            var file1 = Request.Form.Files[0];
-                            var blobname1 = blobService.Filenamer(file1);
-
-                            if (file1 != null)
-                            {
-                                string docName = "Effluent Monitoring Complience";
-                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EffluenceMonitoringDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-
-                                if (Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath == null)
-                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
-                                else
-                                    Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = blobname1;
-
-                            }
-                            else
-                            {
-                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
-                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
-                            }
-                        }
-                        else
-                        {
-                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
-                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
-                        }
-
-                        if (Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling.ToLower() == "yes")
-                        {
-                            Effluenct_Monitoring_Complience_Mode.ReasonForNoEvidenceSampling = null;
-                        }
-                        else
-                        {
-                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
-                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
-                        }
-                        #endregion
-
-                        if (action == GeneralModel.Insert)
-                        {
-
-
-                            if (Id > 0)
-                            {
-                                action = GeneralModel.Update;
-                                getData = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.Id == id select c).FirstOrDefaultAsync();
-
-                                if (getData != null)
-                                {
-                                    _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
-
-                                    Effluenct_Monitoring_Complience_Mode.Date_Created = getData.Date_Created;
-                                    Effluenct_Monitoring_Complience_Mode.Created_by = getData.Created_by;
-                                    Effluenct_Monitoring_Complience_Mode.Date_Updated = DateTime.Now;
-                                    Effluenct_Monitoring_Complience_Mode.Updated_by = WKPCompanyId;
-                                    await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.AddAsync(Effluenct_Monitoring_Complience_Mode);
-                                }
-
-                            }
-                            else
-                            {
-                                Effluenct_Monitoring_Complience_Mode.Date_Created = DateTime.Now;
-                                Effluenct_Monitoring_Complience_Mode.Created_by = WKPCompanyId;
-                                await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.AddAsync(Effluenct_Monitoring_Complience_Mode);
-
-                            }
-
-
-                        }
-                        //else if (action == GeneralModel.Delete)
-                        //{
-                        //    _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Remove(getData);
-                        //}
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
                     }
+                }
+                else if (Effluenct_Monitoring_Complience_Mode != null)
+                {
+                    Effluenct_Monitoring_Complience_Mode.Companyemail = WKPCompanyEmail;
+                    Effluenct_Monitoring_Complience_Mode.CompanyName = WKPCompanyName;
+                    Effluenct_Monitoring_Complience_Mode.COMPANY_ID = WKPCompanyId;
+                    Effluenct_Monitoring_Complience_Mode.CompanyNumber = WKPCompanyNumber.ToString();
+                    Effluenct_Monitoring_Complience_Mode.Date_Updated = DateTime.Now;
+                    Effluenct_Monitoring_Complience_Mode.Updated_by = WKPCompanyId;
+                    Effluenct_Monitoring_Complience_Mode.Year_of_WP = year;
+                    Effluenct_Monitoring_Complience_Mode.OML_Name = omlName;
+                    Effluenct_Monitoring_Complience_Mode.Field_ID = concessionField?.Field_ID ?? null;
+
+                    #region File processing
+                    var files = Request.Form.Files;
+
+                    if (files.Count >= 1)
+                    {
+                        var file1 = Request.Form.Files[0];
+                        var blobname1 = blobService.Filenamer(file1);
+
+                        if (file1 != null)
+                        {
+                            string docName = "Effluent Monitoring Complience";
+                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EffluenceMonitoringDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+
+                            if (Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath == null)
+                                return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                            else
+                                Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = blobname1;
+
+                        }
+                        else
+                        {
+                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                            Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                        }
+                    }
+                    else
+                    {
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                    }
+
+                    if (Effluenct_Monitoring_Complience_Mode.AreThereEvidentOfSampling.ToLower() == "yes")
+                    {
+                        Effluenct_Monitoring_Complience_Mode.ReasonForNoEvidenceSampling = null;
+                    }
+                    else
+                    {
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingPath = null;
+                        Effluenct_Monitoring_Complience_Mode.EvidenceOfSamplingFilename = null;
+                    }
+                    #endregion
+
+                    Effluenct_Monitoring_Complience_Mode.Date_Created = DateTime.Now;
+                    Effluenct_Monitoring_Complience_Mode.Created_by = WKPCompanyId;
+                    await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.AddAsync(Effluenct_Monitoring_Complience_Mode);
+
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
                     {
                         string successMsg = Messager.ShowMessage(Id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
-                        var All_Data = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                     }
                     else
                     {
@@ -2981,7 +2996,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     }
                 }
-
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
 
@@ -2991,13 +3005,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + e.Message, StatusCode = ResponseCodes.InternalError };
             }
         }
-
-
-
-
-
-
-
 
 
         [HttpPost("POST_HSE_GHG_MANAGEMENT_PLAN"), DisableRequestSizeLimit]
@@ -4668,19 +4675,18 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITY")]
         public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITY([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITy oil_condensate_activity_model, string omlName, string fieldName, string year, string actionToDo)
         {
-
             int save = 0;
+            int Id = oil_condensate_activity_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
+
                 #region Saving Oil Condensate data
                 if (oil_condensate_activity_model != null)
                 {
                     OIL_CONDENSATE_PRODUCTION_ACTIVITy getData;
-                    //var getData = (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefault();
-
                     if (concessionField?.Field_Name != null)
                     {
                         getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
