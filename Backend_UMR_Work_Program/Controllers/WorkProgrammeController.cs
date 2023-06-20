@@ -9821,26 +9821,33 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            hse_compliance_model.Companyemail = WKPCompanyEmail;
-                            hse_compliance_model.CompanyName = WKPCompanyName;
-                            hse_compliance_model.COMPANY_ID = WKPCompanyId;
-                            hse_compliance_model.CompanyNumber = WKPCompanyNumber;
-                            hse_compliance_model.Date_Updated = DateTime.Now;
-                            hse_compliance_model.Updated_by = WKPCompanyId;
-                            hse_compliance_model.Year_of_WP = year;
-                            hse_compliance_model.OML_Name = omlName;
-                            hse_compliance_model.Field_ID = concessionField?.Field_ID ?? null;
-                            hse_compliance_model.ACTUAL_year = year;
-                            hse_compliance_model.PROPOSED_year = (int.Parse(year) + 1).ToString();
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.ACTUAL_year = year;
+                            getData.PROPOSED_year = (int.Parse(year) + 1).ToString();
 
-                            hse_compliance_model.Date_Created = DateTime.Now;
-                            hse_compliance_model.Created_by = WKPCompanyId;
-                            await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
+                            getData.Are_you_a_Producing_or_Non_Producing_Company = hse_compliance_model.Are_you_a_Producing_or_Non_Producing_Company;
+                            getData.Consession_Type = hse_compliance_model.Consession_Type;
+                            getData.Contract_Type = hse_compliance_model.Contract_Type;
+                            getData.Have_you_submitted_your_Chemical_Usage_Inventorization_Report = hse_compliance_model.Have_you_submitted_your_Chemical_Usage_Inventorization_Report;
+                            getData.Have_you_submitted_your_Environmental_Compliance_Report = hse_compliance_model.Have_you_submitted_your_Environmental_Compliance_Report;
+                            getData.If_NO_Give_reasons_for_non_SUBMISSION = hse_compliance_model.If_NO_Give_reasons_for_non_SUBMISSION;
+                            getData.If_NO_Give_reasons_for_non_submission_2 = hse_compliance_model.If_NO_Give_reasons_for_non_submission_2;
+                            getData.If_NO_give_reasons_for_not_registering_your_Point_Sources = hse_compliance_model.If_NO_give_reasons_for_not_registering_your_Point_Sources;
+                            getData.If_YES_have_you_registered_your_Point_Sources = hse_compliance_model.If_YES_have_you_registered_your_Point_Sources;
+                            getData.OML_ID = hse_compliance_model.OML_ID;
+                            getData.Terrain = hse_compliance_model.Terrain;
+                            getData.Year_of_WP = hse_compliance_model.Year_of_WP;
 
-                            if (action == GeneralModel.Delete)
-                            {
-                                _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
-                            }
+                            _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Update(getData);
+
                             save += await _context.SaveChangesAsync();
 
                             string successMsg = Messager.ShowMessage(GeneralModel.Update);
