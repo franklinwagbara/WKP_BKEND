@@ -24,7 +24,10 @@ namespace Backend_UMR_Work_Program.Models
         public string? Status { get; set; }
         public string? Currency { get; set; }
         public DateTime? PaymentDate { get; set; }
+
         [ForeignKey("TypeOfPaymentId")]
-        public PaymentType PaymentType { get; set; }
+        public TypeOfPayments PaymentType { get; set; }
+        public string? RemitaResponse { get; set; }
+        public string? RemitaRequest { get; set; }
     }
 }

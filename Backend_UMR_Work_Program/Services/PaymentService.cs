@@ -2,10 +2,9 @@
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Models;
-using LinqToDB;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Data.Entity;
 using System.Text;
 
 namespace Backend_UMR_Work_Program.Services
@@ -60,6 +59,33 @@ namespace Backend_UMR_Work_Program.Services
                 await _context.SaveChangesAsync();
 
                 return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
+        }
+
+        public async Task<object> GetPaymentSummarySubmission()
+        {
+            try
+            {
+                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Category == GeneralModel.MainPayment).ToListAsync();
+
+                //Check is there is late payment fine
+                var isLateFine = await _context.LateSubmission.Where(x => x.Late == true).FirstOrDefaultAsync();
+
+                if (isLateFine != null && isLateFine.Late == true)
+                {
+                    var lateFee = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Name.Equals(GeneralModel.LateSubmissionFee)).FirstOrDefaultAsync();
+                    if (lateFee != null)
+                    {
+                        fees.Add(lateFee);
+                    }
+                }
+
+                return fees;
             }
             catch (Exception ex)
             {

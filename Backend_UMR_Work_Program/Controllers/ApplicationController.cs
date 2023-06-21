@@ -33,6 +33,8 @@ namespace Backend_UMR_Work_Program.Controllers
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private readonly AppProcessFlowService _appProcessFlowService;
+        private readonly ApplicationService _applicationService;
+        private readonly HelperService _helperService;
 
         public ApplicationController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper, IOptions<AppSettings> appsettings)
         {
@@ -41,6 +43,8 @@ namespace Backend_UMR_Work_Program.Controllers
             _mapper = mapper;
             _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
             _appProcessFlowService = new AppProcessFlowService(_mapper, configuration, context, helpersController, new PaymentService(mapper, context, configuration, _httpContextAccessor, appsettings));
+            _applicationService = new ApplicationService(_mapper, _configuration, context);
+            _helperService = new HelperService(mapper, configuration, context);
         }
         //private int? WKPCompanyNumber => 21;
         //private string? WKPCompanyId => "221";
@@ -490,22 +494,72 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
 
-                var appHistory = await (from his in _context.ApplicationDeskHistories
-                                        join stf in _context.staff on his.StaffID equals stf.StaffID
-                                        join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-                                        join rol in _context.Roles on stf.RoleID equals rol.id
-                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
-                                        where his.AppId == appID
-                                        select new ApplicationDeskHistory_Model
-                                        {
-                                            ID = his.Id,
-                                            Staff_Name = stf.FirstName + " " + stf.LastName,
-                                            Staff_Email = stf.StaffEmail,
-                                            Staff_SBU = sbu.SBU_Name,
-                                            Staff_Role = rol.RoleName,
-                                            Comment = his.Comment,
-                                            Date = his.ActionDate
-                                        }).ToListAsync();
+                //var appHistory = await (from his in _context.ApplicationDeskHistories
+                //                        join stf in _context.staff on his.StaffID equals stf.StaffID
+                //                        join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                //                        join rol in _context.Roles on stf.RoleID equals rol.id
+                //                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
+                //                        where his.AppId == appID
+                //                        select new ApplicationDeskHistory_Model
+                //                        {
+                //                            ID = his.Id,
+                //                            Staff_Name = stf.FirstName + " " + stf.LastName,
+                //                            Staff_Email = stf.StaffEmail,
+                //                            Staff_SBU = sbu.SBU_Name,
+                //                            Staff_Role = rol.RoleName,
+                //                            Comment = his.Comment,
+                //                            Date = his.ActionDate
+                //                        }).ToListAsync();
+
+                //var apphistory = await (from his in _context.ApplicationDeskHistories
+                //                        where his.AppId == appID
+                //                        select new applicationdeskhistory_model
+                //                        {
+                //                            id = his.Id,
+                //                            //staff_name = stf.firstname + " " + stf.lastname,
+                //                            staff_name = (_context.staff.Where(x => x.StaffID == his.StaffID).FirstOrDefault()) == null? null: (_context.staff.Where(x => x.StaffID == his.StaffID).FirstOrDefault()).LastName,
+                //                            staff_email = stf.staffemail,
+                //                            staff_sbu = sbu.sbu_name,
+                //                            staff_role = rol.rolename,
+                //                            comment = his.comment,
+                //                            date = his.actiondate
+                //                        }).tolistasync();
+
+                var appHistory = await _context.ApplicationDeskHistories.Include(x => x.Staff).Include(x => x.Company).Where(x => x.AppId == appID)
+                                    .Select( x => new
+                                    {
+                                        ID = x.Id,
+                                        Staff_Name = x.Staff.LastName + ", " + x.Staff.FirstName,
+                                        Staff_Email = x.Staff.StaffEmail,
+                                        Staff_SBU = _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().SBU_Name,
+                                        Staff_Role = _context.Roles.Where(r => r.id == x.Staff.RoleID).FirstOrDefault().RoleName,
+                                        Comment = x.Comment,
+                                        Date = x.ActionDate,
+                                        ActionByCompany = x.ActionByCompany,
+                                        Company = x.Company,
+                                        Status = x.Status,
+                                        Action = x.AppAction,
+                                    }).ToListAsync();
+
+                //var appHistory = await _context.ApplicationDeskHistories
+                //                    .Include(x => x.Staff)
+                //                        .ThenInclude(s => s.StrategicBusinessUnit)
+                //                    .Include(x => x.Staff)
+                //                        .ThenInclude(s => s.Role)
+                //                    .Include(x => x.Company)
+                //                    .Where(x => x.AppId == appID)
+                //                    .Select(x => new
+                //                    {
+                //                        ID = x.Id,
+                //                        Staff_Name = x.Staff.LastName + ", " + x.Staff.FirstName,
+                //                        Staff_Email = x.Staff.StaffEmail,
+                //                        Staff_SBU = x.Staff.StrategicBusinessUnit,
+                //                        Staff_Role = x.Staff.Role,
+                //                        Comment = x.Comment,
+                //                        Date = x.ActionDate
+                //                    })
+                //                    .ToListAsync();
+
 
                 var currentDesks = await (from dsk in _context.MyDesks
                                        join stf in _context.staff on dsk.StaffID equals stf.StaffID
@@ -562,7 +616,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     sbuApprovals = null;
                 }
 
-                var appDetails = new ApplicationDetailsModel
+                var appDetails = new 
                 {
                     Application = application,
                     Field = field,
@@ -651,7 +705,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
                         if (saveStaffDesk > 0)
                         {
-                            _helpersController.SaveHistory(application.Id, staff.StaffID, GeneralModel.Submitted, "Application submitted and landed on staff desk", null);
+                            //_helpersController.SaveHistory(application.Id, staff.StaffID, GeneralModel.Submitted, "Application submitted and landed on staff desk", null);
+                            _helperService.SaveApplicationHistory(application.Id, staff.StaffID, GeneralModel.Submitted, "Application submitted and landed on staff desk", null, false, null, GeneralModel.Submit);
 
                             //send mail to staff
                             var getStaff = (from stf in _context.staff
@@ -795,7 +850,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                     await _helpersController.UpdateDeskAfterPush(staffDesk, comment, STAFF_DESK_STATUS.APPROVED);
                                 }
 
-                                _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.Approval, comment, null);
+                                //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.Approval, comment, null);
+                                _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.Approval, comment, null, false, null, GeneralModel.Push);
 
 
                                 //send mail to staff
@@ -877,7 +933,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 await _helpersController.UpdateDeskAfterPush(staffDesk, comment, STAFF_DESK_STATUS.APPROVED);
                                 //}
 
-                                _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.Approval, comment, null);
+                                //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.Approval, comment, null);
+                                _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.Approval, comment, null, false, null, GeneralModel.Push);
 
                                 //Todo: Update EC Approvals Table
                                 await _helpersController.UpdateApprovalTable(application.Id, comment, staffDesk.StaffID, staffDesk.DeskID, GeneralModel.Approval);
@@ -1010,7 +1067,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
                         }
 
-                        _helpersController.SaveHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null);
+                        //_helpersController.SaveHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null);
+                        _helperService.SaveApplicationHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null, false, null, GeneralModel.Move);
 
 
                         string subject = $"Re-assignment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
@@ -1075,13 +1133,15 @@ namespace Backend_UMR_Work_Program.Controllers
                             string RejectedTables = await _appProcessFlowService.getTableNames(selectedTables);
 
                             //Update Staffs Desk
+                            //todo: update desk status
                             staffDesk.Comment = comment;
                             _context.MyDesks.Update(staffDesk);
                             _context.SaveChanges();
 
                             //Save Application history
-                            _helpersController.SaveHistory(application.Id, currentStaff.StaffID, GeneralModel.SentBackToCompany, comment, RejectedTables);
-                           
+                            //_helpersController.SaveHistory(application.Id, currentStaff.StaffID, GeneralModel.SentBackToCompany, comment, RejectedTables);
+                            _helperService.SaveApplicationHistory(application.Id, currentStaff.StaffID, GeneralModel.SentBackToCompany, comment, RejectedTables, false, null, GeneralModel.SendBackToCompany);
+
                             string subject = $"Sent back WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                             string content = $"{WKPCompanyName} sent back WORK PROGRAM application for year {application.YearOfWKP}.";
                             var emailMsg = _helpersController.SaveMessage(application.Id, currentStaff.StaffID, subject, content, "Staff");
@@ -1203,7 +1263,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
                                 await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
-                                _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, RejectedTables);
+                                //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, RejectedTables);
+                                _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, RejectedTables, false, null, GeneralModel.SendBackToStaff);
 
                                 var SBU = await (from sb in _context.StrategicBusinessUnits where sb.Id == getStaff.Staff_SBU select sb).FirstOrDefaultAsync();
 
@@ -1244,7 +1305,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                     //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
                                     await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
-                                    _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                                    //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                                    _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
 
                                     _helpersController.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, GeneralModel.Rejected);
 
@@ -1321,7 +1383,8 @@ namespace Backend_UMR_Work_Program.Controllers
 
                                         await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
-                                        _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                                        //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                                        _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
 
                                         //send mail to staff
                                         var getStaff = (from stf in _context.staff
@@ -1380,7 +1443,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
                                 await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
-                                _helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                                //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                                _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
 
                                 //send mail to staff
                                 var getStaff = (from stf in _context.staff
@@ -1467,7 +1531,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         //}
 
                         //send email to staff approver
-                        _helpersController.SaveHistory(appId, staff.StaffID, GeneralModel.Approved, staff.StaffEmail + "Final Approval For Application With Ref: " + application.ReferenceNo, null);
+                        //_helpersController.SaveHistory(appId, staff.StaffID, GeneralModel.Approved, staff.StaffEmail + "Final Approval For Application With Ref: " + application.ReferenceNo, null);
+                        _helperService.SaveApplicationHistory(application.Id, staff.StaffID, GeneralModel.Approved, staff.StaffEmail + "Final Approval For Application With Ref: " + application.ReferenceNo, null, false, null, GeneralModel.Approve);
 
                         string subject = $"Approval For Application With REF: {application.ReferenceNo}";
                         string content = $"An approval has been generated for application with reference: " + application.ReferenceNo + " for " + field.Field_Name + "(" + Company.NAME + ").";
@@ -4002,5 +4067,32 @@ namespace Backend_UMR_Work_Program.Controllers
 
         #endregion
 
+        [HttpGet("GET_SENDBACK_COMMENTS")]
+        public async Task<object> GET_SENDBACK_COMMENTS(int appId)
+        {
+            try
+            {
+                return await _applicationService.GetSendBackComments(appId);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new { message = "Error: " + ex.Message });
+            }
+        }
+
+        [HttpPost("ADD_COMMENT")]
+        public async Task<object> ADD_COMMENT(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany)
+        {
+            try
+            {
+                var res = _applicationService.AddCommentToApplication(appId, staffId, status, comment, selectedTables, actionByCompany, WKPCompanyNumber);
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = res, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error: " + ex.Message });
+            }
+        }
     }
 }
