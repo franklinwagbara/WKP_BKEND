@@ -2661,6 +2661,30 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+        //public async Task<WebApiResponse> Hse_Sustainable_Development_Community_Project_Program_Training_Details(string year)
+        //{
+        //    var ResultData = new List<>();
+        //    try
+        //    {
+        //        if (WKUserRole == GeneralModel.Admin)
+        //        {
+        //            ResultData = await _context. Where(c => c.Year_of_WP == year).ToListAsync();
+        //        }
+
+        //        else
+        //        {
+        //            ResultData = await _context.csr Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+        //        }
+
+        //        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+        //    }
+
+        //    catch (Exception e)
+        //    {
+        //        return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+        //    }
+        //}
+
         [HttpGet("STRATEGIC_PLANS_ON_COMPANY_BASIS")]
         public async Task<WebApiResponse> STRATEGIC_PLANS_ON_COMPANY_BASIS(string year)
         {
@@ -3235,6 +3259,28 @@ namespace Backend_UMR_Work_Program.Controllers
                 else
                 {
                     ResultData =await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        public async Task<WebApiResponse> HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU(string year)
+        {
+            var ResultData = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU>();
+            try
+            {
+                if (WKUserRole == GeneralModel.Admin)
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
+                else
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
