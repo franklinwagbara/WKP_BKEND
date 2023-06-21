@@ -4666,12 +4666,6 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-
-
-
-
-
-
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITY")]
         public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITY([FromBody] OIL_CONDENSATE_PRODUCTION_ACTIVITy oil_condensate_activity_model, string omlName, string fieldName, string year, string actionToDo)
         {
@@ -4682,21 +4676,93 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-
-                #region Saving Oil Condensate data
-                if (oil_condensate_activity_model != null)
+                if(Id > 0)
                 {
-                    OIL_CONDENSATE_PRODUCTION_ACTIVITy getData;
-                    if (concessionField?.Field_Name != null)
+                    var getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
                     {
-                        getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName.ToUpper();
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.proposed_year = year;
+
+                            getData.Actual_year = oil_condensate_activity_model.Actual_year;
+                            getData.Committees_been_inaugurated = oil_condensate_activity_model.Committees_been_inaugurated;
+                            getData.Company_AG = oil_condensate_activity_model.Company_AG;
+                            getData.Company_Condensate = oil_condensate_activity_model.Company_Condensate;
+                            getData.Company_NAG = oil_condensate_activity_model.Company_NAG;
+                            getData.Company_Name_OP = oil_condensate_activity_model.Company_Name_OP;
+                            getData.Company_Oil = oil_condensate_activity_model.Company_Oil;
+                            getData.Company_Timeline = oil_condensate_activity_model.Company_Timeline;
+                            getData.Consession_Type = oil_condensate_activity_model.Consession_Type;
+                            getData.Contract_Type = oil_condensate_activity_model.Contract_Type;
+                            getData.Cost_Barrel = oil_condensate_activity_model.Cost_Barrel;
+                            getData.Current_year_Actual = oil_condensate_activity_model.Current_year_Actual;
+                            getData.Daily_Production_ = oil_condensate_activity_model.Daily_Production_;
+                            getData.Deferment = oil_condensate_activity_model.Deferment;
+                            getData.Did_you_carry_out_any_well_test = oil_condensate_activity_model.Did_you_carry_out_any_well_test;
+                            getData.Fiveyear_AG = oil_condensate_activity_model.Fiveyear_AG;
+                            getData.Fiveyear_Condensate = oil_condensate_activity_model.Fiveyear_Condensate;
+                            getData.Fiveyear_NAG = oil_condensate_activity_model.Fiveyear_NAG;
+                            getData.Fiveyear_Oil = oil_condensate_activity_model.Fiveyear_Oil;
+                            getData.Fiveyear_Timeline = oil_condensate_activity_model.Fiveyear_Timeline;
+                            getData.Forecast = oil_condensate_activity_model.Forecast;
+                            getData.Gas_AG = oil_condensate_activity_model.Gas_AG;
+                            getData.Gas_NAG = oil_condensate_activity_model.Gas_NAG;
+                            getData.Has_DPR_been_notified = oil_condensate_activity_model.Has_DPR_been_notified;
+                            getData.Has_the_CA_been_signed = oil_condensate_activity_model.Has_the_CA_been_signed;
+                            getData.Has_the_other_party_been_notified = oil_condensate_activity_model.Has_the_other_party_been_notified;
+                            getData.Has_the_PUA_been_signed = oil_condensate_activity_model.Has_the_PUA_been_signed;
+                            getData.Has_the_UUOA_been_signed = oil_condensate_activity_model.Has_the_UUOA_been_signed;
+                            getData.How_many_fields_straddle = oil_condensate_activity_model.How_many_fields_straddle;
+                            getData.Is_any_of_your_field_straddling = oil_condensate_activity_model.Is_any_of_your_field_straddling;
+                            getData.Is_there_a_Joint_Development = oil_condensate_activity_model.Is_there_a_Joint_Development;
+                            getData.Maximum_Efficiency_Rate = oil_condensate_activity_model.Maximum_Efficiency_Rate;
+                            getData.Number_of_Producing_Wells = oil_condensate_activity_model.Number_of_Producing_Wells;
+                            getData.Number_of_Test_Carried_out = oil_condensate_activity_model.Number_of_Test_Carried_out;
+                            getData.Oil_Royalty_Payment = oil_condensate_activity_model.Oil_Royalty_Payment;
+                            getData.Participation_been_determined = oil_condensate_activity_model.Participation_been_determined;
+                            getData.Prod_Status_OC = oil_condensate_activity_model.Prod_Status_OC;
+                            getData.Prod_Status_OP = oil_condensate_activity_model.Prod_Status_OP;
+                            getData.Remarks = oil_condensate_activity_model.Remarks;
+                            getData.straddle_field_producing = oil_condensate_activity_model.straddle_field_producing;
+                            getData.Straddling_Fields_OC = oil_condensate_activity_model.Straddling_Fields_OC;
+                            getData.Straddling_Field_OP = oil_condensate_activity_model.Straddling_Field_OP;
+                            getData.Terrain = oil_condensate_activity_model.Terrain;
+                            getData.Total_Reconciled_National_Crude_Oil_Production = oil_condensate_activity_model.Total_Reconciled_National_Crude_Oil_Production;
+                            getData.Type_of_Test = oil_condensate_activity_model.Type_of_Test;
+                            getData.what_concession_field_straddling = oil_condensate_activity_model.what_concession_field_straddling;
+                            
+                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
                     }
                     else
                     {
-                        getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
                     }
-
-
+                }
+                #region Saving Oil Condensate data
+                else if (oil_condensate_activity_model != null)
+                {
                     oil_condensate_activity_model.Companyemail = WKPCompanyEmail;
                     oil_condensate_activity_model.CompanyName = WKPCompanyName;
                     oil_condensate_activity_model.COMPANY_ID = WKPCompanyId;
@@ -4709,49 +4775,24 @@ namespace Backend_UMR_Work_Program.Controllers
                     //oil_condensate_activity_model.Actual_year = year;
                     oil_condensate_activity_model.proposed_year = year;
 
-
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null)
-                        {
-                            oil_condensate_activity_model.Date_Created = DateTime.Now;
-                            oil_condensate_activity_model.Created_by = WKPCompanyId;
-                            await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.AddAsync(oil_condensate_activity_model);
-                        }
-                        else
-                        {
-                            oil_condensate_activity_model.Date_Created = getData.Date_Created;
-                            oil_condensate_activity_model.Created_by = getData.Created_by;
-                            oil_condensate_activity_model.Date_Updated = DateTime.Now;
-                            oil_condensate_activity_model.Updated_by = WKPCompanyId;
-                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Remove(getData);
-                            await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.AddAsync(oil_condensate_activity_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Remove(getData);
-                    }
-
+                    oil_condensate_activity_model.Date_Created = DateTime.Now;
+                    oil_condensate_activity_model.Created_by = WKPCompanyId;
+                    await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.AddAsync(oil_condensate_activity_model);
+                    
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
                     {
                         string successMsg = Messager.ShowMessage(action);
-
-                        //var All_Data = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                     }
                     else
                     {
                         return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
                     }
                 }
-
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
-
             }
             catch (Exception e)
             {
