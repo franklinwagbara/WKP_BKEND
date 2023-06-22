@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using Org.BouncyCastle.Asn1.Cmp;
 using System.Security.Claims;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
@@ -7231,29 +7232,70 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT")]
         public async Task<object> POST_OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT([FromBody] OIL_AND_GAS_FACILITY_MAINTENANCE_Model _oil_gas_facility_model, string omlName, string fieldName, string year, string id, string actionToDo)
         {
-
-
-
             int save = 0;
+            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : _oil_gas_facility_model.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
             try
             {
-
-                if (!string.IsNullOrEmpty(id))
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Actual_Proposed = _oil_gas_facility_model.Actual_Proposed;
+                            getData.Actual_capital_expenditure_Current_year_NGN = _oil_gas_facility_model.Actual_capital_expenditure_Current_year_NGN;
+                            getData.Actual_capital_expenditure_Current_year_USD = _oil_gas_facility_model.Actual_capital_expenditure_Current_year_USD;
+                            getData.Challenges = _oil_gas_facility_model.Challenges;
+                            getData.Comment_ = _oil_gas_facility_model.Comment_;
+                            getData.Completion_Status = _oil_gas_facility_model.Completion_Status;
+                            getData.Has_it_been_adopted_by_DPR_ = _oil_gas_facility_model.Has_it_been_adopted_by_DPR_;
+                            getData.New_Technology_ = _oil_gas_facility_model.New_Technology_;
+                            getData.Nigerian_Content_Value = _oil_gas_facility_model.Nigerian_Content_Value;
+                            getData.Planned_ongoing_and_routine_maintenance = _oil_gas_facility_model.Planned_ongoing_and_routine_maintenance;
+                            getData.Project_Stage = _oil_gas_facility_model.Project_Stage;
+                            getData.Project_Timeline_StartDate = _oil_gas_facility_model.Project_Timeline_StartDate;
+                            getData.Project_Timeline_EndDate = _oil_gas_facility_model.Project_Timeline_EndDate;
+                            getData.Proposed_Capital_Expenditure_NGN = _oil_gas_facility_model.Proposed_Capital_Expenditure_NGN;
+                            getData.Proposed_Capital_Expenditure_USD = _oil_gas_facility_model.Proposed_Capital_Expenditure_USD;
+                            getData.Facility_Name = _oil_gas_facility_model.Facility_Name;
+                            getData.Facility_Type = _oil_gas_facility_model.Facility_Type;
+                            getData.Proposed_Projects = _oil_gas_facility_model.Proposed_Projects;
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
 
-                    if (action == GeneralModel.Delete)
-                        _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Remove(getData);
-                    save += _context.SaveChanges();
+                            _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
                 }
                 else if (_oil_gas_facility_model != null)
                 {
                     var oil_gas_facility_model = new OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT()
                     {
-                        Id = _oil_gas_facility_model.Id,
                         Actual_Proposed = _oil_gas_facility_model.Actual_Proposed,
                         Actual_capital_expenditure_Current_year_NGN = _oil_gas_facility_model.Actual_capital_expenditure_Current_year_NGN,
                         Actual_capital_expenditure_Current_year_USD = _oil_gas_facility_model.Actual_capital_expenditure_Current_year_USD,
@@ -7275,19 +7317,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     };
 
 
-
-                    List<OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECT> getData;
-
-                    if (concessionField.Field_Name != null)
-                    {
-                        getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id == oil_gas_facility_model.Id select c).ToListAsync();
-                    }
-                    else
-                    {
-                        getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id == oil_gas_facility_model.Id select c).ToListAsync();
-                    }
-                    //var getData = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_Proposed == oil_gas_facility_model.Actual_Proposed select c).ToListAsync();
-
                     oil_gas_facility_model.Companyemail = WKPCompanyEmail;
                     oil_gas_facility_model.CompanyName = WKPCompanyName;
                     oil_gas_facility_model.COMPANY_ID = WKPCompanyId;
@@ -7300,29 +7329,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     // oil_gas_facility_model.Actual_year = year;
                     //  oil_gas_facility_model.Proposed_year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null || getData.Count == 0)
-                        {
-                            oil_gas_facility_model.Date_Created = DateTime.Now;
-                            oil_gas_facility_model.Created_by = WKPCompanyId;
-                            await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.AddAsync(oil_gas_facility_model);
-                        }
-                        else
-                        {
-                            oil_gas_facility_model.Date_Created = getData[0].Date_Created;
-                            oil_gas_facility_model.Created_by = getData[0].Created_by;
-                            oil_gas_facility_model.Date_Updated = DateTime.Now;
-                            oil_gas_facility_model.Updated_by = WKPCompanyId;
-                            _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.RemoveRange(getData);
-                            await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.AddAsync(oil_gas_facility_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.RemoveRange(getData);
-                    }
-
+                    oil_gas_facility_model.Date_Created = DateTime.Now;
+                    oil_gas_facility_model.Created_by = WKPCompanyId;
+                    await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.AddAsync(oil_gas_facility_model);
                     save += await _context.SaveChangesAsync();
                 }
                 else
@@ -7332,8 +7341,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (save > 0)
                 {
                     string successMsg = Messager.ShowMessage(action);
-                    //var All_Data = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    //var All_Data = await (from c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                 }
                 else
@@ -7344,7 +7351,6 @@ namespace Backend_UMR_Work_Program.Controllers
             catch (Exception e)
             {
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + e.Message, StatusCode = ResponseCodes.InternalError };
-
             }
         }
 
