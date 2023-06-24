@@ -3352,5 +3352,34 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+        /// <summary>
+        /// Endpoint to get the HSE point_source_registration
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("point_source_registration")]
+        public async Task<WebApiResponse> Get_point_source_registration([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_POINT_SOURCE_REGISTRATION>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.Where(c => c.Company_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
     }
 }
