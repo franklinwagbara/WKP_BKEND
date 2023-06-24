@@ -1744,7 +1744,6 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("CONCESSIONSINFORMATION")]
         public async Task<WebApiResponse> Get_ADMIN_CONCESSIONS_INFORMATION_BY_CURRENT_YEAR(string year)
         {
-
             try
             {
                 var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
@@ -3392,5 +3391,93 @@ namespace Backend_UMR_Work_Program.Controllers
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
             }
         }
+
+        /// <summary>
+        /// Endpoint to get the HSE remediation fund
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("remediation_fund")]
+        public async Task<WebApiResponse> Get_remediation_fund([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_REMEDIATION_FUND>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.Where(c => c.Company_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE effluent_compliance_monitoring
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("effluent_compliance_monitoring")]
+        public async Task<WebApiResponse> Get_effluent_compliance_monitoring([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_EFFLUENT_MONITORING_COMPLIANCE>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE point_source_registration
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("point_source_registration")]
+        public async Task<WebApiResponse> Get_point_source_registration([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_POINT_SOURCE_REGISTRATION>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.Where(c => c.Company_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
     }
 }
