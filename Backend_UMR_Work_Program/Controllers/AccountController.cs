@@ -31,8 +31,9 @@ namespace Backend_UMR_Work_Program.Controllers
 		WebApiResponse webApiResponse = new WebApiResponse();
 		private readonly IMapper _mapper;
 		public ElpsUtility _elpsObj;
+        private readonly HelperService _helperService;
 
-		public AccountController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, Account account, IMapper mapper, IOptions<AppSettings> appSettings, ElpsUtility elpsObj)
+        public AccountController(WKP_DBContext context, IConfiguration configuration,Account account, IMapper mapper, IOptions<AppSettings> appSettings, ElpsUtility elpsObj, HelperService helperService)
 		{
 			//_httpContextAccessor = httpContextAccessor;
 			_appSettings=appSettings.Value;
@@ -40,9 +41,9 @@ namespace Backend_UMR_Work_Program.Controllers
 			_context = context;
 			_configuration = configuration;
 			_mapper = mapper;
-			_helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
 			_elpsObj = elpsObj;
-		}
+            _helperService = helperService;
+        }
 
 		[HttpGet("GetElpsStaff")]
 		public object GetElpsStaff()
@@ -237,12 +238,12 @@ namespace Backend_UMR_Work_Program.Controllers
 		{
 			try
 			{
-				string encryptCP = _helpersController.Encrypt(currentPassword);
+				string encryptCP = _helperService.Encrypt(currentPassword);
 				string email = User.FindFirstValue(ClaimTypes.Email);
 				var getUser = (from u in _context.ADMIN_COMPANY_INFORMATIONs where u.EMAIL == email.Trim() && u.PASSWORDS == encryptCP select u).FirstOrDefault();
 				if (getUser != null)
 				{
-					getUser.PASSWORDS = _helpersController.Encrypt(newPassword);
+					getUser.PASSWORDS = _helperService.Encrypt(newPassword);
 					getUser.UPDATED_BY = getUser.Id.ToString();
 					getUser.UPDATED_DATE = DateTime.Now.ToString();
 
