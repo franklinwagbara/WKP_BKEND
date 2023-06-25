@@ -17,7 +17,6 @@ namespace Backend_UMR_Work_Program.Controllers
         private Account _account;
         public WKP_DBContext _context;
         public IConfiguration _configuration;
-        HelpersController _helpersController;
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
@@ -28,12 +27,7 @@ namespace Backend_UMR_Work_Program.Controllers
             _context = context;
             _configuration = configuration;
             _mapper = mapper;
-            _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
         }
-        //private string? WKPCompanyId => "221";
-        //private string? WKPCompanyName => "Name";
-        //private string? WKPCompanyEmail => "adeola.kween123@gmail.com";
-        //private string? WKUserRole => "Admin";
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);

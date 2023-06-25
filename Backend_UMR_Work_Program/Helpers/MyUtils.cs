@@ -7,7 +7,7 @@ namespace Backend_UMR_Work_Program.Helpers
 	{
 		public static string GenerateSha512(string inputString)
 		{
-			SHA512 sha512 = SHA512Managed.Create();
+			SHA512 sha512 = SHA512.Create();
 			byte[] bytes = Encoding.UTF8.GetBytes(inputString);
 			byte[] hash = sha512.ComputeHash(bytes);
 			StringBuilder sb = new StringBuilder();

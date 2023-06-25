@@ -97,6 +97,11 @@ namespace Backend_UMR_Work_Program
             services.AddTransient<BlobService>();
             services.AddTransient<ElpsUtility>();
             services.AddTransient<Seeder>();
+            services.AddTransient<PaymentService>();
+            
+            services.AddTransient<ApplicationService>();
+            services.AddTransient<AppProcessFlowService>();
+            services.AddTransient<HelperService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped(x => new BlobServiceClient(Configuration.GetValue<string>("AzureBlobStorage")));

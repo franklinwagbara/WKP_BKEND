@@ -30,10 +30,10 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                var types = new List<string>();
-                types.Add(GeneralModel.SubmissionFee);
-                types.Add(GeneralModel.LateSubmissionFee);
-                types.Add(GeneralModel.ModificationFee);
+                var types = new List<string> { 
+                    GeneralModel.APPLICATION_STATUS.SubmissionFee, 
+                    GeneralModel.APPLICATION_STATUS.LateSubmissionFee , 
+                    GeneralModel.APPLICATION_STATUS.ModificationFee };
 
                 types.ForEach( t =>
                 {
@@ -42,7 +42,7 @@ namespace Backend_UMR_Work_Program.Services
                         var fee = new TypeOfPayments
                         {
                             Name = t,
-                            Category = GeneralModel.MainPayment
+                            Category = GeneralModel.APPLICATION_STATUS.MainPayment
                         };
 
                         _dbContext.TypeOfPayments.Add(fee);
@@ -53,7 +53,6 @@ namespace Backend_UMR_Work_Program.Services
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
