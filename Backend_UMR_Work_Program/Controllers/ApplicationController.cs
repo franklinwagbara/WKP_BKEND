@@ -80,7 +80,6 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GetAllApplicationsScopedToSBU")]
         public async Task<WebApiResponse> GetAllApplicationsScopedToSBU() => await _applicationService.GetAllApplicationsScopedToSBU(WKPCompanyEmail);
 
-        //Rework
         [HttpGet("GetReturnedApplications")]
         public async Task<object> GetReturnedApplications() => await _applicationService.GetReturnedApplications((int) WKPCompanyNumber);
 
@@ -95,7 +94,9 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GetStaffDesksByStaffID")]
         public async Task<object> GetAppsOnMyDeskByStaffID(int staffID) => await _applicationService.GetAppsOnMyDeskByStaffID(staffID);
 
-        
+        [HttpGet("All-Companies")]
+        public async Task<object> AllCompanies() => await _applicationService.AllCompanies();
+
         //Rework
         [HttpGet("All-Applications")] //For general application view
         public async Task<object> AllApplications()
@@ -1070,21 +1071,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
         // }
 
-        //Rework
-        [HttpGet("All-Companies")]
-        public async Task<object> AllCompanies()
-        {
-            try
-            {
-                var companies = await _context.ADMIN_COMPANY_INFORMATIONs.Where(ap => ap.DESIGNATION != "Admin").ToListAsync();
-
-                return new WebApiResponse { Data = companies, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { message = "Error : " + e.Message });
-            }
-        }
+        
 
         #region Minimum Requirement
         [HttpGet("Get_Planning_Requirement")]

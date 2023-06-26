@@ -98,6 +98,7 @@ namespace Backend_UMR_Work_Program
             services.AddTransient<ElpsUtility>();
             services.AddTransient<Seeder>();
             services.AddTransient<PaymentService>();
+            services.AddTransient<WorkProgrammeService>();
             
             services.AddTransient<ApplicationService>();
             services.AddTransient<AppProcessFlowService>();

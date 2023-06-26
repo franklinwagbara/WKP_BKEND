@@ -741,5 +741,19 @@ namespace Backend_UMR_Work_Program.Services
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
             }
         }
+
+        public async Task<WebApiResponse> AllCompanies()
+        {
+            try
+            {
+                var companies = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(x => x.COMPANY_NAME != "Admin").ToListAsync();
+
+                return new WebApiResponse { Data = companies, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+            }
+        }
     }
 }
