@@ -1,4 +1,6 @@
 ﻿using Backend_UMR_Work_Program.DataModels;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Backend_UMR_Work_Program.Models
 {
@@ -38,23 +40,8 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Modification = "MODIFICATION";
 		public static string ActualYear = "Actual Year";
 		public static string ProposedYear = "Proposed Year";
-		public static string PaymentPending = "Payment Confirmation Pending";
-		public static string PaymentCompleted = "PaymentCompleted";
-		public static string Approved = "Approved";
-		public static string Submitted = "Submitted";
-		public static string Processing = "Processing";
-		public static string Rejected = "Rejected";
 		public static string OML = "OML";
 		public static string OPL = "OPL";
-		public static string Initiated = "Initiated";
-		public static string Completed = "Completed";
-		public static string Submit = "Submit";
-		public static string Push = "Push";
-		public static string ApprovedByEC = "Approved By EC";
-		public static string FinalApproval = "FinalApproval";
-		public static string Approve = "Approve";
-		public static string Reject = "Reject";
-		public static string Delegate = "Delegate";
 		public static string PLANNING_CODE = "ER&SP";
 		public static string HSE_CODE = "HSE&C";
 		public static string LEGAL_CODE = "LGL";
@@ -62,35 +49,92 @@ namespace Backend_UMR_Work_Program.Models
 		public static string EXPOLRATION_CODE = "E&AM";
 		public static string DEVELOPMENT_CODE = "ER&SP";
 		public static string CORPORATE_SERVICE_CODE = "ER&SP";
-		public static string Reviewer = "Reviewer";
-		public static string Supervisor = "Supervisor";
-		public static string Approval = "Approving Authority";
-		public static string FinalApprovalAuthority = "Final Approving Authority";
 		public static string Activated = "Activated";
 		public static string Deactivated = "Deactivated";
-		public static string SentBackToCompany = "Sent Back To Company";
-		public static string SentBackToStaff = "Sent Back To Staff";
-		public static string AddAComment = "Add a Comment";
-		public static string Move = "Move";
-		public static string SendBackToCompany = "Send Back To Company";
-		public static string SendBackToStaff = "Send Back To Staff";
-		public static string SubmissionFee = "Submission Fee";
-		public static string LateSubmissionFee = "Late Submission Fee";
-		public static string ModificationFee = "Modification Fee";
-		public static string MainPayment = "Main Payment";
-		public static string OtherPayment = "Other Payment";
-		public static string SecondaryPayment = "Secondary Payment";
+		
+
+		//Application, Payment statuses
+
+		public static class APPLICATION_STATUS{
+			public static string PaymentPending = "Payment Confirmation Pending";
+			public static string PaymentCompleted = "Payment Completed";
+			public static string SubmissionFee = "Submission Fee";
+			public static string LateSubmissionFee = "Late Submission Fee";
+			public static string ModificationFee = "Modification Fee";
+			public static string MainPayment = "Main Payment";
+			public static string OtherPayment = "Other Payment";
+			public static string SecondaryPayment = "Secondary Payment";
+
+			public static string Approved = "Approved";
+			public static string SubmissionByCompany = "Submission By Company";
+
+			public static string SubmissionByStaff = "Submission By Staff";
+			public static string ApprovalByFinalAuthority = "Approval By Final Authority";
+			public static string ApprovalByFinalApprovingAuthority = "Approval By Final Approving Authority";
+			public static string Pushed = "Pushed";
+			public static string Processing = "Processing";
+			public static string Rejected = "Rejected";
+			public static string SendBackToCompany = "Send Back To Company";
+			public static string SendBackToStaff = "Send Back To Staff";
+			public static string NotSubmitted = "Not Submitted";
+			public static string SentBackToCompany = "Sent Back To Company";
+			public static string SentBackToStaff = "Sent Back To Staff";
+
+			public static string ReviewerApproved = "Reviewer Approved";
+			public static string SuppervisorApproved = "Supervisor Approved";
+			public static string ManagerApproved = "Manager Approved";
+			public static string FinalAuthorityApproved = "Final Authority Approved";
+			public static string DirectorApproved = "Director Approved";
+			public static string DeputyDirectorApproved = "Deputy Director Approved";
+		}
 
 
+		//Process flow constants
 
-        //Added by Musa for Testing
-        //public static string CompanyId { get; set; }
-        //public static string WKPCompanyName { get; set; }
-        //public static string WKPCompanyEmail { get; set; }
-        //public static string WKUserRole { get; set; }
-        //public static string WKPCompanyNumber { get; set; }
+		public static class PROCESS_CONSTANTS{
+			public static string Initiated = "Initiated";
+			public static string Completed = "Completed";
+			public static string Submit = "Submit";
+			public static string SubmissionByCompany = "Submission By Company";
+			public static string Submitted = "Submitted";
+			public static string Push = "Push";
+			public static string ApprovedByEC = "Approved By EC";
+			public static string FinalApproval = "FinalApproval";
+			public static string Approve = "Approve";
+			public static string Reject = "Reject";
+			public static string Delegate = "Delegate";
+			public static string Reviewer = "Reviewer";
+			public static string Supervisor = "Supervisor";
+			public static string Approval = "Approving Authority";
+			public static string FinalApprovalAuthority = "Final Approving Authority";
+			public static string AddAComment = "Add a Comment";
+			public static string Move = "Move";
+		}
 
-        public class ActionModel
+		public static class ROLE
+		{
+			public static string AD = "AD";
+			public static string Admin = "Admin";
+			public static string Company = "Company";
+			public static string DD = "DD";
+			public static string ExecutiveCommissioner = "Executive Commissioner";
+			public static string FinalApproval = "Final Approval";
+			public static string Reviewer = "Reviewer";
+			public static string SuperAdmin = "SuperAdmin";
+			public static string Supervisor = "Supervisor";
+			public static string WPAMGR = "WPA MGR";
+        }
+		
+
+		public static string CurrencyNGN = "NGN";
+		public static string CurrencyUSD = "USD";
+
+		public struct Currency { 
+			public static string NGN = "NGN";
+			public static string USD = "USD";
+		}
+
+		public class ActionModel
 		{
 			public string[] selectedApps { get; set; }
 			public string[] SBU_IDs { get; set; }
@@ -2481,8 +2525,8 @@ namespace Backend_UMR_Work_Program.Models
 			public const string DuplicatePassword = "14";
 			public const string OtpExpired = "15";
 			public const string ExtraPaymentAlreadyExist = "16";
-
-
+			public const string MissingParameter = "17";
+			public const string InvalidParameterPassed = "18";
 		}
 		public class ResponseCodes
 		{

@@ -41,7 +41,6 @@ namespace Backend_UMR_Work_Program.Controllers.Authentications
             _configuration = configuration;
             _mapper = mapper;
             _account = account;
-            _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
             _mapper = mapper;
         }
 
@@ -342,8 +341,6 @@ namespace Backend_UMR_Work_Program.Controllers.Authentications
                     result = "Password not change. " + res.msg;
                 }
             }
-
-            //_helpersController.LogMessages("Result for user changing password " + result, _helpersController.getSessionEmail());
 
             return Json(result);
             }

@@ -23,24 +23,20 @@ namespace Backend_UMR_Work_Program.Controllers
         private Account _account;
         public WKP_DBContext _context;
         public IConfiguration _configuration;
-        HelpersController _helpersController;
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private BlobService blobService;
 
-        public WorkProgrammeController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper, BlobService blobservice)
+        public WorkProgrammeController(WKP_DBContext context, IConfiguration configuration, IMapper mapper, BlobService blobservice)
         {
             _context = context;
             _configuration = configuration;
             _mapper = mapper;
-            _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
             blobService = blobservice;
             GeneralModel.Insert = GeneralModel.Insert.ToLower().Trim();
             GeneralModel.Delete = GeneralModel.Delete.ToLower().Trim();
             GeneralModel.Update = GeneralModel.Update.ToLower().Trim();
         }
-        //Added by Musa for Testing
-        //private string WKPCompanyId = GeneralModel.CompanyId;
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -367,7 +363,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         field.isEditable = true;
                         if (checkApplication != null)
                         {
-                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.Initiated).FirstOrDefaultAsync();
+                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
                             if (NRejectApp == null)
                                 field.isEditable = false;
                         }
@@ -13682,7 +13678,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             isEditable = true;
                             if (checkApplication != null)
                             {
-                                var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.Initiated).FirstOrDefaultAsync();
+                                var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
                                 if (NRejectApp == null)
                                     isEditable = false;
                             }
@@ -13703,7 +13699,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         isEditable = true;
                         if (checkApplication != null)
                         {
-                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.Initiated).FirstOrDefaultAsync();
+                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
                             if (NRejectApp == null)
                                 isEditable = false;
                         }

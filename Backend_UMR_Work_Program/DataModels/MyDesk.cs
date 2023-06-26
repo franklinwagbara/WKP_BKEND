@@ -4,7 +4,6 @@
 	{
 		public int DeskID { get; set; }
 		public int? ProcessID { get; set; }
-		public int StaffID { get; set; }
 		public int AppId { get; set; }
 		public int? Sort { get; set; }
 		public bool HasWork { get; set; }
@@ -18,5 +17,8 @@
 		public DateTime LastJobDate { get; set; }
 
 		public string? ProcessStatus { get; set; }
+
+		public int StaffID { get; set; }
+    	public staff Staff {get; set;}
 	}
 }
