@@ -7840,14 +7840,62 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN")]
-        public async Task<object> POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN([FromBody] NIGERIA_CONTENT_Upload_Succession_Plan nigeria_content_succession_model, string omlName, string fieldName, string year, string actionToDo)
+        public async Task<object> POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN([FromBody] NIGERIA_CONTENT_Upload_Succession_Plan nigeria_content_succession_model, string omlName, string fieldName, string year, string actionToDo, int id)
         {
             int save = 0;
+            int Id = id == 0 ? nigeria_content_succession_model.Id : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
+                if(Id > 0)
+                {
+                    var getData = (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.NIGERIA_CONTENT_Upload_Succession_Plans.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.Actual_proposed = nigeria_content_succession_model.Actual_proposed;
+                            getData.Actual_Proposed_Year = nigeria_content_succession_model.Actual_Proposed_Year;
+                            getData.Consession_Type = nigeria_content_succession_model.Consession_Type;
+                            getData.Contract_Type = nigeria_content_succession_model.Contract_Type;
+                            getData.Name_ = nigeria_content_succession_model.Name_;
+                            getData.OML_ID = nigeria_content_succession_model.OML_ID;
+                            getData.Position_Occupied_ = nigeria_content_succession_model.Position_Occupied_;
+                            getData.Terrain = nigeria_content_succession_model.Terrain;
+                            getData.Timeline_ = nigeria_content_succession_model.Timeline_;
+                            getData.Understudy_ = nigeria_content_succession_model.Understudy_;
+                            getData.Year = nigeria_content_succession_model.Year;
+
+                            _context.NIGERIA_CONTENT_Upload_Succession_Plans.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
+                }
                 #region Saving NIGERIA_CONTENT_Upload_Succession_Plans data
-                if (nigeria_content_succession_model != null)
+                else if (nigeria_content_succession_model != null)
                 {
                     var getData = (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_proposed == nigeria_content_succession_model.Actual_proposed select c).FirstOrDefault();
 
@@ -7862,29 +7910,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     nigeria_content_succession_model.Field_ID = concessionField?.Field_ID ?? null;
                     //nigeria_content_succession_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null)
-                        {
-                            nigeria_content_succession_model.Date_Created = DateTime.Now;
-                            nigeria_content_succession_model.Created_by = WKPCompanyId;
-                            await _context.NIGERIA_CONTENT_Upload_Succession_Plans.AddAsync(nigeria_content_succession_model);
-                        }
-                        else
-                        {
-                            nigeria_content_succession_model.Date_Created = getData.Date_Created;
-                            nigeria_content_succession_model.Created_by = getData.Created_by;
-                            nigeria_content_succession_model.Date_Updated = DateTime.Now;
-                            nigeria_content_succession_model.Updated_by = WKPCompanyId;
-                            _context.NIGERIA_CONTENT_Upload_Succession_Plans.Remove(getData);
-                            await _context.NIGERIA_CONTENT_Upload_Succession_Plans.AddAsync(nigeria_content_succession_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.NIGERIA_CONTENT_Upload_Succession_Plans.Remove(getData);
-                    }
-
+                    nigeria_content_succession_model.Date_Created = DateTime.Now;
+                    nigeria_content_succession_model.Created_by = WKPCompanyId;
+                    await _context.NIGERIA_CONTENT_Upload_Succession_Plans.AddAsync(nigeria_content_succession_model);
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
@@ -7896,10 +7924,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     else
                     {
                         return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
                     }
                 }
-
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
 
