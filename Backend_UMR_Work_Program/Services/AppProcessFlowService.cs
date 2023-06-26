@@ -3,6 +3,7 @@ using Backend_UMR_Work_Program.Controllers;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
 using LinqToDB;
+using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Services
 {
@@ -25,6 +26,8 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
+                var typeOfPayment = await _dbContext.TypeOfPayments.Where(x => x.Id == TypeOfPaymentId).FirstOrDefaultAsync();
+
                 //Add fee for payment by company
                 await _paymentService.AddPayment(new AppPaymentViewModel
                 {
@@ -38,8 +41,8 @@ namespace Backend_UMR_Work_Program.Services
                 });
 
                 //update application status
-                app.Status = GeneralModel.APPLICATION_STATUS.SentBackToCompany;
-                app.PaymentStatus = GeneralModel.APPLICATION_STATUS.PaymentPending;
+                //app.Status = GeneralModel.APPLICATION_STATUS.SentBackToCompany;
+                app.PaymentStatus = typeOfPayment.Name == TYPE_OF_FEE.NoFee? app.PaymentStatus : PAYMENT_STATUS.PaymentPending;
                 app.UpdatedAt= DateTime.Now;
 
                 _dbContext.Applications.Update(app);   

@@ -62,7 +62,7 @@ namespace Backend_UMR_Work_Program.Services
                     AmountUSD = $"{model.AmountUSD}",
                     CompanyNumber = model.CompanyNumber,
                     FieldId = model.FieldId,
-                    Status = GeneralModel.APPLICATION_STATUS.PaymentPending,
+                    Status = PAYMENT_STATUS.PaymentPending,
                     TransactionDate = DateTime.UtcNow.AddHours(1),
                     TypeOfPaymentId = model.TypeOfPayment,
                     AccountNumber = AccountNumber,
@@ -80,22 +80,30 @@ namespace Backend_UMR_Work_Program.Services
             
         }
 
-        public async Task<string> UpdatePaymentAfterRRRGeneration(string rrr, string transactionId, Application app, string orderId, string? paymentCategory = null)
+        public async Task<string> UpdatePaymentAfterRRRGeneration(string rrr, string transactionId, Application app, string orderId)
         {
             try
             {
-                paymentCategory ??= GeneralModel.APPLICATION_STATUS.MainPayment;
+                var payment = await _context.Payments.Include(
+                    x => x.PaymentType)
+                    .FirstOrDefaultAsync(
+                        x => x.AppId == app.Id && 
+                        x.OrderId == orderId);
 
-                var payment = await _context.Payments.Include(x => x.PaymentType).FirstOrDefaultAsync(x => x.AppId == app.Id && x.PaymentType.Category == GeneralModel.APPLICATION_STATUS.MainPayment);
+                //var payment = await _context.Payments.Include(
+                //    x => x.PaymentType)
+                //    .FirstOrDefaultAsync(
+                //        x => x.AppId == app.Id &&
+                //        x.PaymentType.Category == GeneralModel.APPLICATION_STATUS.MainPayment);
 
                 if (payment != null)
                 {
                     payment.RRR = rrr;
                     payment.TransactionId = transactionId;
                     payment.TransactionDate = DateTime.Now;
-                    payment.Currency = GeneralModel.Currency.NGN;
+                    payment.Currency = Currency.NGN;
                     payment.OrderId = orderId;
-                    app.Status = GeneralModel.APPLICATION_STATUS.PaymentPending;
+                    app.PaymentStatus = PAYMENT_STATUS.PaymentPending;
 
                     await _context.SaveChangesAsync();
                     return payment.RRR;
@@ -113,14 +121,14 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Category == GeneralModel.APPLICATION_STATUS.MainPayment).ToListAsync();
+                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Category == PAYMENT_CATEGORY.MainPayment).ToListAsync();
 
                 //Check if there is late payment fine
                 var lateFine = await _context.LateSubmission.Where(x => x.Late == true).FirstOrDefaultAsync();
 
                 if (lateFine != null && lateFine.Late == true)
                 {
-                    var lateFee = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Name.Equals(GeneralModel.APPLICATION_STATUS.LateSubmissionFee)).FirstOrDefaultAsync();
+                    var lateFee = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Name.Equals(TYPE_OF_FEE.LateSubmissionFee)).FirstOrDefaultAsync();
                     if (lateFee != null)
                     {
                         if (!fees.Contains(lateFee))
@@ -145,11 +153,11 @@ namespace Backend_UMR_Work_Program.Services
             try
             {
                 var payments = await _context.Payments.Where(p => p.AppId == appId).ToListAsync();
-                var payment = payments.Where(p => p.Status == GeneralModel.APPLICATION_STATUS.PaymentPending).FirstOrDefault();
+                var payment = payments.Where(p => p.Status == PAYMENT_STATUS.PaymentPending).FirstOrDefault();
 
                 var app = await _context.Applications.Where(a => a.Id == appId).FirstOrDefaultAsync();
 
-                if (payment != null && payment.Status != GeneralModel.APPLICATION_STATUS.PaymentCompleted && !string.IsNullOrEmpty(payment.RRR))
+                if (payment != null && payment.Status != PAYMENT_STATUS.PaymentCompleted && !string.IsNullOrEmpty(payment.RRR))
                 {
                     using (var http = new HttpClient())
                     {
@@ -170,13 +178,12 @@ namespace Backend_UMR_Work_Program.Services
                                 if ((!string.IsNullOrEmpty(dic.GetValueOrDefault("message").ToString()) && dic.GetValueOrDefault("message").ToString().Equals("successful"))
                                    || (!string.IsNullOrEmpty(dic.GetValueOrDefault("status").ToString()) && dic.GetValueOrDefault("status").ToString().Equals("00")))
                                 {
-                                    payment.Status = GeneralModel.APPLICATION_STATUS.PaymentCompleted;
+                                    payment.Status = PAYMENT_STATUS.PaymentCompleted;
                                     payment.TransactionDate = Convert.ToDateTime(dic.GetValueOrDefault("transactiontime"));
                                     payment.AppReceiptId = dic.GetValueOrDefault("appreceiptid");
                                     payment.TXNMessage = "Confirmed";
                                     
-                                    app.Status = GeneralModel.APPLICATION_STATUS.PaymentCompleted;
-                                    app.PaymentStatus = GeneralModel.APPLICATION_STATUS.PaymentCompleted;
+                                    app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
 
                                     _context.Payments.Update(payment);
                                     _context.Applications.Update(app);
@@ -258,7 +265,7 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                paymentCategory ??= GeneralModel.APPLICATION_STATUS.MainPayment;
+                paymentCategory ??= PAYMENT_CATEGORY.MainPayment;
 
                 if (string.IsNullOrEmpty(serviceCharge))
                     serviceCharge = "0";
@@ -268,14 +275,14 @@ namespace Backend_UMR_Work_Program.Services
 
                 if (app == null)
                 {
-                    app = await _context.Applications.FirstOrDefaultAsync(x => x.CompanyID == companyId && x.ConcessionID == concessionId && x.FieldID == fieldId);
+                    app = await _context.Applications.FirstOrDefaultAsync(x => x.CompanyID == companyId && x.YearOfWKP == year && x.ConcessionID == concessionId && x.FieldID == fieldId);
 
                     if (app == null)
                     {
                         app = await _helperService.AddNewApplication(
                             companyId, company.EMAIL, year,
-                            concessionId, fieldId, GeneralModel.APPLICATION_STATUS.NotSubmitted,
-                            GeneralModel.APPLICATION_STATUS.PaymentPending, null, false
+                            concessionId, fieldId, MAIN_APPLICATION_STATUS.NotSubmitted,
+                            PAYMENT_STATUS.PaymentPending, null, false
                             ) as Application;
                     }
                 }
@@ -284,7 +291,7 @@ namespace Backend_UMR_Work_Program.Services
                 {
                     string orderId = null;
 
-                    if (paymentCategory == GeneralModel.APPLICATION_STATUS.OtherPayment)
+                    if (paymentCategory == PAYMENT_CATEGORY.OtherPayment)
                         orderId = _helperService.Generate_Reference_Number();
                     else
                         orderId = app.ReferenceNo;
@@ -299,7 +306,7 @@ namespace Backend_UMR_Work_Program.Services
 
                         HttpResponseMessage resp = null;
 
-                        if(paymentCategory == GeneralModel.APPLICATION_STATUS.MainPayment)
+                        if(paymentCategory == PAYMENT_CATEGORY.MainPayment)
                         {
                             //Generate RRR for main payments
                             resp = await http.SendAsync(new HttpRequestMessage(HttpMethod.Post, $"api/Payments/{company.ELPS_ID}/{_appSettings.AppEmail}/{appHash}")
@@ -325,7 +332,7 @@ namespace Backend_UMR_Work_Program.Services
                                 if (dic != null)
                                 {
                                     var rrr = await UpdatePaymentAfterRRRGeneration($"{dic.GetValueOrDefault("rrr")}"
-                                        , $"{dic.GetValueOrDefault("transactionId")}", app, orderId, paymentCategory);
+                                        , $"{dic.GetValueOrDefault("transactionId")}", app, orderId);
 
                                     if (rrr != null)
                                     {
@@ -350,7 +357,7 @@ namespace Backend_UMR_Work_Program.Services
                                         var res = await AddPayment(newPayment);
 
                                         rrr = await UpdatePaymentAfterRRRGeneration($"{dic.GetValueOrDefault("rrr")}"
-                                                , $"{dic.GetValueOrDefault("transactionId")}", app, orderId, paymentCategory);
+                                                , $"{dic.GetValueOrDefault("transactionId")}", app, orderId);
 
                                         if (res == true && rrr != null)
                                         {
