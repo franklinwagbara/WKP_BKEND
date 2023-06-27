@@ -382,8 +382,8 @@ namespace Backend_UMR_Work_Program.Services
                 application.CompanyID = companyId;
                 application.CurrentUserEmail = companyEmail;
                 application.CategoryID = _dbContext.ApplicationCategories.Where(x => x.Name == GeneralModel.New).FirstOrDefault().Id;
-                application.Status = status ?? GeneralModel.APPLICATION_STATUS.Processing;
-                application.PaymentStatus = paymentStatus ?? GeneralModel.APPLICATION_STATUS.PaymentPending;
+                application.Status = status ?? MAIN_APPLICATION_STATUS.NotSubmitted;
+                application.PaymentStatus = paymentStatus ?? PAYMENT_STATUS.PaymentPending;
                 application.CurrentDesk = currentDeskID ?? null; //to change
                 application.Submitted = submitted ?? false;
                 application.CreatedAt = DateTime.Now;

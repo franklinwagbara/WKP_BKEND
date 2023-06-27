@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Services
 {
@@ -30,19 +31,21 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                var types = new List<string> { 
-                    GeneralModel.APPLICATION_STATUS.SubmissionFee, 
-                    GeneralModel.APPLICATION_STATUS.LateSubmissionFee , 
-                    GeneralModel.APPLICATION_STATUS.ModificationFee };
+                var types = new List<List<string>> {
+                    new List<string>{ TYPE_OF_FEE.NoFee, PAYMENT_CATEGORY.OtherPayment },
+                    new List<string>{ TYPE_OF_FEE.SubmissionFee, PAYMENT_CATEGORY.MainPayment },
+                    new List<string>{ TYPE_OF_FEE.LateSubmissionFee, PAYMENT_CATEGORY.SecondaryPayment } , 
+                    new List<string>{ TYPE_OF_FEE.ModificationFee, PAYMENT_CATEGORY.OtherPayment }
+                    };
 
                 types.ForEach( t =>
                 {
-                    if(_dbContext.TypeOfPayments.Where(x => x.Name == t).FirstOrDefault() == null)
+                    if(_dbContext.TypeOfPayments.Where(x => x.Name == t[0]).FirstOrDefault() == null)
                     {
                         var fee = new TypeOfPayments
                         {
-                            Name = t,
-                            Category = GeneralModel.APPLICATION_STATUS.MainPayment
+                            Name = t[0],
+                            Category = t[1]
                         };
 
                         _dbContext.TypeOfPayments.Add(fee);

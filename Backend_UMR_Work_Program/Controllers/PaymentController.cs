@@ -83,7 +83,13 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             try
             {
-                var rrr = await _paymentService.GenerateRRR(appId, Convert.ToInt32(WKPCompanyNumber), Convert.ToDecimal(amountNGN), serviceCharge, concessionId, year,  fieldId, GeneralModel.APPLICATION_STATUS.MainPayment);
+                var rrr = await _paymentService.GenerateRRR(
+                    appId, 
+                    Convert.ToInt32(WKPCompanyNumber), 
+                    Convert.ToDecimal(amountNGN), 
+                    serviceCharge, concessionId, year,  
+                    fieldId, PAYMENT_CATEGORY.MainPayment);
+
                 return new WebApiResponse { Data = rrr, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception ex)
@@ -103,7 +109,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     Convert.ToDecimal(amountNGN), 
                     serviceCharge, 
                     concessionId, year, fieldId, 
-                    GeneralModel.APPLICATION_STATUS.OtherPayment);
+                    PAYMENT_CATEGORY.OtherPayment);
                 return new WebApiResponse { Data = rrr, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception ex)
