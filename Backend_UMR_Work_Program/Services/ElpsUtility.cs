@@ -22,13 +22,14 @@ namespace Backend_UMR_Work_Program.Services
 		public WKP_DBContext _context;
 		public IConfiguration _configuration;
 		IHttpContextAccessor _httpContextAccessor;
-		public ElpsUtility(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper)
+		HelperService _helperService;
+		public ElpsUtility(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper, HelperService helperService)
 		{
 			_context = context;
 			_configuration = configuration;
 			//_appSettings=appSettings;
 			_mapper = mapper;
-			_helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
+			_helperService = helperService;
 		}
 		public async Task<WebApiResponse> ValidateLogin(string email, string code, WKP_DBContext _context, AppSettings appSettings, WebApiResponse webApiResponse)
 		{

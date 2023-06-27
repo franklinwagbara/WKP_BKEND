@@ -19,6 +19,8 @@ public partial class WKP_DBContext : DbContext
         _configuration = configuration;
     }
 
+    public virtual DbSet<LateSubmission> LateSubmission { get; set; }
+    public virtual DbSet<Fee> Fees { get; set; }
     public virtual DbSet<TypeOfPayments> TypeOfPayments { get; set; }
     public virtual DbSet<Payments> Payments { get; set; }
     public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals { get; set; }

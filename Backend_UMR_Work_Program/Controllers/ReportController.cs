@@ -17,7 +17,6 @@ namespace Backend_UMR_Work_Program.Controllers
         private Account _account;
         public WKP_DBContext _context;
         public IConfiguration _configuration;
-        HelpersController _helpersController;
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
@@ -28,12 +27,7 @@ namespace Backend_UMR_Work_Program.Controllers
             _context = context;
             _configuration = configuration;
             _mapper = mapper;
-            _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
         }
-        //private string? WKPCompanyId => "221";
-        //private string? WKPCompanyName => "Name";
-        //private string? WKPCompanyEmail => "adeola.kween123@gmail.com";
-        //private string? WKUserRole => "Admin";
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
@@ -1744,7 +1738,6 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("CONCESSIONSINFORMATION")]
         public async Task<WebApiResponse> Get_ADMIN_CONCESSIONS_INFORMATION_BY_CURRENT_YEAR(string year)
         {
-
             try
             {
                 var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
@@ -3245,6 +3238,104 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+        [HttpGet("HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU")]
+        public async Task<WebApiResponse> HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU(string year)
+        {
+            var ResultData = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU>();
+            try
+            {
+                if (WKUserRole == GeneralModel.Admin)
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
+                else
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        [HttpGet("HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEME")]
+        public async Task<WebApiResponse> Hse_Sustainable_Development_Community_Project_Program_Training_Scheme(string year)
+        {
+            var ResultData = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEME>();
+            try
+            {
+                if (WKUserRole == GeneralModel.Admin)
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
+
+                else
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+            }
+
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        [HttpGet("HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTION")]
+        public async Task<WebApiResponse> HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTION(string year)
+        {
+            var ResultData = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTION>();
+            try
+            {
+                if (WKUserRole == GeneralModel.Admin)
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
+
+                else
+                {
+                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+            }
+
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        [HttpGet("NIGERIA_CONTENT_QUESTION")]
+        public async Task<WebApiResponse> NIGERIA_CONTENT_QUESTION(string year)
+        {
+            var ResultData = new List<NIGERIA_CONTENT_QUESTION>();
+            try
+            {
+                if (WKUserRole == GeneralModel.Admin)
+                {
+                    ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
+
+                else
+                {
+                    ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+            }
+
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
         [HttpGet("EXECUTIVE_SUMMARY_REPORT2")]
         public async Task<WebApiResponse> EXECUTIVE_SUMMARY(string year)
         {
@@ -3294,5 +3385,209 @@ namespace Backend_UMR_Work_Program.Controllers
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
             }
         }
+
+        /// <summary>
+        /// Endpoint to get the HSE remediation fund
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("remediation_fund")]
+        public async Task<WebApiResponse> Get_remediation_fund([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_REMEDIATION_FUND>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.Where(c => c.Company_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE effluent_compliance_monitoring
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("effluent_compliance_monitoring")]
+        public async Task<WebApiResponse> Get_effluent_compliance_monitoring([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_EFFLUENT_MONITORING_COMPLIANCE>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE point_source_registration
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("point_source_registration")]
+        public async Task<WebApiResponse> Get_point_source_registration([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_POINT_SOURCE_REGISTRATION>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.Where(c => c.Company_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE GHG_management_plan
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("GHG_management_plan")]
+        public async Task<WebApiResponse> Get_GHG_management_plan([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_GHG_MANAGEMENT_PLAN>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.Where(c => c.CompanY_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE host_communities_development
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("host_communities_development")]
+        public async Task<WebApiResponse> Get_host_communities_development([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_HOST_COMMUNITIES_DEVELOPMENT>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE scholarship_scheme
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("scholarship_scheme")]
+        public async Task<WebApiResponse> Get_scholarship_scheme([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
+        /// <summary>
+        /// Endpoint to get the HSE sustainable_development_community_project_planned_and_actuals
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        [HttpGet("sustainable_development_community_project_planned_and_actuals")]
+        public async Task<WebApiResponse> Get_sustainable_development_community_project_planned_and_actuals([FromQuery] string? year)
+        {
+            try
+            {
+                var dateYear = DateTime.Now.AddYears(0).ToString("yyyy");
+                var ConcessionsInformation = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL>();
+
+                if (WKUserRole == GeneralModel.Admin)
+                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.ToListAsync();
+                else
+                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
+
+                if (!string.IsNullOrEmpty(year))
+                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error :  " + e.Message, StatusCode = ResponseCodes.InternalError }; ;
+            }
+        }
+
     }
 }

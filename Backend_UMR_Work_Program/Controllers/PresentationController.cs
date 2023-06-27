@@ -19,7 +19,6 @@ namespace Backend_UMR_Work_Program.Controllers
 		private Presentation _presentation;
 		public WKP_DBContext _context;
 		public IConfiguration _configuration;
-		HelpersController _helpersController;
 		IHttpContextAccessor _httpContextAccessor;
 		IMapper _mapper;
 		private BlobService blobService;
@@ -29,7 +28,6 @@ namespace Backend_UMR_Work_Program.Controllers
 			_context = context;
 			_configuration = configuration;
 			_mapper = mapper;
-			_helpersController = new HelpersController(_context, configuration, _httpContextAccessor, _mapper);
 			this.blobService = blobservice;
 		}
 
@@ -355,7 +353,7 @@ namespace Backend_UMR_Work_Program.Controllers
 						Year_of_WP = year,
 						uploaded_presentation = uploadedDocument,
 						upload_extension = "." + document_FileExtension,
-						original_filemane = document.Name,
+						original_filemane = document.FileName.Split(".")[0].Trim(),
 						Created_by = WKPUserEmail,
 						Date_Created = DateTime.Now,
 					};

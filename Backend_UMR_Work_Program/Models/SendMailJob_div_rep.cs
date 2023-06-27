@@ -249,7 +249,7 @@ namespace Backend_UMR_Work_Program
             message.Body = mailbody;
             message.BodyEncoding = Encoding.UTF8;
             message.IsBodyHtml = true;
-            SmtpClient client = new SmtpClient("email-smtp.us-west-2.amazonaws.com", 25); //Gmail smtp    
+            SmtpClient client = new SmtpClient("email-smtp.us-east-2.amazonaws.com", 587); //Gmail smtp    
             System.Net.NetworkCredential basicCredential1 = new
             System.Net.NetworkCredential("AKIAQCM2OPFBW35OSTFV", "BNW5He3DoWQAJVMkeMlEzPTtbYIXNveS4t+GuGtXzxQJ");
             client.EnableSsl = true;

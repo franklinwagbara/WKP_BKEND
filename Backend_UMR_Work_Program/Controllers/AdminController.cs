@@ -2,6 +2,7 @@
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Models;
+using Backend_UMR_Work_Program.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,18 +24,18 @@ namespace Backend_UMR_Work_Program.Controllers
 		private Account _account;
 		public WKP_DBContext _context;
 		public IConfiguration _configuration;
-		HelpersController _helpersController;
 		IHttpContextAccessor _httpContextAccessor;
 		private readonly IMapper _mapper;
-		RestSharpServices _restSharpServices = new RestSharpServices();
+        private readonly HelperService _helperService;
+        RestSharpServices _restSharpServices = new RestSharpServices();
 
-		public AdminController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper)
+		public AdminController(WKP_DBContext context, IConfiguration configuration, IMapper mapper, HelperService helperService)
 		{
 			_context = context;
 			_configuration = configuration;
 			_mapper = mapper;
-			_helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
-		}
+            _helperService = helperService;
+        }
 		private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 		private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
 		private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
@@ -693,7 +694,7 @@ namespace Backend_UMR_Work_Program.Controllers
 					var data = _mapper.Map<ADMIN_COMPANY_INFORMATION>(userModel);
 
 					data.EMAIL = userModel.EMAIL.ToLower();
-					data.PASSWORDS = _helpersController.Encrypt(userModel.PASSWORDS);
+					data.PASSWORDS = _helperService.Encrypt(userModel.PASSWORDS);
 					data.STATUS_ = "Activated";
 					data.Date_Created = DateTime.Now;
 					data.Created_by = WKPCompanyEmail;
@@ -1055,7 +1056,7 @@ namespace Backend_UMR_Work_Program.Controllers
 					var data = _mapper.Map<ADMIN_COMPANY_INFORMATION>(userModel);
 
 					data.EMAIL = userModel.EMAIL.ToLower();
-					data.PASSWORDS = _helpersController.Encrypt(userModel.PASSWORDS);
+					data.PASSWORDS = _helperService.Encrypt(userModel.PASSWORDS);
 					data.STATUS_ = "Activated";
 					data.UPDATED_DATE = DateTime.Now.ToString();
 					data.UPDATED_BY = WKPCompanyEmail;

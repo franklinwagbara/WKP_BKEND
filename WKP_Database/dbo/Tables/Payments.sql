@@ -9,8 +9,8 @@
     [AmountNGN] NVARCHAR(MAX) NOT NULL, 
     [AmountUSD] NVARCHAR(MAX) NOT NULL, 
     [TransactionDate] DATETIME2 NOT NULL, 
-    [TransactionId] INT NULL, 
-    [RRR] INT NULL, 
+    [TransactionId] NVARCHAR(MAX) NULL, 
+    [RRR] NVARCHAR(MAX) NULL, 
     [Description] NVARCHAR(MAX) NULL, 
     [AppReceiptId] NVARCHAR(MAX) NULL, 
     [TXNMessage] NVARCHAR(MAX) NULL, 
@@ -19,5 +19,9 @@
     [Status] NVARCHAR(MAX) NULL, 
     [Currency] NVARCHAR(MAX) NULL, 
     [PaymentDate] NVARCHAR(MAX) NULL,
+    [RemitaRequest] NVARCHAR(MAX) NULL, 
+    [RemitaResponse] NVARCHAR(MAX) NULL, 
+    [OrderId] NVARCHAR(MAX) NULL, 
+    [ServiceCharge] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_PAYMENTS] PRIMARY KEY CLUSTERED ([ID] ASC)
 );

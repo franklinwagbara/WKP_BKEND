@@ -3,6 +3,7 @@ using Backend_UMR_Work_Program.Controllers;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
 using LinqToDB;
+using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Services
 {
@@ -11,15 +12,13 @@ namespace Backend_UMR_Work_Program.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
         private readonly WKP_DBContext _dbContext;
-        private readonly HelpersController _helpersController;
         private readonly PaymentService _paymentService;
 
-        public AppProcessFlowService(IMapper mapper, IConfiguration config, WKP_DBContext dbContext, HelpersController helpersController, PaymentService paymentService)
+        public AppProcessFlowService(IMapper mapper, IConfiguration config, WKP_DBContext dbContext, PaymentService paymentService)
         {
             _mapper = mapper;
             _config = config;
             _dbContext = dbContext;
-            _helpersController = helpersController;
             _paymentService = paymentService;
         }
 
@@ -27,12 +26,14 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
+                var typeOfPayment = await _dbContext.TypeOfPayments.Where(x => x.Id == TypeOfPaymentId).FirstOrDefaultAsync();
+
                 //Add fee for payment by company
                 await _paymentService.AddPayment(new AppPaymentViewModel
                 {
                     AppId = app.Id,
                     CompanyNumber = Company.Id,
-                    ConcessionId = app.ConcessionID,
+                    ConcessionId = (int)app.ConcessionID,
                     FieldId = app.FieldID,
                     TypeOfPayment = TypeOfPaymentId,
                     AmountNGN = AmountNGN,
@@ -40,8 +41,8 @@ namespace Backend_UMR_Work_Program.Services
                 });
 
                 //update application status
-                app.Status = GeneralModel.SentBackToCompany;
-                app.PaymentStatus = GeneralModel.PaymentPending;
+                //app.Status = GeneralModel.APPLICATION_STATUS.SentBackToCompany;
+                app.PaymentStatus = typeOfPayment.Name == TYPE_OF_FEE.NoFee? app.PaymentStatus : PAYMENT_STATUS.PaymentPending;
                 app.UpdatedAt= DateTime.Now;
 
                 _dbContext.Applications.Update(app);   
@@ -76,6 +77,18 @@ namespace Backend_UMR_Work_Program.Services
                 }
 
                 return RejectedTables;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<List<ApplicationProccess>> GetApplicationProccessByAction(string processAction)
+        {
+            try
+            {
+                return await _dbContext.ApplicationProccesses.Where(x => x.ProcessAction == processAction).ToListAsync();
             }
             catch (Exception ex)
             {
