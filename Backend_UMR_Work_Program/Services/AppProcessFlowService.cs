@@ -38,6 +38,7 @@ namespace Backend_UMR_Work_Program.Services
                     TypeOfPayment = TypeOfPaymentId,
                     AmountNGN = AmountNGN,
                     AmountUSD = AmountUSD,
+                    ServiceCharge = "0"
                 });
 
                 //update application status
