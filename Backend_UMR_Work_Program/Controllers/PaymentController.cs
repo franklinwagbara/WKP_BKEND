@@ -27,7 +27,13 @@ namespace Backend_UMR_Work_Program.Controllers
         private readonly ApplicationService _applicationService;
         public IHttpContextAccessor _httpContext;
         private readonly AppSettings _appSettings;
-        
+
+        private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
+        private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
+        private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
+        private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
+        private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
+
         public PaymentController(WKP_DBContext context, IConfiguration configuration, 
             IMapper mapper, IHttpContextAccessor httpAccessor, 
             IOptions<AppSettings> appsettings, PaymentService paymentService,
@@ -42,12 +48,6 @@ namespace Backend_UMR_Work_Program.Controllers
             _appSettings = appsettings.Value;
         }
 
-        private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
-        private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
-        private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
-        private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
-
-        private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
 
         [HttpGet("GET_TYPE_OF_PAYMENTS")]
         public async Task<object> Get_Type_Of_Payments()
