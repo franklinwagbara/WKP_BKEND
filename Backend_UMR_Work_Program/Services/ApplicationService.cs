@@ -68,16 +68,16 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
-        public bool AddCommentToApplication(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId)
+        public async Task<WebApiResponse> AddCommentToApplication(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId)
         {
             try
             {
                 _helperService.SaveApplicationHistory(appId, staffId, status, comment, selectedTables, actionByCompany, companyId, PROCESS_CONSTANTS.AddAComment);
-                return true;
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = true, Message = "Success", StatusCode = ResponseCodes.Success };
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
             }
         }
 
@@ -572,11 +572,9 @@ namespace Backend_UMR_Work_Program.Services
                 var staffDesk = await _dbContext.MyDesks.Where(x => x.DeskID == deskId).FirstOrDefaultAsync();
                 var app = await _dbContext.Applications.Where(x => x.Id == staffDesk.AppId).FirstOrDefaultAsync();
 
-                staffDesk.ProcessStatus = (staffDesk?.ProcessStatus == DESK_PROCESS_STATUS.SubmittedByStaff 
-                    || staffDesk?.ProcessStatus == DESK_PROCESS_STATUS.SubmittedByCompany) ? DESK_PROCESS_STATUS.Processing : staffDesk?.ProcessStatus;
+                staffDesk.ProcessStatus = _helperService.IsIncomingDeskStatus(staffDesk.ProcessStatus) ? DESK_PROCESS_STATUS.Processing : staffDesk.ProcessStatus;
 
-                app.Status = (app.Status == DESK_PROCESS_STATUS.SubmittedByStaff
-                    || app.Status == DESK_PROCESS_STATUS.SubmittedByCompany) ? DESK_PROCESS_STATUS.Processing : app.Status;
+                app.Status = _helperService.IsIncomingDeskStatus(app.Status) ? DESK_PROCESS_STATUS.Processing : app.Status;
 
                 _dbContext.MyDesks.Update(staffDesk);
                 _dbContext.Applications.Update(app);
@@ -803,7 +801,7 @@ namespace Backend_UMR_Work_Program.Services
                             string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                             string content = $"{WKPCompanyName} returned WORK PROGRAM application for year {application.YearOfWKP}.";
                             var emailMsg = _helperService.SaveMessage(application.Id, currentStaff.StaffID, subject, content, "Staff");
-                            var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.FirstName, emailMsg, null);
+                            //var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.FirstName, emailMsg, null);
 
                             _helperService.LogMessages("Returned application with REF : " + application.ReferenceNo, WKPCompanyEmail);
                         }

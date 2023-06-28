@@ -646,6 +646,14 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
+        public List<string> GetListOfIncomingDeskStatuses()
+            => new List<string> {
+                DESK_PROCESS_STATUS.FinalAuthorityApproved,
+                DESK_PROCESS_STATUS.SubmittedByCompany,
+                DESK_PROCESS_STATUS.SubmittedByStaff
+            };
+
+        public bool IsIncomingDeskStatus(string status) => GetListOfIncomingDeskStatuses().Contains(status);
 
         //public string GetActionCommentByRole(string role)
         //{
