@@ -10475,12 +10475,9 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU"), DisableRequestSizeLimit]
         public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU([FromForm] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU hse_sustainable_model, string year, int id, string actionToDo)
         {
-
             int save = 0;
             int Id = id == 0 ? (hse_sustainable_model != null ? hse_sustainable_model.Id : 0) : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
-            //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
             try
             {
                 if (id > 0)
@@ -10599,7 +10596,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
 
                 }
-
             }
             catch (Exception e)
             {
@@ -10610,7 +10606,6 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW")]
         public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW hse_sustainable_model, string omlName, string fieldName, string year, int id, string actionToDo)
         {
-
             int save = 0;
             int Id = id == 0 ? hse_sustainable_model.Id : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
