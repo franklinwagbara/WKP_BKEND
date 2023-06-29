@@ -17,6 +17,7 @@
     [SelectedTables] NVARCHAR(MAX) NULL, 
     [ActionByCompany] BIT NULL, 
     [CompanyId] INT NULL, 
+    [isPublic] BIT NULL, 
     CONSTRAINT [PK_ApplicationDeskHistories] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

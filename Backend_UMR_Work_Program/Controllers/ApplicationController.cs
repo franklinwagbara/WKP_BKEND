@@ -108,8 +108,10 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpPost("ADD_COMMENT_BY_COMPANY")]
         public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
-            => await _applicationService.AddCommentToApplication(appId, staffId, null, comment, selectedTables, true, WKPCompanyNumber);
+            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
 
+        [HttpGet("GET_SENDBACK_COMMENTS_PUBLIC")]
+        public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId) => await _applicationService.GetReturnToCompanyComments(appId);
 
         //Rework
         [HttpGet("All-Applications")] //For general application view
@@ -3481,20 +3483,5 @@ namespace Backend_UMR_Work_Program.Controllers
         #endregion
 
        
-        //Rework
-        [HttpGet("GET_SENDBACK_COMMENTS")]
-        public async Task<object> GET_SENDBACK_COMMENTS(int appId)
-        {
-            try
-            {
-                return await _applicationService.GetReturnToCompanyComments(appId);
-            }
-            catch (Exception ex)
-            {
-
-                return BadRequest(new { message = "Error: " + ex.Message });
-            }
-        }
-
     }
 }
