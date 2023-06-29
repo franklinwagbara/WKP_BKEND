@@ -13,16 +13,14 @@ namespace Backend_UMR_Work_Program.Controllers
         //private Account _account;
         public WKP_DBContext _context;
         public IConfiguration _configuration;
-        HelpersController _helpersController;
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public TableController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper)
+        public TableController(WKP_DBContext context, IConfiguration configuration, IMapper mapper)
         {
             _context = context;
             _configuration = configuration;
             _mapper = mapper;
-            _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using Backend_UMR_Work_Program.Services;
 using Backend_UMR_Work_Program.ViewModels;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office2010.Excel;
@@ -23,31 +24,37 @@ namespace Backend_UMR_Work_Program.Controllers
         private Account _account;
         public WKP_DBContext _context;
         public IConfiguration _configuration;
-        HelpersController _helpersController;
         IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private BlobService blobService;
-
-        public WorkProgrammeController(WKP_DBContext context, IConfiguration configuration, HelpersController helpersController, IMapper mapper, BlobService blobservice)
-        {
-            _context = context;
-            _configuration = configuration;
-            _mapper = mapper;
-            _helpersController = new HelpersController(_context, _configuration, _httpContextAccessor, _mapper);
-            blobService = blobservice;
-            GeneralModel.Insert = GeneralModel.Insert.ToLower().Trim();
-            GeneralModel.Delete = GeneralModel.Delete.ToLower().Trim();
-            GeneralModel.Update = GeneralModel.Update.ToLower().Trim();
-        }
-        //Added by Musa for Testing
-        //private string WKPCompanyId = GeneralModel.CompanyId;
+        private readonly WorkProgrammeService _workProgrammeService;
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
         private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
         private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
         private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
+
+        public WorkProgrammeController(WKP_DBContext context, IConfiguration configuration, IMapper mapper, BlobService blobservice, WorkProgrammeService workProgrammeService)
+        {
+            _context = context;
+            _configuration = configuration;
+            _mapper = mapper;
+            blobService = blobservice;
+            _workProgrammeService = workProgrammeService;
+
+            GeneralModel.Insert = GeneralModel.Insert.ToLower().Trim();
+            GeneralModel.Delete = GeneralModel.Delete.ToLower().Trim();
+            GeneralModel.Update = GeneralModel.Update.ToLower().Trim();
+        }
+
+
+        [HttpGet("CanDeleteConcession")]
+        public async Task<WebApiResponse> CanDeleteConcession(int concessionId) => await _workProgrammeService.CanDeleteConcession(concessionId);
+
+        [HttpGet("CanDeleteField")]
+        public async Task<WebApiResponse> CanDeleteField(int FieldId) => await _workProgrammeService.CanDeleteField(FieldId);
+
 
         [HttpGet("GETWORKPROGRAMYEARS")]
         public object GETWORKPROGRAMYEARS()
@@ -367,7 +374,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         field.isEditable = true;
                         if (checkApplication != null)
                         {
-                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.Initiated).FirstOrDefaultAsync();
+                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
                             if (NRejectApp == null)
                                 field.isEditable = false;
                         }
@@ -7833,14 +7840,62 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN")]
-        public async Task<object> POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN([FromBody] NIGERIA_CONTENT_Upload_Succession_Plan nigeria_content_succession_model, string omlName, string fieldName, string year, string actionToDo)
+        public async Task<object> POST_NIGERIA_CONTENT_UPLOAD_SUCCESSION_PLAN([FromBody] NIGERIA_CONTENT_Upload_Succession_Plan nigeria_content_succession_model, string omlName, string fieldName, string year, string actionToDo, int id)
         {
             int save = 0;
+            int Id = id == 0 ? nigeria_content_succession_model.Id : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
+                if(Id > 0)
+                {
+                    var getData = (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.NIGERIA_CONTENT_Upload_Succession_Plans.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.Actual_proposed = nigeria_content_succession_model.Actual_proposed;
+                            getData.Actual_Proposed_Year = nigeria_content_succession_model.Actual_Proposed_Year;
+                            getData.Consession_Type = nigeria_content_succession_model.Consession_Type;
+                            getData.Contract_Type = nigeria_content_succession_model.Contract_Type;
+                            getData.Name_ = nigeria_content_succession_model.Name_;
+                            getData.OML_ID = nigeria_content_succession_model.OML_ID;
+                            getData.Position_Occupied_ = nigeria_content_succession_model.Position_Occupied_;
+                            getData.Terrain = nigeria_content_succession_model.Terrain;
+                            getData.Timeline_ = nigeria_content_succession_model.Timeline_;
+                            getData.Understudy_ = nigeria_content_succession_model.Understudy_;
+                            getData.Year = nigeria_content_succession_model.Year;
+
+                            _context.NIGERIA_CONTENT_Upload_Succession_Plans.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
+                }
                 #region Saving NIGERIA_CONTENT_Upload_Succession_Plans data
-                if (nigeria_content_succession_model != null)
+                else if (nigeria_content_succession_model != null)
                 {
                     var getData = (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_proposed == nigeria_content_succession_model.Actual_proposed select c).FirstOrDefault();
 
@@ -7855,29 +7910,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     nigeria_content_succession_model.Field_ID = concessionField?.Field_ID ?? null;
                     //nigeria_content_succession_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null)
-                        {
-                            nigeria_content_succession_model.Date_Created = DateTime.Now;
-                            nigeria_content_succession_model.Created_by = WKPCompanyId;
-                            await _context.NIGERIA_CONTENT_Upload_Succession_Plans.AddAsync(nigeria_content_succession_model);
-                        }
-                        else
-                        {
-                            nigeria_content_succession_model.Date_Created = getData.Date_Created;
-                            nigeria_content_succession_model.Created_by = getData.Created_by;
-                            nigeria_content_succession_model.Date_Updated = DateTime.Now;
-                            nigeria_content_succession_model.Updated_by = WKPCompanyId;
-                            _context.NIGERIA_CONTENT_Upload_Succession_Plans.Remove(getData);
-                            await _context.NIGERIA_CONTENT_Upload_Succession_Plans.AddAsync(nigeria_content_succession_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.NIGERIA_CONTENT_Upload_Succession_Plans.Remove(getData);
-                    }
-
+                    nigeria_content_succession_model.Date_Created = DateTime.Now;
+                    nigeria_content_succession_model.Created_by = WKPCompanyId;
+                    await _context.NIGERIA_CONTENT_Upload_Succession_Plans.AddAsync(nigeria_content_succession_model);
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
@@ -7889,10 +7924,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     else
                     {
                         return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
                     }
                 }
-
                 return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 #endregion
 
@@ -10442,12 +10475,9 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU"), DisableRequestSizeLimit]
         public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU([FromForm] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU hse_sustainable_model, string year, int id, string actionToDo)
         {
-
             int save = 0;
             int Id = id == 0 ? (hse_sustainable_model != null ? hse_sustainable_model.Id : 0) : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
-            //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
             try
             {
                 if (id > 0)
@@ -10566,7 +10596,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
 
                 }
-
             }
             catch (Exception e)
             {
@@ -10577,28 +10606,62 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW")]
         public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW hse_sustainable_model, string omlName, string fieldName, string year, int id, string actionToDo)
         {
-
             int save = 0;
-            int Id = hse_sustainable_model.Id;
+            int Id = id == 0 ? hse_sustainable_model.Id : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (id > 0 && action == GeneralModel.Delete)
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.Id == id select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
+                            save += await _context.SaveChangesAsync();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Delete)
-                        _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                    save += _context.SaveChanges();
+                            getData.Actual_proposed = hse_sustainable_model.Actual_proposed;
+                            getData.Actual_Spent = hse_sustainable_model.Actual_Spent;
+                            getData.Beneficiary_Communities = hse_sustainable_model.Beneficiary_Communities;
+                            getData.Budget_ = hse_sustainable_model.Budget_;
+                            getData.Consession_Type = hse_sustainable_model.Consession_Type;
+                            getData.Contract_Type = hse_sustainable_model.Contract_Type;
+                            getData.CSR_ = hse_sustainable_model.CSR_;
+                            getData.OML_ID = hse_sustainable_model.OML_ID;
+                            getData.Percentage_Completion_ = hse_sustainable_model.Percentage_Completion_;
+                            getData.Terrain = hse_sustainable_model.Terrain;
+
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
                 }
                 else if (hse_sustainable_model != null)
                 {
-                    HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW getData;
-
-                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_Proposed_Year == hse_sustainable_model.Actual_Proposed_Year select c).FirstOrDefaultAsync();
-
                     hse_sustainable_model.Companyemail = WKPCompanyEmail;
                     hse_sustainable_model.CompanyName = WKPCompanyName;
                     hse_sustainable_model.COMPANY_ID = WKPCompanyId;
@@ -10610,42 +10673,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     //hse_sustainable_model.Field_ID = concessionField?.Field_ID ?? null;
                     //hse_sustainable_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        //if (getData == null)
-                        //{
-
-                        if (getData == null)
-                        {
-                            hse_sustainable_model.Date_Created = DateTime.Now;
-                            hse_sustainable_model.Created_by = WKPCompanyId;
-                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
-                        }
-                        else
-                        {
-                            hse_sustainable_model.Date_Created = DateTime.Now;
-                            hse_sustainable_model.Created_by = WKPCompanyId;
-
-                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
-                        }
-
-                        // }
-                        // else
-                        // {
-                        // 	hse_sustainable_model.Date_Created = getData.Date_Created;
-                        // 	hse_sustainable_model.Created_by = getData.Created_by;
-                        // 	hse_sustainable_model.Date_Updated = DateTime.Now;
-                        // 	hse_sustainable_model.Updated_by = WKPCompanyId;
-                        // 	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                        // 	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
-                        // }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                    }
-
+                    hse_sustainable_model.Date_Created = DateTime.Now;
+                    hse_sustainable_model.Created_by = WKPCompanyId;
+                    await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
                     save += await _context.SaveChangesAsync();
 
                 }
@@ -10662,7 +10692,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 else
                 {
                     return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
                 }
 
             }
@@ -13656,7 +13685,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             isEditable = true;
                             if (checkApplication != null)
                             {
-                                var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.Initiated).FirstOrDefaultAsync();
+                                var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
                                 if (NRejectApp == null)
                                     isEditable = false;
                             }
@@ -13677,7 +13706,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         isEditable = true;
                         if (checkApplication != null)
                         {
-                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.Initiated).FirstOrDefaultAsync();
+                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
                             if (NRejectApp == null)
                                 isEditable = false;
                         }
