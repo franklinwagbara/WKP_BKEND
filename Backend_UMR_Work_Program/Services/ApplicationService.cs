@@ -47,32 +47,31 @@ namespace Backend_UMR_Work_Program.Services
         //    }
         //}
 
-        public async Task<object> GetReturnToCompanyComments(int appId)
+        public async Task<WebApiResponse> GetReturnToCompanyComments(int appId)
         {
             try
             {
-                var comments = await _dbContext.ApplicationDeskHistories
+                var appHistories = await _dbContext.ApplicationDeskHistories
                     .Include(x => x.Staff)
                     .Include(x => x.Company)
                     .Where(
                         x => x.AppId == appId
-                        && x.Status != null
-                        && x.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany
+                        && x.isPublic == true
                         ).OrderByDescending(x => x.ActionDate).ToListAsync();
 
-                return comments;
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = appHistories, Message = "Success", StatusCode = ResponseCodes.Success };
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
             }
         }
 
-        public async Task<WebApiResponse> AddCommentToApplication(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId)
+        public async Task<WebApiResponse> AddCommentToApplication(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, bool? isPublic = false)
         {
             try
             {
-                _helperService.SaveApplicationHistory(appId, staffId, status, comment, selectedTables, actionByCompany, companyId, PROCESS_CONSTANTS.AddAComment);
+                _helperService.SaveApplicationHistory(appId, staffId, status, comment, selectedTables, actionByCompany, companyId, PROCESS_CONSTANTS.AddAComment, isPublic);
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = true, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -170,7 +169,7 @@ namespace Backend_UMR_Work_Program.Services
                             string emailSubject = $"{year} submission of WORK PROGRAM application for {company.COMPANY_NAME} field - {field?.Field_Name} : {app.ReferenceNo}";
                             string emailContent = $"{company.COMPANY_NAME} have submitted their WORK PROGRAM application for year {year}.";
                             var emailMessage = _helperService.SaveMessage(app.Id, staff.StaffID, emailSubject, emailContent, "Staff");
-                            //var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
+                            var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
 
                             _helperService.LogMessages("Submission of application with REF : " + app.ReferenceNo, company.EMAIL);
                         }
@@ -195,7 +194,7 @@ namespace Backend_UMR_Work_Program.Services
                     string subject = $"{year} submission of WORK PROGRAM application for field - {field?.Field_Name} : {app.ReferenceNo}";
                     string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
                     var emailMsg = _helperService.SaveMessage(app.Id, Convert.ToInt32(company.Id), subject, content, "Company");
-                    //var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
+                    var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
                     var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
 
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
@@ -313,7 +312,7 @@ namespace Backend_UMR_Work_Program.Services
                                 string subject = $"Push action was taken for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                 string content = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) has been pushed by a staff to the next processing level.";
                                 var emailMsg = _helperService.SaveMessage(application.Id, staffActing.StaffID, subject, content, "Staff");
-                                // var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
+                                var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
 
                                 _helperService.LogMessages($"Push action was taken for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).");
                                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been pushed successfully.", StatusCode = ResponseCodes.Success };
@@ -361,7 +360,7 @@ namespace Backend_UMR_Work_Program.Services
                                 string subject = $"Approval from Final Athority for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                 string content = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) has been approved approved by Final Authority to the next processing level.";
                                 var emailMsg = _helperService.SaveMessage(application.Id, staffActing.StaffID, subject, content, "Staff");
-                                // var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
+                                var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
 
                                 _helperService.LogMessages($"Approval from Final Athority for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).");
                                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been approved by Final Authority successfully.", StatusCode = ResponseCodes.Success };
@@ -458,14 +457,14 @@ namespace Backend_UMR_Work_Program.Services
                                         .Where(x => x.AppId == submittedApp.Id 
                                         && x.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany).FirstOrDefaultAsync();
 
-                        var selectedTables = returnToCompanyAppHistory?.SelectedTables.Split('|').ToList();
+                        var selectedTables = returnToCompanyAppHistory?.SelectedTables?.Split('|').ToList();
 
                         var res = new FormLock
                         {
                             disableSubmission = submittedApp != null,
                             enableReSubmission = returnToCompanyAppHistory != null 
                                                 && (returnToCompanyAppHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany 
-                                                && returnToCompanyAppHistory.Status == PAYMENT_STATUS.PaymentPending) ? true : false,
+                                                || submittedApp.PaymentStatus == PAYMENT_STATUS.PaymentPending) ? true : false,
                             formsToBeEnabled = selectedTables
                         };
 
@@ -778,16 +777,16 @@ namespace Backend_UMR_Work_Program.Services
                         var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
                         var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
+                        
+                        string RejectedTables = await _processFlowService.getTableNames(selectedTables);
 
                         if (application.FieldID != null)
                         {
                             var field = _dbContext.COMPANY_FIELDs.Where(p => p.Field_ID == application.FieldID).FirstOrDefault();
                         }
 
-                        if (await _processFlowService.SendBackApplicationToCompany(Company, application, currentStaff, TypeOfPaymentId, AmountNGN, AmountUSD, comment, selectedTables))
+                        if (await _processFlowService.SendBackApplicationToCompany(Company, application, currentStaff, TypeOfPaymentId, AmountNGN, AmountUSD, comment, RejectedTables))
                         {
-                            string RejectedTables = await _processFlowService.getTableNames(selectedTables);
-
                             //Update Staffs Desk
                             //todo: update desk status
                             staffDesk.Comment = comment;
@@ -858,31 +857,80 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                var applications = await (from app in _dbContext.Applications
-                                          join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
-                                          join appHistory in _dbContext.ApplicationDeskHistories on app.Id equals appHistory.AppId
-                                          join stf in _dbContext.staff on appHistory.StaffID equals stf.StaffID
-                                          join sbu in _dbContext.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
-                                          where app.DeleteStatus != true && appHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany
-                                          && app.CompanyID == WKPCompanyNumber
-                                          select new
-                                          {
-                                              Last_SBU = sbu.SBU_Name,
-                                              Id = app.Id,
-                                              FieldID = app.FieldID,
-                                              ConcessionID = app.ConcessionID,
-                                              ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
-                                              FieldName = app.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
-                                              SBU_Comment = appHistory.Comment,
-                                              Comment = appHistory.Comment,
-                                              ReferenceNo = app.ReferenceNo,
-                                              CreatedAt = app.CreatedAt,
-                                              SubmittedAt = app.SubmittedAt,
-                                              Status = app.Status,
-                                              SBU_Tables = appHistory.SelectedTables,
-                                              YearOfWKP = app.YearOfWKP
-                                          }).ToListAsync();
-                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+                //var applications = await (from app in _dbContext.Applications
+                                          //join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                                          //join appHistory in _dbContext.ApplicationDeskHistories on app.Id equals appHistory.AppId
+                                          //join stf in _dbContext.staff on appHistory.StaffID equals stf.StaffID
+                                          //join sbu in _dbContext.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
+                                          //where app.DeleteStatus != true && appHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany
+                                          //&& app.CompanyID == WKPCompanyNumber
+                                          //select new
+                                          //{
+                                          //    Last_SBU = sbu.SBU_Name,
+                                          //    Id = app.Id,
+                                          //    FieldID = app.FieldID,
+                                          //    ConcessionID = app.ConcessionID,
+                                          //    ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
+                                          //    FieldName = app.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
+                                          //    SBU_Comment = appHistory.Comment,
+                                          //    Comment = appHistory.Comment,
+                                          //    ReferenceNo = app.ReferenceNo,
+                                          //    CreatedAt = app.CreatedAt,
+                                          //    SubmittedAt = app.SubmittedAt,
+                                          //    Status = app.Status,
+                                          //    SBU_Tables = appHistory.SelectedTables,
+                                          //    YearOfWKP = app.YearOfWKP
+                                          //}).ToListAsync();
+
+                //var apps = await (from rApp in _dbContext.ReturnedApplications
+                //                  join app in _dbContext.Applications on rApp.AppId equals app.Id
+                //                  join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                //                  join appHistory in _dbContext.ApplicationDeskHistories on app.Id equals appHistory.AppId
+                //                  join stf in _dbContext.staff on appHistory.StaffID equals stf.StaffID
+                //                  join sbu in _dbContext.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
+                //                  where app.DeleteStatus != true && appHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany
+                //                  && app.CompanyID == WKPCompanyNumber
+                //                  select new
+                //                  {
+                //                      Last_SBU = sbu.SBU_Name,
+                //                      Id = app.Id,
+                //                      FieldID = app.FieldID,
+                //                      ConcessionID = app.ConcessionID,
+                //                      ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
+                //                      FieldName = app.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
+                //                      SBU_Comment = appHistory.Comment,
+                //                      Comment = appHistory.Comment,
+                //                      ReferenceNo = app.ReferenceNo,
+                //                      CreatedAt = app.CreatedAt,
+                //                      SubmittedAt = app.SubmittedAt,
+                //                      Status = app.Status,
+                //                      SBU_Tables = appHistory.SelectedTables,
+                //                      YearOfWKP = app.YearOfWKP
+                //                  }).ToListAsync();
+
+                var apps = await (from rApp in _dbContext.ReturnedApplications
+                                  join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on rApp.Application.CompanyID equals comp.Id
+                                  join sbu in _dbContext.StrategicBusinessUnits on rApp.Staff.Staff_SBU equals sbu.Id
+                                  where rApp.Application.CompanyID == WKPCompanyNumber
+                                  select new
+                                  {
+                                      Last_SBU = sbu.SBU_Name,
+                                      Id = rApp.Application.Id,
+                                      FieldID = rApp.Application.FieldID,
+                                      ConcessionID = rApp.Application.ConcessionID,
+                                      ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == rApp.Application.ConcessionID).FirstOrDefault().Concession_Held,
+                                      FieldName = rApp.Application.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == rApp.Application.FieldID).FirstOrDefault().Field_Name : "",
+                                      SBU_Comment = rApp.Comment,
+                                      Comment = rApp.Comment,
+                                      ReferenceNo = rApp.Application.ReferenceNo,
+                                      CreatedAt = rApp.Application.CreatedAt,
+                                      SubmittedAt = rApp.Application.SubmittedAt,
+                                      Status = rApp.Application.Status,
+                                      SBU_Tables = rApp.SelectedTables,
+                                      YearOfWKP = rApp.Application.YearOfWKP
+                                  }).ToListAsync();
+
+                return new WebApiResponse { Data = apps, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
             {

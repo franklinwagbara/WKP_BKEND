@@ -91,7 +91,9 @@ namespace Backend_UMR_Work_Program.Models
             public const string DeputyDirectorApproved = "Deputy Director Approved";
 
             public const string ReturnedToCompany = "Returned To Company";
-            public const string ReturnedToStaff = "Returned To Staff"; 
+            public const string ReturnedToStaff = "Returned To Staff";
+
+			public const string AddedComment = "Added Comment";
 			
 			//public static string SentBackToCompany = "Application Sent Back To Company";
 			//public static string SentBackToStaff = "Application Sent Back To Staff";
