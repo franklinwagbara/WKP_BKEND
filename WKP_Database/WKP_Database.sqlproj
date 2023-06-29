@@ -532,6 +532,7 @@
     <Build Include="dbo\Tables\TypeOfPayments.sql" />
     <Build Include="dbo\Tables\Fees.sql" />
     <Build Include="dbo\Tables\LateSubmission.sql" />
+    <Build Include="dbo\Tables\ReturnedApplications.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="WKP_Database.refactorlog" />

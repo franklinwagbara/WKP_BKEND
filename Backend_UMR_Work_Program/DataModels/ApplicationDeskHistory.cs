@@ -27,5 +27,11 @@ namespace Backend_UMR_Work_Program.DataModels
 
 		[ForeignKey(nameof(StaffID))]
 		public staff? Staff { get; set; }
+		public bool? isPublic { get; set; }
+
+		public ApplicationDeskHistory()
+		{
+			isPublic= false;
+		}
     }
 }

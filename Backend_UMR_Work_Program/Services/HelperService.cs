@@ -63,7 +63,7 @@ namespace Backend_UMR_Work_Program.Services
         }
         private Object lockThis = new object();
 
-        public async void SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action)
+        public async void SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action, bool? isPublic = false)
         {
             try
             {
@@ -82,6 +82,7 @@ namespace Backend_UMR_Work_Program.Services
                     CompanyId = companyId,
                     Status = status == null || status == "null" || status == ""? app.Status: status,
                     AppAction = action,
+                    isPublic = isPublic,
                 };
 
                 _dbContext.ApplicationDeskHistories.Add(appDeskHistory);
