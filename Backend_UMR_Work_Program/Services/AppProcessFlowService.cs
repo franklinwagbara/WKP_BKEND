@@ -57,7 +57,7 @@ namespace Backend_UMR_Work_Program.Services
 
                 _dbContext.Applications.Update(app);   
 
-                await _dbContext.SaveChangesAsync();
+                _dbContext.SaveChanges();
 
                 return true;
             }
