@@ -115,7 +115,7 @@ namespace Backend_UMR_Work_Program
                     errorNumbersToAdd: null)
                 ));
             services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
-            services.AddTransient<PaymentService>();
+            //services.AddTransient<PaymentService>();
             services.AddSingleton<IMailer, Mailer>();
             services.AddAzureClients(builder =>
             {
