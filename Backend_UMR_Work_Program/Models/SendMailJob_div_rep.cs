@@ -251,7 +251,7 @@ namespace Backend_UMR_Work_Program
             message.IsBodyHtml = true;
             SmtpClient client = new SmtpClient("email-smtp.us-east-2.amazonaws.com", 587); //Gmail smtp    
             System.Net.NetworkCredential basicCredential1 = new
-            System.Net.NetworkCredential("AKIAQCM2OPFBW35OSTFV", "BJIdfFWQCb/fdKYej/Mw6EfHK3QJ9XPJ9k6UwHLcjjsu");
+            System.Net.NetworkCredential("AKIAQCM2OPFBSV5LH3U7", "BJIdfFWQCb/fdKYej/Mw6EfHK3QJ9XPJ9k6UwHLcjjsu");
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
             client.Credentials = basicCredential1;
