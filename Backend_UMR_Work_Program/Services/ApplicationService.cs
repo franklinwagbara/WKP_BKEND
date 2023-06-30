@@ -93,7 +93,6 @@ namespace Backend_UMR_Work_Program.Services
         public async Task<bool> HasApplicationBeenSubmittedBefore(int yearID, COMPANY_FIELD field, ADMIN_CONCESSIONS_INFORMATION concession)
         {
             var app = new Application();
-            //var listOfSubmittedStatus = new List<string> { GeneralModel.APPLICATION_STATUS.SubmissionByCompany, GeneralModel.APPLICATION_STATUS.PaymentPending};
 
             try
             {
