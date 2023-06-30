@@ -47,17 +47,27 @@ namespace Backend_UMR_Work_Program.Services
         //    }
         //}
 
-        public async Task<WebApiResponse> GetReturnToCompanyComments(int appId)
+        public async Task<WebApiResponse> GetReturnToCompanyComments(int appId, bool isPublic = false)
         {
             try
             {
-                var appHistories = await _dbContext.ApplicationDeskHistories
-                    .Include(x => x.Staff)
-                    .Include(x => x.Company)
-                    .Where(
-                        x => x.AppId == appId
-                        && x.isPublic == true
-                        ).OrderByDescending(x => x.ActionDate).ToListAsync();
+                List<ApplicationDeskHistory> appHistories = null;
+                
+                if(isPublic)
+                    appHistories = await _dbContext.ApplicationDeskHistories
+                        .Include(x => x.Staff)
+                        .Include(x => x.Company)
+                        .Where(
+                            x => x.AppId == appId
+                            && x.isPublic == isPublic
+                            ).OrderByDescending(x => x.ActionDate).ToListAsync();
+                else
+                    appHistories = await _dbContext.ApplicationDeskHistories
+                        .Include(x => x.Staff)
+                        .Include(x => x.Company)
+                        .Where(
+                            x => x.AppId == appId
+                            ).OrderByDescending(x => x.ActionDate).ToListAsync();
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = appHistories, Message = "Success", StatusCode = ResponseCodes.Success };
             }
@@ -857,77 +867,27 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                //var applications = await (from app in _dbContext.Applications
-                                          //join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
-                                          //join appHistory in _dbContext.ApplicationDeskHistories on app.Id equals appHistory.AppId
-                                          //join stf in _dbContext.staff on appHistory.StaffID equals stf.StaffID
-                                          //join sbu in _dbContext.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
-                                          //where app.DeleteStatus != true && appHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany
-                                          //&& app.CompanyID == WKPCompanyNumber
-                                          //select new
-                                          //{
-                                          //    Last_SBU = sbu.SBU_Name,
-                                          //    Id = app.Id,
-                                          //    FieldID = app.FieldID,
-                                          //    ConcessionID = app.ConcessionID,
-                                          //    ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
-                                          //    FieldName = app.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
-                                          //    SBU_Comment = appHistory.Comment,
-                                          //    Comment = appHistory.Comment,
-                                          //    ReferenceNo = app.ReferenceNo,
-                                          //    CreatedAt = app.CreatedAt,
-                                          //    SubmittedAt = app.SubmittedAt,
-                                          //    Status = app.Status,
-                                          //    SBU_Tables = appHistory.SelectedTables,
-                                          //    YearOfWKP = app.YearOfWKP
-                                          //}).ToListAsync();
-
-                //var apps = await (from rApp in _dbContext.ReturnedApplications
-                //                  join app in _dbContext.Applications on rApp.AppId equals app.Id
-                //                  join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
-                //                  join appHistory in _dbContext.ApplicationDeskHistories on app.Id equals appHistory.AppId
-                //                  join stf in _dbContext.staff on appHistory.StaffID equals stf.StaffID
-                //                  join sbu in _dbContext.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
-                //                  where app.DeleteStatus != true && appHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany
-                //                  && app.CompanyID == WKPCompanyNumber
-                //                  select new
-                //                  {
-                //                      Last_SBU = sbu.SBU_Name,
-                //                      Id = app.Id,
-                //                      FieldID = app.FieldID,
-                //                      ConcessionID = app.ConcessionID,
-                //                      ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
-                //                      FieldName = app.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
-                //                      SBU_Comment = appHistory.Comment,
-                //                      Comment = appHistory.Comment,
-                //                      ReferenceNo = app.ReferenceNo,
-                //                      CreatedAt = app.CreatedAt,
-                //                      SubmittedAt = app.SubmittedAt,
-                //                      Status = app.Status,
-                //                      SBU_Tables = appHistory.SelectedTables,
-                //                      YearOfWKP = app.YearOfWKP
-                //                  }).ToListAsync();
-
                 var apps = await (from rApp in _dbContext.ReturnedApplications
-                                  join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on rApp.Application.CompanyID equals comp.Id
-                                  join sbu in _dbContext.StrategicBusinessUnits on rApp.Staff.Staff_SBU equals sbu.Id
-                                  where rApp.Application.CompanyID == WKPCompanyNumber
+                                  join app in _dbContext.Applications on rApp.AppId equals app.Id
+                                  join stf in _dbContext.staff on rApp.StaffId equals stf.StaffID
+                                  join sbu in _dbContext.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
+                                  where app.DeleteStatus != true && app.CompanyID == WKPCompanyNumber
                                   select new
                                   {
                                       Last_SBU = sbu.SBU_Name,
-                                      Id = rApp.Application.Id,
-                                      FieldID = rApp.Application.FieldID,
-                                      ConcessionID = rApp.Application.ConcessionID,
-                                      ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == rApp.Application.ConcessionID).FirstOrDefault().Concession_Held,
-                                      FieldName = rApp.Application.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == rApp.Application.FieldID).FirstOrDefault().Field_Name : "",
-                                      SBU_Comment = rApp.Comment,
-                                      Comment = rApp.Comment,
-                                      ReferenceNo = rApp.Application.ReferenceNo,
-                                      CreatedAt = rApp.Application.CreatedAt,
-                                      SubmittedAt = rApp.Application.SubmittedAt,
-                                      Status = rApp.Application.Status,
-                                      SBU_Tables = rApp.SelectedTables,
-                                      YearOfWKP = rApp.Application.YearOfWKP
+                                      Id = app.Id,
+                                      FieldID = app.FieldID,
+                                      ConcessionID = app.ConcessionID,
+                                      ConcessionName = _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
+                                      FieldName = app.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
+                                      SBU_Comment = rApp.Comment != null? rApp.Comment: "",
+                                      Comment = rApp.Comment != null ? rApp.Comment : "",
+                                      ReferenceNo = app.ReferenceNo,
+                                      CreatedAt = app.CreatedAt,
+                                      SubmittedAt = app.SubmittedAt,
+                                      Status = app.Status,
+                                      SBU_Tables = rApp.StaffId,
+                                      YearOfWKP = app.YearOfWKP
                                   }).ToListAsync();
 
                 return new WebApiResponse { Data = apps, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
