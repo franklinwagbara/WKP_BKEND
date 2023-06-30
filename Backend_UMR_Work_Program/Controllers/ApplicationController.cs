@@ -110,8 +110,8 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
             => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
 
-        [HttpGet("GET_SENDBACK_COMMENTS_PUBLIC")]
-        public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId) => await _applicationService.GetReturnToCompanyComments(appId);
+        [HttpGet("GET_SENDBACK_COMMENTS")]
+        public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId, bool isPublic) => await _applicationService.GetReturnToCompanyComments(appId, isPublic);
 
         //Rework
         [HttpGet("All-Applications")] //For general application view

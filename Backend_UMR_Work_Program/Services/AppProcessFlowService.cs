@@ -46,6 +46,7 @@ namespace Backend_UMR_Work_Program.Services
                     AppId = app.Id,
                     StaffId = staff.StaffID,
                     SelectedTables = selectedTables,
+                    Comment = comment
                 };
 
                 _dbContext.ReturnedApplications.Add(rApp);
