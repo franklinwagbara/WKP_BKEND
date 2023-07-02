@@ -12,6 +12,6 @@
         public string AmountUSD { get; set; }
         public string OrderId { get; set; }
         public string? ServiceCharge { get; set; }
-
+        public string Currency { get; set; }
     }
 }

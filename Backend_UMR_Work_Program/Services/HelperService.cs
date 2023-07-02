@@ -63,7 +63,7 @@ namespace Backend_UMR_Work_Program.Services
         }
         private Object lockThis = new object();
 
-        public async void SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action)
+        public async void SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action, bool? isPublic = false)
         {
             try
             {
@@ -82,6 +82,7 @@ namespace Backend_UMR_Work_Program.Services
                     CompanyId = companyId,
                     Status = status == null || status == "null" || status == ""? app.Status: status,
                     AppAction = action,
+                    isPublic = isPublic,
                 };
 
                 _dbContext.ApplicationDeskHistories.Add(appDeskHistory);
@@ -370,7 +371,7 @@ namespace Backend_UMR_Work_Program.Services
             return clearText;
         }
 
-        public async Task<object> AddNewApplication(int companyId, string companyEmail, int year, int concessionId, int? fieldId, string? status, string? paymentStatus, int? currentDeskID, bool? submitted)
+        public async Task<Application> AddNewApplication(int companyId, string companyEmail, int year, int concessionId, int? fieldId, string? status, string? paymentStatus, int? currentDeskID, bool? submitted)
         {
             try
             {
@@ -646,6 +647,14 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
+        public List<string> GetListOfIncomingDeskStatuses()
+            => new List<string> {
+                DESK_PROCESS_STATUS.FinalAuthorityApproved,
+                DESK_PROCESS_STATUS.SubmittedByCompany,
+                DESK_PROCESS_STATUS.SubmittedByStaff
+            };
+
+        public bool IsIncomingDeskStatus(string status) => GetListOfIncomingDeskStatuses().Contains(status);
 
         //public string GetActionCommentByRole(string role)
         //{

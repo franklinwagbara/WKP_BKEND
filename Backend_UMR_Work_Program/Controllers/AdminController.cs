@@ -907,8 +907,41 @@ namespace Backend_UMR_Work_Program.Controllers
             }
             catch (Exception ex)
             {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {ex.Message}", StatusCode = ResponseCodes.InternalError };
+            }
+        }
 
-                throw ex;
+        [HttpGet("GET_CURRENT_STAFF_SBU_ROLE")]
+        public async Task<WebApiResponse> GET_STAFF_SBU_ROLE()
+        {
+            try
+            {
+                var result = await (from staff in _context.staff
+                                    join sbu in _context.StrategicBusinessUnits on staff.Staff_SBU equals sbu.Id
+                                    join role in _context.Roles on staff.RoleID equals role.id
+                                    where staff.StaffEmail == WKPCompanyEmail && staff.DeleteStatus != true
+                                    select new StaffSBURoleModel
+                                    {
+                                        Staff = staff,
+                                        SBU = sbu,
+                                        Role = role,
+                                    }).FirstOrDefaultAsync();
+
+                if (result != null)
+                {
+                    //var data = _mapper.Map<StaffSBURoleModel>(result);
+
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Success", Data = result, StatusCode = ResponseCodes.Success };
+                }
+                else
+                {
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = $"Error: User information was not found.", StatusCode = ResponseCodes.Failure };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {ex.Message}", StatusCode = ResponseCodes.InternalError };
             }
         }
 

@@ -22,7 +22,7 @@ namespace Backend_UMR_Work_Program.Services
             _paymentService = paymentService;
         }
 
-        public async Task<bool> SendBackApplicationToCompany(ADMIN_COMPANY_INFORMATION Company, Application app, staff staff, int TypeOfPaymentId, string AmountNGN, string AmountUSD, string comment, string[] selectedTables)
+        public async Task<bool> SendBackApplicationToCompany(ADMIN_COMPANY_INFORMATION Company, Application app, staff staff, int TypeOfPaymentId, string AmountNGN, string AmountUSD, string comment, string selectedTables)
         {
             try
             {
@@ -41,6 +41,16 @@ namespace Backend_UMR_Work_Program.Services
                     ServiceCharge = "0"
                 });
 
+                var rApp = new ReturnedApplication
+                {
+                    AppId = app.Id,
+                    StaffId = staff.StaffID,
+                    SelectedTables = selectedTables,
+                    Comment = comment
+                };
+
+                _dbContext.ReturnedApplications.Add(rApp);
+
                 //update application status
                 //app.Status = GeneralModel.APPLICATION_STATUS.SentBackToCompany;
                 app.PaymentStatus = typeOfPayment.Name == TYPE_OF_FEE.NoFee? app.PaymentStatus : PAYMENT_STATUS.PaymentPending;
@@ -48,7 +58,7 @@ namespace Backend_UMR_Work_Program.Services
 
                 _dbContext.Applications.Update(app);   
 
-                await _dbContext.SaveChangesAsync();
+                _dbContext.SaveChanges();
 
                 return true;
             }
@@ -72,7 +82,7 @@ namespace Backend_UMR_Work_Program.Services
                         var getSBU_TablesToDisplay = await _dbContext.Table_Details.Where(x => x.TableId == tableID).FirstOrDefaultAsync();
 
                         if (getSBU_TablesToDisplay != null)
-                            RejectedTables = RejectedTables != "" ? $"{RejectedTables}|{getSBU_TablesToDisplay.TableName}" : getSBU_TablesToDisplay.TableName;
+                            RejectedTables = RejectedTables != "" ? $"{RejectedTables}|{getSBU_TablesToDisplay.TableSchema}" : getSBU_TablesToDisplay.TableSchema;
 
                     }
                 }

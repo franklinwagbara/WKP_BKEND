@@ -14003,6 +14003,21 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 						</Relationship>
 					</Element>
 				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ApplicationDeskHistories].[isPublic]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[bit]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
 			</Relationship>
 			<Relationship Name="Schema">
 				<Entry>
@@ -62790,6 +62805,85 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 						</Relationship>
 					</Element>
 				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[Payments].[FileName]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="IsMax" Value="True" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[Payments].[FilePath]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="IsMax" Value="True" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[Payments].[IsConfirmed]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[bit]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[Payments].[PaymentEvidenceFilePath]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="IsMax" Value="True" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[Payments].[PaymentEvidenceFileName]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="IsMax" Value="True" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
 			</Relationship>
 			<Relationship Name="Schema">
 				<Entry>
@@ -67634,6 +67728,25 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 			</Relationship>
 			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="239" />
 		</Element>
+		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_ReturnedApplications]">
+			<Relationship Name="ColumnSpecifications">
+				<Entry>
+					<Element Type="SqlIndexedColumnSpecification">
+						<Relationship Name="Column">
+							<Entry>
+								<References Name="[dbo].[ReturnedApplications].[Id]" />
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+			</Relationship>
+			<Relationship Name="DefiningTable">
+				<Entry>
+					<References Name="[dbo].[ReturnedApplications]" />
+				</Entry>
+			</Relationship>
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="240" />
+		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_Role]">
 			<Relationship Name="ColumnSpecifications">
 				<Entry>
@@ -67651,7 +67764,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[Role]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="240" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="241" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_RoleFunctionalityRef]">
 			<Relationship Name="ColumnSpecifications">
@@ -67679,7 +67792,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[RoleFunctionalityRef]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="241" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="242" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_Royalty]">
 			<Relationship Name="ColumnSpecifications">
@@ -67698,7 +67811,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[Royalty]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="242" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="243" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_SafetyManagement]">
 			<Relationship Name="ColumnSpecifications">
@@ -67717,7 +67830,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[SafetyManagement]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="243" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="244" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_SBU_ApplicationComments]">
 			<Relationship Name="ColumnSpecifications">
@@ -67736,7 +67849,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[SBU_ApplicationComments]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="244" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="245" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_SBU_Records]">
 			<Relationship Name="ColumnSpecifications">
@@ -67755,7 +67868,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[SBU_Records]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="245" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="246" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_SBU_Submission]">
 			<Relationship Name="ColumnSpecifications">
@@ -67774,7 +67887,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[SBU_Submission]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="246" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="247" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_staff]">
 			<Relationship Name="ColumnSpecifications">
@@ -67793,7 +67906,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[staff]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="247" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="248" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_STRATEGIC_PLANS_ON_COMPANY_BASIS]">
 			<Relationship Name="ColumnSpecifications">
@@ -67812,7 +67925,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[STRATEGIC_PLANS_ON_COMPANY_BASIS]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="248" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="249" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_StrategicBusinessUnits]">
 			<Relationship Name="ColumnSpecifications">
@@ -67831,7 +67944,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[StrategicBusinessUnits]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="249" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="250" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_SubmittedDocuments]">
 			<Relationship Name="ColumnSpecifications">
@@ -67850,7 +67963,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[SubmittedDocuments]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="250" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="251" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_SubstainableDevelopment]">
 			<Relationship Name="ColumnSpecifications">
@@ -67869,7 +67982,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[SubstainableDevelopment]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="251" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="252" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_Table_Details]">
 			<Relationship Name="ColumnSpecifications">
@@ -67888,7 +68001,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[Table_Details]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="252" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="253" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_TrainingForStaff]">
 			<Relationship Name="ColumnSpecifications">
@@ -67907,7 +68020,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[TrainingForStaff]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="253" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="254" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_TYPEOFPAYMENTS]">
 			<Relationship Name="ColumnSpecifications">
@@ -67926,7 +68039,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[TypeOfPayments]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="254" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="255" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_UserLogin]">
 			<Relationship Name="ColumnSpecifications">
@@ -67954,7 +68067,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[UserLogin]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="255" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="256" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_UserMaster]">
 			<Relationship Name="ColumnSpecifications">
@@ -67973,7 +68086,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[UserMaster]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="256" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="257" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_WORK_PROGRAM_FLOW]">
 			<Relationship Name="ColumnSpecifications">
@@ -67992,7 +68105,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[WORK_PROGRAM_FLOW]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="257" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="258" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_WorkOverJobs]">
 			<Relationship Name="ColumnSpecifications">
@@ -68011,7 +68124,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[WorkOverJobs]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="258" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="259" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_WorkOvers_Recompletion_Job]">
 			<Relationship Name="ColumnSpecifications">
@@ -68030,7 +68143,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[WorkOvers_Recompletion_Job]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="259" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="260" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_WorkOvers_Recompletion_Job_Field_Dvelopment_Plans]">
 			<Relationship Name="ColumnSpecifications">
@@ -68049,7 +68162,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[WorkOvers_Recompletion_Job_Field_Dvelopment_Plans]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="260" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="261" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_WORKOVERS_RECOMPLETION_JOBS]">
 			<Relationship Name="ColumnSpecifications">
@@ -68068,7 +68181,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References Name="[dbo].[WORKOVERS_RECOMPLETION_JOBS]" />
 				</Entry>
 			</Relationship>
-			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="261" />
+			<Annotation Type="SqlInlineConstraintAnnotation" Disambiguator="262" />
 		</Element>
 		<Element Type="SqlPrimaryKeyConstraint" Name="[dbo].[PK_WorkProccess_]">
 			<Relationship Name="ColumnSpecifications">
@@ -73523,6 +73636,112 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 			</Relationship>
 			<AttachedAnnotation Disambiguator="239" />
 		</Element>
+		<Element Type="SqlTable" Name="[dbo].[ReturnedApplications]">
+			<Property Name="IsAnsiNullsOn" Value="True" />
+			<Relationship Name="Columns">
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ReturnedApplications].[Id]">
+						<Property Name="IsNullable" Value="False" />
+						<Property Name="IsIdentity" Value="True" />
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[int]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ReturnedApplications].[AppId]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[int]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ReturnedApplications].[CreatedAt]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="Scale" Value="7" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[datetime2]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ReturnedApplications].[StaffId]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[int]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ReturnedApplications].[Comment]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="IsMax" Value="True" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ReturnedApplications].[SelectedTables]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="IsMax" Value="True" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
+					</Element>
+				</Entry>
+			</Relationship>
+			<Relationship Name="Schema">
+				<Entry>
+					<References ExternalSource="BuiltIns" Name="[dbo]" />
+				</Entry>
+			</Relationship>
+			<AttachedAnnotation Disambiguator="240" />
+		</Element>
 		<Element Type="SqlTable" Name="[dbo].[Role]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
 			<Relationship Name="Columns">
@@ -73613,7 +73832,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="240" />
+			<AttachedAnnotation Disambiguator="241" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[RoleFunctionalityRef]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -73658,7 +73877,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="241" />
+			<AttachedAnnotation Disambiguator="242" />
 			<AttachedAnnotation Disambiguator="120" />
 			<AttachedAnnotation Disambiguator="121" />
 		</Element>
@@ -74152,7 +74371,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="242" />
+			<AttachedAnnotation Disambiguator="243" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[SafetyManagement]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -74276,7 +74495,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="243" />
+			<AttachedAnnotation Disambiguator="244" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[SBU_ApplicationComments]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -74427,7 +74646,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="244" />
+			<AttachedAnnotation Disambiguator="245" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[SBU_Records]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -74516,7 +74735,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="245" />
+			<AttachedAnnotation Disambiguator="246" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[SBU_Submission]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -74655,7 +74874,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="246" />
+			<AttachedAnnotation Disambiguator="247" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[staff]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -74959,7 +75178,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="247" />
+			<AttachedAnnotation Disambiguator="248" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[STRATEGIC_PLANS_ON_COMPANY_BASIS]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -75559,7 +75778,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="248" />
+			<AttachedAnnotation Disambiguator="249" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[StrategicBusinessUnits]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -75634,7 +75853,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="249" />
+			<AttachedAnnotation Disambiguator="250" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[SubmittedDocuments]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -75816,7 +76035,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="250" />
+			<AttachedAnnotation Disambiguator="251" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[SubstainableDevelopment]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -75876,7 +76095,7 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="251" />
+			<AttachedAnnotation Disambiguator="252" />
 		</Element>
 		<Element Type="SqlView" Name="[dbo].[Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLS]">
 			<Property Name="QueryScript">
@@ -76449,7 +76668,7 @@ GROUP BY Year_of_WP, Geo_Type_of_Data_being_Processed, CompanyName, OML_Name, Te
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="252" />
+			<AttachedAnnotation Disambiguator="253" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[tbl_fruitanalysis]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -76668,7 +76887,7 @@ GROUP BY Year_of_WP, Geo_Type_of_Data_being_Processed, CompanyName, OML_Name, Te
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="253" />
+			<AttachedAnnotation Disambiguator="254" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[TypeOfPayments]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -76729,7 +76948,7 @@ GROUP BY Year_of_WP, Geo_Type_of_Data_being_Processed, CompanyName, OML_Name, Te
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="254" />
+			<AttachedAnnotation Disambiguator="255" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[UserLogin]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -76869,7 +77088,7 @@ GROUP BY Year_of_WP, Geo_Type_of_Data_being_Processed, CompanyName, OML_Name, Te
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="255" />
+			<AttachedAnnotation Disambiguator="256" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[UserMaster]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -77164,7 +77383,7 @@ GROUP BY Year_of_WP, Geo_Type_of_Data_being_Processed, CompanyName, OML_Name, Te
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="256" />
+			<AttachedAnnotation Disambiguator="257" />
 		</Element>
 		<Element Type="SqlView" Name="[dbo].[View_2]">
 			<Property Name="QueryScript">
@@ -81602,7 +81821,7 @@ GROUP BY Year]]></Value>
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="257" />
+			<AttachedAnnotation Disambiguator="258" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[WorkOverJobs]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -81693,7 +81912,7 @@ GROUP BY Year]]></Value>
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="258" />
+			<AttachedAnnotation Disambiguator="259" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[WorkOvers_Recompletion_Job]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -81833,7 +82052,7 @@ GROUP BY Year]]></Value>
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="259" />
+			<AttachedAnnotation Disambiguator="260" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[WorkOvers_Recompletion_Job_Field_Dvelopment_Plans]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -82005,7 +82224,7 @@ GROUP BY Year]]></Value>
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="260" />
+			<AttachedAnnotation Disambiguator="261" />
 		</Element>
 		<Element Type="SqlTable" Name="[dbo].[WORKOVERS_RECOMPLETION_JOBS]">
 			<Property Name="IsAnsiNullsOn" Value="True" />
@@ -82509,7 +82728,7 @@ GROUP BY Year]]></Value>
 					<References ExternalSource="BuiltIns" Name="[dbo]" />
 				</Entry>
 			</Relationship>
-			<AttachedAnnotation Disambiguator="261" />
+			<AttachedAnnotation Disambiguator="262" />
 		</Element>
 		<Element Type="SqlView" Name="[dbo].[WP_Cost_Efficiency_Metric_CAPEX_OPEX]">
 			<Property Name="QueryScript">

@@ -102,6 +102,17 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GetSentBackApplications")]
         public async Task<object> GetSentBackApplications() => await _applicationService.GetSentBackApplications((int)WKPCompanyNumber);
 
+        [HttpPost("SendBackApplicationToCompany")]
+        public async Task<object> SendBackApplicationToCompany(int deskID, string comment, string[] selectedApps, string[] selectedTables, int TypeOfPaymentId, string AmountNGN, string AmountUSD)
+            => await _applicationService.SendBackApplicationToCompany(deskID, comment, selectedApps, selectedTables, TypeOfPaymentId, AmountNGN, AmountUSD, (int)WKPCompanyNumber, WKPCompanyEmail, WKPCompanyName);
+
+        [HttpPost("ADD_COMMENT_BY_COMPANY")]
+        public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
+            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
+
+        [HttpGet("GET_SENDBACK_COMMENTS")]
+        public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId, bool isPublic) => await _applicationService.GetReturnToCompanyComments(appId, isPublic);
+
         //Rework
         [HttpGet("All-Applications")] //For general application view
         public async Task<object> AllApplications()
@@ -576,10 +587,6 @@ namespace Backend_UMR_Work_Program.Controllers
         //     }
 
         // }
-
-        [HttpPost("SendBackApplicationToCompany")]
-        public async Task<object> SendBackApplicationToCompany(int deskID, string comment, string[] selectedApps, string[] selectedTables, int TypeOfPaymentId, string AmountNGN, string AmountUSD)
-            => await _applicationService.SendBackApplicationToCompany(deskID, comment, selectedApps, selectedTables, TypeOfPaymentId, AmountNGN, AmountUSD, (int)WKPCompanyNumber, WKPCompanyEmail, WKPCompanyName);
 
 
         // [HttpPost("RejectApplication")]
@@ -3476,35 +3483,5 @@ namespace Backend_UMR_Work_Program.Controllers
         #endregion
 
        
-        //Rework
-        [HttpGet("GET_SENDBACK_COMMENTS")]
-        public async Task<object> GET_SENDBACK_COMMENTS(int appId)
-        {
-            try
-            {
-                return await _applicationService.GetReturnToCompanyComments(appId);
-            }
-            catch (Exception ex)
-            {
-
-                return BadRequest(new { message = "Error: " + ex.Message });
-            }
-        }
-
-        //Rework
-        [HttpPost("ADD_COMMENT")]
-        public async Task<object> ADD_COMMENT(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany)
-        {
-            try
-            {
-                var res = _applicationService.AddCommentToApplication(appId, staffId, status, comment, selectedTables, actionByCompany, WKPCompanyNumber);
-                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = res, StatusCode = ResponseCodes.Success };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = "Error: " + ex.Message });
-            }
-        }
-
     }
 }

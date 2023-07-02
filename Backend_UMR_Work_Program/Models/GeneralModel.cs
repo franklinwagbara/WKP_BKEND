@@ -90,8 +90,10 @@ namespace Backend_UMR_Work_Program.Models
             public const string DirectorApproved = "Director Approved";
             public const string DeputyDirectorApproved = "Deputy Director Approved";
 
-            public const string ReturnedToCompany = "Application was returned to Company";
-            public const string ReturnedToStaff = "Application was returned to Staff"; 
+            public const string ReturnedToCompany = "Returned To Company";
+            public const string ReturnedToStaff = "Returned To Staff";
+
+			public const string AddedComment = "Added Comment";
 			
 			//public static string SentBackToCompany = "Application Sent Back To Company";
 			//public static string SentBackToStaff = "Application Sent Back To Staff";
@@ -115,10 +117,19 @@ namespace Backend_UMR_Work_Program.Models
 
 		public static class APPLICATION_ACTION
 		{
-			public const string Approve = "Approve";
             public const string ReturnToCompany = "Return To Company";
             public const string ReturnToStaff = "Return To Staff";
 			public const string SubmitApplication = "Submit Application";
+
+            public static string Initiate = "Initiate";
+            public static string Complete = "Complete";
+            public static string Submit = "Submit";
+            public static string Push = "Push";
+            public static string Approve = "Approve";
+            public static string Reject = "Reject";
+            public static string Delegate = "Delegate";
+            public static string AddAComment = "Add a Comment";
+            public static string Move = "Move";
 
             //public static string SendBackToCompany = "Send Back To Company";
             //public static string SendBackToStaff = "Send Back To Staff";
@@ -2614,6 +2625,8 @@ namespace Backend_UMR_Work_Program.Models
 			public const string ExtraPaymentAlreadyExist = "16";
 			public const string MissingParameter = "17";
 			public const string InvalidParameterPassed = "18";
+			public const string PaymentAlreadyExists = "19";
+			public const string PaymentDoesNotExist = "20";
 		}
 		public class ResponseCodes
 		{
