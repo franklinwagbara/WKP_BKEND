@@ -11350,44 +11350,116 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_REMEDIATION_FUND")]
         public async Task<object> POST_HSE_REMEDIATION_FUND([FromForm] HSE_REMEDIATION_FUND hse_remediation_fund, string omlName, string fieldName, string year, int id, string actionToDo)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName); 
-            int Id = hse_remediation_fund.Id != null ? hse_remediation_fund.Id : 0;
-
+            int Id = id == 0 ? hse_remediation_fund.Id : id;
             try
             {
-
-                if (id > 0 && action == GeneralModel.Delete)
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.HSE_REMEDIATION_FUNDs where c.Id == id select c).FirstOrDefault();
-
-                    if (action == GeneralModel.Delete)
-                        _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                    save += _context.SaveChanges();
-
-                    if (save > 0)
+                    var getData = (from c in _context.HSE_REMEDIATION_FUNDs where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
                     {
-                        string successMsg = Messager.ShowMessage(action);
-                        var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.HSE_REMEDIATION_FUNDs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.OML_ID = concessionField.Concession_ID.ToString();
+                            getData.Company_Email = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.Company_ID = WKPCompanyId;
+                            getData.Company_Number = WKPCompanyNumber.ToString();
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.Year_of_WP = year;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.OML_ID = hse_remediation_fund.OML_ID;
+                            getData.areThereRemediationFund = hse_remediation_fund.areThereRemediationFund;
+                            getData.reasonForNoRemediation = hse_remediation_fund.areThereRemediationFund;
+
+                            if (hse_remediation_fund.areThereRemediationFund == "YES")
+                            {
+                                #region Fileregion
+                                var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                                var file2 = Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
+
+                                if (file1 != null)
+                                {
+                                    var blobname1 = blobService.Filenamer(file1);
+                                    string docName = "Evidence of Payment";
+                                    getData.evidenceOfPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (getData.evidenceOfPaymentPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        getData.evidenceOfPaymentFilename = docName;
+                                }
+                                else
+                                {
+                                    getData.evidenceOfPaymentPath = null;
+                                    getData.evidenceOfPaymentFilename = null;
+                                }
+
+                                if (file2 != null)
+                                {
+                                    var blobname2 = blobService.Filenamer(file2);
+                                    string docName = "Evidence of previous year payment";
+                                    getData.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"Remediation Documents/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (getData.evidenceOfPreviousYearsPaymentPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        getData.evidenceOfPreviousYearsPaymentFilename = docName;
+                                }
+                                else
+                                {
+                                    getData.evidenceOfPreviousYearsPaymentPath = null;
+                                    getData.evidenceOfPreviousYearsPaymentFilename = null;
+                                }
+                                #endregion
+                            }
+                            else
+                            {
+                                getData.evidenceOfPaymentPath = null;
+                                getData.evidenceOfPaymentFilename = null;
+
+                                var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+
+                                if (file1 != null)
+                                {
+                                    var blobname1 = blobService.Filenamer(file1);
+                                    string docName = "Evidence of Payment";
+                                    getData.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (getData.evidenceOfPreviousYearsPaymentPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        getData.evidenceOfPreviousYearsPaymentFilename = docName;
+                                }
+                                else
+                                {
+                                    getData.evidenceOfPreviousYearsPaymentPath = null;
+                                    getData.evidenceOfPreviousYearsPaymentFilename = null;
+                                }
+                            }
+                            _context.HSE_REMEDIATION_FUNDs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
                     }
                 }
                 if (hse_remediation_fund != null)
                 {
-                    HSE_REMEDIATION_FUND getData;
-                    getData = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Id == Id select c).FirstOrDefaultAsync();
-
-                    //if (concessionField.Field_Name != null)
-                    //{
-                    //    getData = await (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    //}
-                    //else
-                    //{
-                    //    getData = await (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == omlName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    //}
-
                     hse_remediation_fund.OML_ID = concessionField.Concession_ID.ToString();
                     hse_remediation_fund.Company_Email = WKPCompanyEmail;
                     hse_remediation_fund.CompanyName = WKPCompanyName;
@@ -11396,6 +11468,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_remediation_fund.OML_Name = omlName;
                     hse_remediation_fund.Field_ID = concessionField?.Field_ID ?? null;
                     hse_remediation_fund.Year_of_WP = year;
+                    hse_remediation_fund.Date_Created = DateTime.Now;
+                    hse_remediation_fund.Created_by = WKPCompanyId;
 
                     if (hse_remediation_fund.areThereRemediationFund == "YES")
                     {
@@ -11411,7 +11485,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             if (hse_remediation_fund.evidenceOfPaymentPath == null)
                                 return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                             else
-                                hse_remediation_fund.evidenceOfPaymentFilename = blobname1;
+                                hse_remediation_fund.evidenceOfPaymentFilename = docName;
                         }
                         else
                         {
@@ -11422,7 +11496,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (file2 != null)
                         {
                             var blobname2 = blobService.Filenamer(file2);
-                            string docName = "Evidence of Payment";
+                            string docName = "Evidence of previous year Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"Remediation Documents/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
                                 return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
@@ -11446,12 +11520,12 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (file1 != null)
                         {
                             var blobname1 = blobService.Filenamer(file1);
-                            string docName = "Evidence of Payment";
+                            string docName = "Evidence of previous Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
                                 return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                             else
-                                hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = blobname1;
+                                hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = docName;
                         }
                         else
                         {
@@ -11460,56 +11534,24 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
 
                     }
-
-                    if (action == GeneralModel.Insert)
-                    {
-                        // if (getData == null)
-                        // {
-                        if (getData == null)
-                        {
-                            await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
-                        }
-                        else
-                        {
-                            _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                            await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
-                        }
-                        // }
-                        // else
-                        // {
-                        //     hse_remediation_fund.Updated_by = WKPCompanyId;
-                        //     hse_remediation_fund.Date_Updated = DateTime.Now;
-                        //     hse_remediation_fund.Date_Created = getData.Date_Created;
-                        //     hse_remediation_fund.Created_by = getData.Created_by;
-                        //     _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                        //     await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
-                        // }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                    }
-
+                    await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
                     save += await _context.SaveChangesAsync();
+
+                    if (save > 0)
+                    {
+                        string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        string successMsg = "No Changes was made.";
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
                 }
                 else
                 {
                     return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 }
-                if (save > 0)
-                {
-                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
-                    var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_ID == WKPCompanyId && c.Year_of_WP == year && c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName select c).ToListAsync();
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
-                }
-                else
-                {
-                    string successMsg = "No Changes was made.";
-                    var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_ID == WKPCompanyId && c.Year_of_WP == year && c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName select c).ToListAsync();
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
-
-                }
-
             }
             catch (Exception e)
             {
