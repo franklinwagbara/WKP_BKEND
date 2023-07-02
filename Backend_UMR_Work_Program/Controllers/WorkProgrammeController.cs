@@ -3452,6 +3452,15 @@ namespace Backend_UMR_Work_Program.Controllers
                                     getData.EvidenceOfRegTrustFundFilename = null;
                                 }
                             }
+                            else
+                            {
+                                getData.EvidenceOfRegTrustFundPath = null;
+                                getData.EvidenceOfRegTrustFundFilename = null;
+                                getData.UploadCommDevPlanApprovalPath = null;
+                                getData.UploadCommDevPlanApprovalFilename = null;
+                                getData.EvidenceOfRegTrustFundPath = null;
+                                getData.EvidenceOfRegTrustFundFilename = null;
+                            }
 
                             #endregion
 
@@ -3628,6 +3637,15 @@ namespace Backend_UMR_Work_Program.Controllers
                             host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
                             host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
                         }
+                    }
+                    else
+                    {
+                        host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                        host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
+                        host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
+                        host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
+                        host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                        host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
                     }
 
                     #endregion
@@ -9585,7 +9603,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-
                 if (Id > 0)
                 {
                     var getData = (from c in _context.HSE_ENVIRONMENTAL_STUDIES_NEWs where c.Id == Id select c).FirstOrDefault();
@@ -10155,10 +10172,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_compliance_model.Created_by = WKPCompanyId;
                     await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
 
-                    if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
-                    }
                     save += await _context.SaveChangesAsync();
                 }
                 else
