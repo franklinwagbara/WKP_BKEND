@@ -115,7 +115,7 @@ namespace Backend_UMR_Work_Program.Services
             return null;
         }
 
-        public async Task<object> GetPaymentSummarySubmission()
+        public async Task<WebApiResponse> GetPaymentSummarySubmission()
         {
             try
             {
@@ -136,14 +136,41 @@ namespace Backend_UMR_Work_Program.Services
                     }
                 }
 
-                return fees;
+                return new WebApiResponse { Data = fees, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception ex)
             {
-
-                throw ex;
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
             }
             
+        }
+
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission()
+        {
+            try
+            {
+                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Category == PAYMENT_CATEGORY.OtherPayment).ToListAsync();
+                return new WebApiResponse { Data = fees, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse {ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
+
+        public async Task<WebApiResponse> GetTypesOfPayments()
+        {
+            try
+            {
+                var res = await _context.TypeOfPayments.ToListAsync();
+                return new WebApiResponse { Data = res, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+
         }
 
         public async Task<WebApiResponse> ConfirmPayment(int appId)
@@ -409,6 +436,8 @@ namespace Backend_UMR_Work_Program.Services
                 _context.Payments.Update(paymentExist);
                 await _context.SaveChangesAsync();
 
+                //Drop the application on accounts department desk
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Payment Evidence was successfully uploaded!", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -417,6 +446,11 @@ namespace Backend_UMR_Work_Program.Services
             }
 
         }
+
+        //public async Task<WebApiResponse> DropAppOnAccountDesk()
+        //{
+
+        //}
 
 
         public async Task<WebApiResponse> CreateUSDPayment(USDPaymentDTO model, string? paymentCategory)

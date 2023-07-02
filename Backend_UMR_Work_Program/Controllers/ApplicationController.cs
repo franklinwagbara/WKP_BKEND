@@ -113,9 +113,12 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GET_SENDBACK_COMMENTS")]
         public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId, bool isPublic) => await _applicationService.GetReturnToCompanyComments(appId, isPublic);
 
+        [HttpGet("Rejected-Applications")]
+        public async Task<WebApiResponse> AllApplications() => await _applicationService.RejectedApplications();
+
         //Rework
         [HttpGet("All-Applications")] //For general application view
-        public async Task<object> AllApplications()
+        public async Task<object> RejectedApplications()
         {
             try
             {
@@ -123,6 +126,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                           join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
                                           //join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID
                                           join con in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals con.Consession_Id
+                                          where app.DeleteStatus != true && app.Status == MAIN_APPLICATION_STATUS.Rejected
                                           select new Application_Model
                                           {
                                               Id = app.Id,
