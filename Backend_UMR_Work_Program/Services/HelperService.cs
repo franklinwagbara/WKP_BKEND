@@ -371,7 +371,7 @@ namespace Backend_UMR_Work_Program.Services
             return clearText;
         }
 
-        public async Task<object> AddNewApplication(int companyId, string companyEmail, int year, int concessionId, int? fieldId, string? status, string? paymentStatus, int? currentDeskID, bool? submitted)
+        public async Task<Application> AddNewApplication(int companyId, string companyEmail, int year, int concessionId, int? fieldId, string? status, string? paymentStatus, int? currentDeskID, bool? submitted)
         {
             try
             {

@@ -23,5 +23,10 @@
     [RemitaResponse] NVARCHAR(MAX) NULL, 
     [OrderId] NVARCHAR(MAX) NULL, 
     [ServiceCharge] NVARCHAR(MAX) NULL, 
+    [FileName] NVARCHAR(MAX) NULL, 
+    [FilePath] NVARCHAR(MAX) NULL, 
+    [IsConfirmed] BIT NULL, 
+    [PaymentEvidenceFilePath] NVARCHAR(MAX) NULL, 
+    [PaymentEvidenceFileName] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_PAYMENTS] PRIMARY KEY CLUSTERED ([ID] ASC)
 );

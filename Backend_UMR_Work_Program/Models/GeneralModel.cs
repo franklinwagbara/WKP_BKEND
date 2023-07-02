@@ -2625,6 +2625,8 @@ namespace Backend_UMR_Work_Program.Models
 			public const string ExtraPaymentAlreadyExist = "16";
 			public const string MissingParameter = "17";
 			public const string InvalidParameterPassed = "18";
+			public const string PaymentAlreadyExists = "19";
+			public const string PaymentDoesNotExist = "20";
 		}
 		public class ResponseCodes
 		{

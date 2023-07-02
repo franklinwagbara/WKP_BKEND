@@ -22,7 +22,7 @@ namespace Backend_UMR_Work_Program.Models
         public string? AccountNumber { get; set; }
         public string? BankCode { get; set; }
         public string? Status { get; set; }
-        public string? Currency { get; set; }
+        public string Currency { get; set; }
         public DateTime? PaymentDate { get; set; }
 
         [ForeignKey("TypeOfPaymentId")]
@@ -33,5 +33,17 @@ namespace Backend_UMR_Work_Program.Models
         public string? OrderId { get; set; }
 
         public string? ServiceCharge { get; set; }
+
+        public string? FileName { get; set; }
+        public string? FilePath { get; set; }
+        public bool? IsConfirmed { get; set; }
+
+        public string? PaymentEvidenceFilePath { get; set; }
+        public string? PaymentEvidenceFileName { get; set; }
+
+        public Payments()
+        {
+            IsConfirmed = false;
+        }
     }
 }
