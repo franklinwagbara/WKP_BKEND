@@ -54,38 +54,18 @@ namespace Backend_UMR_Work_Program.Controllers
             _blobService = blobService;
         }
 
+        [HttpGet("GET_PAYMENT_SUMMARY_SUBMISSION")]
+        public async Task<WebApiResponse> GetPaymentSummarySubmission() => await _paymentService.GetPaymentSummarySubmission();
+
+        [HttpGet("GET_EXTRA_PAYMENT_SUMMARY_SUBMISSION")]
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission() => await _paymentService.GetExtraPaymentSummarySubmission();
+
 
         [HttpGet("GET_TYPE_OF_PAYMENTS")]
-        public async Task<object> Get_Type_Of_Payments()
-        {
-            try
-            {
-                var res = await _context.TypeOfPayments.ToListAsync();
-                return new WebApiResponse { Data = res, ResponseCode = AppResponseCodes.Success, Message="Success", StatusCode=ResponseCodes.Success};
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new {message = "Error: " + ex.Message});                
-            }
-        }
-
-        [HttpGet("GET_PAYMENT_SUMMARY_SUBMISSION")]
-        public async Task<object> GetPaymentSummarySubmission()
-        {
-            try
-            {
-                var res = await _paymentService.GetPaymentSummarySubmission();
-                return new WebApiResponse { Data = res, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
-            }
-            catch (Exception e)
-            {
-
-                return BadRequest(new { message = "Error : " + e.Message });
-            }
-        }
+        public async Task<WebApiResponse> Get_Type_Of_Payments() => await _paymentService.GetTypesOfPayments();
 
         [HttpPost("GENERATE_RRR")]
-        public async Task<object> GenerateRRR(int appId, string amountNGN, string serviceCharge, int concessionId, int year, int? fieldId)
+        public async Task<WebApiResponse> GenerateRRR(int appId, string amountNGN, string serviceCharge, int concessionId, int year, int? fieldId)
         {
             try
             {
@@ -100,13 +80,13 @@ namespace Backend_UMR_Work_Program.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Error : " + ex.Message });
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
             }
 
         }
 
         [HttpPost("GENERATE_EXTRAPAYMENT_RRR")]
-        public async Task<object> GenerateExtraPaymentRRR(int appId, string amountNGN, string serviceCharge, int concessionId, int year, int? fieldId)
+        public async Task<WebApiResponse> GenerateExtraPaymentRRR(int appId, string amountNGN, string serviceCharge, int concessionId, int year, int? fieldId)
         {
             try
             {
@@ -120,7 +100,7 @@ namespace Backend_UMR_Work_Program.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Error : " + ex.Message });
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
             }
 
         }

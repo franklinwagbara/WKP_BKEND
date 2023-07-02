@@ -47,6 +47,38 @@ namespace Backend_UMR_Work_Program.Services
         //    }
         //}
 
+        public async Task<WebApiResponse> RejectedApplications()
+        {
+            try
+            {
+                var applications = await (from app in _dbContext.Applications
+                                          join comp in _dbContext.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                                          //join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID
+                                          join con in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals con.Consession_Id
+                                          where app.DeleteStatus != true && app.Status == MAIN_APPLICATION_STATUS.Rejected
+                                          select new Application_Model
+                                          {
+                                              Id = app.Id,
+                                              FieldID = app.FieldID,
+                                              ConcessionID = app.ConcessionID,
+                                              ConcessionName = con.ConcessionName,
+                                              FieldName = app.FieldID != null ? _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
+                                              ReferenceNo = app.ReferenceNo,
+                                              CreatedAt = app.CreatedAt,
+                                              SubmittedAt = app.SubmittedAt,
+                                              CompanyName = comp.COMPANY_NAME,
+                                              Status = app.Status,
+                                              PaymentStatus = app.PaymentStatus,
+                                              YearOfWKP = app.YearOfWKP
+                                          }).ToListAsync();
+                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
         public async Task<WebApiResponse> GetReturnToCompanyComments(int appId, bool isPublic = false)
         {
             try
@@ -404,6 +436,7 @@ namespace Backend_UMR_Work_Program.Services
                 var allApplicationsCount = 0;
                 var allProcessingCount = 0;
                 var allApprovalsCount = 0;
+                var allRejectionsCount = 0;
 
                 var currentStaff = (from stf in _dbContext.staff
                                 join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
@@ -417,13 +450,15 @@ namespace Backend_UMR_Work_Program.Services
                     allApplicationsCount = (await _dbContext.MyDesks.Include(s => s.Staff).Where(x => x.HasWork && x.Staff.Staff_SBU == currentStaff.Staff_SBU).ToListAsync()).DistinctBy(x => x.AppId).Count();
                 }
                 
+                allRejectionsCount = await _dbContext.Applications.Where(x => x.Status == MAIN_APPLICATION_STATUS.Rejected).CountAsync();
                 allApprovalsCount = await _dbContext.PermitApprovals.CountAsync();
                 var data = new
                 {
                     deskCount = deskCount,
                     allApplicationsCount = allApplicationsCount,
                     allProcessingCount = allProcessingCount,
-                    allApprovalsCount = allApprovalsCount
+                    allApprovalsCount = allApprovalsCount,
+                    allRejectionsCount = allRejectionsCount
                 };
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = data, Message = "Success", StatusCode = ResponseCodes.Success };
