@@ -72,19 +72,12 @@ namespace Backend_UMR_Work_Program
             set { myRole = value; }
         }
 
-
-
-
         private string LM;
         public string Linemanager
         {
             get { return LM; }
             set { LM = value; }
         }
-
-
-
-
 
         System.Net.Mail.SmtpClient SmtpMail = new System.Net.Mail.SmtpClient();
 
@@ -142,8 +135,6 @@ namespace Backend_UMR_Work_Program
             get { return myToRecievedBCC; }
             set { myToRecievedBCC = value; }
         }
-
-
 
         private string myErrMsg;
         public string ErrMsg
@@ -261,8 +252,6 @@ namespace Backend_UMR_Work_Program
             set { reportowneruname = value; }
         }
 
-
-
         //public string BuildMailAddress(string uname)
         //{
         //    //return uname + "@mtnnigeria.net";
@@ -277,8 +266,6 @@ namespace Backend_UMR_Work_Program
             set { report_title = value; }
         }
 
-
-
         private string resolution_status;
 
         public string Resolution_Status
@@ -286,7 +273,6 @@ namespace Backend_UMR_Work_Program
             get { return resolution_status; }
             set { resolution_status = value; }
         }
-
 
         private string resolution_details;
 
@@ -296,7 +282,6 @@ namespace Backend_UMR_Work_Program
             set { resolution_details = value; }
         }
 
-
         private string report_path;
 
         public string Report_Path
@@ -304,7 +289,6 @@ namespace Backend_UMR_Work_Program
             get { return report_path; }
             set { report_path = value; }
         }
-
 
         private string report_recipients;
 
@@ -314,7 +298,6 @@ namespace Backend_UMR_Work_Program
             set { report_recipients = value; }
         }
 
-
         private string resolved_by;
 
         public string Resolved_By
@@ -322,7 +305,6 @@ namespace Backend_UMR_Work_Program
             get { return resolved_by; }
             set { resolved_by = value; }
         }
-
 
         private string switch_name;
 
@@ -332,7 +314,6 @@ namespace Backend_UMR_Work_Program
             set { switch_name = value; }
         }
 
-
         private string rack_name;
 
         public string Rack_name
@@ -340,7 +321,6 @@ namespace Backend_UMR_Work_Program
             get { return rack_name; }
             set { rack_name = value; }
         }
-
 
         private string no_of_U;
 
@@ -350,7 +330,6 @@ namespace Backend_UMR_Work_Program
             set { no_of_U = value; }
         }
 
-
         private string room_name;
 
         public string Room_name
@@ -358,7 +337,6 @@ namespace Backend_UMR_Work_Program
             get { return room_name; }
             set { room_name = value; }
         }
-
 
         private string rack_size;
 
@@ -368,7 +346,6 @@ namespace Backend_UMR_Work_Program
             set { rack_size = value; }
         }
 
-
         private string urlcomment;
 
         public string URLComment
@@ -376,7 +353,6 @@ namespace Backend_UMR_Work_Program
             get { return urlcomment; }
             set { urlcomment = value; }
         }
-
 
         private string applink;
 
@@ -386,7 +362,6 @@ namespace Backend_UMR_Work_Program
             set { applink = value; }
         }
 
-
         private string notification_header;
 
         public string Notification_header
@@ -394,7 +369,6 @@ namespace Backend_UMR_Work_Program
             get { return notification_header; }
             set { notification_header = value; }
         }
-
 
         private string tx_email_subject;
 
@@ -412,7 +386,6 @@ namespace Backend_UMR_Work_Program
             set { project_lead_name = value; }
         }
 
-
         private string project_mnanagers_comment;
 
         public string Project_mnanagers_comment
@@ -420,7 +393,6 @@ namespace Backend_UMR_Work_Program
             get { return project_mnanagers_comment; }
             set { project_mnanagers_comment = value; }
         }
-
 
         private string nes_subject;
 
@@ -437,7 +409,6 @@ namespace Backend_UMR_Work_Program
             get { return nes_body; }
             set { nes_body = value; }
         }
-
 
         private string nes_header;
 
@@ -462,15 +433,12 @@ namespace Backend_UMR_Work_Program
             set { nes_rework = value; }
         }
 
-
         private string email_test;
         public string Email_test
         {
             get { return email_test; }
             set { email_test = value; }
         }
-
-
 
         private string concession_held;
         public string Concession_held
@@ -479,16 +447,12 @@ namespace Backend_UMR_Work_Program
             set { concession_held = value; }
         }
 
-
         private string email_Step_5;
         public string Email_Step_5
         {
             get { return email_Step_5; }
             set { email_Step_5 = value; }
         }
-
-
-
 
         private string company_rep_name;
         public string Company_rep_name
@@ -497,18 +461,13 @@ namespace Backend_UMR_Work_Program
             set { company_rep_name = value; }
         }
 
-
-
-
         private System.Net.Mail.Attachment attachment;
         public System.Net.Mail.Attachment Attachment
         {
             get { return attachment; }
             set { attachment = value; }
         }
-
         // System.Net.Mail.Attachment attachment;
-
 
         private string companyname;
         public string CompanyNAme
@@ -516,7 +475,6 @@ namespace Backend_UMR_Work_Program
             get { return companyname; }
             set { companyname = value; }
         }
-
 
         private string chairperson;
         public string Chairperson
@@ -531,8 +489,6 @@ namespace Backend_UMR_Work_Program
             get { return scribe; }
             set { scribe = value; }
         }
-
-
 
         private string presentation_date;
         public string Presentation_date
@@ -595,9 +551,6 @@ namespace Backend_UMR_Work_Program
             get { return my_email_result; }
             set { my_email_result = value; }
         }
-
-
-
 
         public void NES_SendMail_Project_Team_stakeholder_initiate()
         {
@@ -713,11 +666,6 @@ namespace Backend_UMR_Work_Program
 
 
         }
-
-
-
-
-
 
         public void NES_SendMail_Project_Team()
         {
@@ -838,8 +786,6 @@ namespace Backend_UMR_Work_Program
 
         }
 
-
-
         public void SendMail_Notification_to_Companies()
         {
 
@@ -942,7 +888,6 @@ namespace Backend_UMR_Work_Program
 
 
         }
-
 
         public void NES_SendMail_Project_Team_divisional_representative()
         {
@@ -1166,11 +1111,6 @@ namespace Backend_UMR_Work_Program
 
         }
 
-
-
-
-
-
         public void NES_SendMail_When_Concession_information_is_completed()
         {
 
@@ -1289,13 +1229,6 @@ namespace Backend_UMR_Work_Program
 
 
         }
-
-
-
-
-
-
-
 
         public void NES_SendMail_password_changed()
         {
@@ -1507,7 +1440,6 @@ namespace Backend_UMR_Work_Program
 
         }
 
-
         public void SendMail_Login_Credentials()
         {
 
@@ -1615,7 +1547,6 @@ namespace Backend_UMR_Work_Program
 
         }
 
-
         public void SendMail_Error_Logs()
         {
 
@@ -1721,12 +1652,6 @@ namespace Backend_UMR_Work_Program
 
         }
 
-
-
-
-
-
-
         public void SendMail_Requester()
         {
 
@@ -1829,7 +1754,6 @@ namespace Backend_UMR_Work_Program
 
         }
 
-
         public void SendMail_from_manager_to_Requester()
         {
 
@@ -1913,8 +1837,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
         public void SendMail_linemanger_to_LINE_MANAGER_new()
         {
 
@@ -1997,9 +1919,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
-
-
 
         public void SendMail_Requester_LINE_MANAGER()
         {
@@ -2087,8 +2006,6 @@ namespace Backend_UMR_Work_Program
 
         }
 
-
-
         public void SendMail_linemanger_to_LINE_MANAGER()
         {
 
@@ -2175,7 +2092,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
         public void SendMail_tcp_guys_to_requester()
         {
 
@@ -2260,7 +2176,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
 
         public void SendMail_NID_guys_to_requester()
         {
@@ -2347,8 +2262,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
         public void SendMail_ess_guys_to_requester()
         {
 
@@ -2433,8 +2346,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
-
 
         public void SendMail_from_ess_guys_to_requester()
         {
@@ -2521,8 +2432,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
         public void SendMail_from_ess_guys_to_requester_manager()
         {
 
@@ -2608,7 +2517,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
         public void SendMail_from_ess_guys_to_ess_guys()
         {
 
@@ -2693,7 +2601,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
 
         public void SendMail_from_ess_guys_to_tcpguys_and_txcore_manager()
         {
@@ -2866,8 +2773,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
         public void SendMail_NID_guys_to_LINE_MANAGER()
         {
 
@@ -2952,7 +2857,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
 
         public void SendMail_ess_guys_to_LINE_MANAGER()
         {
@@ -3039,10 +2943,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
-
-
         public void SendMail_from_tcp_guys_to_tcp_team()
         {
 
@@ -3127,7 +3027,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
 
         public void SendMail_from_ess_guys_to_tcp_team()
         {
@@ -3214,7 +3113,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
         public void SendMail_from_TXCOREMANAGER_to_tcp_team()
         {
 
@@ -3299,7 +3197,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
 
         public void SendMail_from_TXCOREMANAGER_to_NID_team()
         {
@@ -3386,8 +3283,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
         public void SendMail_from_NID_to_STAKEHOLDER()
         {
 
@@ -3472,8 +3367,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
-
 
         public void SendMail_from_TCP_to_STAKEHOLDER()
         {
@@ -3560,8 +3453,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
         public void SendMail_from_tcp_guys_to_ess_team()
         {
 
@@ -3646,9 +3537,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
-
-
 
         public void SendMail_from_ess_guys_to_ess_team()
         {
@@ -3735,8 +3623,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
-
         public void SendMail_from_TXCOREMANAGER_to_ess_team()
         {
 
@@ -3821,10 +3707,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
-
-
-
 
         public void SendMail_to_tcp_manager()
         {
@@ -3911,7 +3793,6 @@ namespace Backend_UMR_Work_Program
             }
         }
 
-
         public void SendMail_to_nid_team()
         {
 
@@ -3991,7 +3872,6 @@ namespace Backend_UMR_Work_Program
                 //log report
             }
         }
-
 
         public void SendMail_to_all_stakeholders()
         {

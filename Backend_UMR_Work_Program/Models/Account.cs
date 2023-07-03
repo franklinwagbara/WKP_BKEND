@@ -477,9 +477,9 @@ namespace Backend_UMR_Work_Program.Models
 			message.Body = mailbody;
 			message.BodyEncoding = Encoding.UTF8;
 			message.IsBodyHtml = true;
-			SmtpClient client = new SmtpClient("email-smtp.us-west-2.amazonaws.com", 25); //Gmail smtp    
+			SmtpClient client = new SmtpClient("email-smtp.us-east-2.amazonaws.com", 587); //Gmail smtp    
 			System.Net.NetworkCredential basicCredential1 = new
-			System.Net.NetworkCredential("AKIAQCM2OPFBW35OSTFV", "BNW5He3DoWQAJVMkeMlEzPTtbYIXNveS4t+GuGtXzxQJ");
+			System.Net.NetworkCredential("AKIAQCM2OPFBSV5LH3U7", "BJIdfFWQCb/fdKYej/Mw6EfHK3QJ9XPJ9k6UwHLcjjsu");
 			client.EnableSsl = true;
 			client.UseDefaultCredentials = false;
 			client.Credentials = basicCredential1;
@@ -614,9 +614,9 @@ namespace Backend_UMR_Work_Program.Models
 			message.Body = mailbody;
 			message.BodyEncoding = Encoding.UTF8;
 			message.IsBodyHtml = true;
-			SmtpClient client = new SmtpClient("email-smtp.us-west-2.amazonaws.com", 25); //Gmail smtp             
+			SmtpClient client = new SmtpClient("email-smtp.us-east-2.amazonaws.com", 587); //Gmail smtp             
 			System.Net.NetworkCredential basicCredential1 = new
-			System.Net.NetworkCredential("AKIAQCM2OPFBW35OSTFV", "BNW5He3DoWQAJVMkeMlEzPTtbYIXNveS4t+GuGtXzxQJ");
+			System.Net.NetworkCredential("AKIAQCM2OPFBSV5LH3U7", "BJIdfFWQCb/fdKYej/Mw6EfHK3QJ9XPJ9k6UwHLcjjsu");
 			client.EnableSsl = true;
 			client.UseDefaultCredentials = false;
 			client.Credentials = basicCredential1;
@@ -755,9 +755,9 @@ namespace Backend_UMR_Work_Program.Models
 			message.Body = mailbody;
 			message.BodyEncoding = Encoding.UTF8;
 			message.IsBodyHtml = true;
-			SmtpClient client = new SmtpClient("email-smtp.us-west-2.amazonaws.com", 25); //Gmail smtp    
+			SmtpClient client = new SmtpClient("email-smtp.us-east-2.amazonaws.com", 587); //Gmail smtp    
 			System.Net.NetworkCredential basicCredential1 = new
-			System.Net.NetworkCredential("AKIAQCM2OPFBW35OSTFV", "BNW5He3DoWQAJVMkeMlEzPTtbYIXNveS4t+GuGtXzxQJ");
+			System.Net.NetworkCredential("AKIAQCM2OPFBSV5LH3U7", "BJIdfFWQCb/fdKYej/Mw6EfHK3QJ9XPJ9k6UwHLcjjsu");
 			client.EnableSsl = true;
 			client.UseDefaultCredentials = false;
 			client.Credentials = basicCredential1;

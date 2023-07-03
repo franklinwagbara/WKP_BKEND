@@ -4,6 +4,7 @@ using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Models.Enurations;
+using Backend_UMR_Work_Program.Services;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 //using LinqToDB;
@@ -27,9 +28,11 @@ namespace Backend_UMR_Work_Program.Controllers
 		IHttpContextAccessor _httpContextAccessor;
 		private readonly IMapper _mapper;
 		RestSharpServices restSharpServices = new RestSharpServices();
+        public HelperService _helperService { get; }
 
-		public HelpersController(WKP_DBContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+		public HelpersController(WKP_DBContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper, HelperService helperService)
 		{
+        	_helperService = helperService;
 			_mapper = mapper;
 			_context = context;
 			_configuration = configuration;
@@ -40,28 +43,6 @@ namespace Backend_UMR_Work_Program.Controllers
 		private string? WKPUserName => User.FindFirstValue(ClaimTypes.Name);
 		private string? WKPUserEmail => User.FindFirstValue(ClaimTypes.Email);
 		private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
-
-		public string Encrypt(string clearText)
-		{
-			string EncryptionKey = "MAKV2SPBNI99212";
-			byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
-			using (Aes encryptor = Aes.Create())
-			{
-				Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-				encryptor.Key = pdb.GetBytes(32);
-				encryptor.IV = pdb.GetBytes(16);
-				using (MemoryStream ms = new MemoryStream())
-				{
-					using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-					{
-						cs.Write(clearBytes, 0, clearBytes.Length);
-						cs.Close();
-					}
-					clearText = Convert.ToBase64String(ms.ToArray());
-				}
-			}
-			return clearText;
-		}
 
 		public string Decrypt(string cipherText)
 		{
@@ -2658,15 +2639,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
 				string subject = $"APPROVAL FOR WORK PROGRAM SUBMISSION FOR YEAR: {application.YearOfWKP}";
 				var msgBody = string.Format(body, subject, Company.NAME, approval.PermitNo, approval.DateIssued.ToShortDateString(), approval.DateExpired.ToShortDateString(), DateTime.Now.Year);
-				var emailMsg = SaveMessage(app.Id, app.CompanyID, subject, msgBody, "Company");
-				var sendEmail = SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
+				var emailMsg = _helperService.SaveMessage(app.Id, app.CompanyID, subject, msgBody, "Company");
+				var sendEmail = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
 				#endregion
 
 				return pm;
 			}
 			catch (Exception x)
 			{
-				LogMessages(x.ToString());
+				_helperService.LogMessages(x.ToString());
 				return x.ToString();
 			}
 		}
@@ -2824,39 +2805,6 @@ generate:
 		//	}
 		//}
 
-		public int RecordStaffDesks(int appID, staff staff, int FromStaffID, int FromStaffSBU, int FromStaffRoleID, int processID)
-		{
-			try
-			{
-				MyDesk drop = new MyDesk()
-				{
-					ProcessID = processID,
-					AppId = appID,
-					StaffID = staff.StaffID,
-					FromStaffID = FromStaffID,
-					FromSBU = FromStaffSBU,
-					FromRoleId= FromStaffRoleID,
-					HasWork = true,
-					HasPushed = false,
-					CreatedAt = DateTime.Now,
-					ProcessStatus = STAFF_DESK_STATUS.SUBMISSION,
-					LastJobDate = DateTime.Now,
-				};
-				_context.MyDesks.Add(drop);
-
-				if (_context.SaveChanges() > 0)
-				{
-					return 1;
-				}
-
-				return 0;
-			}
-			catch (Exception e)
-			{
-				throw e;
-			}
-		}
-
 		public async Task<List<ApplicationProcessModel>> GetApplicationProccess(string appType, int sortID = 0, int SBU_ID = 0)
 		{
 			try
@@ -2923,25 +2871,6 @@ generate:
 			}
 		}
 
-		public async Task<staff> GetStaffByStaffId(int staffId)
-		{
-			try
-			{
-				var getStaff = await _context.staff.FirstOrDefaultAsync(x => x.StaffID==staffId);
-				if (getStaff ==null)
-				{
-					return null;
-				}
-				return getStaff;
-			}
-			catch (Exception ex)
-			{
-
-				throw ex;
-			}
-		}
-
-
 		public async Task<MyDesk> GetStaffMyDesks(List<int> staffIds, int appId)
 		{
 			try
@@ -2993,161 +2922,6 @@ generate:
 			}
 		}
 
-        public async Task<MyDesk> GetNextStaffDesk(List<int> staffIds, int appId)
-        {
-            try
-            {
-                var staffDesks = new List<MyDesk>();
-
-                foreach (var staffId in staffIds)
-                {
-                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
-					var mostRecentJob = _context.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
-                    //var desk_conflict = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
-
-                    if (desk != null)
-                    {
-                        throw new Exception("This application has already been push to this desk.");
-                    }
-                    else
-                    {
-						if(mostRecentJob == null)
-						{
-                            var tempDesk = new MyDesk
-                            {
-                                //save staff desk
-                                StaffID = staffId,
-                                AppId = appId,
-                                HasPushed = false,
-                                HasWork = false,
-                                CreatedAt = DateTime.Now,
-                                UpdatedAt = DateTime.Now,
-                                //Comment="",
-                                LastJobDate = DateTime.Now,
-                            };
-
-                            _context.MyDesks.Add(tempDesk);
-
-                            await _context.SaveChangesAsync();
-
-                            return tempDesk;
-                        }
-						else
-						{
-							staffDesks.Add(mostRecentJob);
-						}
-                    }
-                }
-
-				var chosenDesk = staffDesks.OrderBy(x => x.LastJobDate).FirstOrDefault();
-                
-				var newDesk = new MyDesk
-                {
-                    //save staff desk
-                    StaffID = chosenDesk.StaffID,
-                    AppId = appId,
-                    HasPushed = false,
-                    HasWork = false,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    //Comment="",
-                    LastJobDate = DateTime.Now,
-                };
-
-                _context.MyDesks.Add(newDesk);
-                
-				await _context.SaveChangesAsync();
-
-                return newDesk;
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-        public async Task<MyDesk> GetNextStaffDesk_EC(List<int> staffIds, int appId)
-        {
-            try
-            {
-                var staffDesks = new List<MyDesk>();
-
-                foreach (var staffId in staffIds)
-                {
-                    var desk = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefault();
-                    var mostRecentJob = _context.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
-                    //var desk_conflict = _context.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
-
-                    if (desk != null)
-                    {
-						var res = new MyDesk
-						{
-							DeskID = -1,
-							StaffID = staffId,
-							AppId = appId,
-						};
-						return res; 
-                    }
-                    else
-                    {
-                        if (mostRecentJob == null)
-                        {
-                            var tempDesk = new MyDesk
-                            {
-                                //save staff desk
-                                StaffID = staffId,
-                                AppId = appId,
-                                HasPushed = false,
-                                HasWork = false,
-                                CreatedAt = DateTime.Now,
-                                UpdatedAt = DateTime.Now,
-                                //Comment="",
-                                LastJobDate = DateTime.Now,
-                            };
-
-                            _context.MyDesks.Add(tempDesk);
-
-                            await _context.SaveChangesAsync();
-
-                            return tempDesk;
-                        }
-                        else
-                        {
-                            staffDesks.Add(mostRecentJob);
-                        }
-                    }
-                }
-
-                var chosenDesk = staffDesks.OrderBy(x => x.LastJobDate).FirstOrDefault();
-
-                var newDesk = new MyDesk
-                {
-                    //save staff desk
-                    StaffID = chosenDesk.StaffID,
-                    AppId = appId,
-                    HasPushed = false,
-                    HasWork = false,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    //Comment="",
-                    LastJobDate = DateTime.Now,
-                };
-
-                _context.MyDesks.Add(newDesk);
-
-                await _context.SaveChangesAsync();
-
-                return newDesk;
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-
         public async Task<int> GetDeskIdByStaffIdAndAppId(int staffId, int appId)
 		{
 			try
@@ -3192,75 +2966,6 @@ generate:
 			}
 		}
 
-		public async Task<MyDesk> UpdateDeskAfterPush(MyDesk desk, string? comment, string? processStatus)
-		{
-			try
-			{
-                desk.HasPushed = true;
-                desk.HasWork = false;
-                desk.UpdatedAt = DateTime.Now;
-                desk.Comment = comment;
-                desk.ProcessStatus = processStatus;
-
-				_context.MyDesks.Update(desk);
-				_context.SaveChanges();
-
-				return desk;
-            }
-			catch (Exception ex)
-			{
-
-				throw ex;
-			}
-		}
-
-        public async Task<ApplicationSBUApproval> UpdateApprovalTable(int appId, string? comment, int? staffId, int? deskId, string? processStatus)
-        {
-            try
-            {
-				//var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId && x.DeskID == deskId).FirstOrDefault();
-				var foundApproval = _context.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.StaffID == staffId).FirstOrDefault();
-
-				if (foundApproval != null)
-				{
-					foundApproval.AppId = appId;
-					foundApproval.StaffID = staffId;
-					foundApproval.Status = processStatus;
-					foundApproval.Comment = comment;
-					foundApproval.UpdatedDate = DateTime.Now;
-					foundApproval.DeskID = deskId;
-
-					_context.ApplicationSBUApprovals.Update(foundApproval);
-                    _context.SaveChanges();
-                }
-				else
-				{
-					var newApproval = new ApplicationSBUApproval()
-					{
-                        AppId = appId,
-						StaffID = staffId,
-						Status = processStatus,
-						Comment = comment,
-						UpdatedDate = DateTime.Now,
-						DeskID = deskId
-					};
-
-                    _context.ApplicationSBUApprovals.Add(newApproval);
-                    _context.SaveChanges();
-
-                    return newApproval;
-                }
-
-
-                return foundApproval;
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
         public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
         {
             try
@@ -3303,136 +3008,6 @@ generate:
             }
         }
 
-        public async Task<List<int>> GetStaffByTargetRoleAndSBU(int targetedToRole, int targetedToSBU)
-		{
-			try
-			{
-				var getstaffs = await _context.staff.Where(x => x.RoleID==targetedToRole && x.Staff_SBU==targetedToSBU && x.DeleteStatus !=true).Select(x => x.StaffID).ToListAsync();
-
-				return getstaffs;
-			}
-			catch (Exception ex)
-			{
-
-				throw ex;
-			}
-		}
-
-		public async Task<List<ApplicationProccess>> GetApplicationProccessBySBUAndRole(string processAction, int triggeredByRole = 0, int triggeredBySBU = 0)
-		{
-			try
-			{
-
-				var applicationProcess = await _context.ApplicationProccesses.Where(x => x.TriggeredByRole==triggeredByRole && x.TriggeredBySBU==triggeredBySBU && x.ProcessAction==processAction && x.DeleteStatus !=true).ToListAsync();
-
-				return applicationProcess;
-
-			}
-			catch (Exception e)
-			{
-				throw e;
-			}
-		}
-
-		public async Task<bool> hasApplicationBeenSubmittedBefore(int yearID, COMPANY_FIELD field, ADMIN_CONCESSIONS_INFORMATION concession)
-		{
-			var app = new Application();
-
-			try
-			{
-				if (field != null)
-				{
-					app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id && a.FieldID == field.Field_ID).FirstOrDefaultAsync();
-				}
-				else
-				{
-					app = await _context.Applications.Where<Application>(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id).FirstOrDefaultAsync();
-				}
-
-				if (app != null) return true;
-				else return false;
-			}
-			catch(Exception ex)
-			{
-				throw ex;
-			}
-		}
-
-		public async Task<List<staff>> GetReviewerStafff(List<ApplicationProccess> applicationProccesses)
-		{
-			try
-			{
-				var staffLists = new List<staff>();
-				foreach (var item in applicationProccesses)
-				{
-                    var staffs = await _context.staff.Where(x => x.Staff_SBU == item.TargetedToSBU && x.RoleID == item.TargetedToRole).ToListAsync();
-
-					if(staffs.Count <= 0)
-					{
-						break;
-					}
-
-					var isFound = false;
-					var choosenStaff = staffs.Count > 0? staffs[0]: new staff();
-					var choosenDesk = new MyDesk()
-					{
-						LastJobDate = DateTime.Now,
-					};
-
-					foreach(var staff in staffs)
-					{
-                        //var desk = (from stf in _context.staff
-                        //            join dsk in _context.MyDesks on stf.StaffID equals dsk.StaffID
-                        //            where stf.Staff_SBU == item.TargetedToSBU && stf.RoleID == item.TargetedToRole
-                        //            select dsk).OrderBy(d => d.LastJobDate).FirstOrDefault();
-
-						var desk = await _context.MyDesks.Where<MyDesk>(d => d.StaffID == staff.StaffID && d.HasWork == true).OrderByDescending(d => d.LastJobDate).FirstOrDefaultAsync();
-
-						if(desk == null)
-						{
-							staffLists.Add(staff);
-							isFound = true;
-							break;
-						}
-
-						choosenStaff = desk.LastJobDate < choosenDesk.LastJobDate ? staff : choosenStaff;
-						choosenDesk = desk.LastJobDate < choosenDesk.LastJobDate? desk: choosenDesk;
-                    }
-
-					if (!isFound)
-					{
-						staffLists.Add(choosenStaff);
-					}
-				}
-				return staffLists;
-			}
-			catch (Exception ex)
-			{
-
-				throw ex;
-			}
-		}
-		public async Task<List<ApplicationProccess>> GetApplicationProccessByAction(string processAction)
-		{
-			try
-			{
-				//var getStaff = new List<ApplicationProcessModel>();
-
-				//Get Processes by action
-				var applicationProcesses = await _context.ApplicationProccesses.Where(x => x.ProcessAction==processAction).ToListAsync();
-
-				//if (applicationProcesses.Count>0)
-				//{
-				//	return applicationProcesses;
-				//}
-
-				return applicationProcesses;
-			}
-			catch (Exception ex)
-			{
-				throw ex;
-			}
-		}
 
 		public async Task<ProcessFlowModel> GetAllSUBsFromProcessFlow(int ProcessFlowId)
 		{
@@ -3513,20 +3088,6 @@ generate:
 			}
 		}
 
-		//public async Task<List<int>> GetRoleBySBUId(int SBUId)
-		//{
-		//	try
-		//	{
-
-		//	}
-		//	catch (Exception ex)
-		//	{
-
-		//		throw ex;
-		//	}
-		//}
-
-
 		public void SaveHistory(int appid, int staffid, string status, string comment , string selectedTables)
 		{
 			var getStaff = (from u in _context.staff where u.StaffID == staffid select u).FirstOrDefault();
@@ -3565,135 +3126,5 @@ generate:
 			_context.ApplicationDeskHistories.Add(appDeskHistory);
 			_context.SaveChanges();
 		}
-
-		public List<AppMessage> SaveMessage(int appID, int userID, string subject, string content, string type)
-		{
-
-			Message messages = new Message()
-			{
-				companyID = type.Contains("ompany") ? userID : 0,
-				staffID = userID,
-				AppId = appID,
-				subject = subject,
-				content = content,
-				//sender_id = userElpsID,
-				read = 0,
-				UserType = type,
-				date = DateTime.UtcNow.AddHours(1)
-			};
-			_context.Messages.Add(messages);
-			_context.SaveChanges();
-
-			var msg = GetMessage(messages.id, userID);
-			return msg;
-		}
-		public List<AppMessage> GetMessage(int msg_id, int seid)
-		{
-
-			var message = (from m in _context.Messages
-						   join a in _context.Applications on m.AppId equals a.Id
-						   join cm in _context.ADMIN_COMPANY_INFORMATIONs on a.CompanyID equals cm.Id
-						   join ca in _context.ApplicationCategories on a.CategoryID equals ca.Id
-						   where m.id == msg_id
-						   select new AppMessage
-						   {
-							   Subject = m.subject,
-							   Content = m.content,
-							   RefNo = a == null ? "" : a.ReferenceNo,
-							   Status = a == null ? "" : a.Status,
-							   Seen = m.read,
-							   CompanyName = cm == null ? "" : cm.COMPANY_NAME,
-							   CategoryName = ca.Name,
-							   Field = "Field",
-							   Concession = "Concession",
-							   DateSubmitted = a.CreatedAt
-						   });
-			return message.ToList();
-		}
-		public string SendEmailMessage(string email_to, string email_to_name, List<AppMessage> AppMessages, byte[] attach)
-		{
-			var result = "";
-			var password = _configuration.GetSection("SmtpSettings").GetSection("Password").Value.ToString();
-			var username = _configuration.GetSection("SmtpSettings").GetSection("Username").Value.ToString();
-			var emailFrom = _configuration.GetSection("SmtpSettings").GetSection("SenderEmail").Value.ToString();
-			var Host = _configuration.GetSection("SmtpSettings").GetSection("Server").Value.ToString();
-			var Port = Convert.ToInt16(_configuration.GetSection("SmtpSettings").GetSection("Port").Value.ToString());
-
-			var msgBody = CompanyMessageTemplate(AppMessages);
-
-			MailMessage _mail = new MailMessage();
-			SmtpClient client = new SmtpClient(Host, Port);
-			client.DeliveryMethod = SmtpDeliveryMethod.Network;
-
-			client.UseDefaultCredentials = false;
-			client.EnableSsl = true;
-			client.Credentials = new System.Net.NetworkCredential(username, password);
-			_mail.From = new MailAddress(emailFrom);
-			_mail.To.Add(new MailAddress(email_to, email_to_name));
-			_mail.Subject = AppMessages.FirstOrDefault().Subject.ToString();
-			_mail.IsBodyHtml = true;
-			_mail.Body = msgBody;
-			if (attach != null)
-			{
-				string name = "App Letter";
-				Attachment at = new Attachment(new MemoryStream(attach), name);
-				_mail.Attachments.Add(at);
-			}
-			//_mail.CC=
-			try
-			{
-				client.Send(_mail);
-			}
-			catch (Exception ex)
-			{
-				result = ex.Message;
-			}
-			return result;
-		}
-		public string CompanyMessageTemplate(List<AppMessage> AppMessages)
-		{
-			var msg = AppMessages?.FirstOrDefault();
-			string body = "<div>";
-
-			body += "<div style='width: 800px; background-color: #ece8d4; padding: 5px 0 5px 0;'><img style='width: 98%; height: 120px; display: block; margin: 0 auto;' src='~/images/NUPRC Logo.JPG' alt='Logo'/></div>";
-			body += "<div class='text-left' style='background-color: #ece8d4; width: 800px; min-height: 200px;'>";
-			body += "<div style='padding: 10px 30px 30px 30px;'>";
-			body += "<h5 style='text-align: center; font-weight: 300; padding-bottom: 10px; border-bottom: 1px solid #ddd;'>" + msg.Subject + "</h5>";
-			body += "<p>Dear Sir/Madam,</p>";
-			body += "<p style='line-height: 30px; text-align: justify;'>" + msg.Content + "</p>";
-			body += "<p style='line-height: 30px; text-align: justify;'> Kindly find application details below.</p>";
-			body += "<table style = 'width: 100%;'><tbody>";
-			body += "<tr><td style='width: 200px;'><strong>Company Name:</strong></td><td> " + msg.CompanyName + " </td></tr>";
-			body += "<tr><td style='width: 200px;'><strong>Year:</strong></td><td> " + msg.Year + " </td></tr>";
-			body += "<tr><td style='width: 200px;'><strong>Concession:</strong></td><td> " + msg.Concession + " </td></tr>";
-			body += "<tr><td style='width: 200px;'><strong>Field:</strong></td><td> " + msg.Field + " </td></tr>";
-			body += "</tbody></table><br/>";
-
-			body += "<p> </p>";
-			body += "&copy; " + DateTime.Now.Year + "<p>  Powered by NUPRC Work Program Team. </p>";
-			body += "<div style='padding:10px 0 10px; 10px; background-color:#888; color:#f9f9f9; width:800px;'> &copy; " + DateTime.UtcNow.AddHours(1).Year + " Nigerian Upstream Petroleum Regulatory Commission &minus; NUPRC Nigeria</div></div></div>";
-
-			return body;
-		}
-		public void LogMessages(string message, string user_id = null)
-		{
-			var auditTrail = new AuditTrail()
-			{
-				CreatedAt = DateTime.UtcNow,
-				UserID = user_id,
-				AuditAction = message
-			};
-
-			_context.AuditTrails.Add(auditTrail);
-			_context.SaveChanges();
-
-		}
-
-		//public List<object> FilterData(int SBU_ID)
-		//{
-
-
-		//}
-
 	}
 }

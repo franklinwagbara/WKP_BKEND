@@ -6,7 +6,7 @@
     [FieldID]          INT            NULL,
     [CategoryID]       INT            NOT NULL,
     [YearOfWKP]        INT            NOT NULL,
-    [Status]           NVARCHAR (25)  NOT NULL,
+    [Status]           NVARCHAR (100)  NOT NULL,
     [PaymentStatus]    VARCHAR (50)   NOT NULL,
     [CurrentDesk]      INT            NULL,
     [Submitted]        BIT            NULL,

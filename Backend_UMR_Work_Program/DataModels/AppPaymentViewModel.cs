@@ -5,10 +5,13 @@
         public int Id { get; set; }
         public int AppId { get; set; }
         public int CompanyNumber { get; set; }
-        public int? ConcessionId { get; set; }
+        public int ConcessionId { get; set; }
         public int? FieldId { get; set; }
         public int TypeOfPayment { get; set; }
         public string AmountNGN { get; set; }
         public string AmountUSD { get; set; }
+        public string OrderId { get; set; }
+        public string? ServiceCharge { get; set; }
+        public string Currency { get; set; }
     }
 }

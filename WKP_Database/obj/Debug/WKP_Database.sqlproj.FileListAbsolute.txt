@@ -18,17 +18,6 @@ C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\Model.xml
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\refactor.xml
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\postdeploy.sql
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\predeploy.sql
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dacpac
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dll
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.pdb
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.sqlproj.AssemblyReference.cache
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.xml
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.dll
-C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb
-<<<<<<< HEAD
 C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dacpac
 C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dll
 C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.pdb
@@ -39,5 +28,23 @@ C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.x
 C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
 C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
 C:\Users\prisc\source\repos\EMMA\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
-=======
->>>>>>> 8cd9e92ac584cb2cd3056f258c719952de1f6c6e
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dacpac
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dll
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.pdb
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.sqlproj.AssemblyReference.cache
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.xml
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.dll
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dacpac
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\bin\Debug\WKP_Database.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.sqlproj.AssemblyReference.cache
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.xml
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
