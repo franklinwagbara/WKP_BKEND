@@ -3347,6 +3347,10 @@ namespace Backend_UMR_Work_Program.Controllers
                                         getData.UploadCommDevPlanApprovalPath = null;
                                         getData.UploadCommDevPlanApprovalFilename = null;
                                     }
+                                    getData.EvidenceOfPayTrustFundPath = null;
+                                    getData.EvidenceOfPayTrustFundFilename = null;
+                                    getData.EvidenceOfRegTrustFundPath = null;
+                                    getData.EvidenceOfRegTrustFundFilename = null;
                                 }
                                 if (Request.Form.Files.Count == 2)
                                 {
@@ -3384,6 +3388,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                         getData.EvidenceOfPayTrustFundPath = null;
                                         getData.EvidenceOfPayTrustFundFilename = null;
                                     }
+                                    getData.EvidenceOfRegTrustFundPath = null;
+                                    getData.EvidenceOfRegTrustFundFilename = null;
                                 }
                                 else
                                 {
@@ -3458,8 +3464,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 getData.EvidenceOfRegTrustFundFilename = null;
                                 getData.UploadCommDevPlanApprovalPath = null;
                                 getData.UploadCommDevPlanApprovalFilename = null;
-                                getData.EvidenceOfRegTrustFundPath = null;
-                                getData.EvidenceOfRegTrustFundFilename = null;
+                                getData.EvidenceOfPayTrustFundPath = null;
+                                getData.EvidenceOfPayTrustFundFilename = null;
                             }
 
                             #endregion
@@ -3525,6 +3531,10 @@ namespace Backend_UMR_Work_Program.Controllers
                                 host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
                                 host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
                             }
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
+                            host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
+                            host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
                         }
                         if (Request.Form.Files.Count == 2)
                         {
@@ -3565,7 +3575,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
                                 host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
                             }
-
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
                         }
                         else
                         {
@@ -3644,8 +3655,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
                         host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
                         host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
-                        host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
-                        host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
+                        host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
+                        host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
                     }
 
                     #endregion
