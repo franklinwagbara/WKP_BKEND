@@ -124,20 +124,28 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
-        public async Task<AccountDesk> UpdatedAccountDeskToConfirm(int deskId)
+        public async Task<AccountDesk> UpdatedAccountDeskToConfirmedPayment(int deskId)
         {
             try
             {
                 var desk = await _context.AccountDesks.Where(x => x.AccountDeskID == deskId).FirstOrDefaultAsync();
+                var payment = await _context.Payments.Where(x => x.Id == desk.PaymentId).FirstOrDefaultAsync();
 
-                if (desk == null)
+                if (desk == null || payment == null)
                     throw new Exception("Payment not on accounts desk.");
 
                 desk.UpdatedAt = DateTime.Now;
                 desk.ProcessStatus = PAYMENT_STATUS.PaymentCompleted;
                 desk.isApproved = true;
 
+                payment.Status = PAYMENT_STATUS.PaymentCompleted;
+                payment.TransactionDate= DateTime.Now;
+                payment.TXNMessage = "Confirmed";
+                payment.IsConfirmed = true;
+
                 _context.AccountDesks.Update(desk);
+                _context.Payments.Update(payment);
+
                 await _context.SaveChangesAsync();
 
                 return desk;
@@ -152,19 +160,14 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                var desk = await UpdatedAccountDeskToConfirm(deskId);
-                var paymentRes = await _paymentService.ConfirmPayment(desk.AppId);
-
-                if (paymentRes.ResponseCode != AppResponseCodes.Success)
-                    return paymentRes;
+                var desk = await UpdatedAccountDeskToConfirmedPayment(deskId);
 
                 var submitRes = await _applicationService.SubmitApplication(desk.AppId);
 
                 if (submitRes.ResponseCode != AppResponseCodes.Success)
                     return submitRes;
 
-                paymentRes.Message = submitRes.Message;
-                return paymentRes;
+                return submitRes;
             }
             catch (Exception e)
             {
