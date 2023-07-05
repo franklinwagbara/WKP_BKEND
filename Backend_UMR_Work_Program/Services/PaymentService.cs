@@ -405,7 +405,29 @@ namespace Backend_UMR_Work_Program.Services
             }
             
         }
-    
+
+        public async Task<bool> DropAppOnAccountDesk(Payments payment)
+        {
+            try
+            {
+                var targetDesk = await _helperService.GetNextAccountDesk();
+
+                targetDesk.AppId = payment.AppId;
+                targetDesk.PaymentId = payment.Id;
+                targetDesk.isApproved = false;
+                targetDesk.LastJobDate = DateTime.Now;
+                targetDesk.ProcessStatus = PAYMENT_STATUS.PaymentPending;
+
+                _context.AccountDesks.Add(targetDesk);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         public async Task<WebApiResponse> ConfirmUSDPayment(USDPaymentDTO model, string? paymentCategory)
         {
             try
@@ -437,6 +459,7 @@ namespace Backend_UMR_Work_Program.Services
                 await _context.SaveChangesAsync();
 
                 //Drop the application on accounts department desk
+                await DropAppOnAccountDesk(paymentExist);
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Payment Evidence was successfully uploaded!", StatusCode = ResponseCodes.Success };
             }
@@ -446,13 +469,7 @@ namespace Backend_UMR_Work_Program.Services
             }
 
         }
-
-        //public async Task<WebApiResponse> DropAppOnAccountDesk()
-        //{
-
-        //}
-
-
+                
         public async Task<WebApiResponse> CreateUSDPayment(USDPaymentDTO model, string? paymentCategory)
         {
             try

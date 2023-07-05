@@ -19,6 +19,7 @@ public partial class WKP_DBContext : DbContext
         _configuration = configuration;
     }
 
+    public virtual DbSet<AccountDesk> AccountDesks { get; set; }
     public virtual DbSet<ReturnedApplication> ReturnedApplications { get; set; }
     public virtual DbSet<LateSubmission> LateSubmission { get; set; }
     public virtual DbSet<Fee> Fees { get; set; }

@@ -52,6 +52,16 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Activated = "Activated";
 		public static string Deactivated = "Deactivated";
 
+		public static class SBU
+		{
+			public const string Accounts = "Accounts";
+			public const string Legal = "Legal";
+		}
+
+		public static class RoleName
+		{
+			public const string Accountant = "Accountant";
+		}
 
         //Application, Payment statuses
         public static class MAIN_APPLICATION_STATUS
