@@ -791,7 +791,7 @@ namespace Backend_UMR_Work_Program.Services
                 var staff = await _dbContext.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();    
 
 
-                var companies = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(x => x.COMPANY_NAME != "Admin").ToListAsync();
+                var companies = await _dbContext.ADMIN_COMPANY_DETAILs.ToListAsync();
 
                 return new WebApiResponse { Data = companies, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
