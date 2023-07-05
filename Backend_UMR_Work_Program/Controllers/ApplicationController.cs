@@ -116,6 +116,9 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("Rejected-Applications")]
         public async Task<WebApiResponse> AllApplications() => await _applicationService.RejectedApplications();
 
+        [HttpGet("GET_ACCOUNT_DESK")]
+        public async Task<WebApiResponse> GetAccountDesk() => await _applicationService.GetAccountDesk(WKPCompanyEmail);
+
         //Rework
         [HttpGet("All-Applications")] //For general application view
         public async Task<object> RejectedApplications()
@@ -374,6 +377,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 var concession = await _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == application.ConcessionID).FirstOrDefaultAsync();
 
                 var company = await _context.ADMIN_COMPANY_INFORMATIONs.Where(x => x.Id == application.CompanyID).FirstOrDefaultAsync();
+                var companyDetails = await _context.ADMIN_COMPANY_DETAILs.Where(x => x.EMAIL == company.EMAIL).FirstOrDefaultAsync();
 
                 var appHistory = await _context.ApplicationDeskHistories.Include(x => x.Staff).Include(x => x.Company).Where(x => x.AppId == appID)
                                     .Select( x => new
@@ -387,6 +391,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                         Date = x.ActionDate,
                                         ActionByCompany = x.ActionByCompany,
                                         Company = x.Company,
+                                        CompanyDetails = companyDetails,
                                         Status = x.Status,
                                         Action = x.AppAction,
                                     }).ToListAsync();
@@ -448,6 +453,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     Field = field,
                     Concession = concession,
                     Company = company,
+                    CompanyDetails = companyDetails,
                     Staff = staffDesk,
                     currentDesks = currentDesks,
                     Application_History = appHistory.OrderByDescending(x => x.ID).ToList(),
