@@ -244,100 +244,95 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_ADMIN_CONCESSIONS_INFORMATION")]
-        public async Task<object> POST_ADMIN_CONCESSIONS_INFORMATION([FromBody] ADMIN_CONCESSIONS_INFORMATION ADMIN_CONCESSIONS_INFORMATION_model, string id, string actionToDo)
+        public async Task<object> POST_ADMIN_CONCESSIONS_INFORMATION([FromBody] ADMIN_CONCESSIONS_INFORMATION model, string id, string actionToDo)
         {
             int save = 0;
+            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : model.Consession_Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
 
             try
             {
+                if(Id > 0)
+                {
+                    var companyConcession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs
+                                                   where d.Consession_Id == Id
+                                                   select d).FirstOrDefaultAsync();
+                    if (companyConcession != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.ADMIN_CONCESSIONS_INFORMATIONs.Remove(companyConcession);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            companyConcession.Area = model.Area;
+                            companyConcession.Comment = model.Comment;
+                            companyConcession.ConcessionName = model.ConcessionName;
+                            companyConcession.Concession_Held = model.Concession_Held;
+                            companyConcession.Consession_Type = model.Consession_Type;
+                            companyConcession.Contract_Type = model.Contract_Type;
+                            companyConcession.Terrain = model.Terrain;
+                            companyConcession.Comment = model.Comment;
+                            companyConcession.Equity_distribution = model.Equity_distribution;
+                            companyConcession.Date_of_Expiration = model.Date_of_Expiration;
+                            companyConcession.Year_of_Grant_Award = model.Year_of_Grant_Award;
+                            _context.Entry(companyConcession).State = EntityState.Modified;
 
+                            //_context.ADMIN_CONCESSIONS_INFORMATIONs.Update(companyConcession);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : This concession details could not be found for ID: {Id}." });
+                    }
+                }
                 #region Saving Concession
 
-                if (action == GeneralModel.Insert || action == GeneralModel.Insert.ToUpper())
+                else if (model != null)
                 {
                     var companyConcession = (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs
-                                             where (d.ConcessionName == ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper() || d.Concession_Held == ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper())
+                                             where (d.ConcessionName == model.Concession_Held.TrimEnd().ToUpper() || d.Concession_Held == model.Concession_Held.TrimEnd().ToUpper())
                                                    && d.CompanyNumber == WKPCompanyNumber && d.DELETED_STATUS == null
                                              select d).FirstOrDefault();
 
                     if (companyConcession != null)
                     {
-                        //return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
-
-                        return BadRequest(new { message = $"Error : Concession ({ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held} is already existing and can not be duplicated." });
+                        return BadRequest(new { message = $"Error : Concession ({model.Concession_Held} is already existing and can not be duplicated." });
                     }
                     else
                     {
-                        ADMIN_CONCESSIONS_INFORMATION_model.CompanyName = WKPCompanyName;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Company_ID = WKPCompanyId;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Year = DateTime.UtcNow.Year.ToString();
-                        ADMIN_CONCESSIONS_INFORMATION_model.DELETED_STATUS = null;
-                        ADMIN_CONCESSIONS_INFORMATION_model.CompanyNumber = WKPCompanyNumber;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Date_Created = DateTime.Now;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Created_by = WKPCompanyEmail;
-                        ADMIN_CONCESSIONS_INFORMATION_model.ConcessionName = ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper();
-                        await _context.ADMIN_CONCESSIONS_INFORMATIONs.AddAsync(ADMIN_CONCESSIONS_INFORMATION_model);
+                        model.CompanyName = WKPCompanyName;
+                        model.Company_ID = WKPCompanyId;
+                        model.Year = DateTime.UtcNow.Year.ToString();
+                        model.DELETED_STATUS = null;
+                        model.CompanyNumber = WKPCompanyNumber;
+                        model.Date_Created = DateTime.Now;
+                        model.Created_by = WKPCompanyEmail;
+                        model.ConcessionName = model.Concession_Held.TrimEnd().ToUpper();
+                        await _context.ADMIN_CONCESSIONS_INFORMATIONs.AddAsync(model);
+                    }
+
+                    if (save > 0)
+                    {
+                        string successMsg = Messager.ShowMessage(action);
+                        var allConcessions = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Company_ID == WKPCompanyId && d.DELETED_STATUS != "DELETED" select d).ToListAsync();
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = allConcessions, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
+
                     }
                 }
-                else
-                {
-                    var companyConcession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs
-                                                   where d.Consession_Id == int.Parse(id)
-                                                   select d).FirstOrDefaultAsync();
-
-                    if (action == GeneralModel.Update)
-                    {
-
-                        if (companyConcession == null)
-                        {
-                            return BadRequest(new { message = $"Error : This concession details could not be found." });
-                        }
-                        else
-                        {
-                            // ADMIN_CONCESSIONS_INFORMATION_model.CompanyName = WKPCompanyName;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Company_ID = WKPCompanyId;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Year = DateTime.UtcNow.Year.ToString();
-                            // ADMIN_CONCESSIONS_INFORMATION_model.CompanyNumber = WKPCompanyNumber;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Date_Updated = DateTime.Now;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Date_Created = companyConcession.Date_Created;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Updated_by = WKPCompanyEmail;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.ConcessionName = ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper();
-
-                            companyConcession.Area = ADMIN_CONCESSIONS_INFORMATION_model.Area;
-                            companyConcession.Comment = ADMIN_CONCESSIONS_INFORMATION_model.Comment;
-                            companyConcession.ConcessionName = ADMIN_CONCESSIONS_INFORMATION_model.ConcessionName;
-                            companyConcession.Concession_Held = ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held;
-                            companyConcession.Consession_Type = ADMIN_CONCESSIONS_INFORMATION_model.Consession_Type;
-                            companyConcession.Contract_Type = ADMIN_CONCESSIONS_INFORMATION_model.Contract_Type;
-                            companyConcession.Terrain = ADMIN_CONCESSIONS_INFORMATION_model.Terrain;
-                            companyConcession.Comment = ADMIN_CONCESSIONS_INFORMATION_model.Comment;
-                            companyConcession.Equity_distribution = ADMIN_CONCESSIONS_INFORMATION_model.Equity_distribution;
-                            companyConcession.Date_of_Expiration = ADMIN_CONCESSIONS_INFORMATION_model.Date_of_Expiration;
-                            companyConcession.Year_of_Grant_Award = ADMIN_CONCESSIONS_INFORMATION_model.Year_of_Grant_Award;
-                            _context.Entry(companyConcession).State = EntityState.Modified;
-                            //await _context.SaveChangesAsync();
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.ADMIN_CONCESSIONS_INFORMATIONs.Remove(companyConcession);
-                    }
-                }
-                save += await _context.SaveChangesAsync();
                 #endregion
-
-                if (save > 0)
-                {
-                    string successMsg = Messager.ShowMessage(action);
-                    var allConcessions = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Company_ID == WKPCompanyId && d.DELETED_STATUS != "DELETED" select d).ToListAsync();
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = allConcessions, Message = successMsg, StatusCode = ResponseCodes.Success };
-                }
-                else
-                {
-                    return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
-                }
+                return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
             }
             catch (Exception e)
             {
@@ -3340,7 +3335,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                                         else
                                             getData.UploadCommDevPlanApprovalFilename = docName;
-
                                     }
                                     else
                                     {
