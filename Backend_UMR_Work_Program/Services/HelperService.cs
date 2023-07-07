@@ -694,5 +694,31 @@ namespace Backend_UMR_Work_Program.Services
             newDesk.StaffID = desks[0].StaffID;
             return newDesk;
         }
+
+        public async Task<int> DeleteDeskByDeskId(int deskId)
+        {
+            try
+            {
+                var getDesk = _dbContext.MyDesks.Where(x => x.DeskID == deskId).FirstOrDefault();
+                if (getDesk != null)
+                {
+
+                    _dbContext.MyDesks.Remove(getDesk);
+                    var save = await _dbContext.SaveChangesAsync();
+
+                    if (save > 0)
+                    {
+                        return 1;
+                    }
+
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }
