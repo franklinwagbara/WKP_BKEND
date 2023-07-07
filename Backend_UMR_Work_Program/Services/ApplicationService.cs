@@ -707,7 +707,7 @@ namespace Backend_UMR_Work_Program.Services
                 //var staffs = _context.staff.Where<staff>(s => s.Staff_SBU == sbuID && s.RoleID == roleID).ToList();
                 var staffDesks = await (from desk in _dbContext.MyDesks
                                         join staff in _dbContext.staff on desk.StaffID equals staff.StaffID
-                                        join app in _dbContext.Applications on desk.AppId equals app.Id
+                                        join app in _dbContext.Applications.Include(a => a.Company).Include(a => a.Concession).Include(a => a.Field) on desk.AppId equals app.Id
                                         where staff.Staff_SBU == sbuID && staff.RoleID == roleID && desk.HasWork == true
                                         select new DeskStaffAppsModel
                                         {
