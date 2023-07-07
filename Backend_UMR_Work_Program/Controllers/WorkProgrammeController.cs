@@ -332,6 +332,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     }
                 }
                 #endregion
+                return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
             }
             catch (Exception e)
             {

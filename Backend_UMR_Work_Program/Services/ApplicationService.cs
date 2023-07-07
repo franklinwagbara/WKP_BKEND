@@ -91,7 +91,7 @@ namespace Backend_UMR_Work_Program.Services
                         .Include(x => x.Company)
                         .Where(
                             x => x.AppId == appId
-                            && x.isPublic == isPublic
+                            && x.isPublic == true
                             ).OrderByDescending(x => x.ActionDate).ToListAsync();
                 else
                     appHistories = await _dbContext.ApplicationDeskHistories
@@ -791,7 +791,7 @@ namespace Backend_UMR_Work_Program.Services
                 var staff = await _dbContext.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();    
 
 
-                var companies = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(x => x.COMPANY_NAME != "Admin").ToListAsync();
+                var companies = await _dbContext.ADMIN_COMPANY_DETAILs.ToListAsync();
 
                 return new WebApiResponse { Data = companies, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
@@ -925,6 +925,30 @@ namespace Backend_UMR_Work_Program.Services
                                   }).ToListAsync();
 
                 return new WebApiResponse { Data = apps, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+        public async Task<WebApiResponse> GetAccountDesk(string staffEmail)
+        {
+            try
+            {
+                var desks = await (
+                        from desk in _dbContext.AccountDesks
+                        join app in _dbContext.Applications on desk.StaffID equals app.Id
+                        join staff in _dbContext.staff on desk.StaffID equals staff.StaffID
+                        where desk.isApproved == false && staff.StaffEmail == staffEmail
+                        select new
+                        {
+                            Desk = desk,
+                            Application = app,
+                            Staff = staff,
+                        }
+                    ).ToListAsync();
+                return new WebApiResponse { Data = desks, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
             {
