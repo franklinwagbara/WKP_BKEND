@@ -261,6 +261,12 @@ namespace Backend_UMR_Work_Program.Controllers
                     {
                         if (action == GeneralModel.Delete.ToLower())
                         {
+                            var fields = await (from d in _context.COMPANY_FIELDs
+                                                where d.Concession_ID == Id
+                                                           select d).ToListAsync();
+                            if(fields.Count > 0)
+                                _context.COMPANY_FIELDs.RemoveRange(fields);
+
                             _context.ADMIN_CONCESSIONS_INFORMATIONs.Remove(companyConcession);
                             save += _context.SaveChanges();
                             string successMsg = Messager.ShowMessage(GeneralModel.Delete);
