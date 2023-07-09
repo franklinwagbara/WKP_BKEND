@@ -49,27 +49,27 @@ namespace Backend_UMR_Work_Program.Services
                 var desks = await (from accDesk in _context.AccountDesks
                                    join payment in _context.Payments on accDesk.AppId equals payment.AppId
                                    join app in _context.Applications on accDesk.AppId equals app.Id
-                                   join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID
-                                   join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                                   //join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
+                                   //join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID
+                                   //join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
                                    join stf in _context.staff on accDesk.StaffID equals stf.StaffID
                                    where accDesk.StaffID == staff.StaffID
                                    select new
                                    {
                                        Year = app.YearOfWKP,
                                        ReferenceNumber = app.ReferenceNo,
-                                       ConcessionName = conc.ConcessionName,
-                                       FieldName = field.Field_Name,
-                                       CompanyName = comp.COMPANY_NAME,
-                                       CompanyEmail = comp.EMAIL,
+                                       //ConcessionName = conc.ConcessionName,
+                                       //FieldName = field.Field_Name,
+                                       //CompanyName = comp.COMPANY_NAME,
+                                       //CompanyEmail = comp.EMAIL,
                                        EvidenceFilePath = payment.PaymentEvidenceFilePath,
                                        EvidenceFileName = payment.PaymentEvidenceFileName,
                                        Desk = accDesk,
                                        Payment = payment,
                                        Application = app,
                                        Staff = stf,
-                                       Concession = conc,
-                                       Field = field,
+                                       //Concession = conc,
+                                       //Field = field,
                                        PaymentStatus = accDesk.ProcessStatus,
                                        SubmittedAt = accDesk.CreatedAt
                                    }).ToListAsync();
