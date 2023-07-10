@@ -27,6 +27,7 @@ namespace Backend_UMR_Work_Program.Models
         {
             isApproved = false;
             CreatedAt= DateTime.Now;
+            AppId = 0;
         }
     }
 }

@@ -2940,32 +2940,6 @@ generate:
 			}
 		}
 
-		public async Task<int> DeleteDeskIdByDeskId(int deskId)
-		{
-			try
-			{
-				var getDesk = _context.MyDesks.Where(x => x.DeskID==deskId).FirstOrDefault();
-				if (getDesk !=null)
-				{
-
-					_context.MyDesks.Remove(getDesk);
-					var save = await _context.SaveChangesAsync();
-
-					if (save>0)
-					{
-						return 1;
-					}
-
-				}
-				return 0;
-			}
-			catch (Exception ex)
-			{
-
-				throw ex;
-			}
-		}
-
         public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
         {
             try
