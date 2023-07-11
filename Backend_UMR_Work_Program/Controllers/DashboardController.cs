@@ -360,6 +360,18 @@ namespace Backend_UMR_Work_Program.Controllers
             }
             return ProdList;
         }
+        
+        [HttpGet("COMPANY_MONTHLY_PRODUCTION_PROPOSED")]
+        public async Task<object> COMPANY_MONTHLY_PRODUCTION_PROPOSED(string year)
+        {
+            var ProdList = new List<object>();
+            var months = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.Production_month).ToListAsync()).Distinct();
+            foreach (var month in months) {
+                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.Production_month == month && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production)).ToListAsync()).Sum();
+                ProdList.Add(new {prodMonth = prodMonth, month = month});
+            }
+            return ProdList;
+        }
 
         [HttpGet("COMPANY_CONCESSION_PRODUCTION")]
         public async Task<object> COMPANY_CONCESSION_PRODUCTION(string year)
@@ -372,9 +384,33 @@ namespace Backend_UMR_Work_Program.Controllers
             }
             return ProdList;
         }
+        
+        [HttpGet("COMPANY_CONCESSION_PRODUCTION_PROPOSED")]
+        public async Task<object> COMPANY_CONCESSION_PRODUCTION_PROPOSED(string year)
+        {
+            var ProdList = new List<object>();
+            var contractList = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.OML_Name).ToListAsync()).Distinct();
+            foreach (var conType in contractList) {
+                var prod = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production)).ToListAsync()).Sum();
+                ProdList.Add(new {omlname = conType, prod = prod});
+            }
+            return ProdList;
+        }
 
         [HttpGet("COMPANY_CONCESSION_RESERVE")]
         public async Task<object> COMPANY_CONCESSION_RESERVE(string year)
+        {
+            var ProdList = new List<object>();
+            var contractList = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select a.OML_Name).ToListAsync()).Distinct();
+            foreach (var conType in contractList) {
+                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil) + Convert.ToDouble(a.Company_Reserves_Condensate)).ToListAsync()).Sum();
+                ProdList.Add(new {omlname = conType, reserve = reserve});
+            }
+            return ProdList;
+        }
+        
+        [HttpGet("COMPANY_CONCESSION_RESERVE_PROPOSED")]
+        public async Task<object> COMPANY_CONCESSION_RESERVE_PROPOSED(string year)
         {
             var ProdList = new List<object>();
             var contractList = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select a.OML_Name).ToListAsync()).Distinct();

@@ -11,8 +11,12 @@
     [DateUpdated]        DATETIME2 (7)  NULL,
     [CreatedBy]          NVARCHAR (MAX) NULL,
     [UpdatedBy]          NVARCHAR (MAX) NULL,
+    [COMPANY_ID]         NVARCHAR (MAX) NULL,
+    [CompanyName]        NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_DECOMMISSIONING_ABANDONMENTs] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 
