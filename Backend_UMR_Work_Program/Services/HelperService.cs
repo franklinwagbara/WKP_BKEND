@@ -63,7 +63,7 @@ namespace Backend_UMR_Work_Program.Services
         }
         private Object lockThis = new object();
 
-        public async void SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action)
+        public async void SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action, bool? isPublic = false)
         {
             try
             {
@@ -82,6 +82,7 @@ namespace Backend_UMR_Work_Program.Services
                     CompanyId = companyId,
                     Status = status == null || status == "null" || status == ""? app.Status: status,
                     AppAction = action,
+                    isPublic = isPublic,
                 };
 
                 _dbContext.ApplicationDeskHistories.Add(appDeskHistory);
@@ -370,7 +371,7 @@ namespace Backend_UMR_Work_Program.Services
             return clearText;
         }
 
-        public async Task<object> AddNewApplication(int companyId, string companyEmail, int year, int concessionId, int? fieldId, string? status, string? paymentStatus, int? currentDeskID, bool? submitted)
+        public async Task<Application> AddNewApplication(int companyId, string companyEmail, int year, int concessionId, int? fieldId, string? status, string? paymentStatus, int? currentDeskID, bool? submitted)
         {
             try
             {
@@ -646,11 +647,78 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
+        public List<string> GetListOfIncomingDeskStatuses()
+            => new List<string> {
+                DESK_PROCESS_STATUS.FinalAuthorityApproved,
+                DESK_PROCESS_STATUS.SubmittedByCompany,
+                DESK_PROCESS_STATUS.SubmittedByStaff
+            };
+
+        public bool IsIncomingDeskStatus(string status) => GetListOfIncomingDeskStatuses().Contains(status);
 
         //public string GetActionCommentByRole(string role)
         //{
         //    var 
         //    if(role == GeneralModel.ROLE.Reviewer) 
         //}
+
+        public async Task<AccountDesk> GetNextAccountDesk()
+        {
+            var accountantRole = await _dbContext.Roles.Where(x => x.RoleName == RoleName.Accountant).FirstOrDefaultAsync();
+
+            //Get all the account staffs
+            var accountStaffs = await _dbContext.staff.Where(x => x.RoleID == accountantRole.id).ToListAsync();
+            var desks = await _dbContext.AccountDesks.OrderBy(x => x.LastJobDate).ToListAsync();
+
+            var newDesk = new AccountDesk
+            {
+                CreatedAt = DateTime.Now,
+            };
+
+            if(desks == null || desks.Count == 0)
+            {
+                newDesk.StaffID = accountStaffs[0].StaffID;
+                return newDesk;
+            }
+            else if (desks.Count < accountStaffs.Count)
+            {
+                foreach(var staff in accountStaffs)
+                {
+                    if(!desks.Any(x => x.StaffID == staff.StaffID)) {
+                        newDesk.StaffID = staff.StaffID;
+                        return newDesk;
+                    }
+                }
+            }
+
+            newDesk.StaffID = desks[0].StaffID;
+            return newDesk;
+        }
+
+        public async Task<int> DeleteDeskByDeskId(int deskId)
+        {
+            try
+            {
+                var getDesk = _dbContext.MyDesks.Where(x => x.DeskID == deskId).FirstOrDefault();
+                if (getDesk != null)
+                {
+
+                    _dbContext.MyDesks.Remove(getDesk);
+                    var save = await _dbContext.SaveChangesAsync();
+
+                    if (save > 0)
+                    {
+                        return 1;
+                    }
+
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }

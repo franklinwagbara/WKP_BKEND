@@ -244,100 +244,103 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpPost("POST_ADMIN_CONCESSIONS_INFORMATION")]
-        public async Task<object> POST_ADMIN_CONCESSIONS_INFORMATION([FromBody] ADMIN_CONCESSIONS_INFORMATION ADMIN_CONCESSIONS_INFORMATION_model, string id, string actionToDo)
+        public async Task<object> POST_ADMIN_CONCESSIONS_INFORMATION([FromBody] ADMIN_CONCESSIONS_INFORMATION model, string id, string actionToDo)
         {
             int save = 0;
+            int Id = id != "undefined" && !string.IsNullOrEmpty(id) ? int.Parse(id) : model.Consession_Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
 
             try
             {
+                if(Id > 0)
+                {
+                    var companyConcession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs
+                                                   where d.Consession_Id == Id
+                                                   select d).FirstOrDefaultAsync();
+                    if (companyConcession != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            var fields = await (from d in _context.COMPANY_FIELDs
+                                                where d.Concession_ID == Id
+                                                           select d).ToListAsync();
+                            if(fields.Count > 0)
+                                _context.COMPANY_FIELDs.RemoveRange(fields);
 
+                            _context.ADMIN_CONCESSIONS_INFORMATIONs.Remove(companyConcession);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            companyConcession.Area = model.Area;
+                            companyConcession.Comment = model.Comment;
+                            companyConcession.ConcessionName = model.ConcessionName;
+                            companyConcession.Concession_Held = model.Concession_Held;
+                            companyConcession.Consession_Type = model.Consession_Type;
+                            companyConcession.Contract_Type = model.Contract_Type;
+                            companyConcession.Terrain = model.Terrain;
+                            companyConcession.Comment = model.Comment;
+                            companyConcession.Equity_distribution = model.Equity_distribution;
+                            companyConcession.Date_of_Expiration = model.Date_of_Expiration;
+                            companyConcession.Year_of_Grant_Award = model.Year_of_Grant_Award;
+                            _context.Entry(companyConcession).State = EntityState.Modified;
+
+                            //_context.ADMIN_CONCESSIONS_INFORMATIONs.Update(companyConcession);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : This concession details could not be found for ID: {Id}." });
+                    }
+                }
                 #region Saving Concession
 
-                if (action == GeneralModel.Insert || action == GeneralModel.Insert.ToUpper())
+                else if (model != null)
                 {
                     var companyConcession = (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs
-                                             where (d.ConcessionName == ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper() || d.Concession_Held == ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper())
+                                             where (d.ConcessionName == model.Concession_Held.TrimEnd().ToUpper() || d.Concession_Held == model.Concession_Held.TrimEnd().ToUpper())
                                                    && d.CompanyNumber == WKPCompanyNumber && d.DELETED_STATUS == null
                                              select d).FirstOrDefault();
 
                     if (companyConcession != null)
                     {
-                        //return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
-
-                        return BadRequest(new { message = $"Error : Concession ({ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held} is already existing and can not be duplicated." });
+                        return BadRequest(new { message = $"Error : Concession ({model.Concession_Held} is already existing and can not be duplicated." });
                     }
                     else
                     {
-                        ADMIN_CONCESSIONS_INFORMATION_model.CompanyName = WKPCompanyName;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Company_ID = WKPCompanyId;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Year = DateTime.UtcNow.Year.ToString();
-                        ADMIN_CONCESSIONS_INFORMATION_model.DELETED_STATUS = null;
-                        ADMIN_CONCESSIONS_INFORMATION_model.CompanyNumber = WKPCompanyNumber;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Date_Created = DateTime.Now;
-                        ADMIN_CONCESSIONS_INFORMATION_model.Created_by = WKPCompanyEmail;
-                        ADMIN_CONCESSIONS_INFORMATION_model.ConcessionName = ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper();
-                        await _context.ADMIN_CONCESSIONS_INFORMATIONs.AddAsync(ADMIN_CONCESSIONS_INFORMATION_model);
+                        model.CompanyName = WKPCompanyName;
+                        model.Company_ID = WKPCompanyId;
+                        model.Year = DateTime.UtcNow.Year.ToString();
+                        model.DELETED_STATUS = null;
+                        model.CompanyNumber = WKPCompanyNumber;
+                        model.Date_Created = DateTime.Now;
+                        model.Created_by = WKPCompanyEmail;
+                        model.ConcessionName = model.Concession_Held.TrimEnd().ToUpper();
+                        await _context.ADMIN_CONCESSIONS_INFORMATIONs.AddAsync(model);
+                    }
+
+                    save = await _context.SaveChangesAsync();
+
+                    if (save > 0)
+                    {
+                        string successMsg = Messager.ShowMessage(action);
+                        var allConcessions = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Company_ID == WKPCompanyId && d.DELETED_STATUS != "DELETED" select d).ToListAsync();
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = allConcessions, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
+
                     }
                 }
-                else
-                {
-                    var companyConcession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs
-                                                   where d.Consession_Id == int.Parse(id)
-                                                   select d).FirstOrDefaultAsync();
-
-                    if (action == GeneralModel.Update)
-                    {
-
-                        if (companyConcession == null)
-                        {
-                            return BadRequest(new { message = $"Error : This concession details could not be found." });
-                        }
-                        else
-                        {
-                            // ADMIN_CONCESSIONS_INFORMATION_model.CompanyName = WKPCompanyName;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Company_ID = WKPCompanyId;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Year = DateTime.UtcNow.Year.ToString();
-                            // ADMIN_CONCESSIONS_INFORMATION_model.CompanyNumber = WKPCompanyNumber;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Date_Updated = DateTime.Now;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Date_Created = companyConcession.Date_Created;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.Updated_by = WKPCompanyEmail;
-                            // ADMIN_CONCESSIONS_INFORMATION_model.ConcessionName = ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held.TrimEnd().ToUpper();
-
-                            companyConcession.Area = ADMIN_CONCESSIONS_INFORMATION_model.Area;
-                            companyConcession.Comment = ADMIN_CONCESSIONS_INFORMATION_model.Comment;
-                            companyConcession.ConcessionName = ADMIN_CONCESSIONS_INFORMATION_model.ConcessionName;
-                            companyConcession.Concession_Held = ADMIN_CONCESSIONS_INFORMATION_model.Concession_Held;
-                            companyConcession.Consession_Type = ADMIN_CONCESSIONS_INFORMATION_model.Consession_Type;
-                            companyConcession.Contract_Type = ADMIN_CONCESSIONS_INFORMATION_model.Contract_Type;
-                            companyConcession.Terrain = ADMIN_CONCESSIONS_INFORMATION_model.Terrain;
-                            companyConcession.Comment = ADMIN_CONCESSIONS_INFORMATION_model.Comment;
-                            companyConcession.Equity_distribution = ADMIN_CONCESSIONS_INFORMATION_model.Equity_distribution;
-                            companyConcession.Date_of_Expiration = ADMIN_CONCESSIONS_INFORMATION_model.Date_of_Expiration;
-                            companyConcession.Year_of_Grant_Award = ADMIN_CONCESSIONS_INFORMATION_model.Year_of_Grant_Award;
-                            _context.Entry(companyConcession).State = EntityState.Modified;
-                            //await _context.SaveChangesAsync();
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.ADMIN_CONCESSIONS_INFORMATIONs.Remove(companyConcession);
-                    }
-                }
-                save += await _context.SaveChangesAsync();
                 #endregion
-
-                if (save > 0)
-                {
-                    string successMsg = Messager.ShowMessage(action);
-                    var allConcessions = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Company_ID == WKPCompanyId && d.DELETED_STATUS != "DELETED" select d).ToListAsync();
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = allConcessions, Message = successMsg, StatusCode = ResponseCodes.Success };
-                }
-                else
-                {
-                    return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
-                }
+                return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
             }
             catch (Exception e)
             {
@@ -1438,7 +1441,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSEOilSpill = (from c in _context.HSE_OIL_SPILL_REPORTING_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEAssetRegisterRBI = (from c in _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEWastManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-
+                    var HSEEnfluenceConliences = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEAccidentIncidence = (from c in _context.HSE_ACCIDENT_INCIDENCE_REPORTING_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEAccidentIncidenceType = (from c in _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var accidentModel = (from a1 in _context.HSE_ACCIDENT_INCIDENCE_REPORTING_NEWs
@@ -1495,7 +1498,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     var HSEEFluenceCompliences = (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
 
-                    var HSEHostComms = (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
+                    var HSEHostCommunities = (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
 
                     var HSEGHGPlans = (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.OmL_Name == omlName && c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSERemediationFund = (from c in _context.HSE_REMEDIATION_FUNDs where c.CompanyName == WKPCompanyName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
@@ -1514,7 +1517,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         HSEOSPRegistrations = HSEOSPRegistrations,
                         HSEAccidentIncidenceType = HSEAccidentIncidenceType,
                         HSECommunityDisturbance = HSECommunityDisturbance,
-
+                        HSEEnfluenceConliences= HSEEnfluenceConliences,
                         HSESustainableDevProjectProgmCsr = HSESustainableDevProgramCsr,
                         HSEPointSourceRegistrations = HSEPointSourceRegistrations,
                         HSEQuestion = HSEQuestion,
@@ -1539,7 +1542,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         HSEOperationSafetyCases = HSEOperationSafetyCases,
                         HSEEnvironmentalMgtPlans = HSEEnvironmentalMgtPlans,
                         HSEEFluenceCompliences = HSEEFluenceCompliences,
-                        HSEHostComms = HSEHostComms,
+                        HSEHostCommunities = HSEHostCommunities,
                         HSEGHGPlans = HSEGHGPlans,
                         HSERemediationFund = HSERemediationFund,
                         HSEWastManagementDZs = HSEWastManagementDZs
@@ -3340,13 +3343,16 @@ namespace Backend_UMR_Work_Program.Controllers
                                             return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                                         else
                                             getData.UploadCommDevPlanApprovalFilename = docName;
-
                                     }
                                     else
                                     {
                                         getData.UploadCommDevPlanApprovalPath = null;
                                         getData.UploadCommDevPlanApprovalFilename = null;
                                     }
+                                    getData.EvidenceOfPayTrustFundPath = null;
+                                    getData.EvidenceOfPayTrustFundFilename = null;
+                                    getData.EvidenceOfRegTrustFundPath = null;
+                                    getData.EvidenceOfRegTrustFundFilename = null;
                                 }
                                 if (Request.Form.Files.Count == 2)
                                 {
@@ -3384,6 +3390,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                         getData.EvidenceOfPayTrustFundPath = null;
                                         getData.EvidenceOfPayTrustFundFilename = null;
                                     }
+                                    getData.EvidenceOfRegTrustFundPath = null;
+                                    getData.EvidenceOfRegTrustFundFilename = null;
                                 }
                                 else
                                 {
@@ -3452,6 +3460,15 @@ namespace Backend_UMR_Work_Program.Controllers
                                     getData.EvidenceOfRegTrustFundFilename = null;
                                 }
                             }
+                            else
+                            {
+                                getData.EvidenceOfRegTrustFundPath = null;
+                                getData.EvidenceOfRegTrustFundFilename = null;
+                                getData.UploadCommDevPlanApprovalPath = null;
+                                getData.UploadCommDevPlanApprovalFilename = null;
+                                getData.EvidenceOfPayTrustFundPath = null;
+                                getData.EvidenceOfPayTrustFundFilename = null;
+                            }
 
                             #endregion
 
@@ -3516,6 +3533,10 @@ namespace Backend_UMR_Work_Program.Controllers
                                 host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
                                 host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
                             }
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
+                            host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
+                            host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
                         }
                         if (Request.Form.Files.Count == 2)
                         {
@@ -3556,7 +3577,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                 host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
                                 host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
                             }
-
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                            host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
                         }
                         else
                         {
@@ -3628,6 +3650,15 @@ namespace Backend_UMR_Work_Program.Controllers
                             host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
                             host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
                         }
+                    }
+                    else
+                    {
+                        host_Community_Devt_Model.EvidenceOfRegTrustFundPath = null;
+                        host_Community_Devt_Model.EvidenceOfRegTrustFundFilename = null;
+                        host_Community_Devt_Model.UploadCommDevPlanApprovalPath = null;
+                        host_Community_Devt_Model.UploadCommDevPlanApprovalFilename = null;
+                        host_Community_Devt_Model.EvidenceOfPayTrustFundFilename = null;
+                        host_Community_Devt_Model.EvidenceOfPayTrustFundPath = null;
                     }
 
                     #endregion
@@ -9585,7 +9616,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-
                 if (Id > 0)
                 {
                     var getData = (from c in _context.HSE_ENVIRONMENTAL_STUDIES_NEWs where c.Id == Id select c).FirstOrDefault();
@@ -10155,10 +10185,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_compliance_model.Created_by = WKPCompanyId;
                     await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.AddAsync(hse_compliance_model);
 
-                    if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Remove(getData);
-                    }
                     save += await _context.SaveChangesAsync();
                 }
                 else
@@ -10475,12 +10501,9 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU"), DisableRequestSizeLimit]
         public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU([FromForm] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOU hse_sustainable_model, string year, int id, string actionToDo)
         {
-
             int save = 0;
             int Id = id == 0 ? (hse_sustainable_model != null ? hse_sustainable_model.Id : 0) : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
-            //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
             try
             {
                 if (id > 0)
@@ -10599,7 +10622,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
 
                 }
-
             }
             catch (Exception e)
             {
@@ -10610,28 +10632,62 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW")]
         public async Task<object> POST_HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW([FromBody] HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW hse_sustainable_model, string omlName, string fieldName, string year, int id, string actionToDo)
         {
-
             int save = 0;
-            int Id = hse_sustainable_model.Id;
+            int Id = id == 0 ? hse_sustainable_model.Id : id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
             try
             {
-                if (id > 0 && action == GeneralModel.Delete)
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.Id == id select c).FirstOrDefault();
+                    var getData = (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
+                            save += await _context.SaveChangesAsync();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Delete)
-                        _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                    save += _context.SaveChanges();
+                            getData.Actual_proposed = hse_sustainable_model.Actual_proposed;
+                            getData.Actual_Spent = hse_sustainable_model.Actual_Spent;
+                            getData.Beneficiary_Communities = hse_sustainable_model.Beneficiary_Communities;
+                            getData.Budget_ = hse_sustainable_model.Budget_;
+                            getData.Consession_Type = hse_sustainable_model.Consession_Type;
+                            getData.Contract_Type = hse_sustainable_model.Contract_Type;
+                            getData.CSR_ = hse_sustainable_model.CSR_;
+                            getData.OML_ID = hse_sustainable_model.OML_ID;
+                            getData.Percentage_Completion_ = hse_sustainable_model.Percentage_Completion_;
+                            getData.Terrain = hse_sustainable_model.Terrain;
+
+                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
                 }
                 else if (hse_sustainable_model != null)
                 {
-                    HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW getData;
-
-                    getData = await (from c in _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Actual_Proposed_Year == hse_sustainable_model.Actual_Proposed_Year select c).FirstOrDefaultAsync();
-
                     hse_sustainable_model.Companyemail = WKPCompanyEmail;
                     hse_sustainable_model.CompanyName = WKPCompanyName;
                     hse_sustainable_model.COMPANY_ID = WKPCompanyId;
@@ -10643,42 +10699,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     //hse_sustainable_model.Field_ID = concessionField?.Field_ID ?? null;
                     //hse_sustainable_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        //if (getData == null)
-                        //{
-
-                        if (getData == null)
-                        {
-                            hse_sustainable_model.Date_Created = DateTime.Now;
-                            hse_sustainable_model.Created_by = WKPCompanyId;
-                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
-                        }
-                        else
-                        {
-                            hse_sustainable_model.Date_Created = DateTime.Now;
-                            hse_sustainable_model.Created_by = WKPCompanyId;
-
-                            _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                            await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
-                        }
-
-                        // }
-                        // else
-                        // {
-                        // 	hse_sustainable_model.Date_Created = getData.Date_Created;
-                        // 	hse_sustainable_model.Created_by = getData.Created_by;
-                        // 	hse_sustainable_model.Date_Updated = DateTime.Now;
-                        // 	hse_sustainable_model.Updated_by = WKPCompanyId;
-                        // 	_context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                        // 	await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
-                        // }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Remove(getData);
-                    }
-
+                    hse_sustainable_model.Date_Created = DateTime.Now;
+                    hse_sustainable_model.Created_by = WKPCompanyId;
+                    await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.AddAsync(hse_sustainable_model);
                     save += await _context.SaveChangesAsync();
 
                 }
@@ -10695,7 +10718,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 else
                 {
                     return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
                 }
 
             }
@@ -11354,44 +11376,116 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_HSE_REMEDIATION_FUND")]
         public async Task<object> POST_HSE_REMEDIATION_FUND([FromForm] HSE_REMEDIATION_FUND hse_remediation_fund, string omlName, string fieldName, string year, int id, string actionToDo)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName); 
-            int Id = hse_remediation_fund.Id != null ? hse_remediation_fund.Id : 0;
-
+            int Id = id == 0 ? hse_remediation_fund.Id : id;
             try
             {
-
-                if (id > 0 && action == GeneralModel.Delete)
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.HSE_REMEDIATION_FUNDs where c.Id == id select c).FirstOrDefault();
-
-                    if (action == GeneralModel.Delete)
-                        _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                    save += _context.SaveChanges();
-
-                    if (save > 0)
+                    var getData = (from c in _context.HSE_REMEDIATION_FUNDs where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
                     {
-                        string successMsg = Messager.ShowMessage(action);
-                        var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.HSE_REMEDIATION_FUNDs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.OML_ID = concessionField.Concession_ID.ToString();
+                            getData.Company_Email = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.Company_ID = WKPCompanyId;
+                            getData.Company_Number = WKPCompanyNumber.ToString();
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.Year_of_WP = year;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.OML_ID = hse_remediation_fund.OML_ID;
+                            getData.areThereRemediationFund = hse_remediation_fund.areThereRemediationFund;
+                            getData.reasonForNoRemediation = hse_remediation_fund.areThereRemediationFund;
+
+                            if (hse_remediation_fund.areThereRemediationFund == "YES")
+                            {
+                                #region Fileregion
+                                var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+                                var file2 = Request.Form.Files[1] != null ? Request.Form.Files[1] : null;
+
+                                if (file1 != null)
+                                {
+                                    var blobname1 = blobService.Filenamer(file1);
+                                    string docName = "Evidence of Payment";
+                                    getData.evidenceOfPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (getData.evidenceOfPaymentPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        getData.evidenceOfPaymentFilename = docName;
+                                }
+                                else
+                                {
+                                    getData.evidenceOfPaymentPath = null;
+                                    getData.evidenceOfPaymentFilename = null;
+                                }
+
+                                if (file2 != null)
+                                {
+                                    var blobname2 = blobService.Filenamer(file2);
+                                    string docName = "Evidence of previous year payment";
+                                    getData.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"Remediation Documents/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (getData.evidenceOfPreviousYearsPaymentPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        getData.evidenceOfPreviousYearsPaymentFilename = docName;
+                                }
+                                else
+                                {
+                                    getData.evidenceOfPreviousYearsPaymentPath = null;
+                                    getData.evidenceOfPreviousYearsPaymentFilename = null;
+                                }
+                                #endregion
+                            }
+                            else
+                            {
+                                getData.evidenceOfPaymentPath = null;
+                                getData.evidenceOfPaymentFilename = null;
+
+                                var file1 = Request.Form.Files[0] != null ? Request.Form.Files[0] : null;
+
+                                if (file1 != null)
+                                {
+                                    var blobname1 = blobService.Filenamer(file1);
+                                    string docName = "Evidence of Payment";
+                                    getData.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                    if (getData.evidenceOfPreviousYearsPaymentPath == null)
+                                        return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                    else
+                                        getData.evidenceOfPreviousYearsPaymentFilename = docName;
+                                }
+                                else
+                                {
+                                    getData.evidenceOfPreviousYearsPaymentPath = null;
+                                    getData.evidenceOfPreviousYearsPaymentFilename = null;
+                                }
+                            }
+                            _context.HSE_REMEDIATION_FUNDs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
                     }
                 }
                 if (hse_remediation_fund != null)
                 {
-                    HSE_REMEDIATION_FUND getData;
-                    getData = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Id == Id select c).FirstOrDefaultAsync();
-
-                    //if (concessionField.Field_Name != null)
-                    //{
-                    //    getData = await (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    //}
-                    //else
-                    //{
-                    //    getData = await (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == omlName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    //}
-
                     hse_remediation_fund.OML_ID = concessionField.Concession_ID.ToString();
                     hse_remediation_fund.Company_Email = WKPCompanyEmail;
                     hse_remediation_fund.CompanyName = WKPCompanyName;
@@ -11400,6 +11494,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_remediation_fund.OML_Name = omlName;
                     hse_remediation_fund.Field_ID = concessionField?.Field_ID ?? null;
                     hse_remediation_fund.Year_of_WP = year;
+                    hse_remediation_fund.Date_Created = DateTime.Now;
+                    hse_remediation_fund.Created_by = WKPCompanyId;
 
                     if (hse_remediation_fund.areThereRemediationFund == "YES")
                     {
@@ -11415,7 +11511,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             if (hse_remediation_fund.evidenceOfPaymentPath == null)
                                 return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                             else
-                                hse_remediation_fund.evidenceOfPaymentFilename = blobname1;
+                                hse_remediation_fund.evidenceOfPaymentFilename = docName;
                         }
                         else
                         {
@@ -11426,7 +11522,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (file2 != null)
                         {
                             var blobname2 = blobService.Filenamer(file2);
-                            string docName = "Evidence of Payment";
+                            string docName = "Evidence of previous year Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file2.OpenReadStream(), file2.ContentType, $"Remediation Documents/{blobname2}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
                                 return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
@@ -11450,12 +11546,12 @@ namespace Backend_UMR_Work_Program.Controllers
                         if (file1 != null)
                         {
                             var blobname1 = blobService.Filenamer(file1);
-                            string docName = "Evidence of Payment";
+                            string docName = "Evidence of previous Payment";
                             hse_remediation_fund.evidenceOfPreviousYearsPaymentPath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Remediation Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
                             if (hse_remediation_fund.evidenceOfPreviousYearsPaymentPath == null)
                                 return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
                             else
-                                hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = blobname1;
+                                hse_remediation_fund.evidenceOfPreviousYearsPaymentFilename = docName;
                         }
                         else
                         {
@@ -11464,56 +11560,24 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
 
                     }
-
-                    if (action == GeneralModel.Insert)
-                    {
-                        // if (getData == null)
-                        // {
-                        if (getData == null)
-                        {
-                            await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
-                        }
-                        else
-                        {
-                            _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                            await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
-                        }
-                        // }
-                        // else
-                        // {
-                        //     hse_remediation_fund.Updated_by = WKPCompanyId;
-                        //     hse_remediation_fund.Date_Updated = DateTime.Now;
-                        //     hse_remediation_fund.Date_Created = getData.Date_Created;
-                        //     hse_remediation_fund.Created_by = getData.Created_by;
-                        //     _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                        //     await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
-                        // }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.HSE_REMEDIATION_FUNDs.Remove(getData);
-                    }
-
+                    await _context.HSE_REMEDIATION_FUNDs.AddAsync(hse_remediation_fund);
                     save += await _context.SaveChangesAsync();
+
+                    if (save > 0)
+                    {
+                        string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        string successMsg = "No Changes was made.";
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
                 }
                 else
                 {
                     return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
                 }
-                if (save > 0)
-                {
-                    string successMsg = Messager.ShowMessage(id > 0 && action != GeneralModel.Delete ? GeneralModel.Update : action);
-                    var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_ID == WKPCompanyId && c.Year_of_WP == year && c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName select c).ToListAsync();
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
-                }
-                else
-                {
-                    string successMsg = "No Changes was made.";
-                    var All_Data = await (from c in _context.HSE_REMEDIATION_FUNDs where c.Company_ID == WKPCompanyId && c.Year_of_WP == year && c.Field_ID == concessionField.Field_ID && c.OML_Name == omlName select c).ToListAsync();
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = All_Data, Message = successMsg, StatusCode = ResponseCodes.Success };
-
-                }
-
             }
             catch (Exception e)
             {

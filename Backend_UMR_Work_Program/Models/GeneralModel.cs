@@ -52,26 +52,36 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Activated = "Activated";
 		public static string Deactivated = "Deactivated";
 
+		public static class SBU
+		{
+			public const string Accounts = "Accounts";
+			public const string Legal = "Legal";
+		}
+
+		public static class RoleName
+		{
+			public const string Accountant = "Accountant";
+		}
 
         //Application, Payment statuses
         public static class MAIN_APPLICATION_STATUS
         {
 
-            public static string Approved = "Approved";
+            public const string Approved = "Approved";
 
-            public static string Rejected = "Rejected";
+            public const string Rejected = "Rejected";
 
-            public static string ApprovedByFinalAuthority = "Approved By Final Authority";
-            public static string ApprovedByFinalApprovingAuthority = "Approved By Final Approving Authority";
+            public const string ApprovedByFinalAuthority = "Approved By Final Authority";
+            public const string ApprovedByFinalApprovingAuthority = "Approved By Final Approving Authority";
 
-            public static string ReturnedToCompany = "Returned To Company";
-            public static string ReturnedToStaff = "Returned To Staff";
+            public const string ReturnedToCompany = "Returned To Company";
+            public const string ReturnedToStaff = "Returned To Staff";
 
-            public static string Processing = "Processing";
+            public const string Processing = "Processing";
 
-            public static string SubmittedByCompany = "Submitted By Company";
+            public const string SubmittedByCompany = "Submitted By Company";
 
-            public static string NotSubmitted = "Not Submitted";
+            public const string NotSubmitted = "Not Submitted";
 
             //public static string ApprovalByFinalAuthority = "Approval By Final Authority";
             //public static string ApprovalByFinalApprovingAuthority = "Approval By Final Approving Authority";
@@ -82,45 +92,54 @@ namespace Backend_UMR_Work_Program.Models
 
 		public static class APPLICATION_HISTORY_STATUS
 		{
-            public static string ReviewerApproved = "Reviewer Approved";
-            public static string SuppervisorApproved = "Supervisor Approved";
-            public static string ManagerApproved = "Manager Approved";
-            public static string FinalAuthorityApproved = "Final Authority Approved";
-            public static string FinalApprovingAuthorityApproved = "Final Approving Authority Approved";
-            public static string DirectorApproved = "Director Approved";
-            public static string DeputyDirectorApproved = "Deputy Director Approved";
+            public const string ReviewerApproved = "Reviewer Approved";
+            public const string SuppervisorApproved = "Supervisor Approved";
+            public const string ManagerApproved = "Manager Approved";
+            public const string FinalAuthorityApproved = "Final Authority Approved";
+            public const string FinalApprovingAuthorityApproved = "Final Approving Authority Approved";
+            public const string DirectorApproved = "Director Approved";
+            public const string DeputyDirectorApproved = "Deputy Director Approved";
 
-            public static string ReturnedToCompany = "Application was returned to Company";
-            public static string ReturnedToStaff = "Application was returned to Staff"; 
+            public const string ReturnedToCompany = "Returned To Company";
+            public const string ReturnedToStaff = "Returned To Staff";
+
+			public const string AddedComment = "Added Comment";
 			
 			//public static string SentBackToCompany = "Application Sent Back To Company";
 			//public static string SentBackToStaff = "Application Sent Back To Staff";
         }
 
         public static class DESK_PROCESS_STATUS
-		{
-            public static string FinalAuthorityApproved = "Final Authority Approved";
-            public static string FinalApprovingAuthorityApproved = "Final Approving Authority Approved";
-            public static string Pushed = "Pushed";
-            public static string SubmittedByStaff = "Submitted By Staff";
-			public static string Processing = "Processing";
-			public static string SubmittedByCompany = "Submitted By Company";
-
-            //public static string SubmissionByStaff = "Submission By Staff";
+        {
+            public const string FinalAuthorityApproved = "Final Authority Approved";
+            public const string FinalApprovingAuthorityApproved = "Final Approving Authority Approved";
+            public const string Pushed = "Pushed";
+            public const string SubmittedByStaff = "Submitted By Staff";
+            public const string Processing = "Processing";
+            public const string SubmittedByCompany = "Submitted By Company";
         }
 
         public static class PAYMENT_STATUS
 		{
-            public static string PaymentPending = "Payment Confirmation Pending";
-            public static string PaymentCompleted = "Payment Completed";
+            public const string PaymentPending = "Payment Confirmation Pending";
+            public const string PaymentCompleted = "Payment Completed";
         }
 
 		public static class APPLICATION_ACTION
 		{
-			public static string Approve = "Approve";
-            public static string ReturnToCompany = "Return To Company";
-            public static string ReturnToStaff = "Return To Staff";
-			public static string SubmitApplication = "Submit Application";
+            public const string ReturnToCompany = "Return To Company";
+            public const string ReturnToStaff = "Return To Staff";
+			public const string SubmitApplication = "Submit Application";
+
+            public static string Initiate = "Initiate";
+            public static string Complete = "Complete";
+            public static string Submit = "Submit";
+            public static string Push = "Push";
+            public static string Approve = "Approve";
+            public static string Reject = "Reject";
+            public static string Delegate = "Delegate";
+            public static string AddAComment = "Add a Comment";
+            public static string Move = "Move";
 
             //public static string SendBackToCompany = "Send Back To Company";
             //public static string SendBackToStaff = "Send Back To Staff";
@@ -128,17 +147,17 @@ namespace Backend_UMR_Work_Program.Models
 
 		public static class PAYMENT_CATEGORY
 		{
-            public static string MainPayment = "Main Payment";
-            public static string OtherPayment = "Other Payment";
-            public static string SecondaryPayment = "Secondary Payment";
+            public const string MainPayment = "Main Payment";
+            public const string OtherPayment = "Other Payment";
+            public const string SecondaryPayment = "Secondary Payment";
         }
 
 		public static class TYPE_OF_FEE
 		{
-			public static string NoFee = "No Fee";
-            public static string SubmissionFee = "Submission Fee";
-            public static string LateSubmissionFee = "Late Submission Fee";
-            public static string ModificationFee = "Modification Fee";
+			public const string NoFee = "No Fee";
+            public const string SubmissionFee = "Submission Fee";
+            public const string LateSubmissionFee = "Late Submission Fee";
+            public const string ModificationFee = "Modification Fee";
         }
 
         //public static class APPLICATION_STATUS__OLD
@@ -2616,6 +2635,8 @@ namespace Backend_UMR_Work_Program.Models
 			public const string ExtraPaymentAlreadyExist = "16";
 			public const string MissingParameter = "17";
 			public const string InvalidParameterPassed = "18";
+			public const string PaymentAlreadyExists = "19";
+			public const string PaymentDoesNotExist = "20";
 		}
 		public class ResponseCodes
 		{

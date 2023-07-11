@@ -23,6 +23,10 @@
 		public bool? DeleteStatus { get; set; }
 		public DateTime? DeletedAt { get; set; }
 
+		public ADMIN_CONCESSIONS_INFORMATION Concession { get; set; }
+		public ADMIN_COMPANY_INFORMATION Company { get; set; }
+		public COMPANY_FIELD Field { get; set; }
+
 		//To track application processing stages
 		//public string ProcessingStage { get; set; } = null!;
 	}

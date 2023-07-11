@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
+using Backend_UMR_Work_Program.DTOs;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,7 @@ namespace Backend_UMR_Work_Program.Services
         private string BankName;
         private string AccountNumber;
         private string BankCode;
+        private string Bank;
         private string elpsBase;
         private readonly HelperService _helperService;
 
@@ -46,6 +48,7 @@ namespace Backend_UMR_Work_Program.Services
             BankName = $"{_configuration.GetSection("Payment").GetSection("BankName").Value}";
             AccountNumber = $"{_configuration.GetSection("Payment").GetSection("Account").Value}";
             BankCode = $"{_configuration.GetSection("Payment").GetSection("BankCode").Value}";
+            Bank = $"{_configuration.GetSection("Payment").GetSection("Bank").Value}";
             elpsBase = $"{_configuration.GetSection("Payment").GetSection("elpsBaseUrl").Value}";
             _appSettings = appsettings.Value;
         }
@@ -67,7 +70,8 @@ namespace Backend_UMR_Work_Program.Services
                     TypeOfPaymentId = model.TypeOfPayment,
                     AccountNumber = AccountNumber,
                     ServiceCharge = model.ServiceCharge,
-                    OrderId = model.OrderId
+                    OrderId = model.OrderId,
+                    Currency= model.Currency,
                 });
                 await _context.SaveChangesAsync();
 
@@ -90,12 +94,6 @@ namespace Backend_UMR_Work_Program.Services
                         x => x.AppId == app.Id && 
                         x.OrderId == orderId);
 
-                //var payment = await _context.Payments.Include(
-                //    x => x.PaymentType)
-                //    .FirstOrDefaultAsync(
-                //        x => x.AppId == app.Id &&
-                //        x.PaymentType.Category == GeneralModel.APPLICATION_STATUS.MainPayment);
-
                 if (payment != null)
                 {
                     payment.RRR = rrr;
@@ -117,7 +115,7 @@ namespace Backend_UMR_Work_Program.Services
             return null;
         }
 
-        public async Task<object> GetPaymentSummarySubmission()
+        public async Task<WebApiResponse> GetPaymentSummarySubmission()
         {
             try
             {
@@ -138,14 +136,41 @@ namespace Backend_UMR_Work_Program.Services
                     }
                 }
 
-                return fees;
+                return new WebApiResponse { Data = fees, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception ex)
             {
-
-                throw ex;
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
             }
             
+        }
+
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission()
+        {
+            try
+            {
+                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Category == PAYMENT_CATEGORY.OtherPayment).ToListAsync();
+                return new WebApiResponse { Data = fees, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse {ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
+
+        public async Task<WebApiResponse> GetTypesOfPayments()
+        {
+            try
+            {
+                var res = await _context.TypeOfPayments.ToListAsync();
+                return new WebApiResponse { Data = res, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+
         }
 
         public async Task<WebApiResponse> ConfirmPayment(int appId)
@@ -182,6 +207,7 @@ namespace Backend_UMR_Work_Program.Services
                                     payment.TransactionDate = Convert.ToDateTime(dic.GetValueOrDefault("transactiontime"));
                                     payment.AppReceiptId = dic.GetValueOrDefault("appreceiptid");
                                     payment.TXNMessage = "Confirmed";
+                                    payment.IsConfirmed = true;
                                     
                                     app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
 
@@ -351,7 +377,8 @@ namespace Backend_UMR_Work_Program.Services
                                             AmountNGN = amountNGN.ToString(),
                                             AmountUSD = "",
                                             OrderId = orderId,
-                                            ServiceCharge = serviceCharge
+                                            ServiceCharge = serviceCharge,
+                                            Currency = GeneralModel.Currency.NGN
                                         };
 
                                         var res = await AddPayment(newPayment);
@@ -378,5 +405,123 @@ namespace Backend_UMR_Work_Program.Services
             }
             
         }
+
+        public async Task<bool> DropAppOnAccountDesk(Payments payment)
+        {
+            try
+            {
+                var targetDesk = await _helperService.GetNextAccountDesk();
+
+                targetDesk.AppId = payment.AppId;
+                targetDesk.PaymentId = payment.Id;
+                targetDesk.isApproved = false;
+                targetDesk.LastJobDate = DateTime.Now;
+                targetDesk.ProcessStatus = PAYMENT_STATUS.PaymentPending;
+
+                _context.AccountDesks.Add(targetDesk);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public async Task<WebApiResponse> ConfirmUSDPayment(USDPaymentDTO model, string? paymentCategory)
+        {
+            try
+            {
+                paymentCategory ??= PAYMENT_CATEGORY.MainPayment;
+
+                var app = await _context.Applications.Where(
+                    x => x.CompanyID == model.CompanyNumber
+                    && x.ConcessionID == model.ConcessionId
+                    && x.FieldID == model.FieldId).FirstOrDefaultAsync();
+
+                if (app == null)
+                {
+                    app = await _helperService.AddNewApplication(
+                        model.CompanyNumber, model.CompanyEmail,
+                        model.Year, model.ConcessionId,
+                        model.FieldId, MAIN_APPLICATION_STATUS.NotSubmitted,
+                        PAYMENT_STATUS.PaymentPending, null, false);
+                }
+
+                var paymentExist = await _context.Payments.Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo).FirstOrDefaultAsync();
+
+                if (paymentExist == null) return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = $"This payment record does not exist.", StatusCode = ResponseCodes.Badrequest };
+
+                paymentExist.PaymentEvidenceFileName = model.PaymentEvidenceFileName;    
+                paymentExist.PaymentEvidenceFilePath = model.PaymentEvidenceFilePath;
+
+                _context.Payments.Update(paymentExist);
+                await _context.SaveChangesAsync();
+
+                //Drop the application on accounts department desk
+                await DropAppOnAccountDesk(paymentExist);
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Payment Evidence was successfully uploaded!", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse {ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
+                
+        public async Task<WebApiResponse> CreateUSDPayment(USDPaymentDTO model, string? paymentCategory)
+        {
+            try
+            {
+                paymentCategory ??= PAYMENT_CATEGORY.MainPayment;
+
+                var app = await _context.Applications.Where(
+                    x => x.CompanyID == model.CompanyNumber
+                    && x.ConcessionID == model.ConcessionId
+                    && x.FieldID == model.FieldId).FirstOrDefaultAsync();
+
+                if (app == null)
+                {
+                    app = await _helperService.AddNewApplication(
+                        model.CompanyNumber, model.CompanyEmail,
+                        model.Year, model.ConcessionId,
+                        model.FieldId, MAIN_APPLICATION_STATUS.NotSubmitted,
+                        PAYMENT_STATUS.PaymentPending, null, false);
+                }
+
+                var paymentExist = await _context.Payments.Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo).FirstOrDefaultAsync();
+
+                if (paymentExist != null) return new WebApiResponse { Data = new { OrderId = app.ReferenceNo, AccountNumber = AccountNumber, AccountName = BankName, BankName = Bank }, ResponseCode = AppResponseCodes.PaymentAlreadyExists, Message = $"This payment record has already been created.", StatusCode = ResponseCodes.Success };
+
+                var mainPaymentType = await _context.TypeOfPayments.Where(x => x.Category == paymentCategory).FirstOrDefaultAsync();
+                var newPayment = new AppPaymentViewModel()
+                {
+                    AppId = app.Id,
+                    CompanyNumber = app.CompanyID,
+                    ConcessionId = (int)app.ConcessionID,
+                    FieldId = app.FieldID,
+                    TypeOfPayment = mainPaymentType.Id,
+                    AmountNGN = "",
+                    AmountUSD = model.AmountUSD,
+                    OrderId = app.ReferenceNo,
+                    ServiceCharge = "0",
+                    Currency = Currency.USD
+                };
+
+                var res = await AddPayment(newPayment);
+
+                return new WebApiResponse { 
+                    Data = new { OrderId = app.ReferenceNo, AccountNumber = AccountNumber, AccountName = BankName,  BankName = Bank}, 
+                    ResponseCode = AppResponseCodes.Success, Message = "USD Payment was successfully created!", 
+                    StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
+
     }
 }

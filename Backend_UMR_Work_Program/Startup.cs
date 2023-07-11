@@ -99,10 +99,11 @@ namespace Backend_UMR_Work_Program
             services.AddTransient<Seeder>();
             services.AddTransient<PaymentService>();
             services.AddTransient<WorkProgrammeService>();
-            
             services.AddTransient<ApplicationService>();
             services.AddTransient<AppProcessFlowService>();
             services.AddTransient<HelperService>();
+            services.AddTransient<AccountingService>();
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped(x => new BlobServiceClient(Configuration.GetValue<string>("AzureBlobStorage")));
@@ -115,7 +116,7 @@ namespace Backend_UMR_Work_Program
                     errorNumbersToAdd: null)
                 ));
             services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
-            services.AddTransient<PaymentService>();
+            //services.AddTransient<PaymentService>();
             services.AddSingleton<IMailer, Mailer>();
             services.AddAzureClients(builder =>
             {
