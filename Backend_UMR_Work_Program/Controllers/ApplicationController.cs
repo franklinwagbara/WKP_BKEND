@@ -123,6 +123,9 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> MoveApplication(int sourceStaffID, int targetStaffID, string[] selectedApps)
             => await _applicationService.MoveApplication(sourceStaffID, targetStaffID, selectedApps);
 
+        [HttpGet("IS_APPLICATION_RETURNED")]
+        public async Task<WebApiResponse> IsApplicationReturned(int appId) => await _applicationService.IsApplicationReturned(appId); 
+
         //Rework
         [HttpGet("All-Applications")] //For general application view
         public async Task<object> RejectedApplications()

@@ -93,6 +93,7 @@ namespace Backend_UMR_Work_Program
             services.AddTransient<WorkProgrammeController>();
             services.AddTransient<AdminController>();
             services.AddTransient<DashboardController>();
+            services.AddTransient<TypeOfPaymentController>();
             services.AddTransient<DatabaseService>();
             services.AddTransient<BlobService>();
             services.AddTransient<ElpsUtility>();
@@ -103,6 +104,8 @@ namespace Backend_UMR_Work_Program
             services.AddTransient<AppProcessFlowService>();
             services.AddTransient<HelperService>();
             services.AddTransient<AccountingService>();
+            services.AddTransient<FeeService>();
+            services.AddTransient<TypeOfPaymentService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
