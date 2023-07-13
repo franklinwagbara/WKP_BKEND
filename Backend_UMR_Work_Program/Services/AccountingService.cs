@@ -47,7 +47,8 @@ namespace Backend_UMR_Work_Program.Services
                 var staff = await _context.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
 
                 var desks = await (from accDesk in _context.AccountDesks
-                                   join payment in _context.Payments on accDesk.AppId equals payment.AppId
+                                   join payment in _context.Payments on accDesk.AppId equals payment.AppId into paymentGroup
+                                   from payment in paymentGroup.DefaultIfEmpty()
                                    join app in _context.Applications on accDesk.AppId equals app.Id
                                    join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
                                    join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID
@@ -62,10 +63,10 @@ namespace Backend_UMR_Work_Program.Services
                                        FieldName = field != null ? field.Field_Name : null,
                                        CompanyName = comp.COMPANY_NAME,
                                        CompanyEmail = comp.EMAIL,
-                                       EvidenceFilePath = payment.PaymentEvidenceFilePath,
-                                       EvidenceFileName = payment.PaymentEvidenceFileName,
+                                       EvidenceFilePath = payment != null? payment.PaymentEvidenceFilePath: null,
+                                       EvidenceFileName = payment != null? payment.PaymentEvidenceFileName: null,
                                        Desk = accDesk,
-                                       //Payment = payment,
+                                       Payment = payment != null ? payment : null,
                                        Application = app,
                                        Staff = stf,
                                        Concession = conc,
