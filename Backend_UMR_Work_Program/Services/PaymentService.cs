@@ -543,7 +543,7 @@ namespace Backend_UMR_Work_Program.Services
                 await _context.SaveChangesAsync();
 
                 //return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{app.YearOfWKP}/{concession.ConcessionName}/{field.Field_Name}");
-                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = new {app, concession, field}, Message = "Application was successfully resubmitted!", StatusCode = ResponseCodes.Success };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = $"{concession.ConcessionName}/{field.Field_Name}", Message = "Application was successfully resubmitted!", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
             {
