@@ -6,6 +6,7 @@ using Backend_UMR_Work_Program.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Net;
@@ -150,7 +151,12 @@ namespace Backend_UMR_Work_Program.Services
             try
             {
                 var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Category == PAYMENT_CATEGORY.OtherPayment).ToListAsync();
-                return new WebApiResponse { Data = fees, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+                if(fees.Count == 1 && fees[0].TypeOfPayment.Name == TYPE_OF_FEE.NoFee)
+                {
+                    return new WebApiResponse { Data = null, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+                }
+                else
+                    return new WebApiResponse { Data = fees, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception ex)
             {
@@ -523,5 +529,27 @@ namespace Backend_UMR_Work_Program.Services
 
         }
 
+        public async Task<WebApiResponse> ReSubmissionForNoFee(int appId)
+        {
+            try
+            {
+                var app = await _context.Applications.Where(x => x.Id == appId).FirstOrDefaultAsync();
+                var concession = await _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefaultAsync();
+                var field = await _context.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefaultAsync();
+
+                app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
+                var rApp = await _context.ReturnedApplications.Where(x => x.AppId == appId).FirstOrDefaultAsync();
+                _context.ReturnedApplications.Remove(rApp);
+                await _context.SaveChangesAsync();
+
+                //return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{app.YearOfWKP}/{concession.ConcessionName}/{field.Field_Name}");
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = new {app, concession, field}, Message = "Application was successfully resubmitted!", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
     }
 }

@@ -173,5 +173,16 @@ namespace Backend_UMR_Work_Program.Controllers
 
             return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{app.YearOfWKP}/{concession.ConcessionName}/{field.Field_Name}");
         }
+
+        [HttpPost("RESUBMISSION_FOR_NO_FEE")]
+        public async Task<IActionResult> ReSubmissionForNoFee(int appId)
+        {
+            var res = await _paymentService.ReSubmissionForNoFee(appId);
+
+            if (res.ResponseCode != AppResponseCodes.Success)
+                return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
+
+            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
+        }
     }
 }

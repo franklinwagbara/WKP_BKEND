@@ -1064,7 +1064,19 @@ namespace Backend_UMR_Work_Program.Services
             {
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while pushing application to staff." + x.Message.ToString(), StatusCode = ResponseCodes.InternalError };
             }
+        }
 
+        public async Task<WebApiResponse> IsApplicationReturned(int appId)
+        {
+            try
+            {
+                var rApp = await _dbContext.ReturnedApplications.Include(x => x.Application).Include(x => x.Staff).Where(x => x.AppId== appId).FirstOrDefaultAsync();
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = rApp != null? true: false, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+            }
         }
 
     }
