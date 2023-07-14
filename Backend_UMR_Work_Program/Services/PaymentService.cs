@@ -416,6 +416,10 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
+                var foundOnAccountDesk = await _context.AccountDesks.Where(x => x.PaymentId == payment.Id).FirstOrDefaultAsync();
+
+                if(foundOnAccountDesk != null) { return true; }
+
                 var targetDesk = await _helperService.GetNextAccountDesk();
 
                 targetDesk.AppId = payment.AppId;

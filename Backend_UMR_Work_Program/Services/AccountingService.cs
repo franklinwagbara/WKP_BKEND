@@ -51,7 +51,8 @@ namespace Backend_UMR_Work_Program.Services
                                    from payment in paymentGroup.DefaultIfEmpty()
                                    join app in _context.Applications on accDesk.AppId equals app.Id
                                    join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID
+                                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
+                                   from field in fieldGroup.DefaultIfEmpty()
                                    join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
                                    join stf in _context.staff on accDesk.StaffID equals stf.StaffID
                                    where accDesk.StaffID == staff.StaffID
@@ -91,7 +92,8 @@ namespace Backend_UMR_Work_Program.Services
                                    join payment in _context.Payments on accDesk.AppId equals payment.AppId
                                    join app in _context.Applications on accDesk.AppId equals app.Id
                                    join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID
+                                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
+                                   from field in fieldGroup.DefaultIfEmpty()
                                    join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
                                    join compDetails in _context.ADMIN_COMPANY_DETAILs on comp.EMAIL equals compDetails.EMAIL
                                    join stf in _context.staff on accDesk.StaffID equals stf.StaffID
