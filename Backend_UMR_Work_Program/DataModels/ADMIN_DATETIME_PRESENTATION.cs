@@ -72,4 +72,17 @@ public partial class ADMIN_DATETIME_PRESENTATION
     public string? Date_Created_BY_COMPANY { get; set; }
 
     public int? CompanyNumber { get; set; }
+
+    //public bool? adminAproved { get; set; }
+
+    //public bool? companyAproved { get; set; }
+
+
+    public virtual List<EnagementScheduledHistory> Histories { get; set; }
+
+    public ADMIN_DATETIME_PRESENTATION()
+    {
+        Histories = new List<EnagementScheduledHistory>();
+    }
+
 }

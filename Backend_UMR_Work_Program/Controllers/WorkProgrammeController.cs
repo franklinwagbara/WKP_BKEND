@@ -696,7 +696,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                if (omlName != "undefined")
+                if (omlName != "undefined" && omlName!=null)
                 {
                     COMPANY_FIELD field = null;
                     var concession = (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Company_ID == WKPCompanyId && d.Concession_Held == omlName && d.DELETED_STATUS == null select d).FirstOrDefault();

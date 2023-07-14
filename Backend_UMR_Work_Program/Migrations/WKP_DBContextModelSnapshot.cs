@@ -7198,6 +7198,45 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.ToTable("Drilling_Operations");
                 });
 
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.EnagementScheduledHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PresentationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("actionBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("createdTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("wp_date")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("wp_time")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PresentationId");
+
+                    b.ToTable("EnagementScheduledHistorys");
+                });
+
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.Exploration_Drilling", b =>
                 {
                     b.Property<int>("Exploration_DrillingId")
@@ -29260,6 +29299,17 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.EnagementScheduledHistory", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.ADMIN_DATETIME_PRESENTATION", "Presentation")
+                        .WithMany("Histories")
+                        .HasForeignKey("PresentationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Presentation");
+                });
+
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.MyDesk", b =>
                 {
                     b.HasOne("Backend_UMR_Work_Program.DataModels.staff", "Staff")
@@ -29344,6 +29394,11 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasForeignKey("RoleId")
                         .IsRequired()
                         .HasConstraintName("FK_RoleFunctionalityRef_Role");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ADMIN_DATETIME_PRESENTATION", b =>
+                {
+                    b.Navigation("Histories");
                 });
 #pragma warning restore 612, 618
         }
