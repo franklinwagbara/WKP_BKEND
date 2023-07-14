@@ -91,7 +91,7 @@ namespace Backend_UMR_Work_Program.Services
                         .Include(x => x.Company)
                         .Where(
                             x => x.AppId == appId
-                            && x.isPublic == isPublic
+                            && x.isPublic == true
                             ).OrderByDescending(x => x.ActionDate).ToListAsync();
                 else
                     appHistories = await _dbContext.ApplicationDeskHistories
@@ -707,7 +707,7 @@ namespace Backend_UMR_Work_Program.Services
                 //var staffs = _context.staff.Where<staff>(s => s.Staff_SBU == sbuID && s.RoleID == roleID).ToList();
                 var staffDesks = await (from desk in _dbContext.MyDesks
                                         join staff in _dbContext.staff on desk.StaffID equals staff.StaffID
-                                        join app in _dbContext.Applications on desk.AppId equals app.Id
+                                        join app in _dbContext.Applications.Include(a => a.Company).Include(a => a.Concession).Include(a => a.Field) on desk.AppId equals app.Id
                                         where staff.Staff_SBU == sbuID && staff.RoleID == roleID && desk.HasWork == true
                                         select new DeskStaffAppsModel
                                         {
@@ -791,7 +791,7 @@ namespace Backend_UMR_Work_Program.Services
                 var staff = await _dbContext.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();    
 
 
-                var companies = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(x => x.COMPANY_NAME != "Admin").ToListAsync();
+                var companies = await _dbContext.ADMIN_COMPANY_DETAILs.ToListAsync();
 
                 return new WebApiResponse { Data = companies, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
@@ -931,5 +931,141 @@ namespace Backend_UMR_Work_Program.Services
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
             }
         }
+
+        public async Task<WebApiResponse> GetAccountDesk(string staffEmail)
+        {
+            try
+            {
+                var desks = await (
+                        from desk in _dbContext.AccountDesks
+                        join app in _dbContext.Applications on desk.StaffID equals app.Id
+                        join staff in _dbContext.staff on desk.StaffID equals staff.StaffID
+                        where desk.isApproved == false && staff.StaffEmail == staffEmail
+                        select new
+                        {
+                            Desk = desk,
+                            Application = app,
+                            Staff = staff,
+                        }
+                    ).ToListAsync();
+                return new WebApiResponse { Data = desks, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+        public async Task<WebApiResponse> MoveApplication(int sourceStaffID, int targetStaffID, string[] selectedApps)
+        {
+            try
+            {
+                if (selectedApps != null)
+                {
+                    foreach (var b in selectedApps)
+                    {
+                        string appID = b.Replace('[', ' ').Replace(']', ' ').Trim();
+                        int appId = int.Parse(appID);
+
+                        var sourceStaff = await _dbContext.staff.Where<staff>(s => s.StaffID == sourceStaffID && s.DeleteStatus != true).FirstOrDefaultAsync();
+                        var targetStaff = await _dbContext.staff.Where<staff>(s => s.StaffID == targetStaffID && s.DeleteStatus != true).FirstOrDefaultAsync();
+                        var sourceStaffDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == sourceStaff.StaffID && d.AppId == appId).FirstOrDefaultAsync();
+                        var targetStaffDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == targetStaff.StaffID && d.AppId == appId).FirstOrDefaultAsync();
+                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
+                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
+
+                        if (sourceStaff == null || targetStaff == null || appID == null)
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "An error occured while trying to get process flow for this application. Make sure that source and target staffIDs are valid including appId", StatusCode = ResponseCodes.InternalError };
+
+                        if (sourceStaff.Staff_SBU != targetStaff.Staff_SBU)
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "An error occured while trying to get process flow for this application. Source Staff's SBU and Role must match the Target Staff's.", StatusCode = ResponseCodes.InternalError };
+
+                        //retrieve source desk using staffID and appId
+                        var sourceDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == sourceStaffID && d.AppId == appId).FirstOrDefaultAsync();
+                        var targetDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == targetStaffID && d.AppId == appId).FirstOrDefaultAsync();
+
+                        if (sourceDesk == null)
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "An error occured while trying to get process flow for this application. Application was not found on source staff's desk.", StatusCode = ResponseCodes.InternalError };
+
+                        if (targetDesk == null)
+                        {
+                            var desk = new MyDesk
+                            {
+                                //save staff desk
+                                StaffID = targetStaffID,
+                                FromRoleId = sourceDesk.FromRoleId,
+                                FromSBU = sourceDesk.FromSBU,
+                                FromStaffID = sourceDesk.FromStaffID,
+                                //ProcessID = processFlow.ProccessID,
+                                AppId = appId,
+                                HasPushed = false,
+                                HasWork = true,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Comment = sourceDesk.Comment,
+                                LastJobDate = DateTime.Now,
+                                ProcessStatus = sourceDesk.ProcessStatus,
+                            };
+
+                            await _dbContext.MyDesks.AddAsync(desk);
+                        }
+                        else
+                        {
+                            targetDesk.StaffID = targetStaffID;
+                            targetDesk.FromRoleId = sourceDesk.FromRoleId;
+                            targetDesk.FromSBU = sourceDesk.FromSBU;
+                            targetDesk.FromStaffID = sourceDesk.FromStaffID;
+                            targetDesk.AppId = appId;
+                            targetDesk.HasWork = true;
+                            targetDesk.UpdatedAt = DateTime.Now;
+                            targetDesk.Comment = sourceDesk.Comment;
+                            targetDesk.ProcessStatus = sourceDesk.ProcessStatus;
+                            targetDesk.LastJobDate = DateTime.Now;
+
+                            _dbContext.MyDesks.Update(targetDesk);
+                        }
+
+
+                        var save = await _dbContext.SaveChangesAsync();
+                        if (save > 0)
+                        {
+                            var result = await _helperService.DeleteDeskByDeskId(sourceDesk.DeskID);
+                            //await _helpersController.UpdateDeskAfterMove(sourceDesk, sourceDesk.Comment, STAFF_DESK_STATUS.MOVED);
+                        }
+
+                        //_helpersController.SaveHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null);
+                        _helperService.SaveApplicationHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null, false, null, APPLICATION_ACTION.Move);
+
+
+                        string subject = $"Re-assignment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
+
+                        //Send mail to target Staff
+                        string content = "Application with REF : " + application.ReferenceNo + " was moved from " + sourceStaff.LastName + ", " + sourceStaff.FirstName + "'s desk to " + targetStaff.LastName + ", " + targetStaff.FirstName;
+                        var emailMsg = _helperService.SaveMessage(application.Id, targetStaffID, subject, content, "Staff");
+                        //var sendEmail = _helperService.SendEmailMessage(targetStaff.StaffEmail, targetStaff.LastName + ", " + targetStaff.FirstName, emailMsg, null);
+
+                        //Send mail to source staff
+                        var emailMsg_Source = _helperService.SaveMessage(application.Id, sourceStaffID, subject, content, "Staff");
+                        //var sendEmail_Source = _helperService.SendEmailMessage(sourceStaff.StaffEmail, sourceStaff.LastName + ", " + sourceStaff.FirstName, emailMsg_Source, null);
+
+                        _helperService.LogMessages("Application with REF : " + application.ReferenceNo + " was moved from " + sourceStaff.LastName + ", " + sourceStaff.FirstName + "'s desk to " + targetStaff.LastName + ", " + targetStaff.FirstName);
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been moved successfully.", StatusCode = ResponseCodes.Success };
+                    }
+                }
+                else
+                {
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error: No application ID was passed for this action to be completed.", StatusCode = ResponseCodes.InternalError };
+                }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error: No application ID was passed for this action to be completed.", StatusCode = ResponseCodes.InternalError };
+            }
+            catch (Exception x)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while pushing application to staff." + x.Message.ToString(), StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
+
     }
 }

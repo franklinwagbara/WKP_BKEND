@@ -19,6 +19,7 @@ public partial class WKP_DBContext : DbContext
         _configuration = configuration;
     }
 
+    public virtual DbSet<AccountDesk> AccountDesks { get; set; }
     public virtual DbSet<ReturnedApplication> ReturnedApplications { get; set; }
     public virtual DbSet<LateSubmission> LateSubmission { get; set; }
     public virtual DbSet<Fee> Fees { get; set; }
@@ -63,6 +64,7 @@ public partial class WKP_DBContext : DbContext
     public virtual DbSet<ADMIN_CONCESSION_STATUS> ADMIN_CONCESSION_STATUSes { get; set; }
 
     public virtual DbSet<ADMIN_DATETIME_PRESENTATION> ADMIN_DATETIME_PRESENTATIONs { get; set; }
+    public virtual DbSet<EnagementScheduledHistory> EnagementScheduledHistorys { get;set; }
 
     public virtual DbSet<ADMIN_DEVELOPMENT_PLAN_STATUS> ADMIN_DEVELOPMENT_PLAN_STATUSes { get; set; }
 
