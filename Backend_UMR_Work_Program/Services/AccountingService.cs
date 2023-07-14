@@ -165,6 +165,12 @@ namespace Backend_UMR_Work_Program.Services
             {
                 var desk = await UpdatedAccountDeskToConfirmedPayment(deskId);
 
+                var app = await _context.Applications.Where(x => x.Id == desk.AppId).FirstOrDefaultAsync();
+
+                app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
+                _context.Applications.Update(app);
+                await _context.SaveChangesAsync();
+
                 var submitRes = await _applicationService.SubmitApplication(desk.AppId);
 
                 if (submitRes.ResponseCode != AppResponseCodes.Success)
