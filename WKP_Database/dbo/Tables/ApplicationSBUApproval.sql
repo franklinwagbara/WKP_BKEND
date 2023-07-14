@@ -9,5 +9,6 @@
     [UpdatedDate] DATETIME NULL, 
     [AppAction] NVARCHAR(50) NULL, 
     [DeskID] INT NULL,
+    [SBUID] INT NULL, 
     CONSTRAINT [PK_ApplicationSBUApproval] PRIMARY KEY CLUSTERED ([Id] ASC)
 )
