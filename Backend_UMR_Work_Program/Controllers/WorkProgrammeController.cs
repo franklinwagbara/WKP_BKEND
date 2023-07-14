@@ -139,7 +139,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                    proposalBudget = b.Budget_for_Direct_Exploration_and_Production_Activities_Dollars,
                                    majorProjects = c.Major_Projects
                                }).FirstOrDefaultAsync();
-            if (step3?.exploratoryBudget != null && step3?.proposalBudget != null && step3?.majorProjects != null)
+            if (step3?.exploratoryBudget != null || step3?.proposalBudget != null || step3?.majorProjects != null)
             {
                 isStep3 = true;
             }
@@ -158,7 +158,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                    activities = b.ACTIVITIES,
                                    anyLitigation = c.AnyLitigation
                                }).FirstOrDefaultAsync();
-            if (step4?.actual_proposed != null && step4?.activities != null && step4?.anyLitigation != null)
+            if (step4?.actual_proposed != null || step4?.activities != null || step4?.anyLitigation != null)
             {
                 isStep4 = true;
             }
@@ -1282,8 +1282,6 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GET_FORM_FIVE_HSE")]
         public async Task<object> GET_FORM_FIVE_HSE(string omlName, string fieldName, string year, string type_of_facility, string number_of_facilities)
         {
-
-
             try
             {
                 var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
