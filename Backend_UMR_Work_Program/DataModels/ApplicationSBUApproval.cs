@@ -16,5 +16,11 @@ namespace Backend_UMR_Work_Program.DataModels
         public DateTime? UpdatedDate { get; set; }  
         public string? AppAction { get; set; }
         public int? DeskID { get; set; }
+        public int? SBUID { get; set; }
+
+        public staff Staff { get; set; }
+
+        [ForeignKey(nameof(SBUID))]
+        public StrategicBusinessUnit SBU { get; set; }
     }
 }
