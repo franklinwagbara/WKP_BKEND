@@ -211,7 +211,7 @@ namespace Backend_UMR_Work_Program.Services
                             string emailSubject = $"{year} submission of WORK PROGRAM application for {company.COMPANY_NAME} field - {field?.Field_Name} : {app.ReferenceNo}";
                             string emailContent = $"{company.COMPANY_NAME} have submitted their WORK PROGRAM application for year {year}.";
                             var emailMessage = _helperService.SaveMessage(app.Id, staff.StaffID, emailSubject, emailContent, "Staff");
-                            var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
+                            //var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
 
                             _helperService.LogMessages("Submission of application with REF : " + app.ReferenceNo, company.EMAIL);
                         }
@@ -236,7 +236,7 @@ namespace Backend_UMR_Work_Program.Services
                     string subject = $"{year} submission of WORK PROGRAM application for field - {field?.Field_Name} : {app.ReferenceNo}";
                     string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
                     var emailMsg = _helperService.SaveMessage(app.Id, Convert.ToInt32(company.Id), subject, content, "Company");
-                    var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
+                    //var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
                     var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
 
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
@@ -639,9 +639,10 @@ namespace Backend_UMR_Work_Program.Services
                 var applications = await (from app in _dbContext.Applications
                                           join dsk in _dbContext.MyDesks on app.Id equals dsk.AppId
                                           join conc in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                                          join field in _dbContext.COMPANY_FIELDs on app.FieldID equals field.Field_ID
+                                          join field in _dbContext.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
+                                          from field in fieldGroup.DefaultIfEmpty()
                                           where app.DeleteStatus != true && dsk.Staff.Staff_SBU == loggedInStaff.Staff_SBU
-                                          && dsk.HasWork == true
+                                          && dsk.HasWork == true && app.Status != MAIN_APPLICATION_STATUS.NotSubmitted
                                           select new
                                           {
                                               Id = app.Id,
@@ -1096,10 +1097,10 @@ namespace Backend_UMR_Work_Program.Services
         //                int appId = b != "undefined" ? int.Parse(b) : 0;
 
         //                var LoggedInStaff = (from stf in _dbContext.staff
-        //                                        join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-        //                                        join role in _dbContext.Roles on stf.RoleID equals role.id
-        //                                        where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
-        //                                        select stf).FirstOrDefault();
+        //                                     join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+        //                                     join role in _dbContext.Roles on stf.RoleID equals role.id
+        //                                     where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
+        //                                     select stf).FirstOrDefault();
 
         //                var staffDesk = _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
         //                var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
