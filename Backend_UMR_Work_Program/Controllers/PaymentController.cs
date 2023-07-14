@@ -182,9 +182,9 @@ namespace Backend_UMR_Work_Program.Controllers
             try
             {
                 var app = await _context.Applications.Where(x => x.Id == appId).FirstOrDefaultAsync();
-                var payment = await _context.Payments.Where(x => x.AppId == app.Id && x.IsConfirmed == true).FirstOrDefaultAsync();
+                var payment = await _context.Payments.Where(x => x.AppId == app.Id && x.IsConfirmed == false).FirstOrDefaultAsync();
 
-                if(payment == null)
+                if (payment == null)
                     return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = "Application payment details could not be found.", StatusCode = ResponseCodes.Badrequest };
 
                 if (payment.Currency == CurrencyUSD)

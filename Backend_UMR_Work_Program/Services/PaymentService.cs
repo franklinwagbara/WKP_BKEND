@@ -551,5 +551,15 @@ namespace Backend_UMR_Work_Program.Services
             }
 
         }
+
+        public bool IsAllPaymentsConfirmed(List<Payments> payments)
+        {
+            foreach(var p in payments)
+            {
+                if(p.IsConfirmed == false) return false;
+            }
+
+            return true;
+        }
     }
 }
