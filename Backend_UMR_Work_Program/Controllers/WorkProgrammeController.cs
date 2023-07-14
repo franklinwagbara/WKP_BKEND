@@ -252,7 +252,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                if(Id > 0)
+                if (Id > 0)
                 {
                     var companyConcession = await (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs
                                                    where d.Consession_Id == Id
@@ -263,8 +263,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         {
                             var fields = await (from d in _context.COMPANY_FIELDs
                                                 where d.Concession_ID == Id
-                                                           select d).ToListAsync();
-                            if(fields.Count > 0)
+                                                select d).ToListAsync();
+                            if (fields.Count > 0)
                                 _context.COMPANY_FIELDs.RemoveRange(fields);
 
                             _context.ADMIN_CONCESSIONS_INFORMATIONs.Remove(companyConcession);
@@ -696,7 +696,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                if (omlName != "undefined" && omlName!=null)
+                if (omlName != "undefined" && omlName != null)
                 {
                     COMPANY_FIELD field = null;
                     var concession = (from d in _context.ADMIN_CONCESSIONS_INFORMATIONs where d.Company_ID == WKPCompanyId && d.Concession_Held == omlName && d.DELETED_STATUS == null select d).FirstOrDefault();
@@ -1086,7 +1086,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     var BudgetProposalComponents = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).ToListAsync();
                     var BudgetCapexOpex = await (from c in _context.BUDGET_CAPEX_OPices where c.COMPANY_ID == WKPCompanyId && c.OML_Name == omlName && c.Year_of_WP == year select c).ToListAsync();
-                    var DecommissioningAbadonment = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.WpYear == year select c).FirstOrDefaultAsync();
+                    var DecommissioningAbadonment = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.WpYear == year select c).FirstOrDefaultAsync();
 
                     return new
                     {
@@ -1512,7 +1512,7 @@ namespace Backend_UMR_Work_Program.Controllers
                         HSEOSPRegistrations = HSEOSPRegistrations,
                         HSEAccidentIncidenceType = HSEAccidentIncidenceType,
                         HSECommunityDisturbance = HSECommunityDisturbance,
-                        HSEEnfluenceConliences= HSEEnfluenceConliences,
+                        HSEEnfluenceConliences = HSEEnfluenceConliences,
                         HSESustainableDevProjectProgmCsr = HSESustainableDevProgramCsr,
                         HSEPointSourceRegistrations = HSEPointSourceRegistrations,
                         HSEQuestion = HSEQuestion,
@@ -3278,7 +3278,7 @@ namespace Backend_UMR_Work_Program.Controllers
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
-                if(Id > 0)
+                if (Id > 0)
                 {
                     var getData = await (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.Id == Id select c).FirstOrDefaultAsync();
                     if (getData != null)
@@ -4861,7 +4861,7 @@ namespace Backend_UMR_Work_Program.Controllers
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
-                if(Id > 0)
+                if (Id > 0)
                 {
                     var getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.Id == Id select c).FirstOrDefaultAsync();
                     if (getData != null)
@@ -4932,7 +4932,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Total_Reconciled_National_Crude_Oil_Production = oil_condensate_activity_model.Total_Reconciled_National_Crude_Oil_Production;
                             getData.Type_of_Test = oil_condensate_activity_model.Type_of_Test;
                             getData.what_concession_field_straddling = oil_condensate_activity_model.what_concession_field_straddling;
-                            
+
                             _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Update(getData);
                             save += await _context.SaveChangesAsync();
 
@@ -4963,7 +4963,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_condensate_activity_model.Date_Created = DateTime.Now;
                     oil_condensate_activity_model.Created_by = WKPCompanyId;
                     await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.AddAsync(oil_condensate_activity_model);
-                    
+
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
@@ -7490,7 +7490,8 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (Id > 0)
                 {
                     var getData = (from c in _context.FACILITIES_PROJECT_PERFORMANCEs where c.Id == Id select c).FirstOrDefault();
-                    if(getData != null) {
+                    if (getData != null)
+                    {
                         if (action == GeneralModel.Delete)
                         {
                             _context.FACILITIES_PROJECT_PERFORMANCEs.Remove(getData);
@@ -7873,7 +7874,7 @@ namespace Backend_UMR_Work_Program.Controllers
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower(); var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             try
             {
-                if(Id > 0)
+                if (Id > 0)
                 {
                     var getData = (from c in _context.NIGERIA_CONTENT_Upload_Succession_Plans where c.Id == Id select c).FirstOrDefault();
                     if (getData != null)
@@ -9747,7 +9748,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.If_NO_give_reasons_for_not_being_registered = hse_waste_management_model.If_NO_give_reasons_for_not_being_registered;
                             getData.If_YES_is_the_facility_registered = hse_waste_management_model.If_YES_is_the_facility_registered;
                             getData.OML_ID = hse_waste_management_model.OML_ID;
-                            getData.Terrain = hse_waste_management_model.Terrain;                            
+                            getData.Terrain = hse_waste_management_model.Terrain;
 
                             _context.HSE_WASTE_MANAGEMENT_NEWs.Update(getData);
                             save += await _context.SaveChangesAsync();
@@ -9788,7 +9789,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     hse_waste_management_model.Date_Created = DateTime.Now;
                     hse_waste_management_model.Created_by = WKPCompanyId;
                     await _context.HSE_WASTE_MANAGEMENT_NEWs.AddAsync(hse_waste_management_model);
-                        
+
                     if (action == GeneralModel.Delete)
                     {
                         _context.HSE_WASTE_MANAGEMENT_NEWs.Remove(getData);
@@ -9797,7 +9798,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     save += await _context.SaveChangesAsync();
                     if (save > 0)
                     {
-                        string successMsg = Messager.ShowMessage( action);
+                        string successMsg = Messager.ShowMessage(action);
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                     }
                     else
@@ -9982,8 +9983,8 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.OML_ID = hse_produced_water_model.OML_ID;
                             getData.Terrain = hse_produced_water_model.Terrain;
                             getData.Within_which_zone_are_you_operating = hse_produced_water_model.Within_which_zone_are_you_operating;
-                            
-                            _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.Update(getData);                            
+
+                            _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.Update(getData);
                             save += await _context.SaveChangesAsync();
 
                             string successMsg = Messager.ShowMessage(GeneralModel.Update);
@@ -10515,7 +10516,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            if (hse_sustainable_model != null) {
+                            if (hse_sustainable_model != null)
+                            {
                                 getData.Companyemail = WKPCompanyEmail;
                                 getData.CompanyName = WKPCompanyName;
                                 getData.COMPANY_ID = WKPCompanyId;
@@ -11373,7 +11375,7 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
-            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName); 
+            var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             int Id = id == 0 ? hse_remediation_fund.Id : id;
             try
             {
