@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
         public int? OmlId { get; set; }
+        public string? COMPANY_ID { get; set; }
+        public string? CompanyName { get; set; }
         public string CompanyEmail { get; set; }
         public string WpYear { get; set; }
         public int? FieldId { get; set; }

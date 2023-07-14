@@ -247,7 +247,7 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> POST_ADMIN_CONCESSIONS_INFORMATION([FromBody] ADMIN_CONCESSIONS_INFORMATION model, string id, string actionToDo)
         {
             int save = 0;
-            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : model.Consession_Id;
+            int Id = id != "undefined" && !string.IsNullOrEmpty(id) ? int.Parse(id) : model.Consession_Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
 
             try
@@ -324,6 +324,8 @@ namespace Backend_UMR_Work_Program.Controllers
                         model.ConcessionName = model.Concession_Held.TrimEnd().ToUpper();
                         await _context.ADMIN_CONCESSIONS_INFORMATIONs.AddAsync(model);
                     }
+
+                    save = await _context.SaveChangesAsync();
 
                     if (save > 0)
                     {
