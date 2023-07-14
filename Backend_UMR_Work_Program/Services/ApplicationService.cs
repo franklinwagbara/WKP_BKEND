@@ -1083,271 +1083,260 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
-        //public async Task<WebApiResponse> SendBackApplication(int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer, int WKPCompanyNumber, string WKPCompanyName, string WKPCompanyEmail)
-        //{
-        //    try
-        //    {
-        //        if (selectedApps != null)
-        //        {
-        //            var SBU_IDs_int = _helperService.ParseSBUIDs(SBU_IDs);
+        public async Task<WebApiResponse> ReturnApplicationToStaff(int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer, int WKPCompanyNumber, string WKPCompanyName, string WKPCompanyEmail)
+        {
+            try
+            {
+                if (selectedApps != null)
+                {
+                    var SBU_IDs_int = _helperService.ParseSBUIDs(SBU_IDs);
 
 
-        //            foreach (var b in selectedApps)
-        //            {
-        //                int appId = b != "undefined" ? int.Parse(b) : 0;
+                    foreach (var b in selectedApps)
+                    {
+                        int appId = b != "undefined" ? int.Parse(b) : 0;
 
-        //                var LoggedInStaff = (from stf in _dbContext.staff
-        //                                     join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-        //                                     join role in _dbContext.Roles on stf.RoleID equals role.id
-        //                                     where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
-        //                                     select stf).FirstOrDefault();
+                        var LoggedInStaff = (from stf in _dbContext.staff
+                                             join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                                             join role in _dbContext.Roles on stf.RoleID equals role.id
+                                             where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
+                                             select stf).FirstOrDefault();
 
-        //                var staffDesk = _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
-        //                var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
-        //                var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
-        //                var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
+                        var staffDesk = _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
+                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
+                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
 
-        //                //if (application.FieldID != null)
-        //                //    field = _dbContext.COMPANY_FIELDs.Where(p => p.Field_ID == application.FieldID).FirstOrDefault();
+                        var LoggedInStaffSBU = _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefault();
+                        var LoggedInStaffRole = _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefault();
 
+                        //Determine if the app is on a reviewer's desk
+                        var appStatus = application.Status;
 
-        //                //Fetch App process flow
-        //                //var processFlow = _context.ApplicationProccesses.Where<ApplicationProccess>(p => p.ProccessID == staffDesk.ProcessID).FirstOrDefault();
+                        if ((LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER1 || LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER2) && fromWPAReviewer != true)
+                        {
+                            var staffWithAppOnDesk = (from stf in _dbContext.staff where stf.StaffID == staffDesk.StaffID select stf).FirstOrDefault();
+                            var staffWithAppOnDeskSBU = await (from sb in _dbContext.StrategicBusinessUnits where sb.Id == staffWithAppOnDesk.Staff_SBU select sb).FirstOrDefaultAsync();
 
-        //                var LoggedInStaffSBU = _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefault();
-        //                var LoggedInStaffRole = _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefault();
+                            var targetDesk = await _dbContext.MyDesks.Where(x => x.StaffID == staffDesk.FromStaffID && x.AppId == appId).FirstOrDefaultAsync();
 
-        //                //Determine if the app is on a reviewer's desk
-        //                var appStatus = application.Status;
+                            targetDesk.HasWork = true;
+                            targetDesk.UpdatedAt = DateTime.Now;
+                            targetDesk.Comment = comment;
+                            targetDesk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToStaff;
+                            _dbContext.MyDesks.Update(targetDesk);
 
-        //                //if (LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER1 && LoggedInStaffRole?.Rank == (int)ROLE_RANK.ONE)
-        //                //{
-        //                //    var staffWithAppOnDesk = (from stf in _dbContext.staff where stf.StaffID == staffDesk.StaffID select stf).FirstOrDefault();
-        //                //    var staffWithAppOnDeskSBU = await (from sb in _dbContext.StrategicBusinessUnits where sb.Id == staffWithAppOnDesk.Staff_SBU select sb).FirstOrDefaultAsync();
+                            string returnedTables = await _processFlowService.getTableNames(selectedTables);
+                            await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
-        //                //    string returnedTables = await _processFlowService.getTableNames(selectedTables);
-        //                //    await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
+                            await _dbContext.SaveChangesAsync();
 
-        //                //    _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, returnedTables, false, null, APPLICATION_ACTION.ReturnToStaff);
+                            _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, returnedTables, false, null, APPLICATION_ACTION.ReturnToStaff);
 
-        //                //    //Sending email
-        //                //    string subject = $"Comment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
-        //                //    string content = $"{staffWithAppOnDeskSBU?.SBU_Name} made comment on the WORK PROGRAM application with Reference Number: {application.ReferenceNo}. See comment :- " + comment;
-        //                //    var emailMsg = _helperService.SaveMessage(application.Id, Company.Id, subject, content, "Company");
-        //                //    var sendEmail = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
+                            //Sending email
+                            string subject = $"Comment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
+                            string content = $"{staffWithAppOnDeskSBU?.SBU_Name} made comment on the WORK PROGRAM application with Reference Number: {application.ReferenceNo}. See comment :- " + comment;
+                            var emailMsg = _helperService.SaveMessage(application.Id, Company.Id, subject, content, "Company");
+                            //var sendEmail = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
 
-        //                //    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"The Application {concession.Concession_Held} has been returned to staff.", StatusCode = ResponseCodes.Success };
-        //                //}
-        //                if (LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER1)
-        //                {
-        //                    var staffWithAppOnDesk = (from stf in _dbContext.staff where stf.StaffID == staffDesk.StaffID select stf).FirstOrDefault();
-        //                    var staffWithAppOnDeskSBU = await (from sb in _dbContext.StrategicBusinessUnits where sb.Id == staffWithAppOnDesk.Staff_SBU select sb).FirstOrDefaultAsync();
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"The Application {concession.Concession_Held} has been returned to staff.", StatusCode = ResponseCodes.Success };
+                        }
+                        else if (fromWPAReviewer == true)
+                        {
+                            var finalAuthorityApprovals = _dbContext.ApplicationSBUApprovals.Where(x => x.AppId == appId).ToList();
+                            var finalAuthorityDesks = new List<MyDesk>();
 
-        //                    string returnedTables = await _processFlowService.getTableNames(selectedTables);
-        //                    await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
+                            foreach (var a in finalAuthorityApprovals)
+                            {
+                                foreach(var s in SBU_IDs_int)
+                                {
+                                    var apr = finalAuthorityApprovals.Find(x => x.SBUID == s);
+                                    var tempDesk = await _dbContext.MyDesks.Where(x => x.DeskID == apr.DeskID).FirstOrDefaultAsync();
+                                    finalAuthorityDesks.Add(tempDesk);
+                                }
+                            }
 
-        //                    _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, returnedTables, false, null, APPLICATION_ACTION.ReturnToStaff);
+                            if (finalAuthorityDesks != null && finalAuthorityDesks.Count > 0)
+                            {
+                                foreach (var desk in finalAuthorityDesks)
+                                {
+                                    desk.HasWork = true;
+                                    desk.UpdatedAt = DateTime.Now;
+                                    desk.Comment = comment;
+                                    desk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToStaff;
+                                    _dbContext.MyDesks.Update(desk);
 
-        //                    //Sending email
-        //                    string subject = $"Comment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
-        //                    string content = $"{staffWithAppOnDeskSBU?.SBU_Name} made comment on the WORK PROGRAM application with Reference Number: {application.ReferenceNo}. See comment :- " + comment;
-        //                    var emailMsg = _helperService.SaveMessage(application.Id, Company.Id, subject, content, "Company");
-        //                    var sendEmail = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
+                                    await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
+                                    _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, null, false, null, APPLICATION_ACTION.ReturnToStaff);
+                                    _helperService.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
-        //                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"The Application {concession.Concession_Held} has been returned to staff.", StatusCode = ResponseCodes.Success };
-        //                }
-        //                else if (fromWPAReviewer == true)
-        //                {
-        //                    var finalAuthorityApprovals = _dbContext.ApplicationSBUApprovals.Where(x => x.AppId == appId).ToList();
-        //                    var finalAuthorityDesks = new List<MyDesk>();
+                                    await _dbContext.SaveChangesAsync();
 
-        //                    foreach (var a in finalAuthorityApprovals)
-        //                    {
-        //                        //if(a.)
-        //                        //var temp = _dbContext.MyDesks.Where(x => x.DeskID == a.DeskID && x.StaffID == a.StaffID).FirstOrDefault();
-        //                        //finalAuthorityDesks.Add(temp);
-        //                    }
+                                    //sending mail to staff
+                                    var staffWithAppOnDesk = await _dbContext.staff.Where(x => x.StaffID == desk.StaffID).FirstOrDefaultAsync();
+                                    string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
+                                    string content = $"{WKPCompanyName} returned WORK PROGRAM application for year {application.YearOfWKP} with Reference Number {application.ReferenceNo}.";
+                                    var emailMsg = _helperService.SaveMessage(application.Id, staffWithAppOnDesk.StaffID, subject, content, "Staff");
+                                    //var sendEmail = _helperService.SendEmailMessage(staffWithAppOnDesk.StaffEmail, staffWithAppOnDesk.FirstName, emailMsg, null);
+                                    _helperService.LogMessages("Returned application with REF : " + application.ReferenceNo, WKPCompanyEmail);
+                                }
 
-        //                    if (finalAuthorityDesks != null && finalAuthorityDesks.Count > 0)
-        //                    {
-        //                        foreach (var desk in finalAuthorityDesks)
-        //                        {
-        //                            desk.HasPushed = false;
-        //                            desk.HasWork = true;
-        //                            desk.UpdatedAt = DateTime.Now;
-        //                            desk.Comment = comment;
-        //                            desk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToStaff;
-        //                            _dbContext.SaveChanges();
+                                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been sent back successfully.", StatusCode = ResponseCodes.Success };
+                            }
+                            else
+                            {
+                                return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = $"Error: No application ID was passed for this action to be completed.", StatusCode = ResponseCodes.Badrequest };
+                            }
+                        }
+                        //else
+                        //{
+                        //    var prevDesk = await _context.MyDesks.Where<MyDesk>(d => d.StaffID == staffDesk.FromStaffID && d.AppId == appId).FirstOrDefaultAsync();
 
-        //                            await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
-        //                            _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, null, false, null, APPLICATION_ACTION.ReturnToStaff);
-        //                            _helperService.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
+                        //    if (SBU_IDs_int != null && SBU_IDs_int.Length > 0)
+                        //    {
+                        //        foreach (var SBU in SBU_IDs_int)
+                        //        {
+                        //            if (SBU > 0)
+                        //            {
+                        //                prevDesk = (from dsk in _context.MyDesks
+                        //                            join stf in _context.staff on dsk.StaffID equals stf.StaffID
+                        //                            where stf.StaffID == staffDesk.FromStaffID && dsk.AppId == appId && stf.Staff_SBU == SBU && dsk.FromSBU == staffDesk.FromSBU && stf.DeleteStatus != true
+                        //                            select dsk).FirstOrDefault();
 
-        //                            //sending mail to staff
-        //                            var staffWithAppOnDesk = await _dbContext.staff.Where(x => x.StaffID == desk.StaffID).FirstOrDefaultAsync();
-        //                            string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
-        //                            string content = $"{WKPCompanyName} returned WORK PROGRAM application for year {application.YearOfWKP} with Reference Number {application.ReferenceNo}.";
-        //                            var emailMsg = _helperService.SaveMessage(application.Id, staffWithAppOnDesk.StaffID, subject, content, "Staff");
-        //                            var sendEmail = _helperService.SendEmailMessage(staffWithAppOnDesk.StaffEmail, staffWithAppOnDesk.FirstName, emailMsg, null);
-        //                            _helperService.LogMessages("Returned application with REF : " + application.ReferenceNo, WKPCompanyEmail);
-        //                        }
+                        //                if (prevDesk != null)
+                        //                {
+                        //                    prevDesk.HasPushed = false;
+                        //                    prevDesk.HasWork = true;
+                        //                    prevDesk.UpdatedAt = DateTime.Now;
+                        //                    prevDesk.Comment = comment;
+                        //                    prevDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
+                        //                    _context.SaveChanges();
+                        //                }
+                        //                else
+                        //                {
+                        //                    var desk = new MyDesk()
+                        //                    {
+                        //                        StaffID = (int)staffDesk.FromStaffID,
+                        //                        AppId = appId,
+                        //                        HasWork = true,
+                        //                        HasPushed = true,
+                        //                        FromStaffID = staffDesk.FromStaffID,
+                        //                        FromSBU = staffDesk.FromSBU,
+                        //                        FromRoleId = staffDesk.FromRoleId,
+                        //                        CreatedAt = DateTime.Now,
+                        //                        UpdatedAt = DateTime.Now,
+                        //                        Comment = comment,
+                        //                        LastJobDate = DateTime.Now,
+                        //                        ProcessStatus = STAFF_DESK_STATUS.REJECTED,
+                        //                    };
 
-        //                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been sent back successfully.", StatusCode = ResponseCodes.Success };
-        //                    }
-        //                    else
-        //                    {
-        //                        return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = $"Error: No application ID was passed for this action to be completed.", StatusCode = ResponseCodes.Badrequest };
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    var prevDesk = await _context.MyDesks.Where<MyDesk>(d => d.StaffID == staffDesk.FromStaffID && d.AppId == appId).FirstOrDefaultAsync();
+                        //                    await _context.MyDesks.AddAsync(desk);
+                        //                }
 
-        //                    if (SBU_IDs_int != null && SBU_IDs_int.Length > 0)
-        //                    {
-        //                        foreach (var SBU in SBU_IDs_int)
-        //                        {
-        //                            if (SBU > 0)
-        //                            {
-        //                                prevDesk = (from dsk in _context.MyDesks
-        //                                            join stf in _context.staff on dsk.StaffID equals stf.StaffID
-        //                                            where stf.StaffID == staffDesk.FromStaffID && dsk.AppId == appId && stf.Staff_SBU == SBU && dsk.FromSBU == staffDesk.FromSBU && stf.DeleteStatus != true
-        //                                            select dsk).FirstOrDefault();
+                        //                //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
 
-        //                                if (prevDesk != null)
-        //                                {
-        //                                    prevDesk.HasPushed = false;
-        //                                    prevDesk.HasWork = true;
-        //                                    prevDesk.UpdatedAt = DateTime.Now;
-        //                                    prevDesk.Comment = comment;
-        //                                    prevDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
-        //                                    _context.SaveChanges();
-        //                                }
-        //                                else
-        //                                {
-        //                                    var desk = new MyDesk()
-        //                                    {
-        //                                        StaffID = (int)staffDesk.FromStaffID,
-        //                                        AppId = appId,
-        //                                        HasWork = true,
-        //                                        HasPushed = true,
-        //                                        FromStaffID = staffDesk.FromStaffID,
-        //                                        FromSBU = staffDesk.FromSBU,
-        //                                        FromRoleId = staffDesk.FromRoleId,
-        //                                        CreatedAt = DateTime.Now,
-        //                                        UpdatedAt = DateTime.Now,
-        //                                        Comment = comment,
-        //                                        LastJobDate = DateTime.Now,
-        //                                        ProcessStatus = STAFF_DESK_STATUS.REJECTED,
-        //                                    };
+                        //                await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
-        //                                    await _context.MyDesks.AddAsync(desk);
-        //                                }
+                        //                //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                        //                _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
 
-        //                                //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
+                        //                //send mail to staff
+                        //                var getStaff = (from stf in _context.staff
+                        //                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                        //                                where stf.StaffID == prevDesk.StaffID && stf.DeleteStatus != true
+                        //                                select stf).FirstOrDefault();
 
-        //                                await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
+                        //                string subject = $"Sent back WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
 
-        //                                //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
-        //                                _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
+                        //                string content = $"{WKPCompanyName} sent back WORK PROGRAM application for year {application.YearOfWKP}.";
 
-        //                                //send mail to staff
-        //                                var getStaff = (from stf in _context.staff
-        //                                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-        //                                                where stf.StaffID == prevDesk.StaffID && stf.DeleteStatus != true
-        //                                                select stf).FirstOrDefault();
+                        //                var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
 
-        //                                string subject = $"Sent back WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
+                        //                var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
 
-        //                                string content = $"{WKPCompanyName} sent back WORK PROGRAM application for year {application.YearOfWKP}.";
+                        //                _helpersController.LogMessages("Sent back application with REF : " + application.ReferenceNo, WKPCompanyEmail);
 
-        //                                var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
+                        //            }
+                        //        }
+                        //        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been sent back successfully.", StatusCode = ResponseCodes.Success };
+                        //    }
+                        //    else
+                        //    {
+                        //        if (prevDesk != null)
+                        //        {
+                        //            prevDesk.HasPushed = false;
+                        //            prevDesk.HasWork = true;
+                        //            prevDesk.UpdatedAt = DateTime.Now;
+                        //            prevDesk.Comment = comment;
+                        //            prevDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
+                        //            _context.SaveChanges();
+                        //        }
+                        //        else
+                        //        {
+                        //            var desk = new MyDesk()
+                        //            {
+                        //                StaffID = (int)staffDesk.FromStaffID,
+                        //                AppId = appId,
+                        //                HasWork = true,
+                        //                HasPushed = true,
+                        //                FromStaffID = staffDesk.FromStaffID,
+                        //                FromSBU = staffDesk.FromSBU,
+                        //                FromRoleId = staffDesk.FromRoleId,
+                        //                CreatedAt = DateTime.Now,
+                        //                UpdatedAt = DateTime.Now,
+                        //                Comment = comment,
+                        //                LastJobDate = DateTime.Now,
+                        //                ProcessStatus = STAFF_DESK_STATUS.REJECTED,
+                        //            };
 
-        //                                var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
+                        //            await _context.MyDesks.AddAsync(desk);
 
-        //                                _helpersController.LogMessages("Sent back application with REF : " + application.ReferenceNo, WKPCompanyEmail);
+                        //            prevDesk = desk;
+                        //        }
 
-        //                            }
-        //                        }
-        //                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been sent back successfully.", StatusCode = ResponseCodes.Success };
-        //                    }
-        //                    else
-        //                    {
-        //                        if (prevDesk != null)
-        //                        {
-        //                            prevDesk.HasPushed = false;
-        //                            prevDesk.HasWork = true;
-        //                            prevDesk.UpdatedAt = DateTime.Now;
-        //                            prevDesk.Comment = comment;
-        //                            prevDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
-        //                            _context.SaveChanges();
-        //                        }
-        //                        else
-        //                        {
-        //                            var desk = new MyDesk()
-        //                            {
-        //                                StaffID = (int)staffDesk.FromStaffID,
-        //                                AppId = appId,
-        //                                HasWork = true,
-        //                                HasPushed = true,
-        //                                FromStaffID = staffDesk.FromStaffID,
-        //                                FromSBU = staffDesk.FromSBU,
-        //                                FromRoleId = staffDesk.FromRoleId,
-        //                                CreatedAt = DateTime.Now,
-        //                                UpdatedAt = DateTime.Now,
-        //                                Comment = comment,
-        //                                LastJobDate = DateTime.Now,
-        //                                ProcessStatus = STAFF_DESK_STATUS.REJECTED,
-        //                            };
+                        //        //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
+                        //        await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
 
-        //                            await _context.MyDesks.AddAsync(desk);
+                        //        //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
+                        //        _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
 
-        //                            prevDesk = desk;
-        //                        }
+                        //        //send mail to staff
+                        //        var getStaff = (from stf in _context.staff
+                        //                        join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                        //                        where stf.StaffID == prevDesk.StaffID && stf.DeleteStatus != true
+                        //                        select stf).FirstOrDefault();
 
-        //                        //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
-        //                        await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
+                        //        string subject = $"Sent back WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
 
-        //                        //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
-        //                        _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
+                        //        string content = $"{WKPCompanyName} sent back WORK PROGRAM application for year {application.YearOfWKP}.";
 
-        //                        //send mail to staff
-        //                        var getStaff = (from stf in _context.staff
-        //                                        join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-        //                                        where stf.StaffID == prevDesk.StaffID && stf.DeleteStatus != true
-        //                                        select stf).FirstOrDefault();
+                        //        var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
 
-        //                        string subject = $"Sent back WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
+                        //        var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
 
-        //                        string content = $"{WKPCompanyName} sent back WORK PROGRAM application for year {application.YearOfWKP}.";
+                        //        _helpersController.LogMessages("Sent back application with REF : " + application.ReferenceNo, WKPCompanyEmail);
 
-        //                        var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
-
-        //                        var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
-
-        //                        _helpersController.LogMessages("Sent back application with REF : " + application.ReferenceNo, WKPCompanyEmail);
-
-        //                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been sent back successfully.", StatusCode = ResponseCodes.Success };
-        //                    }
-        //                }
+                        //        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been sent back successfully.", StatusCode = ResponseCodes.Success };
+                        //    }
+                        //}
 
 
-        //            }
-        //        }
-        //        else
-        //        {
-        //            return BadRequest(new { message = "Error: No application ID was passed for this action to be completed." });
-        //        }
+                    }
+                }
+                else
+                {
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = $"Error: No application ID was passed for this action to be completed.", StatusCode = ResponseCodes.Badrequest };
+                }
 
-        //        return BadRequest(new { message = "Error: No action was carried out on this application." });
-        //    }
-        //    catch (Exception x)
-        //    {
-        //        _helpersController.LogMessages($"Approve Error:: {x.Message.ToString()}");
-        //        return BadRequest(new { message = $"An error occured while rejecting application." + x.Message.ToString() });
-        //    }
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: No action was carried out on this application.", StatusCode = ResponseCodes.Badrequest };
+            }
+            catch (Exception e)
+            {
+                _helperService.LogMessages($"Approve Error: {e.Message.ToString()}");
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while rejecting application." + e.Message.ToString(), StatusCode = ResponseCodes.Badrequest };
+            }
 
-        //}
+        }
 
         //[HttpPost("ApproveApplication")]
         //public async Task<object> ApproveApplication(int deskID, string comment, string[] selectedApps)
