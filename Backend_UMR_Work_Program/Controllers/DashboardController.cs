@@ -409,13 +409,13 @@ namespace Backend_UMR_Work_Program.Controllers
             return ProdList;
         }
         
-        [HttpGet("COMPANY_CONCESSION_RESERVE_PROPOSED")]
-        public async Task<object> COMPANY_CONCESSION_RESERVE_PROPOSED(string year)
+        [HttpGet("COMPANY_PRODUCTION_OIL_CONDENSATE_PROPOSED")]
+        public async Task<object> COMPANY_PRODUCTION_OIL_CONDENSATE_PROPOSED(string year)
         {
             var ProdList = new List<object>();
-            var contractList = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select a.OML_Name).ToListAsync()).Distinct();
+            var contractList = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.OML_Name).ToListAsync()).Distinct();
             foreach (var conType in contractList) {
-                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil) + Convert.ToDouble(a.Company_Reserves_Condensate)).ToListAsync()).Sum();
+                var reserve = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Company_Oil) + Convert.ToDouble(a.Company_Condensate)).ToListAsync()).Sum();
                 ProdList.Add(new {omlname = conType, reserve = reserve});
             }
             return ProdList;
@@ -431,6 +431,20 @@ namespace Backend_UMR_Work_Program.Controllers
                 ProdList.Add(new {omlname = conType, reserve = reserve});
             }
             return ProdList;
+        }
+
+        [HttpGet("COMPANY_GAS_PRODUCTION_ACTIVITIE_PROPOSED")]
+        public async Task<object> COMPANY_GAS_PRODUCTION_ACTIVITIE_PROPOSED(string year)
+        {
+            var ProdList = new List<object>();
+            var contractList = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.OML_Name).ToListAsync()).Distinct();
+            foreach (var conType in contractList)
+            {
+                var reserve = (await (from a in _context.GAS_PRODUCTION_ACTIVITIEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.proposed_production)).ToListAsync()).Sum();
+                ProdList.Add(new { omlname = conType, reserve = reserve });
+            }
+            return ProdList;
+            
         }
 
 
