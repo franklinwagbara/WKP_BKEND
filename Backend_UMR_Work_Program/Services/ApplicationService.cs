@@ -139,7 +139,7 @@ namespace Backend_UMR_Work_Program.Services
                 }
                 else
                 {
-                    app = await _dbContext.Applications.Where(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id).FirstOrDefaultAsync();
+                    app = await _dbContext.Applications.Where(a => a.YearOfWKP == yearID && a.ConcessionID == concession.Consession_Id && a.Status != MAIN_APPLICATION_STATUS.NotSubmitted).FirstOrDefaultAsync();
                 }
 
                 if (app != null) return true;
@@ -886,6 +886,7 @@ namespace Backend_UMR_Work_Program.Services
                                               CreatedAt = app.CreatedAt,
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
+                                              PaymentStatus = app.PaymentStatus,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
 
@@ -920,6 +921,7 @@ namespace Backend_UMR_Work_Program.Services
                                       CreatedAt = app.CreatedAt,
                                       SubmittedAt = app.SubmittedAt,
                                       Status = app.Status,
+                                      PaymentStatus = app.PaymentStatus,
                                       SBU_Tables = rApp.StaffId,
                                       YearOfWKP = app.YearOfWKP
                                   }).ToListAsync();
@@ -1064,7 +1066,19 @@ namespace Backend_UMR_Work_Program.Services
             {
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while pushing application to staff." + x.Message.ToString(), StatusCode = ResponseCodes.InternalError };
             }
+        }
 
+        public async Task<WebApiResponse> IsApplicationReturned(int appId)
+        {
+            try
+            {
+                var rApp = await _dbContext.ReturnedApplications.Include(x => x.Application).Include(x => x.Staff).Where(x => x.AppId== appId).FirstOrDefaultAsync();
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = rApp != null? true: false, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+            }
         }
 
     }

@@ -123,6 +123,9 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> MoveApplication(int sourceStaffID, int targetStaffID, string[] selectedApps)
             => await _applicationService.MoveApplication(sourceStaffID, targetStaffID, selectedApps);
 
+        [HttpGet("IS_APPLICATION_RETURNED")]
+        public async Task<WebApiResponse> IsApplicationReturned(int appId) => await _applicationService.IsApplicationReturned(appId); 
+
         //Rework
         [HttpGet("All-Applications")] //For general application view
         public async Task<object> RejectedApplications()
@@ -184,6 +187,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                               CreatedAt = app.CreatedAt,
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
+                                              PaymentStatus = app.PaymentStatus,
                                               SBU_Tables = appHistory.SelectedTables,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
@@ -215,6 +219,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                               CreatedAt = app.CreatedAt,
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
+                                              PaymentStatus = app.PaymentStatus,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
                 return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
@@ -245,6 +250,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                               CreatedAt = app.CreatedAt,
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
+                                              PaymentStatus = app.PaymentStatus,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
                 return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };

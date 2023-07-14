@@ -171,7 +171,53 @@ namespace Backend_UMR_Work_Program.Controllers
             if (submitRes.ResponseCode != AppResponseCodes.Success)
                 return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{app.YearOfWKP}/{concession.ConcessionName}/{field.Field_Name}/{submitRes.Message}");
 
-            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{app.YearOfWKP}/{concession.ConcessionName}/{field.Field_Name}");
+            string fieldName = field == null ? "None" : field.Field_Name;
+
+            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{app.YearOfWKP}/{concession.ConcessionName}/{fieldName}");
+        }
+
+        [HttpPost("CONFIRM_APPLICATION_PAYMENT_FROM_COMPANY_DESK")]
+        public async Task<WebApiResponse> ConfirmApplicationPaymentFromCompanyDesk(int appId)
+        {
+            try
+            {
+                var app = await _context.Applications.Where(x => x.Id == appId).FirstOrDefaultAsync();
+                var payment = await _context.Payments.Where(x => x.AppId == app.Id && x.IsConfirmed == false).FirstOrDefaultAsync();
+
+                if (payment == null)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = "Application payment details could not be found.", StatusCode = ResponseCodes.Badrequest };
+
+                if (payment.Currency == CurrencyUSD)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "The account's action is required for payment processing. Kindly reach out to support for assistance.", StatusCode = ResponseCodes.Success };
+
+                var concession = await _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == payment.ConcessionId).FirstOrDefaultAsync();
+                var field = await _context.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefaultAsync();
+
+                var paymenRes = await _paymentService.ConfirmPayment(payment.AppId);
+
+                if (paymenRes.ResponseCode != AppResponseCodes.Success)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = "Could not verify payment.", StatusCode = ResponseCodes.Badrequest };
+
+                var submitRes = await _applicationService.SubmitApplication(payment.AppId);
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = paymenRes.Message, StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = e.Message, StatusCode = ResponseCodes.Badrequest };
+            }
+
+        }
+
+        [HttpPost("RESUBMISSION_FOR_NO_FEE")]
+        public async Task<IActionResult> ReSubmissionForNoFee(int appId)
+        {
+            var res = await _paymentService.ReSubmissionForNoFee(appId);
+
+            if (res.ResponseCode != AppResponseCodes.Success)
+                return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
+
+            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
         }
     }
 }
