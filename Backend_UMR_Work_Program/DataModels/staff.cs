@@ -44,8 +44,9 @@ public partial class staff
 
     public int? AdminCompanyInfo_ID { get; set; }
 
-    //[ForeignKey("Id")]
-    //public StrategicBusinessUnit? StrategicBusinessUnit { get; set; }
+    [ForeignKey("Staff_SBU")]
+    public StrategicBusinessUnit? StrategicBusinessUnit { get; set; }
 
+    //[ForeignKey("Id")]
     //public Role? Role { get; set; }
 }

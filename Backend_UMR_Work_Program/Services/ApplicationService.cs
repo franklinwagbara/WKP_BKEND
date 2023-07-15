@@ -635,7 +635,16 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-                var loggedInStaff = await _dbContext.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
+                var loggedInStaff = await _dbContext.staff.Include(x => x.StrategicBusinessUnit).Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
+                //var staffRole = await _dbContext.Roles.Where(x => x.id == loggedInStaff.RoleID).FirstOrDefaultAsync();
+                
+                //var superRoles = new List<string> { ROLE.ExecutiveCommissioner, ROLE.FinalAuthority };
+
+                //if(loggedInStaff != null && (superRoles.Contains(staffRole.RoleName) || loggedInStaff.StrategicBusinessUnit.SBU_Code == SBU_CODES.WPA))
+                //{
+                //    return await GetAllApplications(staffEmail);
+                //}
+
                 var applications = await (from app in _dbContext.Applications
                                           join dsk in _dbContext.MyDesks on app.Id equals dsk.AppId
                                           join conc in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
@@ -643,6 +652,40 @@ namespace Backend_UMR_Work_Program.Services
                                           from field in fieldGroup.DefaultIfEmpty()
                                           where app.DeleteStatus != true && dsk.Staff.Staff_SBU == loggedInStaff.Staff_SBU
                                           && dsk.HasWork == true && app.Status != MAIN_APPLICATION_STATUS.NotSubmitted
+                                          select new
+                                          {
+                                              Id = app.Id,
+                                              FieldID = app.FieldID,
+                                              ConcessionID = app.ConcessionID,
+                                              ConcessionName = conc.ConcessionName,
+                                              FieldName = field.Field_Name,
+                                              ReferenceNo = app.ReferenceNo,
+                                              CreatedAt = app.CreatedAt,
+                                              SubmittedAt = app.SubmittedAt,
+                                              Status = app.Status,
+                                              PaymentStatus = app.PaymentStatus,
+                                              CompanyName = conc.CompanyName,
+                                              YearOfWKP = app.YearOfWKP
+                                          }).ToListAsync();
+                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+        public async Task<WebApiResponse> GetAllApplications(string staffEmail)
+        {
+            try
+            {
+                var loggedInStaff = await _dbContext.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
+                var applications = await (from app in _dbContext.Applications
+                                          join dsk in _dbContext.MyDesks on app.Id equals dsk.AppId
+                                          join conc in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
+                                          join field in _dbContext.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
+                                          from field in fieldGroup.DefaultIfEmpty()
+                                          where app.DeleteStatus != true && dsk.HasWork == true && app.Status != MAIN_APPLICATION_STATUS.NotSubmitted
                                           select new
                                           {
                                               Id = app.Id,
