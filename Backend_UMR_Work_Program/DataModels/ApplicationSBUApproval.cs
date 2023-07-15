@@ -8,7 +8,7 @@ namespace Backend_UMR_Work_Program.DataModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int AppId { get; set; }
+        public int? AppId { get; set; }
         public int? StaffID { get; set; } 
         public string? Comment { get; set; }
         public string? Status { get; set; }

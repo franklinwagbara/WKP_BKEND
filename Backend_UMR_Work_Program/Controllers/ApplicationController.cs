@@ -77,6 +77,9 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GetLockForms")]
         public async Task<WebApiResponse> GetLockForms(int year, int concessionId, int fieldId) => await _applicationService.LockForms(year, concessionId, fieldId);
 
+        [HttpGet("GetAllApplications")]
+        public async Task<WebApiResponse> GetAllApplications() => await _applicationService.GetAllApplications(WKPCompanyEmail);
+
         [HttpGet("GetAllApplicationsScopedToSBU")]
         public async Task<WebApiResponse> GetAllApplicationsScopedToSBU() => await _applicationService.GetAllApplicationsScopedToSBU(WKPCompanyEmail);
 
@@ -189,37 +192,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                               Status = app.Status,
                                               PaymentStatus = app.PaymentStatus,
                                               SBU_Tables = appHistory.SelectedTables,
-                                              YearOfWKP = app.YearOfWKP
-                                          }).ToListAsync();
-                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { message = "Error : " + e.Message });
-            }
-        }
-
-        //Rework
-        [HttpGet("GetAllApplications")]
-        public async Task<object> GetAllApplications()
-        {
-            try
-            {
-                var applications = await (from app in _context.Applications
-                                          join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
-                                          where app.DeleteStatus != true && app.CompanyID == WKPCompanyNumber
-                                          select new
-                                          {
-                                              Id = app.Id,
-                                              FieldID = app.FieldID,
-                                              ConcessionID = app.ConcessionID,
-                                              ConcessionName = _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefault().Concession_Held,
-                                              FieldName = app.FieldID != null ? _context.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefault().Field_Name : "",
-                                              ReferenceNo = app.ReferenceNo,
-                                              CreatedAt = app.CreatedAt,
-                                              SubmittedAt = app.SubmittedAt,
-                                              Status = app.Status,
-                                              PaymentStatus = app.PaymentStatus,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
                 return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
@@ -448,9 +420,9 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 var sbuApprovals = new List<ApplicationSBUApproval>();
                 
-                if(getStaffSBU.Tier == 2)
+                if(getStaffSBU.Tier == 2 && appID != null)
                 {
-                    sbuApprovals = await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
+                    var sbuApprovals2 = await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
                 }
                 else
                 {
