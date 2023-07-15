@@ -5,6 +5,7 @@ using LinqToDB;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 using static Backend_UMR_Work_Program.Models.ViewModel;
@@ -219,16 +220,13 @@ namespace Backend_UMR_Work_Program.Controllers
                         COMPANYEMAIL = WKPUserEmail,
                         COMPANY_ID = WKPUserId,
                         YEAR = CurrentYear,
-                        CREATED_BY = WKPUserEmail,
-                        Submitted = "Not Yet",
+                        CREATED_BY = WKPUserEmail,                      
                         wp_date = Date_Conversion,
                         DATE_TIME_TEXT = Date_Conversion,
-                        wp_time = time,
-                        Date_Created_BY_COMPANY = DateTime.Now.ToString(),
-                        Date_Created = DateTime.Now,
+                        wp_time = time,                      
                         Histories = new List<EnagementScheduledHistory>
                         {
-                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time }
+                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time}
                         }
                     };
 
@@ -240,11 +238,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     var myTime = await _context.SaveChangesAsync();
 
-                    // var newPresentation = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.COMPANYEMAIL == WKPUserEmail).LastOrDefault();
-                    //  newPresentation.Histories.Add(engagement);
-                    // _context.ADMIN_DATETIME_PRESENTATIONs.Update(newPresentation);
-                    //engagement.PresentationId = newPresentation.Id;
-                    //  _context.EnagementScheduledHistorys.Add(engagement);
 
                     if (myTime > 0)
                     {
@@ -264,6 +257,8 @@ namespace Backend_UMR_Work_Program.Controllers
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
             }
         }
+
+
 
         //Added by Musa
 
@@ -468,7 +463,7 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             try
             {
-                var yearlist = await (from a in _context.ADMIN_DATETIME_PRESENTATIONs where a.YEAR != "" orderby a.YEAR select a.YEAR).Distinct().ToListAsync();
+                var yearlist = await (from a in _context.ADMIN_DATETIME_PRESENTATIONs where a.isDeleted != true && a.YEAR != "" orderby a.YEAR select a.YEAR).Distinct().ToListAsync();
                 return yearlist;
             }
             catch (Exception ex)
@@ -487,11 +482,11 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKPUserRole == GeneralModel.Admin)
                 {
-                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year).ToListAsync();
+                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year && c.isDeleted != true).ToListAsync();
                 }
                 else
                 {
-                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year && c.COMPANY_ID == WKPUserId).ToListAsync();
+                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year && c.COMPANY_ID == WKPUserId && c.isDeleted != true).ToListAsync();
                 }
 
                 //var presentationDetails =
@@ -518,14 +513,59 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
 
+        [HttpPatch]
+        public async Task<WebApiResponse> DELETE_SCHEDULE_PRESENTATION_DATETIME(int Id)
+        {
+            try
+            {
+                var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).FirstOrDefault();
+
+                if (checkSchedule == null)
+                {
+
+                    if(checkSchedule?.Histories.Count>1)
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities", StatusCode = ResponseCodes.Success };
+
+
+                    checkSchedule.isDeleted = true;
+                    _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+                    var myTime = await _context.SaveChangesAsync();
+
+
+                    if (myTime > 0)
+                    {
+                        var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                        string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to delete this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                    }
+                }
+                return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record doesn't exisit", StatusCode = ResponseCodes.RecordNotFound };
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+                //return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+            }
+        }
+
+
+
+
         [HttpGet("EngagementHistories")]
         public async Task<WebApiResponse> GetEngagementHistories(int Id)
         {
-            
+
             var histories = new List<EnagementScheduledHistory>();
             try
             {
-                if(Id> 0 || Id!=null )
+                if (Id > 0 || Id != null)
                 {
                     histories = await _context.EnagementScheduledHistorys.Where(c => c.PresentationId == Id).ToListAsync();
 
@@ -533,7 +573,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 }
 
-                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error : Invalid Id" , StatusCode = ResponseCodes.Success };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error : Invalid Id", StatusCode = ResponseCodes.Success };
 
 
             }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    [Migration("20230713131830_AddEnagerr")]
-    partial class AddEnagerr
+    [Migration("20230715131833_Add adminAproved companyAproved isDeleted do")]
+    partial class AddadminAprovedcompanyAprovedisDeleteddo
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1689,6 +1689,15 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<bool?>("adminAproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("companyAproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("isDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("wp_date")
                         .HasMaxLength(50)
