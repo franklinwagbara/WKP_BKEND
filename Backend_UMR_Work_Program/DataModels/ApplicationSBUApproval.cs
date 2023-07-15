@@ -8,7 +8,7 @@ namespace Backend_UMR_Work_Program.DataModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int AppId { get; set; }
+        public int? AppId { get; set; }
         public int? StaffID { get; set; } 
         public string? Comment { get; set; }
         public string? Status { get; set; }
@@ -16,5 +16,11 @@ namespace Backend_UMR_Work_Program.DataModels
         public DateTime? UpdatedDate { get; set; }  
         public string? AppAction { get; set; }
         public int? DeskID { get; set; }
+        public int? SBUID { get; set; }
+
+        public staff? Staff { get; set; }
+
+        [ForeignKey(nameof(SBUID))]
+        public StrategicBusinessUnit? SBU { get; set; }
     }
 }
