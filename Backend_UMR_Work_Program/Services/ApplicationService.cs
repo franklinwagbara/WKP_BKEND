@@ -708,6 +708,36 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
+        public async Task<WebApiResponse> GetAllApplicationsCompany(int CompanyId)
+        {
+            try
+            {
+                var applications = await (from app in _dbContext.Applications.Include(x => x.Concession).Include(x => x.Field).Include(x => x.Company)
+                                          where app.DeleteStatus != true && app.CompanyID == CompanyId
+                                          select new
+                                          {
+                                              Id = app.Id,
+                                              FieldID = app.FieldID,
+                                              ConcessionID = app.ConcessionID,
+                                              ConcessionName = app.Concession.ConcessionName,
+                                              FieldName = app.Field.Field_Name,
+                                              ReferenceNo = app.ReferenceNo,
+                                              CreatedAt = app.CreatedAt,
+                                              SubmittedAt = app.SubmittedAt,
+                                              Status = app.Status,
+                                              PaymentStatus = app.PaymentStatus,
+                                              CompanyName = app.Company.COMPANY_NAME,
+                                              YearOfWKP = app.YearOfWKP
+                                          }).ToListAsync();
+
+                return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
         public async Task<WebApiResponse> GetReturnedApplications(int WKPCompanyNumber)
         {
             try

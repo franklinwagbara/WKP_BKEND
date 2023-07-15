@@ -80,6 +80,9 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GetAllApplications")]
         public async Task<WebApiResponse> GetAllApplications() => await _applicationService.GetAllApplications();
 
+        [HttpGet("GetAllApplicationsCompany")]
+        public async Task<WebApiResponse> GetAllApplicationsCompany() => await _applicationService.GetAllApplicationsCompany((int)WKPCompanyNumber);
+
         [HttpGet("GetAllApplicationsScopedToSBU")]
         public async Task<WebApiResponse> GetAllApplicationsScopedToSBU() => await _applicationService.GetAllApplicationsScopedToSBU(WKPCompanyEmail);
 
