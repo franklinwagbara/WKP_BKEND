@@ -375,7 +375,15 @@ namespace Backend_UMR_Work_Program.Models
 			public string Error { get; set; }
 
 		}
-		public class WorkProgrammeReport2_Model
+
+        public static class ENGAGEMENT_HISTORY_STATUS
+        {
+            public const string OnCompanyDesk = "On Company Desk";
+            public const string OnAdminDesk = "On Admin Desk";
+            public const string Approved = "Approved";
+        }
+
+        public class WorkProgrammeReport2_Model
 		{
 			public List<Sum_GEOPHYSICAL_ACTIVITIES_ACQUISITION> Seismic_Data_Approved_and_Acquired { get; set; }
 			public object Seismic_Data_Approved_and_Acquired_PREVIOUS { get; set; }
