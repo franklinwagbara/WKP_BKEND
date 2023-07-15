@@ -422,7 +422,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 
                 if(getStaffSBU.Tier == 2 && appID != null)
                 {
-                    var sbuApprovals2 = await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
+                    sbuApprovals = await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
                 }
                 else
                 {

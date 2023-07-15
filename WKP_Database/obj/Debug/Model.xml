@@ -15104,9 +15104,10 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 						<Relationship Name="TypeSpecifier">
 							<Entry>
 								<Element Type="SqlTypeSpecifier">
+									<Property Name="Scale" Value="7" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[datetime]" />
+											<References ExternalSource="BuiltIns" Name="[datetime2]" />
 										</Entry>
 									</Relationship>
 								</Element>
@@ -15119,9 +15120,10 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 						<Relationship Name="TypeSpecifier">
 							<Entry>
 								<Element Type="SqlTypeSpecifier">
+									<Property Name="Scale" Value="7" />
 									<Relationship Name="Type">
 										<Entry>
-											<References ExternalSource="BuiltIns" Name="[datetime]" />
+											<References ExternalSource="BuiltIns" Name="[datetime2]" />
 										</Entry>
 									</Relationship>
 								</Element>

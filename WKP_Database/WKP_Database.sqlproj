@@ -534,6 +534,7 @@
     <Build Include="dbo\Tables\LateSubmission.sql" />
     <Build Include="dbo\Tables\ReturnedApplications.sql" />
     <Build Include="dbo\Tables\AccountDesks.sql" />
+    <Build Include="dbo\Tables\EnagementScheduledHistorys_2.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="WKP_Database.refactorlog" />
