@@ -1096,8 +1096,9 @@ namespace Backend_UMR_Work_Program.Services
                         //var sendEmail_Source = _helperService.SendEmailMessage(sourceStaff.StaffEmail, sourceStaff.LastName + ", " + sourceStaff.FirstName, emailMsg_Source, null);
 
                         _helperService.LogMessages("Application with REF : " + application.ReferenceNo + " was moved from " + sourceStaff.LastName + ", " + sourceStaff.FirstName + "'s desk to " + targetStaff.LastName + ", " + targetStaff.FirstName);
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been moved successfully.", StatusCode = ResponseCodes.Success };
                     }
+
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been moved successfully.", StatusCode = ResponseCodes.Success };
                 }
                 else
                 {
