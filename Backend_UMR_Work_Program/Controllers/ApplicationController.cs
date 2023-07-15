@@ -78,7 +78,7 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> GetLockForms(int year, int concessionId, int fieldId) => await _applicationService.LockForms(year, concessionId, fieldId);
 
         [HttpGet("GetAllApplications")]
-        public async Task<WebApiResponse> GetAllApplications() => await _applicationService.GetAllApplications(WKPCompanyEmail);
+        public async Task<WebApiResponse> GetAllApplications() => await _applicationService.GetAllApplications();
 
         [HttpGet("GetAllApplicationsScopedToSBU")]
         public async Task<WebApiResponse> GetAllApplicationsScopedToSBU() => await _applicationService.GetAllApplicationsScopedToSBU(WKPCompanyEmail);

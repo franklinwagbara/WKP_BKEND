@@ -434,21 +434,33 @@ namespace Backend_UMR_Work_Program.Services
             try
             {
                 var deskCount = 0;
+                var allApplicationsCountSBU = 0;
                 var allApplicationsCount = 0;
                 var allProcessingCount = 0;
                 var allApprovalsCount = 0;
                 var allRejectionsCount = 0;
 
-                var currentStaff = (from stf in _dbContext.staff
+                var currentStaff = await (from stf in _dbContext.staff
                                 join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
                                 where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
-                                select stf).FirstOrDefault();
+                                select stf).FirstOrDefaultAsync();
 
                 if (currentStaff != null)
                 {
                     deskCount = await _dbContext.MyDesks.Where(x => x.StaffID == currentStaff.StaffID && x.HasWork == true).CountAsync();
                     allProcessingCount = await _dbContext.MyDesks.Where(x => x.StaffID == currentStaff.StaffID && x.HasWork == true && x.ProcessStatus == DESK_PROCESS_STATUS.Processing).CountAsync();
-                    allApplicationsCount = (await _dbContext.MyDesks.Include(s => s.Staff).Where(x => x.HasWork && x.Staff.Staff_SBU == currentStaff.Staff_SBU).ToListAsync()).DistinctBy(x => x.AppId).Count();
+                    //allApplicationsCountSBU = (await _dbContext.MyDesks.Include(s => s.Staff).Where(x => x.HasWork && x.Staff.Staff_SBU == currentStaff.Staff_SBU).ToListAsync()).DistinctBy(x => x.AppId).Count();
+                    allApplicationsCountSBU = await (from app in _dbContext.Applications.Include(x => x.Field).Include(x => x.Concession).Include(x => x.Company)
+                                              join dsk in _dbContext.MyDesks on app.Id equals dsk.AppId
+                                              where app.DeleteStatus != true && dsk.Staff.Staff_SBU == currentStaff.Staff_SBU
+                                              && dsk.HasWork == true && app.Status != MAIN_APPLICATION_STATUS.NotSubmitted
+                                              select new
+                                              {
+                                                  app = app
+                                              }
+                                              ).CountAsync();
+
+                    allApplicationsCount = await _dbContext.Applications.Where(x => x.Status != GeneralModel.MAIN_APPLICATION_STATUS.NotSubmitted).CountAsync();
                 }
                 
                 allRejectionsCount = await _dbContext.Applications.Where(x => x.Status == MAIN_APPLICATION_STATUS.Rejected).CountAsync();
@@ -456,6 +468,7 @@ namespace Backend_UMR_Work_Program.Services
                 var data = new
                 {
                     deskCount = deskCount,
+                    allApplicationsCountSBU = allApplicationsCountSBU,
                     allApplicationsCount = allApplicationsCount,
                     allProcessingCount = allProcessingCount,
                     allApprovalsCount = allApprovalsCount,
@@ -636,20 +649,9 @@ namespace Backend_UMR_Work_Program.Services
             try
             {
                 var loggedInStaff = await _dbContext.staff.Include(x => x.StrategicBusinessUnit).Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
-                //var staffRole = await _dbContext.Roles.Where(x => x.id == loggedInStaff.RoleID).FirstOrDefaultAsync();
-                
-                //var superRoles = new List<string> { ROLE.ExecutiveCommissioner, ROLE.FinalAuthority };
 
-                //if(loggedInStaff != null && (superRoles.Contains(staffRole.RoleName) || loggedInStaff.StrategicBusinessUnit.SBU_Code == SBU_CODES.WPA))
-                //{
-                //    return await GetAllApplications(staffEmail);
-                //}
-
-                var applications = await (from app in _dbContext.Applications
+                var applications = await (from app in _dbContext.Applications.Include(x => x.Field).Include(x => x.Concession).Include(x => x.Company)
                                           join dsk in _dbContext.MyDesks on app.Id equals dsk.AppId
-                                          join conc in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                                          join field in _dbContext.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
-                                          from field in fieldGroup.DefaultIfEmpty()
                                           where app.DeleteStatus != true && dsk.Staff.Staff_SBU == loggedInStaff.Staff_SBU
                                           && dsk.HasWork == true && app.Status != MAIN_APPLICATION_STATUS.NotSubmitted
                                           select new
@@ -657,16 +659,17 @@ namespace Backend_UMR_Work_Program.Services
                                               Id = app.Id,
                                               FieldID = app.FieldID,
                                               ConcessionID = app.ConcessionID,
-                                              ConcessionName = conc.ConcessionName,
-                                              FieldName = field.Field_Name,
+                                              ConcessionName = app.Concession.ConcessionName,
+                                              FieldName = app.Field.Field_Name,
                                               ReferenceNo = app.ReferenceNo,
                                               CreatedAt = app.CreatedAt,
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
                                               PaymentStatus = app.PaymentStatus,
-                                              CompanyName = conc.CompanyName,
+                                              CompanyName = app.Company.COMPANY_NAME,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
+
                 return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -675,32 +678,28 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
-        public async Task<WebApiResponse> GetAllApplications(string staffEmail)
+        public async Task<WebApiResponse> GetAllApplications()
         {
             try
             {
-                var loggedInStaff = await _dbContext.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
-                var applications = await (from app in _dbContext.Applications
-                                          join dsk in _dbContext.MyDesks on app.Id equals dsk.AppId
-                                          join conc in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                                          join field in _dbContext.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
-                                          from field in fieldGroup.DefaultIfEmpty()
-                                          where app.DeleteStatus != true && dsk.HasWork == true && app.Status != MAIN_APPLICATION_STATUS.NotSubmitted
+                var applications = await (from app in _dbContext.Applications.Include(x => x.Concession).Include(x => x.Field).Include(x => x.Company)
+                                          where app.DeleteStatus != true && app.Status != MAIN_APPLICATION_STATUS.NotSubmitted
                                           select new
                                           {
                                               Id = app.Id,
                                               FieldID = app.FieldID,
                                               ConcessionID = app.ConcessionID,
-                                              ConcessionName = conc.ConcessionName,
-                                              FieldName = field.Field_Name,
+                                              ConcessionName = app.Concession.ConcessionName,
+                                              FieldName = app.Field.Field_Name,
                                               ReferenceNo = app.ReferenceNo,
                                               CreatedAt = app.CreatedAt,
                                               SubmittedAt = app.SubmittedAt,
                                               Status = app.Status,
                                               PaymentStatus = app.PaymentStatus,
-                                              CompanyName = conc.CompanyName,
+                                              CompanyName = app.Company.COMPANY_NAME,
                                               YearOfWKP = app.YearOfWKP
                                           }).ToListAsync();
+
                 return new WebApiResponse { Data = applications, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
