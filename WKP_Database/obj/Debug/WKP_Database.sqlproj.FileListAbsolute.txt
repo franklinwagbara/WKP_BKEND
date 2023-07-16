@@ -50,3 +50,7 @@ C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\postdeploy.sql
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\predeploy.sql
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\WKP_Database.dll
 C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\WKP_Database.pdb
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\Model.xml
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\refactor.xml
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\postdeploy.sql
+C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\predeploy.sql
