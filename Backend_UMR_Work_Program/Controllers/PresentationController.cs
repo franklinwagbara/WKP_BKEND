@@ -178,7 +178,57 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                var CurrentYear = DateTime.Now.Year.ToString();
+                if(time !=null && date != null)
+                {
+                    var CurrentYear = DateTime.Now.Year.ToString();
+                    string Date_Conversion = date.ToString("dddd , dd MMMM yyyy");
+
+                    var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.wp_date == Date_Conversion && c.wp_time == time).FirstOrDefault();
+
+                    if (checkSchedule != null)
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, date and time have already been selected by another company. Kindly select another day and/or time.", StatusCode = ResponseCodes.Failure };
+                    }
+                    else
+                    {
+                        var presentation = new ADMIN_DATETIME_PRESENTATION()
+                        {
+                            COMPANYNAME = WKPUserName,
+                            COMPANYEMAIL = WKPUserEmail,
+                            COMPANY_ID = WKPUserId,
+                            YEAR = CurrentYear,
+                            CREATED_BY = WKPUserEmail,
+                            wp_date = Date_Conversion,
+                            DATE_TIME_TEXT = Date_Conversion,
+                            wp_time = time,
+                            Histories = new List<EnagementScheduledHistory>
+                        {
+                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time}
+                        }
+                        };
+
+                        // var engagement = new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = presentation.wp_date, wp_time = presentation.wp_time };
+
+                        // presentation.Histories.Add(engagement);
+                        _context.ADMIN_DATETIME_PRESENTATIONs.Add(presentation);
+                        // _context.EnagementScheduledHistorys.Add(engagement);
+
+                        var myTime = await _context.SaveChangesAsync();
+
+
+                        if (myTime > 0)
+                        {
+                            var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was created successfully.", Data = companyPresentations, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to create this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                        }
+                    }
+                }
+
 
                 //var checkCompanySchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.COMPANY_ID == WKPUserId && c.YEAR == CurrentYear).FirstOrDefault();
 
@@ -204,53 +254,11 @@ namespace Backend_UMR_Work_Program.Controllers
                 //{
 
                 //check if date has been scheduled by another company
-                string Date_Conversion = date.ToString("dddd , dd MMMM yyyy");
 
-                var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.wp_date == Date_Conversion && c.wp_time == time).FirstOrDefault();
-
-                if (checkSchedule != null)
-                {
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, date and time have already been selected by another company. Kindly select another day and/or time.", StatusCode = ResponseCodes.Failure };
-                }
-                else
-                {
-                    var presentation = new ADMIN_DATETIME_PRESENTATION()
-                    {
-                        COMPANYNAME = WKPUserName,
-                        COMPANYEMAIL = WKPUserEmail,
-                        COMPANY_ID = WKPUserId,
-                        YEAR = CurrentYear,
-                        CREATED_BY = WKPUserEmail,                      
-                        wp_date = Date_Conversion,
-                        DATE_TIME_TEXT = Date_Conversion,
-                        wp_time = time,                      
-                        Histories = new List<EnagementScheduledHistory>
-                        {
-                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time}
-                        }
-                    };
-
-                    // var engagement = new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = presentation.wp_date, wp_time = presentation.wp_time };
-
-                    // presentation.Histories.Add(engagement);
-                    _context.ADMIN_DATETIME_PRESENTATIONs.Add(presentation);
-                    // _context.EnagementScheduledHistorys.Add(engagement);
-
-                    var myTime = await _context.SaveChangesAsync();
-
-
-                    if (myTime > 0)
-                    {
-                        var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was created successfully.", Data = companyPresentations, StatusCode = ResponseCodes.Success };
-                    }
-                    else
-                    {
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to create this presentation schedule.", StatusCode = ResponseCodes.Failure };
-
-                    }
-                }
                 // }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Invalid entry.", StatusCode = ResponseCodes.Failure };
+
             }
             catch (Exception ex)
             {
@@ -513,18 +521,18 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
 
-        [HttpPatch]
+        [HttpPatch("DELETE_SCHEDULE_PRESENTATION_DATETIME")]
         public async Task<WebApiResponse> DELETE_SCHEDULE_PRESENTATION_DATETIME(int Id)
         {
             try
             {
                 var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).FirstOrDefault();
 
-                if (checkSchedule == null)
+                if (checkSchedule != null)
                 {
 
                     if(checkSchedule?.Histories.Count>1)
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities", StatusCode = ResponseCodes.Success };
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities and can't be deleted", StatusCode = ResponseCodes.Success };
 
 
                     checkSchedule.isDeleted = true;
@@ -534,7 +542,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (myTime > 0)
                     {
-                        var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                       
                         string successMsg = Messager.ShowMessage(GeneralModel.Delete);
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                     }
@@ -544,7 +552,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     }
                 }
-                return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record doesn't exisit", StatusCode = ResponseCodes.RecordNotFound };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record cannot be found", StatusCode = ResponseCodes.RecordNotFound };
 
             }
             catch (Exception e)
@@ -555,7 +563,48 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+        //[HttpPatch("DELETE_SCHEDULE_PRESENTATION_DATETIME")]
+        //public async Task<WebApiResponse> DELETE_SCHEDULE_PRESENTATION_DATETIME(int Id)
+        //{
+        //    try
+        //    {
+        //        var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(p => p.Id == Id).FirstOrDefault();
 
+        //        if (checkSchedule != null)
+        //        {
+
+        //            if (checkSchedule.Histories.ToList().Count > 1)
+        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities and can't be deleted", StatusCode = ResponseCodes.Success };
+
+
+        //            checkSchedule.isDeleted = true;
+
+        //            _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+        //            var myTime = await _context.SaveChangesAsync();
+
+
+        //            if (myTime > 0)
+        //            {
+
+        //                string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+        //            }
+        //            else
+        //            {
+        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to delete this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+        //            }
+        //        }
+        //        return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record cannot be found", StatusCode = ResponseCodes.RecordNotFound };
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw e;
+        //        //return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+        //    }
+        //}
 
 
         [HttpGet("EngagementHistories")]
