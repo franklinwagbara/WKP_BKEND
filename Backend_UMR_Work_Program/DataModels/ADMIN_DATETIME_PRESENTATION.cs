@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Backend_UMR_Work_Program.Models;
+using System;
 using System.Collections.Generic;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
@@ -78,6 +79,8 @@ public partial class ADMIN_DATETIME_PRESENTATION
 
     public bool? companyAproved { get; set; }
     public bool? isDeleted { get; set; }
+    
+    public int numOfHistories { get; set; }
 
 
     public virtual List<EnagementScheduledHistory> Histories { get; set; }
@@ -85,13 +88,14 @@ public partial class ADMIN_DATETIME_PRESENTATION
     public ADMIN_DATETIME_PRESENTATION()
     {
         Histories = new List<EnagementScheduledHistory>();
-        STATUS = ENGAGEMENT_HISTORY_STATUS.OnCompanyDesk;
+        STATUS = ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk;
         isDeleted = false;
         adminAproved = false;
         companyAproved = true;
         Date_Created_BY_COMPANY = DateTime.Now.ToString();
         Date_Created = DateTime.Now;
-        Submitted = "Not Yet";
+        Submitted = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk;
+        numOfHistories=1;
     }
 
 }

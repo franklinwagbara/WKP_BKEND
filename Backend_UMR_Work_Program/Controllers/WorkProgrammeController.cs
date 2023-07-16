@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using Org.BouncyCastle.Asn1.Cmp;
+using Quartz;
 using System.Security.Claims;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
@@ -619,6 +620,40 @@ namespace Backend_UMR_Work_Program.Controllers
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + e.Message, StatusCode = ResponseCodes.InternalError };
             }
         }
+
+
+
+
+
+        [HttpGet("GET_PROPOSED_WELL_NAME")]
+        public async Task<object> GET_PROPOSED_WELL_NAME(string omlName, string fieldName, string year)
+        {
+            try
+            {
+                var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
+
+                
+                List<string> proposedWells = new List<string>();
+                if ((concessionField?.Consession_Type == "OML" || concessionField?.Consession_Type == "PML") && concessionField.Field_Name != null)
+                {
+                    proposedWells = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.COMPANY_ID == WKPCompanyId && d.OML_Name == omlName && d.Field_ID == concessionField.Field_ID && d.Year_of_WP ==year select d.WellName).ToListAsync();
+                }
+                else
+                {
+                    proposedWells = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.COMPANY_ID == WKPCompanyId && d.OML_Name == omlName && d.Year_of_WP == year select d.WellName).ToListAsync();
+
+                }
+
+                return new { proposedWells = proposedWells };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + e.Message, StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+
+
 
 
         [HttpGet("GET_FORM_ONE_GEOPHYSICAL")]
@@ -2090,6 +2125,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     decomAban_model.OmlId = concessionField.Concession_ID ?? null;
                     decomAban_model.FieldId = concessionField?.Field_ID ?? null;
                     decomAban_model.WpYear = year;
+                    decomAban_model.CompanyName = WKPCompanyName;
 
                     if (myDecomAban == null)
                     {
@@ -3861,6 +3897,12 @@ namespace Backend_UMR_Work_Program.Controllers
 
             }
         }
+
+
+
+
+
+
 
         [HttpPost("POST_DRILLING_EACH_WELL_COST")]
         public async Task<object> POST_DRILLING_EACH_WELL_COST([FromBody] DRILLING_EACH_WELL_COST drilling_each_well_cost_model, string omlName, string fieldName, string year, string actionToDo = null)
