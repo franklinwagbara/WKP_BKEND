@@ -1372,7 +1372,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSEEnfluenceConliences = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
 
 
-                    var HSEGHGPlans = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    var HSEGHGPlans = await (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.OmL_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
 
                     var HSEHostCommunities = await (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
 
