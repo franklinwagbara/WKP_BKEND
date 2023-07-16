@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    [Migration("20230715192632_update")]
-    partial class update
+    [Migration("20230716222501_Adddjj")]
+    partial class Adddjj
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1698,6 +1698,9 @@ namespace Backend_UMR_Work_Program.Migrations
 
                     b.Property<bool?>("isDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int>("numOfHistories")
+                        .HasColumnType("int");
 
                     b.Property<string>("wp_date")
                         .HasMaxLength(50)
@@ -7224,6 +7227,10 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MEETINGROOM")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PresentationId")
                         .HasColumnType("int");

@@ -203,7 +203,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             wp_time = time,
                             Histories = new List<EnagementScheduledHistory>
                         {
-                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time}
+                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time, MEETINGROOM = "Not Yet Selected"}
                         }
                         };
 
