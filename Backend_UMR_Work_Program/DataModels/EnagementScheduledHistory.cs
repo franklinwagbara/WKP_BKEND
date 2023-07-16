@@ -15,6 +15,8 @@
 
         public DateTime createdTime { get; set; }
 
+        public string MEETINGROOM { get; set; }
+
         public int PresentationId { get;set; }
         public virtual ADMIN_DATETIME_PRESENTATION Presentation { get; set; }
 
@@ -23,7 +25,9 @@
             createdTime = DateTime.Now;
             action = "Scheduled Engagement";
             comment = "Request for an engangement";
-            
+            MEETINGROOM = "Not Yet Selected";
+
+
         }
 
     }
