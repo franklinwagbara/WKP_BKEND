@@ -96,6 +96,7 @@ public partial class ADMIN_DATETIME_PRESENTATION
         Date_Created = DateTime.Now;
         Submitted = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk;
         MEETINGROOM = "Not Yet Selected";
+        numOfHistories = 1;
     }
 
 }
