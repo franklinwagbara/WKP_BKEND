@@ -563,49 +563,7 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-        //[HttpPatch("DELETE_SCHEDULE_PRESENTATION_DATETIME")]
-        //public async Task<WebApiResponse> DELETE_SCHEDULE_PRESENTATION_DATETIME(int Id)
-        //{
-        //    try
-        //    {
-        //        var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(p => p.Id == Id).FirstOrDefault();
-
-        //        if (checkSchedule != null)
-        //        {
-
-        //            if (checkSchedule.Histories.ToList().Count > 1)
-        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities and can't be deleted", StatusCode = ResponseCodes.Success };
-
-
-        //            checkSchedule.isDeleted = true;
-
-        //            _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
-        //            var myTime = await _context.SaveChangesAsync();
-
-
-        //            if (myTime > 0)
-        //            {
-
-        //                string successMsg = Messager.ShowMessage(GeneralModel.Delete);
-        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
-        //            }
-        //            else
-        //            {
-        //                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to delete this presentation schedule.", StatusCode = ResponseCodes.Failure };
-
-        //            }
-        //        }
-        //        return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record cannot be found", StatusCode = ResponseCodes.RecordNotFound };
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw e;
-        //        //return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
-
-        //    }
-        //}
-
+       
 
         [HttpGet("EngagementHistories")]
         public async Task<WebApiResponse> GetEngagementHistories(int Id)
