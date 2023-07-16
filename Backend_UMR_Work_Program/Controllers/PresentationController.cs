@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using LinqToDB;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System;
 using System.Security.Claims;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 using static Backend_UMR_Work_Program.Models.ViewModel;
@@ -173,58 +174,70 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("SCHEDULEPRESENTATION")]
         public async Task<WebApiResponse> SCHEDULE_PRESENTATION_DATETIME(string time, DateTime date)
         {
+
+
             try
             {
                 var CurrentYear = DateTime.Now.Year.ToString();
-                var checkCompanySchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.COMPANY_ID == WKPUserId && c.YEAR == CurrentYear).FirstOrDefault();
 
-                if (checkCompanySchedule != null)
+                //var checkCompanySchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.COMPANY_ID == WKPUserId && c.YEAR == CurrentYear).FirstOrDefault();
+
+                //if (checkCompanySchedule != null)
+                //{
+                //    string Date_Conversion1 = date.ToString("dddd , dd MMMM yyyy");
+                //    checkCompanySchedule.wp_date = Date_Conversion1;
+                //    checkCompanySchedule.DATE_TIME_TEXT = Date_Conversion1;
+                //    checkCompanySchedule.wp_time = time;
+                //    checkCompanySchedule.Updated_by = WKPUserEmail;
+                //    _context.Entry(checkCompanySchedule).State = EntityState.Modified;
+                //    await _context.SaveChangesAsync();
+
+                //    var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                //    return new WebApiResponse { ResponseCode = "200", Message = "A presentation schedule was created successfully.", Data = companyPresentations, StatusCode = 200 };
+
+
+                //    //schedule already exist for company
+                //    //return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "There is an existing presentation schedule for this year.", StatusCode = ResponseCodes.Failure };
+
+                //}
+                //else
+                //{
+
+                //check if date has been scheduled by another company
+                string Date_Conversion = date.ToString("dddd , dd MMMM yyyy");
+
+                var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.wp_date == Date_Conversion && c.wp_time == time).FirstOrDefault();
+
+                if (checkSchedule != null)
                 {
-                    string Date_Conversion1 = date.ToString("dddd , dd MMMM yyyy");
-                    checkCompanySchedule.wp_date = Date_Conversion1;
-                    checkCompanySchedule.DATE_TIME_TEXT = Date_Conversion1;
-                    checkCompanySchedule.wp_time = time;
-                    checkCompanySchedule.Updated_by = WKPUserEmail;
-                    _context.Entry(checkCompanySchedule).State = EntityState.Modified;
-                    await _context.SaveChangesAsync();
-
-                    var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
-                    return new WebApiResponse { ResponseCode = "200", Message = "A presentation schedule was created successfully.", Data = companyPresentations, StatusCode = 200 };
-
-
-                    //schedule already exist for company
-                    //return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "There is an existing presentation schedule for this year.", StatusCode = ResponseCodes.Failure };
-
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, date and time have already been selected by another company. Kindly select another day and/or time.", StatusCode = ResponseCodes.Failure };
                 }
                 else
                 {
-
-                    //check if date has been scheduled by another company
-                    string Date_Conversion = date.ToString("dddd , dd MMMM yyyy");
-
-                    var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.wp_date == Date_Conversion && c.wp_time == time).FirstOrDefault();
-                    if (checkSchedule != null)
-                    {
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, date and time have already been selected by another company. Kindly select another day and/or time.", StatusCode = ResponseCodes.Failure };
-                    }
-
                     var presentation = new ADMIN_DATETIME_PRESENTATION()
                     {
                         COMPANYNAME = WKPUserName,
                         COMPANYEMAIL = WKPUserEmail,
                         COMPANY_ID = WKPUserId,
                         YEAR = CurrentYear,
-                        CREATED_BY = WKPUserEmail,
-                        Submitted = "Not Yet",
+                        CREATED_BY = WKPUserEmail,                      
                         wp_date = Date_Conversion,
                         DATE_TIME_TEXT = Date_Conversion,
-                        wp_time = time,
-                        Date_Created_BY_COMPANY = DateTime.Now.ToString(),
-                        Date_Created = DateTime.Now,
+                        wp_time = time,                      
+                        Histories = new List<EnagementScheduledHistory>
+                        {
+                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time}
+                        }
                     };
 
+                    // var engagement = new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = presentation.wp_date, wp_time = presentation.wp_time };
+
+                    // presentation.Histories.Add(engagement);
                     _context.ADMIN_DATETIME_PRESENTATIONs.Add(presentation);
+                    // _context.EnagementScheduledHistorys.Add(engagement);
+
                     var myTime = await _context.SaveChangesAsync();
+
 
                     if (myTime > 0)
                     {
@@ -237,12 +250,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     }
                 }
+                // }
             }
             catch (Exception ex)
             {
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
             }
         }
+
+
 
         //Added by Musa
 
@@ -447,7 +463,7 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             try
             {
-                var yearlist = await (from a in _context.ADMIN_DATETIME_PRESENTATIONs where a.YEAR != "" orderby a.YEAR select a.YEAR).Distinct().ToListAsync();
+                var yearlist = await (from a in _context.ADMIN_DATETIME_PRESENTATIONs where a.isDeleted != true && a.YEAR != "" orderby a.YEAR select a.YEAR).Distinct().ToListAsync();
                 return yearlist;
             }
             catch (Exception ex)
@@ -466,12 +482,24 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKPUserRole == GeneralModel.Admin)
                 {
-                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year).ToListAsync();
+                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year && c.isDeleted != true).ToListAsync();
                 }
                 else
                 {
-                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year && c.COMPANY_ID == WKPUserId).ToListAsync();
+                    details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year && c.COMPANY_ID == WKPUserId && c.isDeleted != true).ToListAsync();
                 }
+
+                //var presentationDetails =
+                //        from presentation in details
+                //        join history in _context.EnagementScheduledHistorys on presentation.Id equals history.PresentationId
+                //        select new { Id= presentation.Id, presentation = presentation, history = history };
+
+
+
+
+
+                //var _details = await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.YEAR == year && c.COMPANY_ID == WKPUserId).ToListAsync
+                // var oo=    _context.EnagementScheduledHistorys.Where(a => a.PresentationId == details[0].Id);
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = details, StatusCode = ResponseCodes.Success };
             }
             catch (Exception ex)
@@ -482,6 +510,84 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         }
+
+
+
+        [HttpPatch]
+        public async Task<WebApiResponse> DELETE_SCHEDULE_PRESENTATION_DATETIME(int Id)
+        {
+            try
+            {
+                var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).FirstOrDefault();
+
+                if (checkSchedule == null)
+                {
+
+                    if(checkSchedule?.Histories.Count>1)
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities", StatusCode = ResponseCodes.Success };
+
+
+                    checkSchedule.isDeleted = true;
+                    _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+                    var myTime = await _context.SaveChangesAsync();
+
+
+                    if (myTime > 0)
+                    {
+                        var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                        string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to delete this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                    }
+                }
+                return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record doesn't exisit", StatusCode = ResponseCodes.RecordNotFound };
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+                //return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+            }
+        }
+
+
+
+
+        [HttpGet("EngagementHistories")]
+        public async Task<WebApiResponse> GetEngagementHistories(int Id)
+        {
+
+            var histories = new List<EnagementScheduledHistory>();
+            try
+            {
+                if (Id > 0 || Id != null)
+                {
+                    histories = await _context.EnagementScheduledHistorys.Where(c => c.PresentationId == Id).ToListAsync();
+
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = histories, StatusCode = ResponseCodes.Success };
+
+                }
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error : Invalid Id", StatusCode = ResponseCodes.Success };
+
+
+            }
+            catch (Exception ex)
+            {
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.Success };
+            }
+
+
+        }
+
+
+
 
         [HttpGet("DIVISIONAL_SCHEDULE_LIST")]
         public async Task<WebApiResponse> Get_Divisional_Schedule_list(string year = null)

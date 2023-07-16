@@ -4,6 +4,7 @@ using Backend_UMR_Work_Program.DataModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    partial class WKP_DBContextModelSnapshot : ModelSnapshot
+    [Migration("20230715131708_Add adminAproved companyAproved isDeleted Undo")]
+    partial class AddadminAprovedcompanyAprovedisDeletedUndo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1686,15 +1689,6 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)");
-
-                    b.Property<bool?>("adminAproved")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("companyAproved")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("isDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("wp_date")
                         .HasMaxLength(50)

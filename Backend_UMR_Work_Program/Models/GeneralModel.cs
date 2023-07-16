@@ -58,6 +58,11 @@ namespace Backend_UMR_Work_Program.Models
 			public const string Legal = "Legal";
 		}
 
+		public static class SBU_CODES
+		{
+			public const string WPA = "WPA";
+		}
+
 		public static class RoleName
 		{
 			public const string Accountant = "Accountant";
@@ -224,6 +229,7 @@ namespace Backend_UMR_Work_Program.Models
 			public static string Company = "Company";
 			public static string DD = "DD";
 			public static string ExecutiveCommissioner = "Executive Commissioner";
+			public static string FinalAuthority = "Final Authority";
 			public static string FinalApproval = "Final Approval";
 			public static string Reviewer = "Reviewer";
 			public static string SuperAdmin = "SuperAdmin";
@@ -369,7 +375,15 @@ namespace Backend_UMR_Work_Program.Models
 			public string Error { get; set; }
 
 		}
-		public class WorkProgrammeReport2_Model
+
+        public static class ENGAGEMENT_HISTORY_STATUS
+        {
+            public const string OnCompanyDesk = "On Company Desk";
+            public const string OnAdminDesk = "On Admin Desk";
+            public const string Approved = "Approved";
+        }
+
+        public class WorkProgrammeReport2_Model
 		{
 			public List<Sum_GEOPHYSICAL_ACTIVITIES_ACQUISITION> Seismic_Data_Approved_and_Acquired { get; set; }
 			public object Seismic_Data_Approved_and_Acquired_PREVIOUS { get; set; }

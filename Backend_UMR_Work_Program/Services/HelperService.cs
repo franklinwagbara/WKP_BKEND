@@ -720,5 +720,61 @@ namespace Backend_UMR_Work_Program.Services
                 throw ex;
             }
         }
+
+        public int[] ParseSBUIDs(string[] SBU_IDs) {
+            try
+            {
+                var SBU_IDs_int = new int[SBU_IDs.Length];
+
+                var tempSBUs = new List<string>();
+                foreach (string s in SBU_IDs)
+                {
+                    if (s != null && s != "undefined")
+                    {
+                        tempSBUs.Add(s);
+                    }
+                }
+
+                if (tempSBUs.Count > 0)
+                {
+                    for (int i = 0; i < tempSBUs.Count; i++)
+                    {
+                        SBU_IDs_int[i] = int.Parse(tempSBUs[i]);
+                    }
+                }
+                else
+                {
+                    SBU_IDs_int = null;
+                }
+
+                return SBU_IDs_int;
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
+        {
+            try
+            {
+                desk.HasPushed = false;
+                desk.HasWork = false;
+                desk.UpdatedAt = DateTime.Now;
+                desk.Comment = comment;
+                desk.ProcessStatus = processStatus;
+
+                _dbContext.MyDesks.Update(desk);
+
+                return desk;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }

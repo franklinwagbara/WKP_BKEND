@@ -2940,27 +2940,6 @@ generate:
 			}
 		}
 
-        public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
-        {
-            try
-            {
-                desk.HasPushed = false;
-                desk.HasWork = false;
-                desk.UpdatedAt = DateTime.Now;
-                desk.Comment = comment;
-                desk.ProcessStatus = processStatus;
-
-                _context.MyDesks.Update(desk);
-
-                return desk;
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
         public async Task<MyDesk> UpdateDeskAfterMove(MyDesk desk, string? comment, string? processStatus)
         {
             try

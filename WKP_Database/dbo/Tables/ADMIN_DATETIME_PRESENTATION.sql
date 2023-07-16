@@ -33,6 +33,11 @@
     [LAST_RUN_TIME]           DATETIME      NULL,
     [Date_Created_BY_COMPANY] VARCHAR (50)  NULL,
     [CompanyNumber]           INT           NULL,
+    [adminAproved]            BIT           NULL,
+    [companyAproved]          BIT           NULL,
+    [isDeleted]               BIT           NULL,
     CONSTRAINT [PK_ADMIN_DATETIME_PRESENTATION] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
