@@ -140,7 +140,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                    proposalBudget = b.Budget_for_Direct_Exploration_and_Production_Activities_Dollars,
                                    majorProjects = c.Major_Projects
                                }).FirstOrDefaultAsync();
-            if (step3?.exploratoryBudget != null || step3?.proposalBudget != null || step3?.majorProjects != null)
+            //if (step3?.exploratoryBudget != null || step3?.proposalBudget != null || step3?.majorProjects != null)
+            if (step3 != null)
             {
                 isStep3 = true;
             }
@@ -159,7 +160,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                    activities = b.ACTIVITIES,
                                    anyLitigation = c.AnyLitigation
                                }).FirstOrDefaultAsync();
-            if (step4?.actual_proposed != null || step4?.activities != null || step4?.anyLitigation != null)
+            //if (step4 != null || step4?.activities != null || step4?.anyLitigation != null)
+            if (step4 != null)
             {
                 isStep4 = true;
             }
