@@ -601,7 +601,7 @@ namespace Backend_UMR_Work_Program.Services
 			}
 		}
 
-        public async Task<ApplicationSBUApproval> UpdateApprovalTable(int appId, string? comment, int? staffId, int? deskId, string? processStatus)
+        public async Task<ApplicationSBUApproval> UpdateApprovalTable(int appId, string? comment, int? staffId, int SBUID, int? deskId, string? processStatus)
         {
             try
             {
@@ -611,6 +611,7 @@ namespace Backend_UMR_Work_Program.Services
 				{
 					foundApproval.AppId = appId;
 					foundApproval.StaffID = staffId;
+                    foundApproval.SBUID = SBUID;
 					foundApproval.Status = processStatus;
 					foundApproval.Comment = comment;
 					foundApproval.UpdatedDate = DateTime.Now;
@@ -775,6 +776,15 @@ namespace Backend_UMR_Work_Program.Services
 
                 throw ex;
             }
+        }
+
+        public double TryParseDouble(string value)
+        {
+            double newVal;
+
+            if (double.TryParse(value, out newVal))
+                return newVal;
+            else return 0.0;
         }
     }
 }
