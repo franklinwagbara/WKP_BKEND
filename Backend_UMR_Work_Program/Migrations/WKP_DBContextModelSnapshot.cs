@@ -1696,6 +1696,9 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Property<bool?>("isDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("numOfHistories")
+                        .HasColumnType("int");
+
                     b.Property<string>("wp_date")
                         .HasMaxLength(50)
                         .IsUnicode(false)
@@ -4516,7 +4519,7 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("AppAction");
 
-                    b.Property<int>("AppId")
+                    b.Property<int?>("AppId")
                         .HasColumnType("int")
                         .HasColumnName("AppId");
 
@@ -4531,6 +4534,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("int")
                         .HasColumnName("DeskID");
 
+                    b.Property<int?>("SBUID")
+                        .HasColumnType("int");
+
                     b.Property<int?>("StaffID")
                         .HasColumnType("int")
                         .HasColumnName("StaffID");
@@ -4543,6 +4549,10 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("datetime");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SBUID");
+
+                    b.HasIndex("StaffID");
 
                     b.ToTable("ApplicationSBUApproval", (string)null);
                 });
@@ -7214,6 +7224,10 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MEETINGROOM")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PresentationId")
                         .HasColumnType("int");
@@ -29031,6 +29045,8 @@ namespace Backend_UMR_Work_Program.Migrations
 
                     b.HasKey("StaffID");
 
+                    b.HasIndex("Staff_SBU");
+
                     b.ToTable("staff");
                 });
 
@@ -29308,6 +29324,21 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ApplicationSBUApproval", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.StrategicBusinessUnit", "SBU")
+                        .WithMany()
+                        .HasForeignKey("SBUID");
+
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffID");
+
+                    b.Navigation("SBU");
+
+                    b.Navigation("Staff");
+                });
+
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.EnagementScheduledHistory", b =>
                 {
                     b.HasOne("Backend_UMR_Work_Program.DataModels.ADMIN_DATETIME_PRESENTATION", "Presentation")
@@ -29347,6 +29378,15 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Navigation("Application");
 
                     b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.staff", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.StrategicBusinessUnit", "StrategicBusinessUnit")
+                        .WithMany()
+                        .HasForeignKey("Staff_SBU");
+
+                    b.Navigation("StrategicBusinessUnit");
                 });
 
             modelBuilder.Entity("Backend_UMR_Work_Program.Models.AccountDesk", b =>

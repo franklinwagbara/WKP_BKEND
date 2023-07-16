@@ -7,9 +7,12 @@
     [comment]        NVARCHAR (MAX) NOT NULL,
     [createdTime]    DATETIME2 (7)  NOT NULL,
     [PresentationId] INT            NOT NULL,
+    [MEETINGROOM]    NVARCHAR (MAX) DEFAULT (N'') NOT NULL,
     CONSTRAINT [PK_EnagementScheduledHistorys] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_EnagementScheduledHistorys_ADMIN_DATETIME_PRESENTATION_PresentationId] FOREIGN KEY ([PresentationId]) REFERENCES [dbo].[ADMIN_DATETIME_PRESENTATION] ([Id]) ON DELETE CASCADE
 );
+
+
 
 
 GO

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend_UMR_Work_Program.Migrations
 {
     [DbContext(typeof(WKP_DBContext))]
-    [Migration("20230611074944_Update Drilling Ope Model")]
-    partial class UpdateDrillingOpeModel
+    [Migration("20230716222501_Adddjj")]
+    partial class Adddjj
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1689,6 +1689,18 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<bool?>("adminAproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("companyAproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("numOfHistories")
+                        .HasColumnType("int");
 
                     b.Property<string>("wp_date")
                         .HasMaxLength(50)
@@ -4259,6 +4271,12 @@ namespace Backend_UMR_Work_Program.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyID");
+
+                    b.HasIndex("ConcessionID");
+
+                    b.HasIndex("FieldID");
+
                     b.ToTable("Applications");
                 });
 
@@ -4316,6 +4334,9 @@ namespace Backend_UMR_Work_Program.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool?>("ActionByCompany")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("ActionDate")
                         .HasColumnType("datetime2");
 
@@ -4329,6 +4350,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsRequired()
                         .IsUnicode(false)
                         .HasColumnType("varchar(max)");
+
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasPrecision(0)
@@ -4357,7 +4381,14 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Property<int?>("TriggeredBySBU")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("isPublic")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("StaffID");
 
                     b.ToTable("ApplicationDeskHistories");
                 });
@@ -4491,7 +4522,7 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("AppAction");
 
-                    b.Property<int>("AppId")
+                    b.Property<int?>("AppId")
                         .HasColumnType("int")
                         .HasColumnName("AppId");
 
@@ -4506,6 +4537,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("int")
                         .HasColumnName("DeskID");
 
+                    b.Property<int?>("SBUID")
+                        .HasColumnType("int");
+
                     b.Property<int?>("StaffID")
                         .HasColumnType("int")
                         .HasColumnName("StaffID");
@@ -4518,6 +4552,10 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("datetime");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SBUID");
+
+                    b.HasIndex("StaffID");
 
                     b.ToTable("ApplicationSBUApproval", (string)null);
                 });
@@ -6211,8 +6249,14 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("COMPANY_ID")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CompanyEmail")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
@@ -6671,7 +6715,7 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("Core_Cost_Curreny")
+                    b.Property<string>("Core_Cost_Currency")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Core_Cost_USD")
@@ -6848,8 +6892,8 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(300)");
 
-                    b.Property<string>("spud_date")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("spud_date")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("well_cost")
                         .HasMaxLength(50)
@@ -7174,6 +7218,49 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.HasKey("Drilling_OperationsId");
 
                     b.ToTable("Drilling_Operations");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.EnagementScheduledHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MEETINGROOM")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PresentationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("actionBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("createdTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("wp_date")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("wp_time")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PresentationId");
+
+                    b.ToTable("EnagementScheduledHistorys");
                 });
 
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.Exploration_Drilling", b =>
@@ -10835,6 +10922,15 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(1000)");
 
+                    b.Property<string>("OSCPUploadName")
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("OSCPUploadPath")
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
+
                     b.Property<string>("OmL_ID")
                         .HasMaxLength(100)
                         .IsUnicode(false)
@@ -10854,6 +10950,15 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasMaxLength(30)
                         .IsUnicode(false)
                         .HasColumnType("varchar(30)");
+
+                    b.Property<string>("eMUploadName")
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("eMUploadPath")
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.HasKey("Id");
 
@@ -15207,6 +15312,9 @@ namespace Backend_UMR_Work_Program.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("Year")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Year_of_WP")
                         .HasMaxLength(100)
                         .IsUnicode(false)
@@ -15889,6 +15997,8 @@ namespace Backend_UMR_Work_Program.Migrations
 
                     b.HasKey("DeskID")
                         .HasName("PK_MyDesk_UT");
+
+                    b.HasIndex("StaffID");
 
                     b.ToTable("MyDesks");
                 });
@@ -18901,23 +19011,6 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.ToTable("PRESENTATION_UPLOAD", (string)null);
                 });
 
-            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.PaymentType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentType");
-                });
-
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.PermitApproval", b =>
                 {
                     b.Property<int>("Id")
@@ -20608,6 +20701,40 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.ToTable("Reserve_Update_Oil_Condensate", (string)null);
                 });
 
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ReturnedApplication", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SelectedTables")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StaffId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppId");
+
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("ReturnedApplications");
+                });
+
             modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.Role", b =>
                 {
                     b.Property<string>("RoleId")
@@ -21300,6 +21427,15 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasMaxLength(30)
                         .IsUnicode(false)
                         .HasColumnType("varchar(30)");
+
+                    b.Property<string>("Section")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Step")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubSection")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TableName")
                         .HasMaxLength(250)
@@ -28912,6 +29048,8 @@ namespace Backend_UMR_Work_Program.Migrations
 
                     b.HasKey("StaffID");
 
+                    b.HasIndex("Staff_SBU");
+
                     b.ToTable("staff");
                 });
 
@@ -28926,6 +29064,95 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("int");
 
                     b.ToTable("tbl_fruitanalysis", (string)null);
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.AccountDesk", b =>
+                {
+                    b.Property<int>("AccountDeskID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccountDeskID"));
+
+                    b.Property<int>("AppId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastJobDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProcessID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProcessStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StaffID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("isApproved")
+                        .HasColumnType("bit");
+
+                    b.HasKey("AccountDeskID");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("StaffID");
+
+                    b.ToTable("AccountDesks");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.Fee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AmountNGN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AmountUSD")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TypeOfPaymentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeOfPaymentId");
+
+                    b.ToTable("Fees");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.LateSubmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Late")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LateSubmission");
                 });
 
             modelBuilder.Entity("Backend_UMR_Work_Program.Models.Payments", b =>
@@ -28963,6 +29190,7 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Currency")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
@@ -28971,10 +29199,37 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.Property<int?>("FieldId")
                         .HasColumnType("int");
 
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PaymentEvidenceFileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentEvidenceFilePath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("RRR")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RemitaRequest")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RemitaResponse")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceCharge")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
@@ -29034,9 +29289,142 @@ namespace Backend_UMR_Work_Program.Migrations
                     b.ToTable("RoleFunctionalityRef", (string)null);
                 });
 
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.Application", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.ADMIN_COMPANY_INFORMATION", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.ADMIN_CONCESSIONS_INFORMATION", "Concession")
+                        .WithMany()
+                        .HasForeignKey("ConcessionID");
+
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.COMPANY_FIELD", "Field")
+                        .WithMany()
+                        .HasForeignKey("FieldID");
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Concession");
+
+                    b.Navigation("Field");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ApplicationDeskHistory", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.ADMIN_COMPANY_INFORMATION", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId");
+
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffID");
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ApplicationSBUApproval", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.StrategicBusinessUnit", "SBU")
+                        .WithMany()
+                        .HasForeignKey("SBUID");
+
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffID");
+
+                    b.Navigation("SBU");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.EnagementScheduledHistory", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.ADMIN_DATETIME_PRESENTATION", "Presentation")
+                        .WithMany("Histories")
+                        .HasForeignKey("PresentationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Presentation");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.MyDesk", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ReturnedApplication", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.Application", "Application")
+                        .WithMany()
+                        .HasForeignKey("AppId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Application");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.staff", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.StrategicBusinessUnit", "StrategicBusinessUnit")
+                        .WithMany()
+                        .HasForeignKey("Staff_SBU");
+
+                    b.Navigation("StrategicBusinessUnit");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.AccountDesk", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.Models.Payments", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend_UMR_Work_Program.DataModels.staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.Models.Fee", b =>
+                {
+                    b.HasOne("Backend_UMR_Work_Program.Models.TypeOfPayments", "TypeOfPayment")
+                        .WithMany()
+                        .HasForeignKey("TypeOfPaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeOfPayment");
+                });
+
             modelBuilder.Entity("Backend_UMR_Work_Program.Models.Payments", b =>
                 {
-                    b.HasOne("Backend_UMR_Work_Program.DataModels.PaymentType", "PaymentType")
+                    b.HasOne("Backend_UMR_Work_Program.Models.TypeOfPayments", "PaymentType")
                         .WithMany()
                         .HasForeignKey("TypeOfPaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -29058,6 +29446,11 @@ namespace Backend_UMR_Work_Program.Migrations
                         .HasForeignKey("RoleId")
                         .IsRequired()
                         .HasConstraintName("FK_RoleFunctionalityRef_Role");
+                });
+
+            modelBuilder.Entity("Backend_UMR_Work_Program.DataModels.ADMIN_DATETIME_PRESENTATION", b =>
+                {
+                    b.Navigation("Histories");
                 });
 #pragma warning restore 612, 618
         }

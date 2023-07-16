@@ -376,11 +376,21 @@ namespace Backend_UMR_Work_Program.Models
 
 		}
 
-        public static class ENGAGEMENT_HISTORY_STATUS
+        public static class ENGAGEMENT_SCHEDULE_STATUS
         {
+
+			//STATUS OPTIONS
             public const string OnCompanyDesk = "On Company Desk";
             public const string OnAdminDesk = "On Admin Desk";
             public const string Approved = "Approved";
+
+
+
+
+            //COMPLETED OPTIONS
+            public const string NoActionYet = "No Action Yet";
+            public const string Processing = "Processing";
+            public const string CompletlyScheduled = "Completly Scheduled";
         }
 
         public class WorkProgrammeReport2_Model
