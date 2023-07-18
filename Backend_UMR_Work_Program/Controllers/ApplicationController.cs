@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
+using Rotativa.AspNetCore;
 using Syncfusion.XlsIO.Implementation;
 using System.Data;
 using System.Data.SqlClient;
@@ -3086,8 +3087,34 @@ namespace Backend_UMR_Work_Program.Controllers
 
         #endregion
 
-        //[AllowAnonymous]
-        //[HttpGet("TestGEN")]
-        //public async Task<string> Gen() => await _helperService.GeneratePDF();
+        [AllowAnonymous]
+        [HttpGet("TestGEN")]
+        public IActionResult GeneratePdf()
+        {
+            var model = new MyViewModel
+            {
+                Title = "My PDF Title",
+                Description = "This is the content of my PDF."
+            };
+
+            var rotativaFolder = "Rotativa";
+            var wkhtmltopdfRelativePath = Path.Combine(rotativaFolder, "wkhtmltopdf");
+
+            var wkhtmltopdfPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, wkhtmltopdfRelativePath);
+
+
+            var res = new ViewAsPdf
+            {
+                ViewName = "ApplicationView",
+                IsGrayScale = true,
+                WkhtmltopdfPath = wkhtmltopdfPath
+            };
+
+            //var pdfBytes = res.BuildFile(ControllerContext);
+
+            //return File(pdfBytes, "application/pdf", "GeneratedPdf.pdf");
+
+            return res;
+        }
     }
 }

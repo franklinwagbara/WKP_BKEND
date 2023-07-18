@@ -1182,6 +1182,7 @@ namespace Backend_UMR_Work_Program.Services
 
                         var LoggedInStaffSBU = _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefault();
                         var LoggedInStaffRole = _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefault();
+                        string returnedTables = await _processFlowService.getTableNames(selectedTables);
 
                         //Determine if the app is on a reviewer's desk
                         var appStatus = application.Status;
@@ -1199,7 +1200,6 @@ namespace Backend_UMR_Work_Program.Services
                             targetDesk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToStaff;
                             _dbContext.MyDesks.Update(targetDesk);
 
-                            string returnedTables = await _processFlowService.getTableNames(selectedTables);
                             await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
                             await _dbContext.SaveChangesAsync();
@@ -1238,7 +1238,7 @@ namespace Backend_UMR_Work_Program.Services
                                     _dbContext.MyDesks.Update(desk);
 
                                     await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
-                                    _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, null, false, null, APPLICATION_ACTION.ReturnToStaff);
+                                    _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, returnedTables, false, null, APPLICATION_ACTION.ReturnToStaff);
                                     _helperService.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, (int)desk.Staff.Staff_SBU, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
                                     await _dbContext.SaveChangesAsync();
