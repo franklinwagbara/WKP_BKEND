@@ -80,7 +80,7 @@ public partial class ADMIN_DATETIME_PRESENTATION
     public bool? companyAproved { get; set; }
     public bool? isDeleted { get; set; }
     
-    public int numOfHistories { get; set; }
+   public int numOfHistories { get; set; }
 
 
     public virtual List<EnagementScheduledHistory> Histories { get; set; }
@@ -95,7 +95,8 @@ public partial class ADMIN_DATETIME_PRESENTATION
         Date_Created_BY_COMPANY = DateTime.Now.ToString();
         Date_Created = DateTime.Now;
         Submitted = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk;
-        numOfHistories=1;
+        MEETINGROOM = "Not Yet Selected";
+        numOfHistories = 1;
     }
 
 }

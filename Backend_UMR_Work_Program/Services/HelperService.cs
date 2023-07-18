@@ -507,9 +507,13 @@ namespace Backend_UMR_Work_Program.Services
 
                 foreach (var staffId in staffIds)
                 {
-                    var desk = _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefault();
-                    var mostRecentJob = _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
-                    //var desk_conflict = _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
+                    var desk = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefaultAsync();
+                    
+                    //Check if the app on another role other than the wpa reviewer's desk
+                    if(desk == null)
+                        desk = await _dbContext.MyDesks.Where(x => x.AppId == appId && x.HasWork == true).FirstOrDefaultAsync();
+
+                    var mostRecentJob = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefaultAsync();
 
                     if (desk != null)
                     {
@@ -519,6 +523,7 @@ namespace Backend_UMR_Work_Program.Services
 							StaffID = staffId,
 							AppId = appId,
 						};
+
 						return res; 
                     }
                     else
@@ -538,7 +543,7 @@ namespace Backend_UMR_Work_Program.Services
                                 LastJobDate = DateTime.Now,
                             };
 
-                            _dbContext.MyDesks.Add(tempDesk);
+                            await _dbContext.MyDesks.AddAsync(tempDesk);
 
                             await _dbContext.SaveChangesAsync();
 
@@ -566,7 +571,7 @@ namespace Backend_UMR_Work_Program.Services
                     LastJobDate = DateTime.Now,
                 };
 
-                _dbContext.MyDesks.Add(newDesk);
+                await _dbContext.MyDesks.AddAsync(newDesk);
 
                 await _dbContext.SaveChangesAsync();
 
@@ -601,7 +606,7 @@ namespace Backend_UMR_Work_Program.Services
 			}
 		}
 
-        public async Task<ApplicationSBUApproval> UpdateApprovalTable(int appId, string? comment, int? staffId, int? deskId, string? processStatus)
+        public async Task<ApplicationSBUApproval> UpdateApprovalTable(int appId, string? comment, int? staffId, int SBUID, int? deskId, string? processStatus)
         {
             try
             {
@@ -611,6 +616,7 @@ namespace Backend_UMR_Work_Program.Services
 				{
 					foundApproval.AppId = appId;
 					foundApproval.StaffID = staffId;
+                    foundApproval.SBUID = SBUID;
 					foundApproval.Status = processStatus;
 					foundApproval.Comment = comment;
 					foundApproval.UpdatedDate = DateTime.Now;
@@ -775,6 +781,15 @@ namespace Backend_UMR_Work_Program.Services
 
                 throw ex;
             }
+        }
+
+        public double TryParseDouble(string value)
+        {
+            double newVal;
+
+            if (double.TryParse(value, out newVal))
+                return newVal;
+            else return 0.0;
         }
     }
 }

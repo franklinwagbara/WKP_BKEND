@@ -36,8 +36,11 @@
     [adminAproved]            BIT           NULL,
     [companyAproved]          BIT           NULL,
     [isDeleted]               BIT           NULL,
+    [numOfHistories]          INT           DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_ADMIN_DATETIME_PRESENTATION] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 
