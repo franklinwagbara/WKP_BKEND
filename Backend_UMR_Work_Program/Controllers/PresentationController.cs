@@ -275,17 +275,18 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             try
             {
+
                 var CurrentYear = DateTime.Now.Year.ToString();
 
                 var checkCompanyPresentation = await _context.PRESENTATION_UPLOADs.Where(c => c.COMPANY_ID == WKPUserId && c.Year_of_WP == year).ToListAsync();
 
 
                 //check if date has been scheduled by another company
-                if (checkCompanyPresentation.Count > 0)
+                if (checkCompanyPresentation!=null)
                 {
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "successful", Data = checkCompanyPresentation, StatusCode = ResponseCodes.Success };
                 }
-                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, document is empty.", StatusCode = ResponseCodes.Failure };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, error in get upload documents.", StatusCode = ResponseCodes.Failure };
 
             }
             catch (Exception ex)
@@ -308,13 +309,15 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (getPresentation == null)
                 {
 
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "No Record Found", StatusCode = ResponseCodes.Failure };
+                    // return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "No Record Found", StatusCode = ResponseCodes.Failure };
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Record has been deleted", StatusCode = ResponseCodes.Failure };
+
                 }
                 _context.PRESENTATION_UPLOADs.Remove(getPresentation);
                 var save = await _context.SaveChangesAsync();
                 if (save > 0)
                 {
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Successfu", Data = getPresentation, StatusCode = ResponseCodes.Failure };
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Successful", Data = getPresentation, StatusCode = ResponseCodes.Success };
                 }
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, an error occured.", StatusCode = ResponseCodes.Failure };
 
@@ -366,7 +369,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var PPTX = "pptx";
                     var PPT = "ppt";
 
-                    if (document_FileExtension.ToLower() != PPTX.ToLower() /*|| document_FileExtension.ToLower()!=PPT.ToLower()*/)
+                    if (document_FileExtension.ToLower() != PPTX.ToLower() && document_FileExtension.ToLower()!=PPT.ToLower())
                     {
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Only pptx or ppt are allowed. Please select Presentation file", StatusCode = ResponseCodes.Failure };
                     }

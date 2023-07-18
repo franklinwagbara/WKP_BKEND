@@ -2438,6 +2438,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     geophysical_activities_acquisition_model.Actual_year = year;
                     geophysical_activities_acquisition_model.proposed_year = (int.Parse(year) + 1).ToString();
                     geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString();
+                    
 
                     if (action == GeneralModel.Insert)
                     {
