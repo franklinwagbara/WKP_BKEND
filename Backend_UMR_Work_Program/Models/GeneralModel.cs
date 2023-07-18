@@ -114,6 +114,12 @@ namespace Backend_UMR_Work_Program.Models
 			//public static string SentBackToStaff = "Application Sent Back To Staff";
         }
 
+        public class MyViewModel
+        {
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+
         public static class DESK_PROCESS_STATUS
         {
             public const string FinalAuthorityApproved = "Final Authority Approved";
