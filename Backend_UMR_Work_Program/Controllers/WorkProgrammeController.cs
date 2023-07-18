@@ -78,8 +78,6 @@ namespace Backend_UMR_Work_Program.Controllers
             bool isStep4;
             bool isStep5;
 
-
-
             var step1 = await (from a in _context.CONCESSION_SITUATIONs
                                join b in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs on a.OML_Name equals b.OML_Name
                                join c in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs on a.OML_Name equals c.OML_Name
@@ -91,8 +89,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                    geoData = b,
                                    geoDataProcessed = c,
                                    wellType = d
-
-
                                }).FirstOrDefaultAsync();
             // var _step1 = _context.CONCESSION_SITUATIONs.Where(a => a.OML_Name == omlname);
             if (step1?.geoData != null && step1?.geoDataProcessed != null && step1?.wellType != null && step1?.concessionCreated != null)
@@ -130,15 +126,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 isStep2 = false;
             }
 
-            var step3 = await (from a in _context.BUDGET_ACTUAL_EXPENDITUREs
-                               join b in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs on a.OML_Name equals b.OML_Name
-                               join c in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs on a.OML_Name equals c.OML_Name
+            var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs 
+                               join b in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs on a.OML_Name equals b.OML_Name
+                               join d in _context.FACILITIES_PROJECT_PERFORMANCEs on a.OML_Name equals d.OML_Name
+                               join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name where c.Item_Type == "Capex"
+                               join f in _context.BUDGET_CAPEX_OPices on a.OML_Name equals f.OML_Name where c.Item_Type == "Opex"
+                               join g in _context.DECOMMISSIONING_ABANDONMENTs on a.OML_ID equals g.OmlId.ToString() 
+                               join e in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments on a.OML_Name equals e.OML_Name 
                                where a.OML_Name == omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname
                                select new
                                {
-                                   exploratoryBudget = a.Budget_for_Direct_Exploration_and_Production_Activities_USD,
-                                   proposalBudget = b.Budget_for_Direct_Exploration_and_Production_Activities_Dollars,
-                                   majorProjects = c.Major_Projects
+                                   exploratoryBudget = a.Budget_for_Direct_Exploration_and_Production_Activities_Dollars,
+                                   proposalBudget = b.Actual_capital_expenditure_Current_year_USD,
+                                   majorProjects = b.Major_Projects
                                }).FirstOrDefaultAsync();
             //if (step3?.exploratoryBudget != null || step3?.proposalBudget != null || step3?.majorProjects != null)
             if (step3 != null)
@@ -6581,12 +6581,12 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> POST_BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENT([FromBody] Budget_Proposal_Ngn_Usd_Model budgetProposal_model, string omlName, string fieldName, string year, string id, string actionToDo)
         {
             int save = 0;
+            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : (budgetProposal_model.Id.HasValue ? budgetProposal_model.Id.Value : 0);
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENT getData;
             BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENT budget_proposal_model = new BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENT()
             {
-
                 Budget_for_Direct_Exploration_and_Production_Activities_Dollars = budgetProposal_model.Budget_for_Direct_Exploration_and_Production_Activities_Dollars,
                 Budget_for_Direct_Exploration_and_Production_Activities_Naira = budgetProposal_model.Budget_for_Direct_Exploration_and_Production_Activities_Naira,
                 Budget_for_other_Activities_Dollars = budgetProposal_model.Budget_for_other_Activities_Dollars,
@@ -6595,30 +6595,41 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                if (!string.IsNullOrEmpty(id))
+                if (Id > 0)
                 {
-                    var _getData = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
-                    //var getData = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.Id == int.Parse(id) select c).FirstOrDefaultAsync();
-
-                    if (action == GeneralModel.Delete.Trim().ToLower())
-                        _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Remove(_getData);
-                    save += _context.SaveChanges();
-                }
-                else if (budget_proposal_model != null)
-                {
-
-                    if (concessionField?.Field_Name != null)
+                    getData = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
                     {
-                        getData = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id == budgetProposal_model.Id select c).FirstOrDefaultAsync();
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Budget_for_Direct_Exploration_and_Production_Activities_Dollars = budgetProposal_model.Budget_for_Direct_Exploration_and_Production_Activities_Dollars;
+                            getData.Budget_for_Direct_Exploration_and_Production_Activities_Naira = budgetProposal_model.Budget_for_Direct_Exploration_and_Production_Activities_Naira;
+                            getData.Budget_for_other_Activities_Dollars = budgetProposal_model.Budget_for_other_Activities_Dollars;
+                            getData.Budget_for_other_Activities_Naira = budgetProposal_model.Budget_for_other_Activities_Naira;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
 
+                            _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
                     }
                     else
                     {
-                        getData = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Id == budgetProposal_model.Id select c).FirstOrDefaultAsync();
-
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
                     }
-
-                    //var getData = await (from c in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                }
+                else if (budget_proposal_model != null)
+                {
                     budget_proposal_model.Companyemail = WKPCompanyEmail;
                     budget_proposal_model.CompanyName = WKPCompanyName;
                     budget_proposal_model.COMPANY_ID = WKPCompanyId;
@@ -6626,31 +6637,13 @@ namespace Backend_UMR_Work_Program.Controllers
                     budget_proposal_model.Year_of_WP = year;
                     budget_proposal_model.OML_Name = omlName;
                     budget_proposal_model.Field_ID = concessionField?.Field_ID ?? null;
+                    budget_proposal_model.OML_ID = concessionField.Concession_ID.ToString();
                     // budget_proposal_model.Actual_year = year;
                     budget_proposal_model.Proposed_year = year;
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null)
-                        {
-                            budget_proposal_model.Date_Created = DateTime.Now;
-                            budget_proposal_model.Created_by = WKPCompanyId;
-                            await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.AddAsync(budget_proposal_model);
-                        }
-                        else
-                        {
-                            budget_proposal_model.Date_Created = getData.Date_Created;
-                            budget_proposal_model.Created_by = getData.Created_by;
-                            budget_proposal_model.Date_Updated = DateTime.Now;
-                            budget_proposal_model.Updated_by = WKPCompanyId;
-                            _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Remove(getData);
-                            await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.AddAsync(budget_proposal_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete.Trim().ToLower())
-                    {
-                        _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Remove(getData);
-                    }
 
+                    budget_proposal_model.Date_Created = DateTime.Now;
+                    budget_proposal_model.Created_by = WKPCompanyId;
+                    await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.AddAsync(budget_proposal_model);
                     save += await _context.SaveChangesAsync();
                 }
                 else
@@ -7706,23 +7699,37 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> POST_BUDGET_CAPEX_OPEX([FromBody] Capex_Opex_Model capex_Opex, string omlName, string fieldName, string year, string id, string actionToDo)
         {
             int save = 0;
+            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : capex_Opex.Id;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-            List<BUDGET_CAPEX_OPEX> getData = new List<BUDGET_CAPEX_OPEX>();
-
-
-
-
             try
             {
-
-                if (!string.IsNullOrEmpty(id))
+                if (Id > 0)
                 {
-                    var _getData = (from c in _context.BUDGET_CAPEX_OPices where c.Id == int.Parse(id) select c).FirstOrDefault();
+                    var getData = (from c in _context.BUDGET_CAPEX_OPices where c.Id == Id select c).FirstOrDefault();
 
-                    if (action.Trim().ToLower() == GeneralModel.Delete.Trim().ToLower())
-                        _context.BUDGET_CAPEX_OPices.Remove(_getData);
-                    save += _context.SaveChanges();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.BUDGET_CAPEX_OPices.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            _context.BUDGET_CAPEX_OPices.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
                 }
                 else if (capex_Opex != null)
                 {
@@ -7737,20 +7744,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         remarks = capex_Opex.Remarks
                     };
 
-                    if (concessionField?.Field_Name != null)
-                    {
-                        getData = await (from c in _context.BUDGET_CAPEX_OPices where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Item_Type == budget_capex_opex_model.Item_Type && c.Item_Description == budget_capex_opex_model.Item_Description && c.Year_of_WP == year select c).ToListAsync();
-
-                    }
-                    else
-                    {
-                        getData = await (from c in _context.BUDGET_CAPEX_OPices where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Item_Type == budget_capex_opex_model.Item_Type && c.Item_Description == budget_capex_opex_model.Item_Description && c.Year_of_WP == year select c).ToListAsync();
-
-                    }
-
-
-                    //var getData = await (from c in _context.BUDGET_CAPEX_OPices where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-
                     budget_capex_opex_model.Companyemail = WKPCompanyEmail;
                     budget_capex_opex_model.CompanyName = WKPCompanyName;
                     budget_capex_opex_model.COMPANY_ID = WKPCompanyId;
@@ -7761,28 +7754,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     budget_capex_opex_model.OML_Name = omlName;
                     budget_capex_opex_model.Field_ID = concessionField?.Field_ID ?? null;
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null || getData?.Count == 0)
-                        {
-                            budget_capex_opex_model.Date_Created = DateTime.Now;
-                            budget_capex_opex_model.Created_by = WKPCompanyId;
-                            await _context.BUDGET_CAPEX_OPices.AddAsync(budget_capex_opex_model);
-                        }
-                        else
-                        {
-                            budget_capex_opex_model.Date_Created = getData.LastOrDefault().Date_Created;
-                            budget_capex_opex_model.Created_by = getData.LastOrDefault().Created_by;
-                            budget_capex_opex_model.Date_Updated = DateTime.Now;
-                            budget_capex_opex_model.Updated_by = WKPCompanyId;
-                            _context.BUDGET_CAPEX_OPices.RemoveRange(getData);
-                            await _context.BUDGET_CAPEX_OPices.AddAsync(budget_capex_opex_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.BUDGET_CAPEX_OPices.RemoveRange(getData);
-                    }
+                    budget_capex_opex_model.Date_Created = DateTime.Now;
+                    budget_capex_opex_model.Created_by = WKPCompanyId;
+                    await _context.BUDGET_CAPEX_OPices.AddAsync(budget_capex_opex_model);
 
                     save += await _context.SaveChangesAsync();
                 }
