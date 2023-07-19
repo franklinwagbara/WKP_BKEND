@@ -8275,21 +8275,69 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_STRATEGIC_PLANS_ON_COMPANY_BASES")]
-        public async Task<object> POST_STRATEGIC_PLANS_ON_COMPANY_BASI([FromBody] STRATEGIC_PLANS_ON_COMPANY_BASI strategic_plans_model, string year, string actionToDo)
+        public async Task<object> POST_STRATEGIC_PLANS_ON_COMPANY_BASI([FromBody] STRATEGIC_PLANS_ON_COMPANY_BASI strategic_plans_model, string year, int id, string actionToDo)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert.ToLower() : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            int Id = id > 0 ? id : strategic_plans_model.Id;
             try
             {
-
                 #region Saving STRATEGIC_PLANS_ON_COMPANY_BASIs data
-                if (strategic_plans_model != null)
+                if(Id > 0)
                 {
-                    var getData = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.ACTIVITIES == strategic_plans_model.ACTIVITIES select c).FirstOrDefaultAsync();
 
+                    var getData = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.ACTIVITIES = strategic_plans_model.ACTIVITIES;
+                            getData.Consession_Type = strategic_plans_model.Consession_Type;
+                            getData.Contract_Type = strategic_plans_model.Contract_Type;
+                            getData.N_1_Q1 = strategic_plans_model.N_1_Q1;
+                            getData.N_1_Q2 = strategic_plans_model.N_1_Q2;
+                            getData.N_1_Q3 = strategic_plans_model.N_1_Q3;
+                            getData.N_1_Q4 = strategic_plans_model.N_1_Q4;
+                            getData.N_2_Q1 = strategic_plans_model.N_2_Q1;
+                            getData.N_2_Q2 = strategic_plans_model.N_2_Q2;
+                            getData.N_2_Q3 = strategic_plans_model.N_2_Q3;
+                            getData.N_2_Q4 = strategic_plans_model.N_2_Q4;
+                            getData.N_3_Q1 = strategic_plans_model.N_3_Q1;
+                            getData.N_3_Q2 = strategic_plans_model.N_3_Q2;
+                            getData.N_3_Q3 = strategic_plans_model.N_3_Q3;
+                            getData.N_3_Q4 = strategic_plans_model.N_3_Q4;
+                            getData.N_4_Q1 = strategic_plans_model.N_4_Q1;
+                            getData.N_4_Q2 = strategic_plans_model.N_4_Q2;
+                            getData.N_4_Q3 = strategic_plans_model.N_4_Q3;
+                            getData.N_4_Q4 = strategic_plans_model.N_4_Q4;
+                            getData.N_5_Q1 = strategic_plans_model.N_5_Q1;
+                            getData.N_5_Q2 = strategic_plans_model.N_5_Q2;
+                            getData.N_5_Q3 = strategic_plans_model.N_5_Q3;
+                            getData.N_5_Q4 = strategic_plans_model.N_5_Q4;
+                            getData.Terrain = strategic_plans_model.Terrain;
+
+                            _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
+                }
+                else if (strategic_plans_model != null)
+                {
                     strategic_plans_model.Companyemail = WKPCompanyEmail;
                     strategic_plans_model.CompanyName = WKPCompanyName;
                     strategic_plans_model.COMPANY_ID = WKPCompanyId;
@@ -8299,29 +8347,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     strategic_plans_model.Year_of_WP = year;
                     // strategic_plans_model.OML_Name = omlName;
                     // strategic_plans_model.Field_ID = concessionField?.Field_ID ?? null;
-                    if (action == GeneralModel.Insert.ToLower())
-                    {
-                        if (getData == null)
-                        {
-                            strategic_plans_model.Date_Created = DateTime.Now;
-                            strategic_plans_model.Created_by = WKPCompanyId;
-                            await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
-                        }
-                        else
-                        {
-                            //strategic_plans_model.date_created = getdata.date_created;
-                            //strategic_plans_model.created_by = getdata.created_by;
-                            strategic_plans_model.Date_Updated = DateTime.Now;
-                            strategic_plans_model.Updated_by = WKPCompanyId;
-                            _context.STRATEGIC_PLANS_ON_COMPANY_BAses.RemoveRange(getData);
-                            await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete.ToLower())
-                    {
-                        _context.STRATEGIC_PLANS_ON_COMPANY_BAses.RemoveRange(getData);
-                    }
-
+                    strategic_plans_model.Date_Created = DateTime.Now;
+                    strategic_plans_model.Created_by = WKPCompanyId;
+                    await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
