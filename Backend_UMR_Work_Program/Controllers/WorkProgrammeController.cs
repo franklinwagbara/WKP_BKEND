@@ -7873,9 +7873,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            //nigeria_content_training_model.Date_Created = getData.Date_Created;
-                            //nigeria_content_training_model.Created_by = getData.Created_by;
-
                             nigeria_content_training_model.Date_Updated = DateTime.Now;
                             nigeria_content_training_model.Updated_by = WKPCompanyId;
                             _context.NIGERIA_CONTENT_Trainings.RemoveRange(getData);
@@ -7898,9 +7895,13 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Utilized_EQ = nigeria_content_training_model.Utilized_EQ;
                             getData.Date_Updated = DateTime.Now;
                             getData.Updated_by = WKPCompanyId;
+                            getData.OML_ID = nigeria_content_training_model.OML_ID;
+                            getData.OML_Name = nigeria_content_training_model.OML_Name;
+                            nigeria_content_training_model.Date_Updated = DateTime.Now;
+                            nigeria_content_training_model.Updated_by = WKPCompanyId;
 
+                            _context.NIGERIA_CONTENT_Trainings.Update(getData);
                         }
-
                     }
                     else if (action == GeneralModel.Delete)
                     {
@@ -8032,20 +8033,59 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_NIGERIA_CONTENT_QUESTION")]
-        public async Task<object> POST_NIGERIA_CONTENT_QUESTION([FromBody] NIGERIA_CONTENT_QUESTION nigeria_content_question_model, string year, string actionToDo)
+        public async Task<object> POST_NIGERIA_CONTENT_QUESTION([FromBody] NIGERIA_CONTENT_QUESTION nigeria_content_question_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            int Id = id > 0 ? id : nigeria_content_question_model.Id;
             try
             {
-                #region Saving NIGERIA_CONTENT_QUESTIONs data
-                if (nigeria_content_question_model != null)
+                if(Id > 0)
                 {
-                    var getData = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.Companyemail == WKPCompanyEmail && c.Year_of_WP == year select c).ToListAsync();
+                    var getData = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.NIGERIA_CONTENT_QUESTIONs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Consession_Type = nigeria_content_question_model.Consession_Type;
+                            getData.Contract_Type = nigeria_content_question_model.Contract_Type;
+                            getData.Do_you_have_a_valid_Expatriate_Quota_for_your_foreign_staff = nigeria_content_question_model.Do_you_have_a_valid_Expatriate_Quota_for_your_foreign_staff;
+                            getData.If_NO_why = nigeria_content_question_model.If_NO_why;
+                            getData.Is_there_a_succession_plan_in_place = nigeria_content_question_model.Is_there_a_succession_plan_in_place;
+                            getData.Number_of_staff_released_within_the_year_ = nigeria_content_question_model.Number_of_staff_released_within_the_year_;
+                            getData.Terrain = getData.Terrain;
+                            getData.total_no_of_nigeria_senior_staff = nigeria_content_question_model.total_no_of_nigeria_senior_staff;
+                            getData.total_no_of_senior_staff = nigeria_content_question_model.total_no_of_senior_staff;
+                            getData.total_no_of_top_management_staff = nigeria_content_question_model.total_no_of_top_management_staff;
+                            getData.total_no_of_top_nigerian_management_staff = nigeria_content_question_model.total_no_of_top_nigerian_management_staff;
+                            getData.Year_of_WP = year;
+                            getData.Date_Updated = DateAndTime.Now;
+                            getData.Updated_by = WKPCompanyId;
 
+                            _context.NIGERIA_CONTENT_QUESTIONs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
+                }
+                #region Saving NIGERIA_CONTENT_QUESTIONs data
+                else if (nigeria_content_question_model != null)
+                {
                     nigeria_content_question_model.Companyemail = WKPCompanyEmail;
                     nigeria_content_question_model.CompanyName = WKPCompanyName;
                     nigeria_content_question_model.COMPANY_ID = WKPCompanyId;
@@ -8053,33 +8093,11 @@ namespace Backend_UMR_Work_Program.Controllers
                     nigeria_content_question_model.Date_Updated = DateTime.Now;
                     nigeria_content_question_model.Updated_by = WKPCompanyId;
                     nigeria_content_question_model.Year_of_WP = year;
-                    // nigeria_content_question_model.OML_Name = omlName.ToUpper();
-                    // nigeria_content_question_model.OML_Name = omlName;
                     // nigeria_content_question_model.Field_ID = concessionField?.Field_ID ?? null;
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null)
-                        {
-                            nigeria_content_question_model.Date_Created = DateTime.Now;
-                            nigeria_content_question_model.Created_by = WKPCompanyId;
-                            await _context.NIGERIA_CONTENT_QUESTIONs.AddAsync(nigeria_content_question_model);
-                        }
-                        else
-                        {
-                            //nigeria_content_question_model.Date_Created = getData.Date_Created;
-                            //nigeria_content_question_model.Created_by = getData.Created_by;
-                            nigeria_content_question_model.Date_Updated = DateTime.Now;
-                            nigeria_content_question_model.Updated_by = WKPCompanyId;
-                            _context.NIGERIA_CONTENT_QUESTIONs.RemoveRange(getData);
-                            await _context.NIGERIA_CONTENT_QUESTIONs.AddAsync(nigeria_content_question_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.NIGERIA_CONTENT_QUESTIONs.RemoveRange(getData);
-                    }
-
+                    nigeria_content_question_model.Date_Created = DateTime.Now;
+                    nigeria_content_question_model.Created_by = WKPCompanyId;
+                    await _context.NIGERIA_CONTENT_QUESTIONs.AddAsync(nigeria_content_question_model);
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
