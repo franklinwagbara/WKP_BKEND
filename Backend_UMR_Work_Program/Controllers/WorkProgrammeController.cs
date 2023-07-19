@@ -2101,26 +2101,58 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_DECOMMISSIONING_ABANDONMENT")]
-        public async Task<object> POST_DECOMMISSIONING_ABANDONMENT([FromBody] DECOMMISSIONING_ABANDONMENT decomAban_model, string year, string omlName, string fieldName, string actionToDo)
+        public async Task<object> POST_DECOMMISSIONING_ABANDONMENT([FromBody] DECOMMISSIONING_ABANDONMENT decomAban_model, string year, string omlName, string fieldName, int id, string actionToDo)
         {
             int save = 0;
-
+            int Id = id > 0 ? id : decomAban_model.Id;
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
 
             DECOMMISSIONING_ABANDONMENT myDecomAban;
             try
             {
-                if (concessionField?.Field_Name != null)
+                if (Id > 0)
                 {
-                    myDecomAban = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.FieldId == concessionField.Field_ID && c.WpYear == year select c).FirstOrDefaultAsync();
+                    var getData = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.DECOMMISSIONING_ABANDONMENTs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.CompanyEmail = WKPCompanyEmail;
+                            getData.OmlId = concessionField.Concession_ID ?? null;
+                            getData.FieldId = concessionField?.Field_ID ?? null;
+                            getData.WpYear = year;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.ApprovalStatus = decomAban_model.ApprovalStatus;
+                            getData.WpYear = decomAban_model.WpYear;
+                            getData.AnnualObigationUsd = decomAban_model.AnnualObigationUsd;
+                            getData.ApprovalCostUsd = decomAban_model.ApprovalCostUsd;
+
+                            getData.DateCreated = DateTime.Now;
+                            getData.CreatedBy = WKPCompanyEmail;
+                            getData.DateUpdated = DateTime.Now;
+                            getData.UpdatedBy = WKPCompanyEmail;
+
+                            _context.DECOMMISSIONING_ABANDONMENTs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
                 }
                 else
-                {
-                    myDecomAban = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.WpYear == year select c).FirstOrDefaultAsync();
-                }
-
-                if (action == GeneralModel.Insert)
                 {
                     decomAban_model.CompanyEmail = WKPCompanyEmail;
                     decomAban_model.OmlId = concessionField.Concession_ID ?? null;
@@ -2128,31 +2160,12 @@ namespace Backend_UMR_Work_Program.Controllers
                     decomAban_model.WpYear = year;
                     decomAban_model.CompanyName = WKPCompanyName;
 
-                    if (myDecomAban == null)
-                    {
-
-
-                        decomAban_model.DateCreated = DateTime.Now;
-                        decomAban_model.CreatedBy = WKPCompanyEmail;
-                        await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
-                    }
-                    else
-                    {
-
-
-                        decomAban_model.DateCreated = myDecomAban.DateCreated;
-                        decomAban_model.CreatedBy = myDecomAban.CreatedBy;
-                        decomAban_model.DateUpdated = DateTime.Now;
-                        decomAban_model.UpdatedBy = WKPCompanyEmail;
-                        _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
-                        await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
-                    }
-                }
-                else if (action == GeneralModel.Delete)
-                {
-                    _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
-                }
+                    decomAban_model.DateCreated = DateTime.Now;
+                    decomAban_model.CreatedBy = WKPCompanyEmail;
+                    await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
                 save += await _context.SaveChangesAsync();
+                }
+
                 // }
                 // else
                 // {
@@ -7729,7 +7742,6 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.naira = capex_Opex.Naira;
                             getData.OML_Name = capex_Opex.Oml_Name;
                             getData.remarks = capex_Opex.Remarks;
-
                             getData.Year_of_WP = year;
                             getData.OML_Name = omlName;
                             getData.Field_ID = concessionField?.Field_ID ?? null;
