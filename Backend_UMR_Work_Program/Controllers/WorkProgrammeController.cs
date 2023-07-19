@@ -7653,6 +7653,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     //facilities_project_model.OML_Name = facilities_project_model.OML_Name.ToUpper();
                     facilities_project_model.OML_Name = omlName;
                     facilities_project_model.Field_ID = concessionField?.Field_ID ?? null;
+                    facilities_project_model.OML_ID = concessionField.Concession_ID.ToString();
 
                     if (facilities_project_model.areThereEvidenceOfDesignSafetyCaseApproval == "Yes")
                     {
