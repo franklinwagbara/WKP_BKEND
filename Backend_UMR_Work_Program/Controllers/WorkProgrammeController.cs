@@ -140,6 +140,17 @@ namespace Backend_UMR_Work_Program.Controllers
                                    proposalBudget = b.Actual_capital_expenditure_Current_year_USD,
                                    majorProjects = b.Major_Projects
                                }).FirstOrDefaultAsync();
+
+            //var aa = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Where(a => a.OML_Name==omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname).FirstOrDefaultAsync();
+            //var bb = _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(b=>b.OML_Name==aa.OML_Name && b.Companyemail == WKPCompanyEmail && b.Field_ID.ToString() == fieldname).FirstOrDefaultAsync();
+            //var cc = _context.FACILITIES_PROJECT_PERFORMANCEs.Where(b => b.OML_Name == aa.OML_Name && b.Companyemail == WKPCompanyEmail && b.Field_ID.ToString() == fieldname).FirstOrDefaultAsync();
+            //var dd = _context.BUDGET_CAPEX_OPices.Where(b => b.OML_Name == aa.OML_Name && b.Item_Type == "Capex" && b.Companyemail == WKPCompanyEmail && b.Field_ID.ToString() == fieldname).FirstOrDefaultAsync();
+            //var ee = _context.BUDGET_CAPEX_OPices.Where(b => b.OML_Name == aa.OML_Name && b.Item_Type == "Opex" && b.Companyemail == WKPCompanyEmail && b.Field_ID.ToString() == fieldname).FirstOrDefaultAsync();
+            //var ff = _context.DECOMMISSIONING_ABANDONMENTs.Where(b => b.OmlId.ToString() == aa.OML_ID && b.CompanyEmail == WKPCompanyEmail && b.FieldId.ToString() == fieldname).FirstOrDefaultAsync();
+            //var gg = _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Where(b => b.OML_Name == aa.OML_Name && b.Companyemail == WKPCompanyEmail && b.Field_ID.ToString() == fieldname).FirstOrDefaultAsync();
+
+
+
             //if (step3?.exploratoryBudget != null || step3?.proposalBudget != null || step3?.majorProjects != null)
             if (step3 != null)
             {
@@ -2452,6 +2463,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     geophysical_activities_acquisition_model.Actual_year = year;
                     geophysical_activities_acquisition_model.proposed_year = (int.Parse(year) + 1).ToString();
                     geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString();
+                    
 
                     if (action == GeneralModel.Insert)
                     {

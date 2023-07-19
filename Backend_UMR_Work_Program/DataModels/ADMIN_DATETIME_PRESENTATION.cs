@@ -94,7 +94,7 @@ public partial class ADMIN_DATETIME_PRESENTATION
         companyAproved = true;
         Date_Created_BY_COMPANY = DateTime.Now.ToString();
         Date_Created = DateTime.Now;
-        Submitted = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk;
+        Submitted = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.NoActionYet;
         MEETINGROOM = "Not Yet Selected";
         numOfHistories = 1;
     }
