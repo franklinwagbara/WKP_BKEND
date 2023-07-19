@@ -8286,7 +8286,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 #region Saving STRATEGIC_PLANS_ON_COMPANY_BASIs data
                 if(Id > 0)
                 {
-
                     var getData = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.Id == Id select c).FirstOrDefaultAsync();
                     if (getData != null)
                     {
