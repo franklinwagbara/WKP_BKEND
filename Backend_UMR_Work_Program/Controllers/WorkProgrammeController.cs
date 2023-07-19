@@ -7188,35 +7188,80 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_NEW_TECHNOLOGY_CONFORMITY_ASSESSMENT")]
         public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment([FromForm] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment oil_condensate_assessment_model, string omlName, string fieldName, string year, string id, string actionToDo)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : oil_condensate_assessment_model.Id;
             try
             {
-
-                if (!string.IsNullOrEmpty(id))
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.Id == int.Parse(id) select c).FirstOrDefault();
-
-                    if (action == GeneralModel.Delete)
-                        _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Remove(getData);
-                    save += _context.SaveChanges();
-                }
-                else if (oil_condensate_assessment_model != null)
-                {
-                    List<OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment> getData;
-                    if (concessionField.Field_Name != null)
+                    var getData = (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
                     {
-                        getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.OML_ID = concessionField?.Concession_ID.ToString();
+
+                            #region file section
+                            if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                            {
+                                var files = Request.Form.Files;
+                                if (files.Count >= 1)
+                                {
+                                    var file1 = Request.Form.Files[0];
+                                    if (file1 != null)
+                                    {
+                                        var blobname1 = blobService.Filenamer(file1);
+                                        string docName = "Evidence of Inspection And Ugrade Main";
+                                        getData.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                        if (getData.EvidenceOfInspectionAndUgradePath == null)
+                                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
+                                        else
+                                            getData.EvidenceOfInspectionAndUgradeFilename = docName;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                getData.EvidenceOfInspectionAndUgradePath = null;
+                                getData.EvidenceOfInspectionAndUgradeFilename = null;
+                            }
+                            #endregion
+
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+
+                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
                     }
                     else
                     {
-                        getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
                     }
-                    //var getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-
+                }
+                else if (oil_condensate_assessment_model != null)
+                {
                     oil_condensate_assessment_model.Companyemail = WKPCompanyEmail;
                     oil_condensate_assessment_model.CompanyName = WKPCompanyName;
                     oil_condensate_assessment_model.COMPANY_ID = WKPCompanyId;
@@ -7226,65 +7271,32 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_condensate_assessment_model.Year_of_WP = year;
                     oil_condensate_assessment_model.OML_Name = omlName;
                     oil_condensate_assessment_model.Field_ID = concessionField?.Field_ID ?? null;
+                    oil_condensate_assessment_model.OML_ID = concessionField?.Concession_ID.ToString();
 
-
-
-
-                    if (action == GeneralModel.Insert)
+                    #region file section
+                    if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
                     {
-
-                        #region file section
-                        if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                        var files = Request.Form.Files;
+                        if (files.Count >= 1)
                         {
-
-                            var files = Request.Form.Files;
-                            if (files.Count >= 1)
+                            var file1 = Request.Form.Files[0];
+                            if (file1 != null)
                             {
-                                var file1 = Request.Form.Files[0];
-                                //var file2 = Request.Form.Files[1];
                                 var blobname1 = blobService.Filenamer(file1);
-                                //var blobname2 = blobService.Filenamer(file2);
-
-                                if (file1 != null)
-                                {
-                                    string docName = "Evidence of Inspection And Ugrade Main";
-                                    oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-                                    if (oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath == null)
-                                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
-                                    else
-                                        oil_condensate_assessment_model.EvidenceOfInspectionAndUgradeFilename = blobname1;
-                                }
-
+                                string docName = "Evidence of Inspection And Ugrade Main";
+                                oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                if (oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath == null)
+                                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
+                                else
+                                    oil_condensate_assessment_model.EvidenceOfInspectionAndUgradeFilename = blobname1;
                             }
                         }
-
-                        #endregion
-
-
-
-
-
-                        if (getData == null || getData.Count == 0)
-                        {
-                            oil_condensate_assessment_model.Date_Created = DateTime.Now;
-                            oil_condensate_assessment_model.Created_by = WKPCompanyId;
-                            await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.AddAsync(oil_condensate_assessment_model);
-                        }
-                        else
-                        {
-                            //oil_condensate_assessment_model.Date_Created = getData.Date_Created;
-                            //oil_condensate_assessment_model.Created_by = getData.Created_by;
-                            oil_condensate_assessment_model.Date_Updated = DateTime.Now;
-                            oil_condensate_assessment_model.Updated_by = WKPCompanyId;
-                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.RemoveRange(getData);
-                            await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.AddAsync(oil_condensate_assessment_model);
-                        }
                     }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.RemoveRange(getData);
-                    }
+                    #endregion
 
+                    oil_condensate_assessment_model.Date_Created = DateTime.Now;
+                    oil_condensate_assessment_model.Created_by = WKPCompanyId;
+                    await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.AddAsync(oil_condensate_assessment_model);
                     save += await _context.SaveChangesAsync();
                 }
                 else
@@ -7363,6 +7375,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Year_of_WP = year;
                             getData.OML_Name = omlName;
                             getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.OML_ID = concessionField?.Concession_ID.ToString();
 
                             _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Update(getData);
                             save += await _context.SaveChangesAsync();
@@ -7400,7 +7413,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         Proposed_Projects = _oil_gas_facility_model.Proposed_Projects
                     };
 
-
                     oil_gas_facility_model.Companyemail = WKPCompanyEmail;
                     oil_gas_facility_model.CompanyName = WKPCompanyName;
                     oil_gas_facility_model.COMPANY_ID = WKPCompanyId;
@@ -7410,7 +7422,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_gas_facility_model.Year_of_WP = year;
                     oil_gas_facility_model.OML_Name = omlName;
                     oil_gas_facility_model.Field_ID = concessionField?.Field_ID ?? null;
-                    // oil_gas_facility_model.Actual_year = year;
+                    oil_gas_facility_model.OML_ID = concessionField.Concession_ID.ToString();
                     //  oil_gas_facility_model.Proposed_year = (int.Parse(year) + 1).ToString();
 
                     oil_gas_facility_model.Date_Created = DateTime.Now;
