@@ -31,6 +31,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+//RotativaConfiguration.Setup(env);
+
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{

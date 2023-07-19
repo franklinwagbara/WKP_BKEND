@@ -139,6 +139,7 @@
 
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using Backend_UMR_Work_Program.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -153,11 +154,13 @@ namespace Backend_UMR_Work_Program.Controllers
     [Route("api/[controller]")]
     public class DashboardController : ControllerBase
     {
+        public readonly HelperService _helperService;
         public WKP_DBContext _context;
 
-        public DashboardController(WKP_DBContext context)
+        public DashboardController(WKP_DBContext context, HelperService helperService)
         {
             _context = context;
+            _helperService = helperService;
         }
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -193,14 +196,14 @@ namespace Backend_UMR_Work_Program.Controllers
                         companyDashboard_Data = new CompanyReportModel()
                         {
                             concessionName = key.FirstOrDefault().OML_Name,
-                            oil_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_Oil)),
-                            AG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_AG)),
-                            NAG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_NAG)),
-                            condensate_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_Condensate)),
-                            oil_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualOilProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualOilProduction)),
-                            AG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasAGProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualOilProduction)),
-                            NAG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualOilProduction)),
-                            condensate_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualCondensateProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualCondensateProduction))
+                            oil_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_Oil)),
+                            AG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_AG)),
+                            NAG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_NAG)),
+                            condensate_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_Condensate)),
+                            oil_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualOilProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualOilProduction)),
+                            AG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasAGProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualOilProduction)),
+                            NAG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualOilProduction)),
+                            condensate_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualCondensateProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualCondensateProduction))
 
                         };
                         companyDashboard_Data.totalNetProduction = companyDashboard_Data.oil_NetProduction + companyDashboard_Data.AG_NetProduction + companyDashboard_Data.NAG_NetProduction + companyDashboard_Data.condensate_NetProduction;
@@ -247,14 +250,14 @@ namespace Backend_UMR_Work_Program.Controllers
                         companyDashboard_Data = new CompanyReportModel()
                         {
                             concessionName = key.FirstOrDefault().conc.OML_Name,
-                            oil_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_Oil)),
-                            AG_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_AG)),
-                            NAG_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_NAG)),
-                            condensate_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_Condensate)),
-                            oil_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualOilProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
-                            AG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasAGProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
-                            NAG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
-                            condensate_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualCondensateProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualCondensateProduction))
+                            oil_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_Oil)),
+                            AG_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_AG)),
+                            NAG_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_NAG)),
+                            condensate_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_Condensate)),
+                            oil_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualOilProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
+                            AG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasAGProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
+                            NAG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
+                            condensate_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualCondensateProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualCondensateProduction))
                         };
                         companyDashboard_Data.totalNetProduction = companyDashboard_Data.oil_NetProduction + companyDashboard_Data.AG_NetProduction + companyDashboard_Data.NAG_NetProduction + companyDashboard_Data.condensate_NetProduction;
                         companyDashboard_Data.totalReserves = companyDashboard_Data.oil_Reserves + companyDashboard_Data.AG_Reserves + companyDashboard_Data.NAG_Reserves + companyDashboard_Data.condensate_Reserves;

@@ -281,7 +281,7 @@ namespace Backend_UMR_Work_Program.Services
                         string appID = b.Replace('[', ' ').Replace(']', ' ').Trim();
                         int appId = int.Parse(appID);
                         //get current staff desk
-                        var staffDesk = _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
+                        var staffDesk = _dbContext.MyDesks.Include(x => x.Staff).Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
                         var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
                         var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
@@ -397,7 +397,7 @@ namespace Backend_UMR_Work_Program.Services
                                 _helperService.SaveApplicationHistory(application.Id, staffActing.StaffID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved, comment, null, false, null, APPLICATION_ACTION.Approve);
 
                                 //Update Final Authority Approvals Table
-                                await _helperService.UpdateApprovalTable(application.Id, comment, staffDesk.StaffID, staffDesk.DeskID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved);
+                                await _helperService.UpdateApprovalTable(application.Id, comment, staffDesk.StaffID, (int)staffDesk.Staff.Staff_SBU, staffDesk.DeskID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved);
 
                                 string subject = $"Approval from Final Athority for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                 string content = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) has been approved approved by Final Authority to the next processing level.";
@@ -1182,6 +1182,7 @@ namespace Backend_UMR_Work_Program.Services
 
                         var LoggedInStaffSBU = _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefault();
                         var LoggedInStaffRole = _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefault();
+                        string returnedTables = await _processFlowService.getTableNames(selectedTables);
 
                         //Determine if the app is on a reviewer's desk
                         var appStatus = application.Status;
@@ -1199,7 +1200,6 @@ namespace Backend_UMR_Work_Program.Services
                             targetDesk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToStaff;
                             _dbContext.MyDesks.Update(targetDesk);
 
-                            string returnedTables = await _processFlowService.getTableNames(selectedTables);
                             await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
                             await _dbContext.SaveChangesAsync();
@@ -1216,17 +1216,15 @@ namespace Backend_UMR_Work_Program.Services
                         }
                         else if (fromWPAReviewer == true)
                         {
-                            var finalAuthorityApprovals = _dbContext.ApplicationSBUApprovals.Where(x => x.AppId == appId).ToList();
+                            var finalAuthorityApprovals = _dbContext.ApplicationSBUApprovals.Include(x => x.Staff).Where(x => x.AppId == appId).ToList();
                             var finalAuthorityDesks = new List<MyDesk>();
 
-                            foreach (var a in finalAuthorityApprovals)
+                           
+                            foreach(var s in SBU_IDs_int)
                             {
-                                foreach(var s in SBU_IDs_int)
-                                {
-                                    var apr = finalAuthorityApprovals.Find(x => x.SBUID == s);
-                                    var tempDesk = await _dbContext.MyDesks.Where(x => x.DeskID == apr.DeskID).FirstOrDefaultAsync();
-                                    finalAuthorityDesks.Add(tempDesk);
-                                }
+                                var apr = finalAuthorityApprovals.Find(x => x.Staff.Staff_SBU == s);
+                                var tempDesk = await _dbContext.MyDesks.Include(x => x.Staff).Where(x => x.DeskID == apr.DeskID).FirstOrDefaultAsync();
+                                finalAuthorityDesks.Add(tempDesk);
                             }
 
                             if (finalAuthorityDesks != null && finalAuthorityDesks.Count > 0)
@@ -1240,8 +1238,8 @@ namespace Backend_UMR_Work_Program.Services
                                     _dbContext.MyDesks.Update(desk);
 
                                     await _helperService.UpdateDeskAfterReject(staffDesk, comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
-                                    _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, null, false, null, APPLICATION_ACTION.ReturnToStaff);
-                                    _helperService.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
+                                    _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, returnedTables, false, null, APPLICATION_ACTION.ReturnToStaff);
+                                    _helperService.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, (int)desk.Staff.Staff_SBU, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
                                     await _dbContext.SaveChangesAsync();
 
