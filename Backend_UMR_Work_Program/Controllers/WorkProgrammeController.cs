@@ -126,23 +126,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 isStep2 = false;
             }
 
-            var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs
+            var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs 
                                join b in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs on a.OML_Name equals b.OML_Name
-                               join d in _context.FACILITIES_PROJECT_PERFORMANCEs on a.OML_Name.ToLower().Trim() equals d.OML_Name.ToLower().Trim()
-                               join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name
-                               where c.Item_Type == "Capex"
-                               join f in _context.BUDGET_CAPEX_OPices on a.OML_Name equals f.OML_Name
-                               where c.Item_Type == "Opex"
-                               join g in _context.DECOMMISSIONING_ABANDONMENTs on a.OML_ID equals g.OmlId.ToString()
-                               join e in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments on a.OML_Name equals e.OML_Name
+                               join d in _context.FACILITIES_PROJECT_PERFORMANCEs on a.OML_Name equals d.OML_Name
+                               join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name where c.Item_Type == "Capex"
+                               join f in _context.BUDGET_CAPEX_OPices on a.OML_Name equals f.OML_Name where c.Item_Type == "Opex"
+                               join g in _context.DECOMMISSIONING_ABANDONMENTs on a.OML_ID equals g.OmlId.ToString() 
+                               join e in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments on a.OML_Name equals e.OML_Name 
                                where a.OML_Name == omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname
                                select new
                                {
                                    exploratoryBudget = a.Budget_for_Direct_Exploration_and_Production_Activities_Dollars,
-                                   proposalProjects = b.Proposed_Projects,
-                                   capexItemDescription = c.Item_Description,
-                                   opexItemDescription = f.Item_Description,
-
+                                   proposalBudget = b.Actual_capital_expenditure_Current_year_USD,
+                                   majorProjects = b.Major_Projects
                                }).FirstOrDefaultAsync();
 
             //var aa = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Where(a => a.OML_Name==omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname).FirstOrDefaultAsync();
@@ -168,6 +164,9 @@ namespace Backend_UMR_Work_Program.Controllers
             var step4 = await (from a in _context.NIGERIA_CONTENT_Trainings
                                join b in _context.STRATEGIC_PLANS_ON_COMPANY_BAses on a.COMPANY_ID equals b.COMPANY_ID
                                join c in _context.LEGAL_LITIGATIONs on a.COMPANY_ID equals c.COMPANY_ID
+                               join d in _context.NIGERIA_CONTENT_QUESTIONs on a.COMPANY_ID equals d.COMPANY_ID
+                               join e in _context.NIGERIA_CONTENT_Upload_Succession_Plans on a.COMPANY_ID equals e.COMPANY_ID
+                               join f in _context.LEGAL_ARBITRATIONs on a.COMPANY_ID equals f.COMPANY_ID
                                where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year
                                select new
                                {
@@ -7735,6 +7734,18 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
+                            getData.dollar = capex_Opex.Dollar;
+                            getData.Dollar_equivalent = capex_Opex.Dollar_equivalent;
+                            getData.Item_Description = capex_Opex.Item_Description;
+                            getData.Item_Type = capex_Opex.Item_Type;
+                            getData.naira = capex_Opex.Naira;
+                            getData.OML_Name = capex_Opex.Oml_Name;
+                            getData.remarks = capex_Opex.Remarks;
+
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.OML_ID = capex_Opex.OML_ID;
                             _context.BUDGET_CAPEX_OPices.Update(getData);
                             save += await _context.SaveChangesAsync();
 
@@ -7775,22 +7786,21 @@ namespace Backend_UMR_Work_Program.Controllers
                     await _context.BUDGET_CAPEX_OPices.AddAsync(budget_capex_opex_model);
 
                     save += await _context.SaveChangesAsync();
+                    if (save > 0)
+                    {
+                        string successMsg = Messager.ShowMessage(action);
+                        var All_Data = await (from c in _context.BUDGET_CAPEX_OPices where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        //var All_Data = await (from c in _context.BUDGET_CAPEX_OPices where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
+                    }
                 }
                 else
                 {
                     return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
-                }
-                if (save > 0)
-                {
-                    string successMsg = Messager.ShowMessage(action);
-                    var All_Data = await (from c in _context.BUDGET_CAPEX_OPices where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    //var All_Data = await (from c in _context.BUDGET_CAPEX_OPices where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, Data = All_Data, StatusCode = ResponseCodes.Success };
-                }
-                else
-                {
-                    return BadRequest(new { message = "Error : An error occured while trying to submit this form." });
-
                 }
 
             }
