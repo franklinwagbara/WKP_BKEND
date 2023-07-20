@@ -146,15 +146,19 @@ namespace Backend_UMR_Work_Program.Services
             
         }
 
-        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission()
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int concessionId, int fieldId)
         {
             try
             {
-                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Category == PAYMENT_CATEGORY.OtherPayment).ToListAsync();
+                var payment = await _context.Payments.Include(x => x.PaymentType).Where(x => x.ConcessionId == concessionId && x.FieldId == fieldId && x.Status == PAYMENT_STATUS.PaymentPending).FirstOrDefaultAsync();
+
+                if(payment == null)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = "Error: Payment detail not found", StatusCode = ResponseCodes.RecordNotFound };
+
+                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Id == payment.Id).ToListAsync();
+
                 if(fees.Count == 1 && fees[0].TypeOfPayment.Name == TYPE_OF_FEE.NoFee)
-                {
                     return new WebApiResponse { Data = null, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
-                }
                 else
                     return new WebApiResponse { Data = fees, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }

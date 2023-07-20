@@ -169,7 +169,7 @@ namespace Backend_UMR_Work_Program.Services
 
                 app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
                 _context.Applications.Update(app);
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync();
 
                 var submitRes = await _applicationService.SubmitApplication(desk.AppId);
 

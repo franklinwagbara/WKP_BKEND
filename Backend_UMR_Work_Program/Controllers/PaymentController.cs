@@ -58,8 +58,7 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> GetPaymentSummarySubmission() => await _paymentService.GetPaymentSummarySubmission();
 
         [HttpGet("GET_EXTRA_PAYMENT_SUMMARY_SUBMISSION")]
-        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission() => await _paymentService.GetExtraPaymentSummarySubmission();
-
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int concessionId, int fieldId) => await _paymentService.GetExtraPaymentSummarySubmission(concessionId, fieldId);
 
         [HttpGet("GET_TYPE_OF_PAYMENTS")]
         public async Task<WebApiResponse> Get_Type_Of_Payments() => await _paymentService.GetTypesOfPayments();
