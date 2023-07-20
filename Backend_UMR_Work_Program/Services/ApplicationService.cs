@@ -4,6 +4,7 @@ using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Models.Enurations;
 using DocumentFormat.OpenXml.Bibliography;
+using LpgLicense.Models;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Ocsp;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
@@ -161,9 +162,9 @@ namespace Backend_UMR_Work_Program.Services
                 int year = app.YearOfWKP;
                 //Get Year, Concession, field and configured application processes
                 var company = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(x => x.Id == app.CompanyID).FirstOrDefaultAsync();
-                var concession = await _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID && x.Year == year.ToString()).FirstOrDefaultAsync();
+                var concession = await _dbContext.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == app.ConcessionID).FirstOrDefaultAsync();
                 var field = await _dbContext.COMPANY_FIELDs.Where(x => x.Field_ID == app.FieldID).FirstOrDefaultAsync();
-                var applicationProcesses = await _processFlowService.GetApplicationProccessByAction(GeneralModel.PROCESS_CONSTANTS.Submit);
+                var applicationProcesses = await _processFlowService.GetApplicationProccessByAction(PROCESS_CONSTANTS.Submit);
 
                 if (applicationProcesses.Count <= 0)
                     return new WebApiResponse
@@ -177,13 +178,12 @@ namespace Backend_UMR_Work_Program.Services
                     return new WebApiResponse
                     {
                         ResponseCode = AppResponseCodes.Success,
-                        Message = "Error : An application for the Concession {omlName}, and Field Name {field.Field_Name} for the year {year} has already been submitted.",
+                        Message = $"Error : An application for the Concession {concession.ConcessionName}, and Field Name {field.Field_Name} for the year {year} has already been submitted.",
                         StatusCode = ResponseCodes.Duplicate
                     };
 
                 if (app != null)
                 {
-
                     //Distribute to Reviewers
                     var staffList = await _helperService.GetReviewerStaff(applicationProcesses);
 
@@ -912,7 +912,6 @@ namespace Backend_UMR_Work_Program.Services
                             _dbContext.SaveChanges();
 
                             //Save Application history
-                            //_helpersController.SaveHistory(application.Id, currentStaff.StaffID, GeneralModel.SentBackToCompany, comment, RejectedTables);
                             _helperService.SaveApplicationHistory(application.Id, currentStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToCompany, comment, RejectedTables, false, null, APPLICATION_ACTION.ReturnToCompany);
 
                             string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
@@ -1241,6 +1240,15 @@ namespace Backend_UMR_Work_Program.Services
                                     _helperService.SaveApplicationHistory(application.Id, LoggedInStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, comment, returnedTables, false, null, APPLICATION_ACTION.ReturnToStaff);
                                     _helperService.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, (int)desk.Staff.Staff_SBU, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
+                                    //If there is still approval(s) by atleast one other FA then still keep the application on the wpa rev desk.
+                                    var foundApproval = _dbContext.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.Status == DESK_PROCESS_STATUS.FinalAuthorityApproved).FirstOrDefault();
+
+                                    if(foundApproval != null)
+                                    {
+                                        staffDesk.HasWork = true;
+                                        _dbContext.Update(staffDesk);
+                                    }
+
                                     await _dbContext.SaveChangesAsync();
 
                                     //sending mail to staff
@@ -1259,139 +1267,6 @@ namespace Backend_UMR_Work_Program.Services
                                 return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = $"Error: No application ID was passed for this action to be completed.", StatusCode = ResponseCodes.Badrequest };
                             }
                         }
-                        //else
-                        //{
-                        //    var prevDesk = await _context.MyDesks.Where<MyDesk>(d => d.StaffID == staffDesk.FromStaffID && d.AppId == appId).FirstOrDefaultAsync();
-
-                        //    if (SBU_IDs_int != null && SBU_IDs_int.Length > 0)
-                        //    {
-                        //        foreach (var SBU in SBU_IDs_int)
-                        //        {
-                        //            if (SBU > 0)
-                        //            {
-                        //                prevDesk = (from dsk in _context.MyDesks
-                        //                            join stf in _context.staff on dsk.StaffID equals stf.StaffID
-                        //                            where stf.StaffID == staffDesk.FromStaffID && dsk.AppId == appId && stf.Staff_SBU == SBU && dsk.FromSBU == staffDesk.FromSBU && stf.DeleteStatus != true
-                        //                            select dsk).FirstOrDefault();
-
-                        //                if (prevDesk != null)
-                        //                {
-                        //                    prevDesk.HasPushed = false;
-                        //                    prevDesk.HasWork = true;
-                        //                    prevDesk.UpdatedAt = DateTime.Now;
-                        //                    prevDesk.Comment = comment;
-                        //                    prevDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
-                        //                    _context.SaveChanges();
-                        //                }
-                        //                else
-                        //                {
-                        //                    var desk = new MyDesk()
-                        //                    {
-                        //                        StaffID = (int)staffDesk.FromStaffID,
-                        //                        AppId = appId,
-                        //                        HasWork = true,
-                        //                        HasPushed = true,
-                        //                        FromStaffID = staffDesk.FromStaffID,
-                        //                        FromSBU = staffDesk.FromSBU,
-                        //                        FromRoleId = staffDesk.FromRoleId,
-                        //                        CreatedAt = DateTime.Now,
-                        //                        UpdatedAt = DateTime.Now,
-                        //                        Comment = comment,
-                        //                        LastJobDate = DateTime.Now,
-                        //                        ProcessStatus = STAFF_DESK_STATUS.REJECTED,
-                        //                    };
-
-                        //                    await _context.MyDesks.AddAsync(desk);
-                        //                }
-
-                        //                //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
-
-                        //                await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
-
-                        //                //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
-                        //                _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
-
-                        //                //send mail to staff
-                        //                var getStaff = (from stf in _context.staff
-                        //                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-                        //                                where stf.StaffID == prevDesk.StaffID && stf.DeleteStatus != true
-                        //                                select stf).FirstOrDefault();
-
-                        //                string subject = $"Sent back WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
-
-                        //                string content = $"{WKPCompanyName} sent back WORK PROGRAM application for year {application.YearOfWKP}.";
-
-                        //                var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
-
-                        //                var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
-
-                        //                _helpersController.LogMessages("Sent back application with REF : " + application.ReferenceNo, WKPCompanyEmail);
-
-                        //            }
-                        //        }
-                        //        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application(s) has been sent back successfully.", StatusCode = ResponseCodes.Success };
-                        //    }
-                        //    else
-                        //    {
-                        //        if (prevDesk != null)
-                        //        {
-                        //            prevDesk.HasPushed = false;
-                        //            prevDesk.HasWork = true;
-                        //            prevDesk.UpdatedAt = DateTime.Now;
-                        //            prevDesk.Comment = comment;
-                        //            prevDesk.ProcessStatus = STAFF_DESK_STATUS.REJECTED;
-                        //            _context.SaveChanges();
-                        //        }
-                        //        else
-                        //        {
-                        //            var desk = new MyDesk()
-                        //            {
-                        //                StaffID = (int)staffDesk.FromStaffID,
-                        //                AppId = appId,
-                        //                HasWork = true,
-                        //                HasPushed = true,
-                        //                FromStaffID = staffDesk.FromStaffID,
-                        //                FromSBU = staffDesk.FromSBU,
-                        //                FromRoleId = staffDesk.FromRoleId,
-                        //                CreatedAt = DateTime.Now,
-                        //                UpdatedAt = DateTime.Now,
-                        //                Comment = comment,
-                        //                LastJobDate = DateTime.Now,
-                        //                ProcessStatus = STAFF_DESK_STATUS.REJECTED,
-                        //            };
-
-                        //            await _context.MyDesks.AddAsync(desk);
-
-                        //            prevDesk = desk;
-                        //        }
-
-                        //        //var result = await _helpersController.DeleteDeskIdByDeskId(deskID);
-                        //        await _helpersController.UpdateDeskAfterReject(staffDesk, comment, STAFF_DESK_STATUS.REJECTED);
-
-                        //        //_helpersController.SaveHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null);
-                        //        _helperService.SaveApplicationHistory(application.Id, get_CurrentStaff.StaffID, GeneralModel.SentBackToStaff, comment, null, false, null, GeneralModel.SendBackToStaff);
-
-                        //        //send mail to staff
-                        //        var getStaff = (from stf in _context.staff
-                        //                        join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-                        //                        where stf.StaffID == prevDesk.StaffID && stf.DeleteStatus != true
-                        //                        select stf).FirstOrDefault();
-
-                        //        string subject = $"Sent back WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
-
-                        //        string content = $"{WKPCompanyName} sent back WORK PROGRAM application for year {application.YearOfWKP}.";
-
-                        //        var emailMsg = _helpersController.SaveMessage(application.Id, getStaff.StaffID, subject, content, "Staff");
-
-                        //        var sendEmail = _helpersController.SendEmailMessage(getStaff.StaffEmail, getStaff.FirstName, emailMsg, null);
-
-                        //        _helpersController.LogMessages("Sent back application with REF : " + application.ReferenceNo, WKPCompanyEmail);
-
-                        //        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been sent back successfully.", StatusCode = ResponseCodes.Success };
-                        //    }
-                        //}
-
-
                     }
                 }
                 else

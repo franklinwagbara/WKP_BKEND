@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using Backend_UMR_Work_Program.Models.Enurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
@@ -507,11 +508,14 @@ namespace Backend_UMR_Work_Program.Services
 
                 foreach (var staffId in staffIds)
                 {
-                    var desk = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefaultAsync();
+                    var staff = await _dbContext.staff.Include(x => x.StrategicBusinessUnit).Where(x => x.StaffID == staffId).FirstOrDefaultAsync();                 
+                    var desk = await _dbContext.MyDesks.Include(x => x.Staff).Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefaultAsync();
+                    var staffSBU = staff.StrategicBusinessUnit;
                     
                     //Check if the app on another role other than the wpa reviewer's desk
-                    if(desk == null)
-                        desk = await _dbContext.MyDesks.Where(x => x.AppId == appId && x.HasWork == true).FirstOrDefaultAsync();
+                    if(desk == null && staffSBU.Tier == PROCESS_TIER.TIER2)
+                        desk = await _dbContext.MyDesks.Include(x => x.Staff).ThenInclude(s => s.StrategicBusinessUnit).
+                            Where(x => x.AppId == appId && x.Staff.StrategicBusinessUnit.Tier == PROCESS_TIER.TIER2 && x.HasWork == true).FirstOrDefaultAsync();
 
                     var mostRecentJob = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefaultAsync();
 
