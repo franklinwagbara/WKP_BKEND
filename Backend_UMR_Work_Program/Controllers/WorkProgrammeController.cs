@@ -129,9 +129,9 @@ namespace Backend_UMR_Work_Program.Controllers
             var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs 
                                join b in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs on a.OML_Name equals b.OML_Name
                                join d in _context.FACILITIES_PROJECT_PERFORMANCEs on a.OML_Name equals d.OML_Name
-                               join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name where c.Item_Type == "Capex"
-                               join f in _context.BUDGET_CAPEX_OPices on a.OML_Name equals f.OML_Name where c.Item_Type == "Opex"
-                               join g in _context.DECOMMISSIONING_ABANDONMENTs on a.OML_ID equals g.OmlId.ToString() 
+                               join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name //where c.Item_Type == "Capex"
+                               //join f in _context.BUDGET_CAPEX_OPices on a.OML_Name equals f.OML_Name //where c.Item_Type == "Opex"
+                               join g in _context.DECOMMISSIONING_ABANDONMENTs on a.OML_ID equals g.OmlId.ToString()
                                join e in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments on a.OML_Name equals e.OML_Name 
                                where a.OML_Name == omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname
                                select new
@@ -2174,15 +2174,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     decomAban_model.DateCreated = DateTime.Now;
                     decomAban_model.CreatedBy = WKPCompanyEmail;
                     await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
-                save += await _context.SaveChangesAsync();
+                    save += await _context.SaveChangesAsync();
                 }
-
-                // }
-                // else
-                // {
-                // 	return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
-                // }
-
 
                 if (save > 0)
                 {
@@ -2259,12 +2252,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     _context.Royalties.Remove(myRoyalty);
                 }
                 save += await _context.SaveChangesAsync();
-                // }
-                // else
-                // {
-                // 	return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
-                // }
-
 
                 if (save > 0)
                 {
@@ -6643,7 +6630,8 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Budget_for_other_Activities_Naira = budgetProposal_model.Budget_for_other_Activities_Naira;
                             getData.Date_Updated = DateTime.Now;
                             getData.Updated_by = WKPCompanyId;
-
+                            getData.OML_ID = concessionField.Concession_ID.ToString();
+                            getData.OML_Name = omlName;
                             _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Update(getData);
                             save += await _context.SaveChangesAsync();
 
@@ -6665,7 +6653,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     budget_proposal_model.Year_of_WP = year;
                     budget_proposal_model.OML_Name = omlName;
                     budget_proposal_model.Field_ID = concessionField?.Field_ID ?? null;
-                    budget_proposal_model.OML_ID = concessionField.Concession_ID.ToString();
+                    budget_proposal_model.OML_ID = concessionField.Concession_ID.HasValue ? concessionField.Concession_ID.ToString() : null;
                     // budget_proposal_model.Actual_year = year;
                     budget_proposal_model.Proposed_year = year;
 
