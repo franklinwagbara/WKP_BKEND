@@ -2112,26 +2112,58 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_DECOMMISSIONING_ABANDONMENT")]
-        public async Task<object> POST_DECOMMISSIONING_ABANDONMENT([FromBody] DECOMMISSIONING_ABANDONMENT decomAban_model, string year, string omlName, string fieldName, string actionToDo)
+        public async Task<object> POST_DECOMMISSIONING_ABANDONMENT([FromBody] DECOMMISSIONING_ABANDONMENT decomAban_model, string year, string omlName, string fieldName, int id, string actionToDo)
         {
             int save = 0;
-
+            int Id = id > 0 ? id : decomAban_model.Id;
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
 
             DECOMMISSIONING_ABANDONMENT myDecomAban;
             try
             {
-                if (concessionField?.Field_Name != null)
+                if (Id > 0)
                 {
-                    myDecomAban = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.FieldId == concessionField.Field_ID && c.WpYear == year select c).FirstOrDefaultAsync();
+                    var getData = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.DECOMMISSIONING_ABANDONMENTs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.CompanyEmail = WKPCompanyEmail;
+                            getData.OmlId = concessionField.Concession_ID ?? null;
+                            getData.FieldId = concessionField?.Field_ID ?? null;
+                            getData.WpYear = year;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.ApprovalStatus = decomAban_model.ApprovalStatus;
+                            getData.WpYear = decomAban_model.WpYear;
+                            getData.AnnualObigationUsd = decomAban_model.AnnualObigationUsd;
+                            getData.ApprovalCostUsd = decomAban_model.ApprovalCostUsd;
+
+                            getData.DateCreated = DateTime.Now;
+                            getData.CreatedBy = WKPCompanyEmail;
+                            getData.DateUpdated = DateTime.Now;
+                            getData.UpdatedBy = WKPCompanyEmail;
+
+                            _context.DECOMMISSIONING_ABANDONMENTs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
                 }
                 else
-                {
-                    myDecomAban = await (from c in _context.DECOMMISSIONING_ABANDONMENTs where c.CompanyEmail == WKPCompanyEmail && c.OmlId == concessionField.Concession_ID && c.WpYear == year select c).FirstOrDefaultAsync();
-                }
-
-                if (action == GeneralModel.Insert)
                 {
                     decomAban_model.CompanyEmail = WKPCompanyEmail;
                     decomAban_model.OmlId = concessionField.Concession_ID ?? null;
@@ -2139,31 +2171,12 @@ namespace Backend_UMR_Work_Program.Controllers
                     decomAban_model.WpYear = year;
                     decomAban_model.CompanyName = WKPCompanyName;
 
-                    if (myDecomAban == null)
-                    {
-
-
-                        decomAban_model.DateCreated = DateTime.Now;
-                        decomAban_model.CreatedBy = WKPCompanyEmail;
-                        await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
-                    }
-                    else
-                    {
-
-
-                        decomAban_model.DateCreated = myDecomAban.DateCreated;
-                        decomAban_model.CreatedBy = myDecomAban.CreatedBy;
-                        decomAban_model.DateUpdated = DateTime.Now;
-                        decomAban_model.UpdatedBy = WKPCompanyEmail;
-                        _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
-                        await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
-                    }
-                }
-                else if (action == GeneralModel.Delete)
-                {
-                    _context.DECOMMISSIONING_ABANDONMENTs.Remove(myDecomAban);
-                }
+                    decomAban_model.DateCreated = DateTime.Now;
+                    decomAban_model.CreatedBy = WKPCompanyEmail;
+                    await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
                 save += await _context.SaveChangesAsync();
+                }
+
                 // }
                 // else
                 // {
@@ -7187,35 +7200,80 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpPost("POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_NEW_TECHNOLOGY_CONFORMITY_ASSESSMENT")]
         public async Task<object> POST_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment([FromForm] OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment oil_condensate_assessment_model, string omlName, string fieldName, string year, string id, string actionToDo)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            int Id = !string.IsNullOrEmpty(id) ? int.Parse(id) : oil_condensate_assessment_model.Id;
             try
             {
-
-                if (!string.IsNullOrEmpty(id))
+                if (Id > 0)
                 {
-                    var getData = (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.Id == int.Parse(id) select c).FirstOrDefault();
-
-                    if (action == GeneralModel.Delete)
-                        _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Remove(getData);
-                    save += _context.SaveChanges();
-                }
-                else if (oil_condensate_assessment_model != null)
-                {
-                    List<OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessment> getData;
-                    if (concessionField.Field_Name != null)
+                    var getData = (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.Id == Id select c).FirstOrDefault();
+                    if (getData != null)
                     {
-                        getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.OML_Name == omlName && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Companyemail = WKPCompanyEmail;
+                            getData.CompanyName = WKPCompanyName;
+                            getData.COMPANY_ID = WKPCompanyId;
+                            getData.CompanyNumber = WKPCompanyNumber;
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+                            getData.Year_of_WP = year;
+                            getData.OML_Name = omlName;
+                            getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.OML_ID = concessionField?.Concession_ID.ToString();
+
+                            #region file section
+                            if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                            {
+                                var files = Request.Form.Files;
+                                if (files.Count >= 1)
+                                {
+                                    var file1 = Request.Form.Files[0];
+                                    if (file1 != null)
+                                    {
+                                        var blobname1 = blobService.Filenamer(file1);
+                                        string docName = "Evidence of Inspection And Ugrade Main";
+                                        getData.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                        if (getData.EvidenceOfInspectionAndUgradePath == null)
+                                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
+                                        else
+                                            getData.EvidenceOfInspectionAndUgradeFilename = docName;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                getData.EvidenceOfInspectionAndUgradePath = null;
+                                getData.EvidenceOfInspectionAndUgradeFilename = null;
+                            }
+                            #endregion
+
+                            getData.Date_Updated = DateTime.Now;
+                            getData.Updated_by = WKPCompanyId;
+
+                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
                     }
                     else
                     {
-                        getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
                     }
-                    //var getData = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
-
+                }
+                else if (oil_condensate_assessment_model != null)
+                {
                     oil_condensate_assessment_model.Companyemail = WKPCompanyEmail;
                     oil_condensate_assessment_model.CompanyName = WKPCompanyName;
                     oil_condensate_assessment_model.COMPANY_ID = WKPCompanyId;
@@ -7225,65 +7283,32 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_condensate_assessment_model.Year_of_WP = year;
                     oil_condensate_assessment_model.OML_Name = omlName;
                     oil_condensate_assessment_model.Field_ID = concessionField?.Field_ID ?? null;
+                    oil_condensate_assessment_model.OML_ID = concessionField?.Concession_ID.ToString();
 
-
-
-
-                    if (action == GeneralModel.Insert)
+                    #region file section
+                    if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
                     {
-
-                        #region file section
-                        if (Request.HasFormContentType && Request.Form != null && Request.Form.Count() > 0)
+                        var files = Request.Form.Files;
+                        if (files.Count >= 1)
                         {
-
-                            var files = Request.Form.Files;
-                            if (files.Count >= 1)
+                            var file1 = Request.Form.Files[0];
+                            if (file1 != null)
                             {
-                                var file1 = Request.Form.Files[0];
-                                //var file2 = Request.Form.Files[1];
                                 var blobname1 = blobService.Filenamer(file1);
-                                //var blobname2 = blobService.Filenamer(file2);
-
-                                if (file1 != null)
-                                {
-                                    string docName = "Evidence of Inspection And Ugrade Main";
-                                    oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
-                                    if (oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath == null)
-                                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
-                                    else
-                                        oil_condensate_assessment_model.EvidenceOfInspectionAndUgradeFilename = blobname1;
-                                }
-
+                                string docName = "Evidence of Inspection And Ugrade Main";
+                                oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"EvidenceOfInspectionAndUgradePathDocuments/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                if (oil_condensate_assessment_model.EvidenceOfInspectionAndUgradePath == null)
+                                    return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Failure : An error occured while trying to upload " + docName + " document.", StatusCode = ResponseCodes.Badrequest };
+                                else
+                                    oil_condensate_assessment_model.EvidenceOfInspectionAndUgradeFilename = blobname1;
                             }
                         }
-
-                        #endregion
-
-
-
-
-
-                        if (getData == null || getData.Count == 0)
-                        {
-                            oil_condensate_assessment_model.Date_Created = DateTime.Now;
-                            oil_condensate_assessment_model.Created_by = WKPCompanyId;
-                            await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.AddAsync(oil_condensate_assessment_model);
-                        }
-                        else
-                        {
-                            //oil_condensate_assessment_model.Date_Created = getData.Date_Created;
-                            //oil_condensate_assessment_model.Created_by = getData.Created_by;
-                            oil_condensate_assessment_model.Date_Updated = DateTime.Now;
-                            oil_condensate_assessment_model.Updated_by = WKPCompanyId;
-                            _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.RemoveRange(getData);
-                            await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.AddAsync(oil_condensate_assessment_model);
-                        }
                     }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.RemoveRange(getData);
-                    }
+                    #endregion
 
+                    oil_condensate_assessment_model.Date_Created = DateTime.Now;
+                    oil_condensate_assessment_model.Created_by = WKPCompanyId;
+                    await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.AddAsync(oil_condensate_assessment_model);
                     save += await _context.SaveChangesAsync();
                 }
                 else
@@ -7362,6 +7387,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Year_of_WP = year;
                             getData.OML_Name = omlName;
                             getData.Field_ID = concessionField?.Field_ID ?? null;
+                            getData.OML_ID = concessionField?.Concession_ID.ToString();
 
                             _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Update(getData);
                             save += await _context.SaveChangesAsync();
@@ -7399,7 +7425,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         Proposed_Projects = _oil_gas_facility_model.Proposed_Projects
                     };
 
-
                     oil_gas_facility_model.Companyemail = WKPCompanyEmail;
                     oil_gas_facility_model.CompanyName = WKPCompanyName;
                     oil_gas_facility_model.COMPANY_ID = WKPCompanyId;
@@ -7409,7 +7434,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     oil_gas_facility_model.Year_of_WP = year;
                     oil_gas_facility_model.OML_Name = omlName;
                     oil_gas_facility_model.Field_ID = concessionField?.Field_ID ?? null;
-                    // oil_gas_facility_model.Actual_year = year;
+                    oil_gas_facility_model.OML_ID = concessionField.Concession_ID.ToString();
                     //  oil_gas_facility_model.Proposed_year = (int.Parse(year) + 1).ToString();
 
                     oil_gas_facility_model.Date_Created = DateTime.Now;
@@ -7640,6 +7665,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     //facilities_project_model.OML_Name = facilities_project_model.OML_Name.ToUpper();
                     facilities_project_model.OML_Name = omlName;
                     facilities_project_model.Field_ID = concessionField?.Field_ID ?? null;
+                    facilities_project_model.OML_ID = concessionField.Concession_ID.ToString();
 
                     if (facilities_project_model.areThereEvidenceOfDesignSafetyCaseApproval == "Yes")
                     {
@@ -7741,7 +7767,6 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.naira = capex_Opex.Naira;
                             getData.OML_Name = capex_Opex.Oml_Name;
                             getData.remarks = capex_Opex.Remarks;
-
                             getData.Year_of_WP = year;
                             getData.OML_Name = omlName;
                             getData.Field_ID = concessionField?.Field_ID ?? null;
@@ -7848,9 +7873,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         }
                         else
                         {
-                            //nigeria_content_training_model.Date_Created = getData.Date_Created;
-                            //nigeria_content_training_model.Created_by = getData.Created_by;
-
                             nigeria_content_training_model.Date_Updated = DateTime.Now;
                             nigeria_content_training_model.Updated_by = WKPCompanyId;
                             _context.NIGERIA_CONTENT_Trainings.RemoveRange(getData);
@@ -7873,9 +7895,13 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Utilized_EQ = nigeria_content_training_model.Utilized_EQ;
                             getData.Date_Updated = DateTime.Now;
                             getData.Updated_by = WKPCompanyId;
+                            getData.OML_ID = nigeria_content_training_model.OML_ID;
+                            getData.OML_Name = nigeria_content_training_model.OML_Name;
+                            nigeria_content_training_model.Date_Updated = DateTime.Now;
+                            nigeria_content_training_model.Updated_by = WKPCompanyId;
 
+                            _context.NIGERIA_CONTENT_Trainings.Update(getData);
                         }
-
                     }
                     else if (action == GeneralModel.Delete)
                     {
@@ -7977,6 +8003,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     nigeria_content_succession_model.Year_of_WP = year;
                     nigeria_content_succession_model.OML_Name = omlName;
                     nigeria_content_succession_model.Field_ID = concessionField?.Field_ID ?? null;
+                    nigeria_content_succession_model.OML_ID = concessionField?.Concession_ID.ToString();
                     //nigeria_content_succession_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
 
                     nigeria_content_succession_model.Date_Created = DateTime.Now;
@@ -8007,20 +8034,59 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_NIGERIA_CONTENT_QUESTION")]
-        public async Task<object> POST_NIGERIA_CONTENT_QUESTION([FromBody] NIGERIA_CONTENT_QUESTION nigeria_content_question_model, string year, string actionToDo)
+        public async Task<object> POST_NIGERIA_CONTENT_QUESTION([FromBody] NIGERIA_CONTENT_QUESTION nigeria_content_question_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            int Id = id > 0 ? id : nigeria_content_question_model.Id;
             try
             {
-                #region Saving NIGERIA_CONTENT_QUESTIONs data
-                if (nigeria_content_question_model != null)
+                if(Id > 0)
                 {
-                    var getData = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.Companyemail == WKPCompanyEmail && c.Year_of_WP == year select c).ToListAsync();
+                    var getData = await (from c in _context.NIGERIA_CONTENT_QUESTIONs where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.NIGERIA_CONTENT_QUESTIONs.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.Consession_Type = nigeria_content_question_model.Consession_Type;
+                            getData.Contract_Type = nigeria_content_question_model.Contract_Type;
+                            getData.Do_you_have_a_valid_Expatriate_Quota_for_your_foreign_staff = nigeria_content_question_model.Do_you_have_a_valid_Expatriate_Quota_for_your_foreign_staff;
+                            getData.If_NO_why = nigeria_content_question_model.If_NO_why;
+                            getData.Is_there_a_succession_plan_in_place = nigeria_content_question_model.Is_there_a_succession_plan_in_place;
+                            getData.Number_of_staff_released_within_the_year_ = nigeria_content_question_model.Number_of_staff_released_within_the_year_;
+                            getData.Terrain = getData.Terrain;
+                            getData.total_no_of_nigeria_senior_staff = nigeria_content_question_model.total_no_of_nigeria_senior_staff;
+                            getData.total_no_of_senior_staff = nigeria_content_question_model.total_no_of_senior_staff;
+                            getData.total_no_of_top_management_staff = nigeria_content_question_model.total_no_of_top_management_staff;
+                            getData.total_no_of_top_nigerian_management_staff = nigeria_content_question_model.total_no_of_top_nigerian_management_staff;
+                            getData.Year_of_WP = year;
+                            getData.Date_Updated = DateAndTime.Now;
+                            getData.Updated_by = WKPCompanyId;
 
+                            _context.NIGERIA_CONTENT_QUESTIONs.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
+                }
+                #region Saving NIGERIA_CONTENT_QUESTIONs data
+                else if (nigeria_content_question_model != null)
+                {
                     nigeria_content_question_model.Companyemail = WKPCompanyEmail;
                     nigeria_content_question_model.CompanyName = WKPCompanyName;
                     nigeria_content_question_model.COMPANY_ID = WKPCompanyId;
@@ -8028,33 +8094,11 @@ namespace Backend_UMR_Work_Program.Controllers
                     nigeria_content_question_model.Date_Updated = DateTime.Now;
                     nigeria_content_question_model.Updated_by = WKPCompanyId;
                     nigeria_content_question_model.Year_of_WP = year;
-                    // nigeria_content_question_model.OML_Name = omlName.ToUpper();
-                    // nigeria_content_question_model.OML_Name = omlName;
                     // nigeria_content_question_model.Field_ID = concessionField?.Field_ID ?? null;
 
-                    if (action == GeneralModel.Insert)
-                    {
-                        if (getData == null)
-                        {
-                            nigeria_content_question_model.Date_Created = DateTime.Now;
-                            nigeria_content_question_model.Created_by = WKPCompanyId;
-                            await _context.NIGERIA_CONTENT_QUESTIONs.AddAsync(nigeria_content_question_model);
-                        }
-                        else
-                        {
-                            //nigeria_content_question_model.Date_Created = getData.Date_Created;
-                            //nigeria_content_question_model.Created_by = getData.Created_by;
-                            nigeria_content_question_model.Date_Updated = DateTime.Now;
-                            nigeria_content_question_model.Updated_by = WKPCompanyId;
-                            _context.NIGERIA_CONTENT_QUESTIONs.RemoveRange(getData);
-                            await _context.NIGERIA_CONTENT_QUESTIONs.AddAsync(nigeria_content_question_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete)
-                    {
-                        _context.NIGERIA_CONTENT_QUESTIONs.RemoveRange(getData);
-                    }
-
+                    nigeria_content_question_model.Date_Created = DateTime.Now;
+                    nigeria_content_question_model.Created_by = WKPCompanyId;
+                    await _context.NIGERIA_CONTENT_QUESTIONs.AddAsync(nigeria_content_question_model);
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
@@ -8231,21 +8275,68 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_STRATEGIC_PLANS_ON_COMPANY_BASES")]
-        public async Task<object> POST_STRATEGIC_PLANS_ON_COMPANY_BASI([FromBody] STRATEGIC_PLANS_ON_COMPANY_BASI strategic_plans_model, string year, string actionToDo)
+        public async Task<object> POST_STRATEGIC_PLANS_ON_COMPANY_BASI([FromBody] STRATEGIC_PLANS_ON_COMPANY_BASI strategic_plans_model, string year, int id, string actionToDo)
         {
-
             int save = 0;
             string action = (actionToDo == null || actionToDo == "") ? GeneralModel.Insert.ToLower() : actionToDo.Trim().ToLower();
             //var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
-
+            int Id = id > 0 ? id : strategic_plans_model.Id;
             try
             {
-
                 #region Saving STRATEGIC_PLANS_ON_COMPANY_BASIs data
-                if (strategic_plans_model != null)
+                if(Id > 0)
                 {
-                    var getData = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.ACTIVITIES == strategic_plans_model.ACTIVITIES select c).FirstOrDefaultAsync();
+                    var getData = await (from c in _context.STRATEGIC_PLANS_ON_COMPANY_BAses where c.Id == Id select c).FirstOrDefaultAsync();
+                    if (getData != null)
+                    {
+                        if (action == GeneralModel.Delete.ToLower())
+                        {
+                            _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Remove(getData);
+                            save += _context.SaveChanges();
+                            string successMsg = Messager.ShowMessage(GeneralModel.Delete);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            getData.ACTIVITIES = strategic_plans_model.ACTIVITIES;
+                            getData.Consession_Type = strategic_plans_model.Consession_Type;
+                            getData.Contract_Type = strategic_plans_model.Contract_Type;
+                            getData.N_1_Q1 = strategic_plans_model.N_1_Q1;
+                            getData.N_1_Q2 = strategic_plans_model.N_1_Q2;
+                            getData.N_1_Q3 = strategic_plans_model.N_1_Q3;
+                            getData.N_1_Q4 = strategic_plans_model.N_1_Q4;
+                            getData.N_2_Q1 = strategic_plans_model.N_2_Q1;
+                            getData.N_2_Q2 = strategic_plans_model.N_2_Q2;
+                            getData.N_2_Q3 = strategic_plans_model.N_2_Q3;
+                            getData.N_2_Q4 = strategic_plans_model.N_2_Q4;
+                            getData.N_3_Q1 = strategic_plans_model.N_3_Q1;
+                            getData.N_3_Q2 = strategic_plans_model.N_3_Q2;
+                            getData.N_3_Q3 = strategic_plans_model.N_3_Q3;
+                            getData.N_3_Q4 = strategic_plans_model.N_3_Q4;
+                            getData.N_4_Q1 = strategic_plans_model.N_4_Q1;
+                            getData.N_4_Q2 = strategic_plans_model.N_4_Q2;
+                            getData.N_4_Q3 = strategic_plans_model.N_4_Q3;
+                            getData.N_4_Q4 = strategic_plans_model.N_4_Q4;
+                            getData.N_5_Q1 = strategic_plans_model.N_5_Q1;
+                            getData.N_5_Q2 = strategic_plans_model.N_5_Q2;
+                            getData.N_5_Q3 = strategic_plans_model.N_5_Q3;
+                            getData.N_5_Q4 = strategic_plans_model.N_5_Q4;
+                            getData.Terrain = strategic_plans_model.Terrain;
 
+                            _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Update(getData);
+                            save += await _context.SaveChangesAsync();
+
+                            string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = $"Error : No data found for ID: {Id}." });
+                    }
+                }
+                else if (strategic_plans_model != null)
+                {
                     strategic_plans_model.Companyemail = WKPCompanyEmail;
                     strategic_plans_model.CompanyName = WKPCompanyName;
                     strategic_plans_model.COMPANY_ID = WKPCompanyId;
@@ -8255,29 +8346,9 @@ namespace Backend_UMR_Work_Program.Controllers
                     strategic_plans_model.Year_of_WP = year;
                     // strategic_plans_model.OML_Name = omlName;
                     // strategic_plans_model.Field_ID = concessionField?.Field_ID ?? null;
-                    if (action == GeneralModel.Insert.ToLower())
-                    {
-                        if (getData == null)
-                        {
-                            strategic_plans_model.Date_Created = DateTime.Now;
-                            strategic_plans_model.Created_by = WKPCompanyId;
-                            await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
-                        }
-                        else
-                        {
-                            //strategic_plans_model.date_created = getdata.date_created;
-                            //strategic_plans_model.created_by = getdata.created_by;
-                            strategic_plans_model.Date_Updated = DateTime.Now;
-                            strategic_plans_model.Updated_by = WKPCompanyId;
-                            _context.STRATEGIC_PLANS_ON_COMPANY_BAses.RemoveRange(getData);
-                            await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
-                        }
-                    }
-                    else if (action == GeneralModel.Delete.ToLower())
-                    {
-                        _context.STRATEGIC_PLANS_ON_COMPANY_BAses.RemoveRange(getData);
-                    }
-
+                    strategic_plans_model.Date_Created = DateTime.Now;
+                    strategic_plans_model.Created_by = WKPCompanyId;
+                    await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.AddAsync(strategic_plans_model);
                     save += await _context.SaveChangesAsync();
 
                     if (save > 0)
