@@ -88,7 +88,7 @@ public partial class ADMIN_DATETIME_PRESENTATION
     public ADMIN_DATETIME_PRESENTATION()
     {
         Histories = new List<EnagementScheduledHistory>();
-        STATUS = ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk;
+        STATUS = ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
         isDeleted = false;
         adminAproved = false;
         companyAproved = true;
