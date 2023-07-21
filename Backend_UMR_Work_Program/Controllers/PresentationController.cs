@@ -283,7 +283,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (checkSchedule != null)
                     {
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, date and time have already been selected by another company. Kindly select another day and/or time.", StatusCode = ResponseCodes.Failure };
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, schedule doesn't ", StatusCode = ResponseCodes.Failure };
                     }
                     else
                     {
