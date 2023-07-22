@@ -162,12 +162,12 @@ namespace Backend_UMR_Work_Program.Controllers
             }
 
             var step4 = await (from a in _context.NIGERIA_CONTENT_Trainings
-                               join b in _context.STRATEGIC_PLANS_ON_COMPANY_BAses on a.COMPANY_ID equals b.COMPANY_ID
-                               join c in _context.LEGAL_LITIGATIONs on a.COMPANY_ID equals c.COMPANY_ID
-                               join d in _context.NIGERIA_CONTENT_QUESTIONs on a.COMPANY_ID equals d.COMPANY_ID
-                               join e in _context.NIGERIA_CONTENT_Upload_Succession_Plans on a.COMPANY_ID equals e.COMPANY_ID
-                               join f in _context.LEGAL_ARBITRATIONs on a.COMPANY_ID equals f.COMPANY_ID
-                               where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year
+                               join b in _context.STRATEGIC_PLANS_ON_COMPANY_BAses on a.Companyemail equals b.Companyemail
+                               join c in _context.LEGAL_LITIGATIONs on a.Companyemail equals c.Companyemail
+                               join d in _context.NIGERIA_CONTENT_QUESTIONs on a.Companyemail equals d.Companyemail
+                               join e in _context.NIGERIA_CONTENT_Upload_Succession_Plans on a.Companyemail equals e.Companyemail
+                               join f in _context.LEGAL_ARBITRATIONs on a.Companyemail equals f.Companyemail
+                               where a.Companyemail == WKPCompanyEmail && a.Year_of_WP == year
                                select new
                                {
                                    actual_proposed = a.Actual_Proposed,
