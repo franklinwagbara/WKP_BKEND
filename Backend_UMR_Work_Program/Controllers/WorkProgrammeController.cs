@@ -162,12 +162,12 @@ namespace Backend_UMR_Work_Program.Controllers
             }
 
             var step4 = await (from a in _context.NIGERIA_CONTENT_Trainings
-                               join b in _context.STRATEGIC_PLANS_ON_COMPANY_BAses on a.COMPANY_ID equals b.COMPANY_ID
-                               join c in _context.LEGAL_LITIGATIONs on a.COMPANY_ID equals c.COMPANY_ID
-                               join d in _context.NIGERIA_CONTENT_QUESTIONs on a.COMPANY_ID equals d.COMPANY_ID
-                               join e in _context.NIGERIA_CONTENT_Upload_Succession_Plans on a.COMPANY_ID equals e.COMPANY_ID
-                               join f in _context.LEGAL_ARBITRATIONs on a.COMPANY_ID equals f.COMPANY_ID
-                               where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year
+                               join b in _context.STRATEGIC_PLANS_ON_COMPANY_BAses on a.Companyemail equals b.Companyemail
+                               join c in _context.LEGAL_LITIGATIONs on a.Companyemail equals c.Companyemail
+                               join d in _context.NIGERIA_CONTENT_QUESTIONs on a.Companyemail equals d.Companyemail
+                               join e in _context.NIGERIA_CONTENT_Upload_Succession_Plans on a.Companyemail equals e.Companyemail
+                               join f in _context.LEGAL_ARBITRATIONs on a.Companyemail equals f.Companyemail
+                               where a.Companyemail == WKPCompanyEmail && a.Year_of_WP == year
                                select new
                                {
                                    actual_proposed = a.Actual_Proposed,
@@ -1353,6 +1353,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSETechnicalSafety = await (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
 
                     var HSESafetyStudies = await (from c in _context.HSE_SAFETY_STUDIES_NEWs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+
                     var HSERemediationFund = await (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
 
                     var HSEAssetRegister = await (from c in _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
@@ -1484,7 +1485,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSEAssetRegister = (from c in _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEOilSpill = (from c in _context.HSE_OIL_SPILL_REPORTING_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEAssetRegisterRBI = (from c in _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
-                    var HSEWastManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    var HSEWastManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEEnfluenceConliences = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEAccidentIncidence = (from c in _context.HSE_ACCIDENT_INCIDENCE_REPORTING_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEAccidentIncidenceType = (from c in _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
@@ -1545,7 +1546,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSEHostCommunities = (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
 
                     var HSEGHGPlans = (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.OmL_Name == omlName && c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
-                    var HSERemediationFund = (from c in _context.HSE_REMEDIATION_FUNDs where c.CompanyName == WKPCompanyName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
+                    var HSERemediationFund = (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == omlName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     return new
                     {
                         HSETechnicalSafety = HSETechnicalSafety,
