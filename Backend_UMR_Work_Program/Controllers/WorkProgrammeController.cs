@@ -193,7 +193,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                    facilityLocation = a.facility_location,
                                    typeOfFacility = a.type_of_facility
                                }).FirstOrDefaultAsync();
-            if (step5?.facility != null)
+            if (step5 != null)
             {
                 isStep5 = true;
             }
