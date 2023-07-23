@@ -30,9 +30,9 @@ namespace Backend_UMR_Work_Program.Controllers
         private BlobService blobService;
         private readonly WorkProgrammeService _workProgrammeService;
 
-        private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
+        private string? WKPCompanyId => "DNM9118"; // User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
-        private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
+        private string? WKPCompanyEmail => "drayprogrammer45@yahoo.com"; // User.FindFirstValue(ClaimTypes.Email);
         private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
         private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
 
@@ -69,6 +69,7 @@ namespace Backend_UMR_Work_Program.Controllers
             return yearlist;
         }
 
+        [AllowAnonymous]
         [HttpGet("GETCOMPLETEDPAGES")]
         public async Task<object> GETCOMPLETEDPAGES(string omlname, string year, string fieldname)
         {
@@ -170,7 +171,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                where a.Companyemail == WKPCompanyEmail && a.Year_of_WP == year
                                select new
                                {
-                                   actual_proposed = a.Actual_Proposed,
+                                   actual_proposed = a.Actual_Proposed_Year,
                                    activities = b.ACTIVITIES,
                                    anyLitigation = c.AnyLitigation
                                }).FirstOrDefaultAsync();
@@ -188,7 +189,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                where a.OML_Name == omlname && a.Year_of_WP == year
                                select new
                                {
-                                   facility = a.facility
+                                   facility = a.facility,
+                                   facilityLocation = a.facility_location,
+                                   typeOfFacility = a.type_of_facility
                                }).FirstOrDefaultAsync();
             if (step5?.facility != null)
             {
