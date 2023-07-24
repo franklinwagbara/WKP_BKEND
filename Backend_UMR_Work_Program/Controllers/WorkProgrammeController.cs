@@ -30,9 +30,9 @@ namespace Backend_UMR_Work_Program.Controllers
         private BlobService blobService;
         private readonly WorkProgrammeService _workProgrammeService;
 
-        private string? WKPCompanyId => "DNM9118"; // User.FindFirstValue(ClaimTypes.NameIdentifier);
+        private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
-        private string? WKPCompanyEmail => "drayprogrammer45@yahoo.com"; // User.FindFirstValue(ClaimTypes.Email);
+        private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
         private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
         private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
 
@@ -69,7 +69,6 @@ namespace Backend_UMR_Work_Program.Controllers
             return yearlist;
         }
 
-        [AllowAnonymous]
         [HttpGet("GETCOMPLETEDPAGES")]
         public async Task<object> GETCOMPLETEDPAGES(string omlname, string year, string fieldname)
         {
