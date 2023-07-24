@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAuZyDk7C4G0SMqKcFYJqjVgAAAAACAAAAAAAQZgAAAAEAACAAAADTnRQfjM3wKcoHidpq1Hd77V4vhLQidD9st+kF5bRY6AAAAAAOgAAAAAIAACAAAAA+kOkB9WNg+/zIhXC87Jg+w+gJ//Sivw2qz3ysqF2lPYAAAACxHpbDOE64BYZJU1vj7Rnnm/LrCw9VbCjT8vE9sHYDxYtwdgLEiWfbgh7GBNyH4UxwqhGRfJTs3xVBns5mBxVlDlOv35jKM+tgeh6oNxmXsDi8F+fF6aMTKxZxZ/qTjlyN1oj1BW73Xhm4cbpqmoqUHGVBPnZ6ilmi4JAurj34n0AAAADnLCpZ2/YZTcIEKtdDOVWGqalmW4mp6JnkC43IIKAn19GPbBMgMqJGg9aly5J4lOjlb+/lPqdTCo/kQMvwUVUI</EncryptedPassword>
+    <_PublishTargetUrl>ftp://waws-prod-am2-355.ftp.azurewebsites.windows.net/site/wwwroot</_PublishTargetUrl>
+    <History>False|2022-07-22T07:36:39.2883359Z;</History>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,66 @@
+
+https://dev.azure.com/dprdevops/UMR_Work_Program/_git/UMR_Work_Program/pullrequests?_a=mine
+
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/regular.css" integrity="sha384-aubIA90W7NxJ+Ly4QHAqo1JBSwQ0jejV75iHhj59KRwVjLVHjuhS3LkDAoa/ltO4" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/brands.css" integrity="sha384-1KLgFVb/gHrlDGLFPgMbeedi6tQBLcWvyNUN+YKXbD7ZFbjX6BLpMDf0PJ32XJfX" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/fontawesome.css" integrity="sha384-jLuaxTTBR42U2qJ/pm4JRouHkEDHkVqH0T1nyQXn1mZ7Snycpf6Rl25VBNthU4z0" crossorigin="anonymous">
+
+
+ (MMBBL)
+ (BSCF) 
+
+ requester_mail.ToRecieved = officiating_emails;
+            requester_mail.ToRecievedCC = "anthony.nwosu@brandonetech.com";
+
+
+rpt_hse_management_position
+
+rpt_hse_safetyandculturetraining
+
+rpt_hse_occupationalhealthmgt
+
+rpt_hse_qualitycontrol
+
+rpt_hse_climatechangeairquality
+
+rpt_hse_wastemanagementupload
+
+rpt_hse_environmentmgtsytemupload
+
+rpt_hse_csr_projectdetails
+
+
+<img id="Image1" src="images/NUPRCLogo.JPG" style="height:22px;height:50px; width:50px; margin-left: -16px;">
+
+<img id="image0" src="images/NUPRC2.JPG" class="auto-style4" style="height: 160px;width: 660px;">
+
+
+rpt_project_planned_for_domestic_gas_supply
+
+rpt_ndr
+
+rpt_field_development_plan_to_submit_FDP
+
+rpt_field_development_plan_field_and_status
+
+rpt_field_development_plan_expected_reserve
+
+rpt_unitization
+
+concession_reserves_for_precedingyear_as_at_1st_January
+
+concession_reserves_for_current_year_as_at_1st_January
+
+rpt_company_annual_production
+
+rpt_reserve_addition
+
+rpt_reserve_decline
+
+rpt_life_index
+
+rpt_depletion_rate
+
+

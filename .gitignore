@@ -1,0 +1,16 @@
+################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+/.vs
+/Backend_UMR_Work_Program/bin
+/Backend_UMR_Work_Program/obj
+/.vs/Backend_UMR_Work_Program/FileContentIndex/merges
+/.vs/Backend_UMR_Work_Program/FileContentIndex
+\A_WorkProgram\WKP_Backend\WKP_Database\WKP_Database.dbmdl
+\A_WorkProgram\WKP_Backend\WKP_Database\WKP_Database.jfm
+/A_WorkProgram/WKP_Backend/WKP_Database/WKP_Database.dbmdl
+/A_WorkProgram/WKP_Backend/WKP_Database/WKP_Database.jfm
+/Database/Database.jfm
+/Database
+/WKP_Database/WKP_Database.dbmdl
+/WKP_Database/WKP_Database.jfm

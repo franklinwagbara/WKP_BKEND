@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[HSE_HOST_COMMUNITIES_DEVELOPMENT] (
+    [Id]                                INT            IDENTITY (1, 1) NOT NULL,
+    [DoYouHaveEvidenceOfReg]            VARCHAR (10)   NULL,
+    [EvidenceOfRegTrustFundFilename]    VARCHAR (2000) NULL,
+    [EvidenceOfRegTrustFundPath]        VARCHAR (5000) NULL,
+    [ReasonForNoEvidenceOfRegTF]        VARCHAR (2000) NULL,
+    [DoYouHaveEvidenceOfPay]            VARCHAR (10)   NULL,
+    [EvidenceOfPayTrustFundFilename]    VARCHAR (1000) NULL,
+    [EvidenceOfPayTrustFundPath]        VARCHAR (3000) NULL,
+    [ReasonForNoEvidenceOfPayTF]        VARCHAR (2000) NULL,
+    [UploadCommDevPlanApprovalFilename] VARCHAR (1000) NULL,
+    [UploadCommDevPlanApprovalPath]     VARCHAR (3000) NULL,
+    [Date_Updated]                      DATETIME       NULL,
+    [Updated_by]                        VARCHAR (50)   NULL,
+    [Date_Created]                      DATETIME       NULL,
+    [Created_by]                        VARCHAR (50)   NULL,
+    [Field_ID]                          INT            NULL,
+    [OML_Name]                          VARCHAR (1000) NULL,
+    [OmL_ID]                            VARCHAR (1000) NULL,
+    [CompanyName]                       VARCHAR (200)  NULL,
+    [Companyemail]                      VARCHAR (100)  NULL,
+    [Year_of_WP]                        VARCHAR (30)   NULL,
+    [COMPANY_ID]                        VARCHAR (50)   NULL,
+    [CompanyNumber]                     VARCHAR (50)   NULL,
+    CONSTRAINT [PK_HSE_HOST_COMMUNITIES_DEVELOPMENT] PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+

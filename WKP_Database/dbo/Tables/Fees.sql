@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[Fees]
+(
+	[Id] INT IDENTITY(1, 1) NOT NULL, 
+    [AmountNGN] NVARCHAR(50) NULL, 
+    [AmountUSD] NVARCHAR(50) NULL, 
+    [TypeOfPaymentId] INT NULL,
+    CONSTRAINT [PK_FEES] PRIMARY KEY CLUSTERED ([Id] ASC)
+)

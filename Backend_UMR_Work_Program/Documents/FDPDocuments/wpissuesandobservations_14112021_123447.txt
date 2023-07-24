@@ -1,0 +1,38 @@
+anthony.nwosu@brandonetech.com
+
+
+fORRNGKa8yYj1WaiuGE0739RmYMbOrVbDkymXzJmib0=
+
+Dear Madam ,
+
+chinelo.m.mbanugo@exxonmobil.com have been created under  MOBIL PRODUCING NIG. UNLIMITED
+
+Thank you
+
+
+ifeomaene@energiang.com
+
+Energia_123
+
+
+Select * from HSE_ENVIRONMENTAL_STUDIES_NEW
+
+
+
+
+            SqlDataAdapter da = new SqlDataAdapter("Select distinct categories from ADMIN_ENVIROMENTAL_STUDIES_APPROVED_ONGOING order by categories", con);
+
+            DataTable result = new DataTable();
+
+            da.Fill(result);
+
+            string countrecords = result.Rows.Count.ToString();
+
+            int count_record = int.Parse(countrecords);
+
+            DropDownList38.DataSource = result;
+            DropDownList38.DataTextField = "categories";
+            DropDownList38.DataValueField = "categories";
+            DropDownList38.DataBind();
+            DropDownList38.Items.Insert(0, new ListItem("---- Please Select Category ----", "0"));
+

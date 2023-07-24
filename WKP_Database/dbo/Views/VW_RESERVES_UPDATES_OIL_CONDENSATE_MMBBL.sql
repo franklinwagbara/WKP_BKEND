@@ -1,0 +1,5 @@
+﻿CREATE VIEW [dbo].[VW_RESERVES_UPDATES_OIL_CONDENSATE_MMBBL]
+AS
+SELECT DISTINCT a.CompanyName, a.Contract_Type, a.COMPANY_EMAIL, b.Companyemail, b.Total_Production_, b.Year_of_WP
+FROM         dbo.ADMIN_CONCESSIONS_INFORMATION AS a INNER JOIN
+                      dbo.RESERVES_UPDATES_OIL_CONDENSATE_MMBBL AS b ON a.COMPANY_EMAIL = b.Companyemail

@@ -1,0 +1,17 @@
+﻿definitions:
+  cells:
+    type: array
+    items:
+      type: array
+      items: 
+        type: object
+        properties: 
+          field: 
+            type: string
+          name:
+            type: string
+          width:
+            type: string
+          sortable:
+            type: boolean
+      

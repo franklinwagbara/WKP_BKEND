@@ -1,0 +1,15 @@
+DECLARE @sql VARCHAR(MAX) = ''
+        , @crlf VARCHAR(2) = CHAR(13) + CHAR(10) ;
+
+SELECT @sql = @sql + 'DROP VIEW ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(v.name) +';' + @crlf
+FROM   sys.views v
+
+PRINT @sql;
+EXEC(@sql);
+
+-- Remove Commas ---
+update[OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities] set [dbo].[OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities].Production = Replace(cn.Production,',','') from [OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities] cn
+
+update[GAS_PRODUCTION_ACTIVITIES] set [dbo].[GAS_PRODUCTION_ACTIVITIES].Flared = Replace(cn.Flared,',','') from [GAS_PRODUCTION_ACTIVITIES] cn
+
+update[GAS_PRODUCTION_ACTIVITIES] set [dbo].[GAS_PRODUCTION_ACTIVITIES].Current_Actual_Year = Replace(cn.Current_Actual_Year,',','') from [GAS_PRODUCTION_ACTIVITIES] cn

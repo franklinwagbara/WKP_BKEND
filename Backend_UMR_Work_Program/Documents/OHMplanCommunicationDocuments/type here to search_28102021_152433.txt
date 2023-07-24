@@ -1,0 +1,34 @@
+If you can’t type anything in the Windows 10 search bar, please try two of these methods:
+Method 1:
+Right click on the start menu or press Windows + X keys on the keyboard, select and open Command prompt (admin).
+Then enter the below commands and hit Enter key:
+Command 1: 
+PowerShell -ExecutionPolicy Unrestricted 
+Now enter the below command and hit Enter key: 
+Command 2: 
+ 
+Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"} | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+
+If the issue still persist, follow the second method:
+Method 2:
+Open the Task manager by pressing CTRL+Shift+ESC keys. Or you can open it by right clicking on the taskbar if it works.
+Then click File an then Run New Task. Make sure you have a check mark beside “Create this task with administrative privileges”. Now type Powershell. 
+Type the following in the Powershell prompt:
+
+$manifest = (Get-AppxPackage Microsoft.WindowsStore).InstallLocation + '\AppxManifest.xml' ; Add-AppxPackage -DisableDevelopmentMode -Register $manifest 
+
+Wait till the process completed and then close the Powershell window. Now, reboot the computer and check if it helps.
+We hope this video will be useful for you… Please let us know your experience with this video by commenting below. If you face any problem please feel free to contact us…  Please like this video and subscribe our channel for the latest updates… Thanks for watching…!!
+
+
+
+
+
+
+
+
+
+
+next
+
+
