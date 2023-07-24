@@ -170,7 +170,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                where a.Companyemail == WKPCompanyEmail && a.Year_of_WP == year
                                select new
                                {
-                                   actual_proposed = a.Actual_Proposed,
+                                   actual_proposed = a.Actual_Proposed_Year,
                                    activities = b.ACTIVITIES,
                                    anyLitigation = c.AnyLitigation
                                }).FirstOrDefaultAsync();
@@ -188,9 +188,11 @@ namespace Backend_UMR_Work_Program.Controllers
                                where a.OML_Name == omlname && a.Year_of_WP == year
                                select new
                                {
-                                   facility = a.facility
+                                   facility = a.facility,
+                                   facilityLocation = a.facility_location,
+                                   typeOfFacility = a.type_of_facility
                                }).FirstOrDefaultAsync();
-            if (step5?.facility != null)
+            if (step5 != null)
             {
                 isStep5 = true;
             }
