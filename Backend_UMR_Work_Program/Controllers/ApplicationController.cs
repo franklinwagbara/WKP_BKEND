@@ -2082,7 +2082,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                 hseRemediationFunds = ___hseRemediationFunds
                             };
 
-                        case "E&AM": //Planning
+                        case "E&AM": //Planning ER&SP
                             var geoActivitiesAcquisitions = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var geoActivitiesProcessings = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year_of_WP == year orderby d.QUATER select d).ToListAsync();
                             var concessionSituations = await (from d in _context.CONCESSION_SITUATIONs where d.CompanyNumber == application.CompanyID && d.Field_ID == application.FieldID && d.Year == year select d).ToListAsync();
