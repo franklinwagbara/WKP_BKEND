@@ -9,13 +9,13 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Backend_UMR_Work_Program
 build_property.RootNamespace = Backend_UMR_Work_Program
-build_property.ProjectDir = C:\Project\BrandOne\repos\WorkProgram_BEnd\Backend_UMR_Work_Program\
+build_property.ProjectDir = C:\Sandbox\WorkProgram_BEnd - Copy (6)\Backend_UMR_Work_Program\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Project\BrandOne\repos\WorkProgram_BEnd\Backend_UMR_Work_Program
+build_property.MSBuildProjectDirectory = C:\Sandbox\WorkProgram_BEnd - Copy (6)\Backend_UMR_Work_Program
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Project/BrandOne/repos/WorkProgram_BEnd/Backend_UMR_Work_Program/Views/Application/ApplicationView.cshtml]
+[C:/Sandbox/WorkProgram_BEnd - Copy (6)/Backend_UMR_Work_Program/Views/Application/ApplicationView.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXBwbGljYXRpb25cQXBwbGljYXRpb25WaWV3LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
