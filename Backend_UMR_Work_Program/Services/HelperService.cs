@@ -599,7 +599,7 @@ namespace Backend_UMR_Work_Program.Services
                 desk.ProcessStatus = processStatus;
 
 				_dbContext.MyDesks.Update(desk);
-				_dbContext.SaveChanges();
+				await _dbContext.SaveChangesAsync();
 
 				return desk;
             }
@@ -782,7 +782,6 @@ namespace Backend_UMR_Work_Program.Services
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }

@@ -266,7 +266,6 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-
                 staff staffActing = (from stf in _dbContext.staff
                                         join dsk in _dbContext.MyDesks on stf.StaffID equals dsk.StaffID
                                         where dsk.DeskID == deskID
@@ -280,9 +279,9 @@ namespace Backend_UMR_Work_Program.Services
                         string appID = b.Replace('[', ' ').Replace(']', ' ').Trim();
                         int appId = int.Parse(appID);
                         //get current staff desk
-                        var staffDesk = _dbContext.MyDesks.Include(x => x.Staff).Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
-                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
-                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var staffDesk = await _dbContext.MyDesks.Include(x => x.Staff).Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefaultAsync();
+                        var application = await _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefaultAsync();
+                        var Company = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefaultAsync();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
                         var ownerOfDesk = await _dbContext.staff.Where(x => x.StaffID == staffDesk.StaffID).FirstOrDefaultAsync();
 
@@ -335,7 +334,6 @@ namespace Backend_UMR_Work_Program.Services
                                         Comment = comment,
                                         LastJobDate = DateTime.Now,
                                         ProcessStatus = DESK_PROCESS_STATUS.SubmittedByStaff,
-
                                     };
 
                                     deskTemp = desk;
@@ -1045,8 +1043,8 @@ namespace Backend_UMR_Work_Program.Services
                         var targetStaff = await _dbContext.staff.Where<staff>(s => s.StaffID == targetStaffID && s.DeleteStatus != true).FirstOrDefaultAsync();
                         var sourceStaffDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == sourceStaff.StaffID && d.AppId == appId).FirstOrDefaultAsync();
                         var targetStaffDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == targetStaff.StaffID && d.AppId == appId).FirstOrDefaultAsync();
-                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
-                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var application = await _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefaultAsync();
+                        var Company = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefaultAsync();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
 
                         if (sourceStaff == null || targetStaff == null || appID == null)
@@ -1104,24 +1102,21 @@ namespace Backend_UMR_Work_Program.Services
                         var save = await _dbContext.SaveChangesAsync();
                         if (save > 0)
                         {
-                            var result = await _helperService.DeleteDeskByDeskId(sourceDesk.DeskID);
-                            //await _helpersController.UpdateDeskAfterMove(sourceDesk, sourceDesk.Comment, STAFF_DESK_STATUS.MOVED);
+                            await _helperService.DeleteDeskByDeskId(sourceDesk.DeskID);
                         }
 
-                        //_helpersController.SaveHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null);
                         _helperService.SaveApplicationHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null, false, null, APPLICATION_ACTION.Move);
-
 
                         string subject = $"Re-assignment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
 
                         //Send mail to target Staff
                         string content = "Application with REF : " + application.ReferenceNo + " was moved from " + sourceStaff.LastName + ", " + sourceStaff.FirstName + "'s desk to " + targetStaff.LastName + ", " + targetStaff.FirstName;
                         var emailMsg = _helperService.SaveMessage(application.Id, targetStaffID, subject, content, "Staff");
-                        //var sendEmail = _helperService.SendEmailMessage(targetStaff.StaffEmail, targetStaff.LastName + ", " + targetStaff.FirstName, emailMsg, null);
+                        var sendEmail = _helperService.SendEmailMessage(targetStaff.StaffEmail, targetStaff.LastName + ", " + targetStaff.FirstName, emailMsg, null);
 
                         //Send mail to source staff
                         var emailMsg_Source = _helperService.SaveMessage(application.Id, sourceStaffID, subject, content, "Staff");
-                        //var sendEmail_Source = _helperService.SendEmailMessage(sourceStaff.StaffEmail, sourceStaff.LastName + ", " + sourceStaff.FirstName, emailMsg_Source, null);
+                        var sendEmail_Source = _helperService.SendEmailMessage(sourceStaff.StaffEmail, sourceStaff.LastName + ", " + sourceStaff.FirstName, emailMsg_Source, null);
 
                         _helperService.LogMessages("Application with REF : " + application.ReferenceNo + " was moved from " + sourceStaff.LastName + ", " + sourceStaff.FirstName + "'s desk to " + targetStaff.LastName + ", " + targetStaff.FirstName);
                     }
