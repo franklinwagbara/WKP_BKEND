@@ -44,6 +44,7 @@ public partial class ADMIN_DATETIME_PRESENTATION
     public string? wp_date { get; set; }
 
     public string? wp_time { get; set; }
+    public string? comment { get; set; }
 
     public string? CHAIRPERSONEMAIL { get; set; }
 
@@ -88,7 +89,7 @@ public partial class ADMIN_DATETIME_PRESENTATION
     public ADMIN_DATETIME_PRESENTATION()
     {
         Histories = new List<EnagementScheduledHistory>();
-        STATUS = ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk;
+        STATUS = ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
         isDeleted = false;
         adminAproved = false;
         companyAproved = true;

@@ -67,7 +67,171 @@ namespace Backend_UMR_Work_Program.Controllers
                 yearlist.Add((now - i));
             }
             return yearlist;
+
         }
+
+
+
+
+
+
+        [HttpPost("ADDSCHEDULEHISTORY")]
+        public async Task<WebApiResponse> ADDSCHEDULEHISTORY([FromBody] EnagementScheduledHistory scheduledHistory, int id)
+        {
+
+            try
+            {
+                if (scheduledHistory != null && (id != null || id == 0))
+                {
+                    scheduledHistory.actionBy = WKPCompanyEmail;
+                    scheduledHistory.action = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.UpdatedEngagement;
+
+                    var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).FirstOrDefault();
+
+                    if (checkSchedule == null)
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, schedule doesn't exist ", StatusCode = ResponseCodes.Failure };
+                    }
+                    else
+                    {
+
+                        checkSchedule.Date_Updated = DateTime.Now;
+                        checkSchedule.Submitted = ENGAGEMENT_SCHEDULE_STATUS.Processing;
+                        checkSchedule.adminAproved = !checkSchedule.adminAproved;
+                        checkSchedule.companyAproved = !checkSchedule.companyAproved;
+                        checkSchedule.STATUS = checkSchedule.STATUS == ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk ? ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk : ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
+                        checkSchedule.Histories.Add(scheduledHistory);
+                        checkSchedule.MEETINGROOM = scheduledHistory.MEETINGROOM;
+                        checkSchedule.comment = scheduledHistory.comment;
+                        checkSchedule.numOfHistories = ((await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).ToListAsync()).Count) + 1;
+                        checkSchedule.wp_time = scheduledHistory.wp_time;
+                        checkSchedule.wp_date = scheduledHistory.wp_date;
+
+                        _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+
+
+                        var myTime = await _context.SaveChangesAsync();
+
+
+                        if (myTime > 0)
+                        {
+                            //var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was updated successfully.", StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to update this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                        }
+                    }
+                }
+
+
+
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Invalid entry.", StatusCode = ResponseCodes.Failure };
+
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+
+
+
+
+        [HttpPatch("ACCEPT_SCHEDULE_PRESENTATION_DATETIME")]
+        public async Task<WebApiResponse> ACCEPT_SCHEDULE_PRESENTATION_DATETIME(int Id)
+        {
+            try
+            {
+                var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).FirstOrDefault();
+
+                if (checkSchedule != null)
+                {
+
+                    if (checkSchedule?.isDeleted == true)
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities and can't be approved", StatusCode = ResponseCodes.Success };
+
+
+                    if (WKUserRole == GeneralModel.Admin)
+                    {
+                        checkSchedule.adminAproved = true;
+
+                    }
+                    else
+                    {
+                        checkSchedule.companyAproved = true;
+
+                    }
+
+
+
+                    if (checkSchedule?.adminAproved == true && checkSchedule?.companyAproved == true)
+                    {
+                        checkSchedule.STATUS = ENGAGEMENT_SCHEDULE_STATUS.Approved;
+                        checkSchedule.Submitted = ENGAGEMENT_SCHEDULE_STATUS.CompletlyScheduled;
+                    }
+                    else{
+                        checkSchedule.STATUS = checkSchedule.STATUS == ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk ? ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk : ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
+                        checkSchedule.Submitted = ENGAGEMENT_SCHEDULE_STATUS.Processing;
+
+                    }
+
+                    var scheduledHistory = new EnagementScheduledHistory()
+                    {
+                       
+                        MEETINGROOM = checkSchedule.MEETINGROOM,
+                        wp_date = checkSchedule.wp_date,
+                        action= GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.AcceptedEngagement,
+                        wp_time=checkSchedule.wp_time,
+                        actionBy=WKPCompanyEmail,
+                        comment= ENGAGEMENT_SCHEDULE_STATUS.CompletlyScheduled
+                };
+
+
+                    checkSchedule.Date_Updated = DateTime.Now;
+                    checkSchedule.Histories.Add(scheduledHistory);
+                    checkSchedule.comment = scheduledHistory.comment;
+                    checkSchedule.numOfHistories = ((await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).ToListAsync()).Count) + 1;
+                    
+                    
+
+
+                    _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+                    var myTime = await _context.SaveChangesAsync();
+
+
+                    if (myTime > 0)
+                    {
+
+                        string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to update this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                    }
+                }
+                return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record cannot be found", StatusCode = ResponseCodes.RecordNotFound };
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+                //return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+            }
+        }
+
+
+
+
+
+
 
         [HttpGet("GETCOMPLETEDPAGES")]
         public async Task<object> GETCOMPLETEDPAGES(string omlname, string year, string fieldname)
@@ -126,12 +290,12 @@ namespace Backend_UMR_Work_Program.Controllers
                 isStep2 = false;
             }
 
-            var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs 
+            var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs
                                join b in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs on a.OML_Name equals b.OML_Name
                                join d in _context.FACILITIES_PROJECT_PERFORMANCEs on a.OML_Name equals d.OML_Name
-                               join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name where c.Item_Type == "Capex"
-                               join f in _context.BUDGET_CAPEX_OPices on a.OML_Name equals f.OML_Name where c.Item_Type == "Opex"
-                               join g in _context.DECOMMISSIONING_ABANDONMENTs on a.OML_ID equals g.OmlId.ToString() 
+                               join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name //where c.Item_Type == "Capex"
+                               //join f in _context.BUDGET_CAPEX_OPices on a.OML_Name equals f.OML_Name //where c.Item_Type == "Opex"
+                               join g in _context.DECOMMISSIONING_ABANDONMENTs on a.OML_ID equals g.OmlId.ToString()
                                join e in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments on a.OML_Name equals e.OML_Name 
                                where a.OML_Name == omlname && a.Companyemail == WKPCompanyEmail && a.Field_ID.ToString() == fieldname
                                select new
@@ -162,15 +326,15 @@ namespace Backend_UMR_Work_Program.Controllers
             }
 
             var step4 = await (from a in _context.NIGERIA_CONTENT_Trainings
-                               join b in _context.STRATEGIC_PLANS_ON_COMPANY_BAses on a.COMPANY_ID equals b.COMPANY_ID
-                               join c in _context.LEGAL_LITIGATIONs on a.COMPANY_ID equals c.COMPANY_ID
-                               join d in _context.NIGERIA_CONTENT_QUESTIONs on a.COMPANY_ID equals d.COMPANY_ID
-                               join e in _context.NIGERIA_CONTENT_Upload_Succession_Plans on a.COMPANY_ID equals e.COMPANY_ID
-                               join f in _context.LEGAL_ARBITRATIONs on a.COMPANY_ID equals f.COMPANY_ID
-                               where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year
+                               join b in _context.STRATEGIC_PLANS_ON_COMPANY_BAses on a.Companyemail equals b.Companyemail
+                               join c in _context.LEGAL_LITIGATIONs on a.Companyemail equals c.Companyemail
+                               join d in _context.NIGERIA_CONTENT_QUESTIONs on a.Companyemail equals d.Companyemail
+                               join e in _context.NIGERIA_CONTENT_Upload_Succession_Plans on a.Companyemail equals e.Companyemail
+                               join f in _context.LEGAL_ARBITRATIONs on a.Companyemail equals f.Companyemail
+                               where a.Companyemail == WKPCompanyEmail && a.Year_of_WP == year
                                select new
                                {
-                                   actual_proposed = a.Actual_Proposed,
+                                   actual_proposed = a.Actual_Proposed_Year,
                                    activities = b.ACTIVITIES,
                                    anyLitigation = c.AnyLitigation
                                }).FirstOrDefaultAsync();
@@ -188,9 +352,11 @@ namespace Backend_UMR_Work_Program.Controllers
                                where a.OML_Name == omlname && a.Year_of_WP == year
                                select new
                                {
-                                   facility = a.facility
+                                   facility = a.facility,
+                                   facilityLocation = a.facility_location,
+                                   typeOfFacility = a.type_of_facility
                                }).FirstOrDefaultAsync();
-            if (step5?.facility != null)
+            if (step5 != null)
             {
                 isStep5 = true;
             }
@@ -646,11 +812,11 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
-                
+
                 List<string> proposedWells = new List<string>();
                 if ((concessionField?.Consession_Type == "OML" || concessionField?.Consession_Type == "PML") && concessionField.Field_Name != null)
                 {
-                    proposedWells = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.COMPANY_ID == WKPCompanyId && d.OML_Name == omlName && d.Field_ID == concessionField.Field_ID && d.Year_of_WP ==year select d.WellName).ToListAsync();
+                    proposedWells = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.COMPANY_ID == WKPCompanyId && d.OML_Name == omlName && d.Field_ID == concessionField.Field_ID && d.Year_of_WP == year select d.WellName).ToListAsync();
                 }
                 else
                 {
@@ -1353,6 +1519,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSETechnicalSafety = await (from c in _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
 
                     var HSESafetyStudies = await (from c in _context.HSE_SAFETY_STUDIES_NEWs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+
                     var HSERemediationFund = await (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
 
                     var HSEAssetRegister = await (from c in _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs where c.OML_Name == concessionField.Concession_Name && c.Field_ID == concessionField.Field_ID && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
@@ -1484,7 +1651,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSEAssetRegister = (from c in _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEOilSpill = (from c in _context.HSE_OIL_SPILL_REPORTING_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEAssetRegisterRBI = (from c in _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
-                    var HSEWastManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
+                    var HSEWastManagementDZs = await (from c in _context.HSE_WASTE_MANAGEMENT_DZs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEEnfluenceConliences = await (from c in _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToListAsync();
                     var HSEAccidentIncidence = (from c in _context.HSE_ACCIDENT_INCIDENCE_REPORTING_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     var HSEAccidentIncidenceType = (from c in _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
@@ -1545,7 +1712,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var HSEHostCommunities = (from c in _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
 
                     var HSEGHGPlans = (from c in _context.HSE_GHG_MANAGEMENT_PLANs where c.OmL_Name == omlName && c.CompanY_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
-                    var HSERemediationFund = (from c in _context.HSE_REMEDIATION_FUNDs where c.CompanyName == WKPCompanyName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
+                    var HSERemediationFund = (from c in _context.HSE_REMEDIATION_FUNDs where c.OML_Name == omlName && c.Company_ID == WKPCompanyId && c.Year_of_WP == year select c).ToList();
                     return new
                     {
                         HSETechnicalSafety = HSETechnicalSafety,
@@ -2174,15 +2341,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     decomAban_model.DateCreated = DateTime.Now;
                     decomAban_model.CreatedBy = WKPCompanyEmail;
                     await _context.DECOMMISSIONING_ABANDONMENTs.AddAsync(decomAban_model);
-                save += await _context.SaveChangesAsync();
+                    save += await _context.SaveChangesAsync();
                 }
-
-                // }
-                // else
-                // {
-                // 	return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
-                // }
-
 
                 if (save > 0)
                 {
@@ -2259,12 +2419,6 @@ namespace Backend_UMR_Work_Program.Controllers
                     _context.Royalties.Remove(myRoyalty);
                 }
                 save += await _context.SaveChangesAsync();
-                // }
-                // else
-                // {
-                // 	return BadRequest(new { message = $"Error : No data was passed for {actionToDo} process to be completed." });
-                // }
-
 
                 if (save > 0)
                 {
@@ -2463,7 +2617,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     geophysical_activities_acquisition_model.Actual_year = year;
                     geophysical_activities_acquisition_model.proposed_year = (int.Parse(year) + 1).ToString();
                     geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString();
-                    
+
 
                     if (action == GeneralModel.Insert)
                     {
@@ -6643,7 +6797,8 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Budget_for_other_Activities_Naira = budgetProposal_model.Budget_for_other_Activities_Naira;
                             getData.Date_Updated = DateTime.Now;
                             getData.Updated_by = WKPCompanyId;
-
+                            getData.OML_ID = concessionField.Concession_ID.ToString();
+                            getData.OML_Name = omlName;
                             _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Update(getData);
                             save += await _context.SaveChangesAsync();
 
@@ -6665,7 +6820,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     budget_proposal_model.Year_of_WP = year;
                     budget_proposal_model.OML_Name = omlName;
                     budget_proposal_model.Field_ID = concessionField?.Field_ID ?? null;
-                    budget_proposal_model.OML_ID = concessionField.Concession_ID.ToString();
+                    budget_proposal_model.OML_ID = concessionField.Concession_ID.HasValue ? concessionField.Concession_ID.ToString() : null;
                     // budget_proposal_model.Actual_year = year;
                     budget_proposal_model.Proposed_year = year;
 
