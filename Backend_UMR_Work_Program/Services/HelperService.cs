@@ -436,18 +436,24 @@ namespace Backend_UMR_Work_Program.Services
 
                 foreach (var staffId in staffIds)
                 {
-                    var desk = _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefault();
-					var mostRecentJob = _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefault();
+                    var deskAlreadyExist = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == true).FirstOrDefaultAsync();
+                    var deskHasNoWork = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == false).FirstOrDefaultAsync();
+					//var mostRecentJob = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.HasWork == true).OrderByDescending(x => x.LastJobDate).FirstOrDefaultAsync();
+					var mostRecentJob = await _dbContext.MyDesks.Where(x => x.StaffID == staffId).OrderByDescending(x => x.LastJobDate).FirstOrDefaultAsync();
 
-                    if (desk != null)
+                    if (deskAlreadyExist != null)
                     {
                         throw new Exception("This application has already been push to this desk.");
+                    }
+                    else if (deskHasNoWork != null)
+                    {
+                        return deskHasNoWork;
                     }
                     else
                     {
 						if(mostRecentJob == null)
 						{
-                            var tempDesk = new MyDesk
+                            var newDesk1 = new MyDesk
                             {
                                 //save staff desk
                                 StaffID = staffId,
@@ -460,11 +466,10 @@ namespace Backend_UMR_Work_Program.Services
                                 LastJobDate = DateTime.Now,
                             };
 
-                            _dbContext.MyDesks.Add(tempDesk);
-
+                            await _dbContext.MyDesks.AddAsync(newDesk1);
                             await _dbContext.SaveChangesAsync();
 
-                            return tempDesk;
+                            return newDesk1;
                         }
 						else
 						{
@@ -510,6 +515,8 @@ namespace Backend_UMR_Work_Program.Services
                 {
                     var staff = await _dbContext.staff.Include(x => x.StrategicBusinessUnit).Where(x => x.StaffID == staffId).FirstOrDefaultAsync();                 
                     var desk = await _dbContext.MyDesks.Include(x => x.Staff).Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork==true).FirstOrDefaultAsync();
+                    var deskHasNoWork = await _dbContext.MyDesks.Where(x => x.StaffID == staffId && x.AppId == appId && x.HasWork == false).FirstOrDefaultAsync();
+
                     var staffSBU = staff.StrategicBusinessUnit;
                     
                     //Check if the app on another role other than the wpa reviewer's desk
@@ -529,6 +536,10 @@ namespace Backend_UMR_Work_Program.Services
 						};
 
 						return res; 
+                    }
+                    else if(deskHasNoWork != null)
+                    {
+                        return deskHasNoWork;
                     }
                     else
                     {

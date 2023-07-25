@@ -346,7 +346,6 @@ namespace Backend_UMR_Work_Program.Services
                                 await _helperService.UpdateDeskAfterPush(staffDesk, comment, DESK_PROCESS_STATUS.Pushed);
 
                                 _helperService.SaveApplicationHistory(application.Id, staffActing.StaffID, DESK_PROCESS_STATUS.Pushed, comment, null, false, null, PROCESS_CONSTANTS.Push);
-                                //_helperService.SaveApplicationHistory(application.Id, staffActing.StaffID, GeneralModel.APPLICATION_STATUS.Pushed, comment, null, false, null, GeneralModel.PROCESS_CONSTANTS.Push);
 
                                 string subject = $"Push action was taken for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                 string content = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) has been pushed by a staff to the next processing level.";
@@ -1162,19 +1161,18 @@ namespace Backend_UMR_Work_Program.Services
                     {
                         int appId = b != "undefined" ? int.Parse(b) : 0;
 
-                        var LoggedInStaff = (from stf in _dbContext.staff
-                                             join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-                                             join role in _dbContext.Roles on stf.RoleID equals role.id
-                                             where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
-                                             select stf).FirstOrDefault();
+                        var LoggedInStaff = await (from stf in _dbContext.staff join admin in
+                                                   _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id 
+                                                   join role in _dbContext.Roles on stf.RoleID equals role.id 
+                                                   where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true select stf).FirstOrDefaultAsync();
 
-                        var staffDesk = _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
-                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
-                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var staffDesk = await _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefaultAsync();
+                        var application = await _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefaultAsync();
+                        var Company = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefaultAsync();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
 
-                        var LoggedInStaffSBU = _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefault();
-                        var LoggedInStaffRole = _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefault();
+                        var LoggedInStaffSBU = await _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefaultAsync();
+                        var LoggedInStaffRole = await _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefaultAsync();
                         string returnedTables = await _processFlowService.getTableNames(selectedTables);
 
                         //Determine if the app is on a reviewer's desk
@@ -1182,7 +1180,7 @@ namespace Backend_UMR_Work_Program.Services
 
                         if ((LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER1 || LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER2) && fromWPAReviewer != true)
                         {
-                            var staffWithAppOnDesk = (from stf in _dbContext.staff where stf.StaffID == staffDesk.StaffID select stf).FirstOrDefault();
+                            var staffWithAppOnDesk = await (from stf in _dbContext.staff where stf.StaffID == staffDesk.StaffID select stf).FirstOrDefaultAsync();
                             var staffWithAppOnDeskSBU = await (from sb in _dbContext.StrategicBusinessUnits where sb.Id == staffWithAppOnDesk.Staff_SBU select sb).FirstOrDefaultAsync();
 
                             var targetDesk = await _dbContext.MyDesks.Where(x => x.StaffID == staffDesk.FromStaffID && x.AppId == appId).FirstOrDefaultAsync();
