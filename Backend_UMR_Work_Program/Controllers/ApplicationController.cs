@@ -131,7 +131,10 @@ namespace Backend_UMR_Work_Program.Controllers
             => await _applicationService.MoveApplication(sourceStaffID, targetStaffID, selectedApps);
 
         [HttpGet("IS_APPLICATION_RETURNED")]
-        public async Task<WebApiResponse> IsApplicationReturned(int appId) => await _applicationService.IsApplicationReturned(appId); 
+        public async Task<WebApiResponse> IsApplicationReturned(int appId) => await _applicationService.IsApplicationReturned(appId);
+
+        [HttpPost("SUBMIT_APPLICATION")]
+        public async Task<WebApiResponse> SubmitApplication(int appId) => await _applicationService.SubmitApplication(appId);
 
         //Rework
         [HttpGet("All-Applications")] //For general application view
@@ -3106,12 +3109,11 @@ namespace Backend_UMR_Work_Program.Controllers
             var res = new ViewAsPdf
             {
                 ViewName = "ApplicationView",
-                IsGrayScale = true,
-                WkhtmltopdfPath = wkhtmltopdfPath
+                //IsGrayScale = true,
+                //WkhtmltopdfPath = wkhtmltopdfPath
             };
 
             //var pdfBytes = res.BuildFile(ControllerContext);
-
             //return File(pdfBytes, "application/pdf", "GeneratedPdf.pdf");
 
             return res;
