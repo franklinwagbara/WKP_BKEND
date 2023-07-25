@@ -12,7 +12,7 @@
 		</CustomData>
 		<CustomData Category="Reference" Type="Assembly">
 			<Metadata Name="LogicalName" Value="WKP_Database.dll" />
-			<Metadata Name="FileName" Value="C:\PROJECT\BRANDONE\REPOS\WORKPROGRAM_BEND\WKP_DATABASE\OBJ\DEBUG\WKP_DATABASE.DLL" />
+			<Metadata Name="FileName" Value="C:\SANDBOX\WORKPROGRAM_BEND - COPY (6)\WKP_DATABASE\OBJ\DEBUG\WKP_DATABASE.DLL" />
 			<Metadata Name="AssemblyName" Value="WKP_Database" />
 			<Metadata Name="PermissionSet" Value="SAFE" />
 			<Metadata Name="Owner" Value="" />
@@ -20,7 +20,7 @@
 			<Metadata Name="IsVisible" Value="True" />
 			<Metadata Name="IsModelAware" Value="True" />
 			<Metadata Name="SkipCreationIfEmpty" Value="True" />
-			<Metadata Name="AssemblySymbolsName" Value="C:\Project\BrandOne\repos\WorkProgram_BEnd\WKP_Database\obj\Debug\WKP_Database.pdb" />
+			<Metadata Name="AssemblySymbolsName" Value="C:\Sandbox\WorkProgram_BEnd - Copy (6)\WKP_Database\obj\Debug\WKP_Database.pdb" />
 		</CustomData>
 		<CustomData Category="SqlCmdVariables" Type="SqlCmdVariable" />
 	</Header>
@@ -5996,6 +5996,22 @@ FROM            dbo.ADMIN_COMPANY_INFORMATION INNER JOIN
 							</Entry>
 						</Relationship>
 						<AttachedAnnotation Disambiguator="6" />
+					</Element>
+				</Entry>
+				<Entry>
+					<Element Type="SqlSimpleColumn" Name="[dbo].[ADMIN_DATETIME_PRESENTATION].[comment]">
+						<Relationship Name="TypeSpecifier">
+							<Entry>
+								<Element Type="SqlTypeSpecifier">
+									<Property Name="IsMax" Value="True" />
+									<Relationship Name="Type">
+										<Entry>
+											<References ExternalSource="BuiltIns" Name="[nvarchar]" />
+										</Entry>
+									</Relationship>
+								</Element>
+							</Entry>
+						</Relationship>
 					</Element>
 				</Entry>
 			</Relationship>
