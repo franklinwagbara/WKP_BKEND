@@ -1521,6 +1521,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
 
+
+
+
+      
+
+
+
+
+
         #region Parameters Configuration
         [HttpGet("GET_PARAMETERSCONFIGURATION")]
         public async Task<WebApiResponse> Get_ParametersConfiguration()

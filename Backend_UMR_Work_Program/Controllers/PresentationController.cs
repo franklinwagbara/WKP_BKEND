@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using Grpc.Core;
 using LinqToDB;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -270,56 +271,45 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> ADDSCHEDULEHISTORY([FromBody] EnagementScheduledHistory scheduledHistory, int id)
         {
 
-
             try
             {
                 if (scheduledHistory != null && (id != null || id == 0))
                 {
-                    var CurrentYear = DateTime.Now.Year.ToString();
-                    string Date_Conversion = scheduledHistory.wp_date.ToString();  
+                    scheduledHistory.actionBy = WKPUserEmail;
+                    scheduledHistory.action = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.UpdatedEngagement;
 
+                    var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).FirstOrDefault();
 
-                    var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id==id).FirstOrDefault();
-
-                    if (checkSchedule != null)
+                    if (checkSchedule == null)
                     {
-                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, schedule doesn't ", StatusCode = ResponseCodes.Failure };
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, schedule doesn't exist ", StatusCode = ResponseCodes.Failure };
                     }
                     else
                     {
-                        var presentation = new ADMIN_DATETIME_PRESENTATION()
-                        {
-                            COMPANYNAME = WKPUserName,
-                            COMPANYEMAIL = WKPUserEmail,
-                            COMPANY_ID = WKPUserId,
-                            YEAR = CurrentYear,
-                            CREATED_BY = WKPUserEmail,
-                            wp_date = Date_Conversion,
-                            DATE_TIME_TEXT = Date_Conversion,
-                            wp_time = time,
-                            Histories = new List<EnagementScheduledHistory>
-                        {
-                            new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = Date_Conversion, wp_time = time, MEETINGROOM = "Not Yet Selected"}
-                        }
-                        };
 
-                        // var engagement = new EnagementScheduledHistory() { actionBy = WKPUserEmail, wp_date = presentation.wp_date, wp_time = presentation.wp_time };
+                        checkSchedule.Date_Updated = DateTime.Now;
+                        checkSchedule.Submitted = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.Processing;
+                        checkSchedule.adminAproved = !checkSchedule.adminAproved;
+                        checkSchedule.companyAproved = !checkSchedule.companyAproved;
+                        checkSchedule.STATUS = checkSchedule.STATUS == ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk ? ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk : ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
+                        checkSchedule.Histories.Add(scheduledHistory);
+                        checkSchedule.numOfHistories = ((await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).ToListAsync()).Count) + 1;
 
-                        // presentation.Histories.Add(engagement);
-                        _context.ADMIN_DATETIME_PRESENTATIONs.Add(presentation);
-                        // _context.EnagementScheduledHistorys.Add(engagement);
+
+                        _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+
 
                         var myTime = await _context.SaveChangesAsync();
 
 
                         if (myTime > 0)
                         {
-                            var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
-                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was created successfully.", Data = companyPresentations, StatusCode = ResponseCodes.Success };
+                            //var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was updated successfully.", StatusCode = ResponseCodes.Success };
                         }
                         else
                         {
-                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to create this presentation schedule.", StatusCode = ResponseCodes.Failure };
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to update this presentation schedule.", StatusCode = ResponseCodes.Failure };
 
                         }
                     }
