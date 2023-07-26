@@ -115,11 +115,11 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpPost("ADD_COMMENT_BY_COMPANY")]
         public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
-            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, false, WKPCompanyNumber, true);
+            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
 
         [HttpPost("ADD_COMMENT_BY_STAFF")]
-        public async Task<WebApiResponse> ADD_COMMENT_BY_STAFF(int appId, int? staffId, string comment, string? selectedTables)
-            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
+        public async Task<WebApiResponse> ADD_COMMENT_BY_STAFF(int appId, int? staffId, string comment, string? selectedTables, bool? isPublic)
+            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, false, WKPCompanyNumber, isPublic);
 
         [HttpGet("GET_SENDBACK_COMMENTS")]
         public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId, bool isPublic) => await _applicationService.GetReturnToCompanyComments(appId, isPublic);
