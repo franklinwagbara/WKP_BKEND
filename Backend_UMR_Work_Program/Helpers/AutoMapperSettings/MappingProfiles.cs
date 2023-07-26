@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 using Backend_UMR_Work_Program.DataModels;
+using Backend_UMR_Work_Program.DTOs;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -14,6 +15,8 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
     {
         public MappingProfiles()
         {
+            CreateMap<Fee, FeeDTO>().ReverseMap();
+            CreateMap<FeeDTO, Fee>().ReverseMap();
 
             CreateMap<UserMaster, UserMasterModel>().ReverseMap();
             CreateMap<CONCESSION_SITUATION, CONCESSION_SITUATION_Model>().ReverseMap();

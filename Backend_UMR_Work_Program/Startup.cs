@@ -26,6 +26,7 @@ using Backend_UMR_Work_Program.Helpers.AutoMapperSettings;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Controllers.Authentications;
 using Backend_UMR_Work_Program.DataModels;
+using Rotativa.AspNetCore;
 
 namespace Backend_UMR_Work_Program
 {
@@ -93,9 +94,20 @@ namespace Backend_UMR_Work_Program
             services.AddTransient<WorkProgrammeController>();
             services.AddTransient<AdminController>();
             services.AddTransient<DashboardController>();
+            services.AddTransient<TypeOfPaymentController>();
             services.AddTransient<DatabaseService>();
             services.AddTransient<BlobService>();
             services.AddTransient<ElpsUtility>();
+            services.AddTransient<Seeder>();
+            services.AddTransient<PaymentService>();
+            services.AddTransient<WorkProgrammeService>();
+            services.AddTransient<ApplicationService>();
+            services.AddTransient<AppProcessFlowService>();
+            services.AddTransient<HelperService>();
+            services.AddTransient<AccountingService>();
+            services.AddTransient<FeeService>();
+            services.AddTransient<TypeOfPaymentService>();
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddScoped(x => new BlobServiceClient(Configuration.GetValue<string>("AzureBlobStorage")));
@@ -108,17 +120,23 @@ namespace Backend_UMR_Work_Program
                     errorNumbersToAdd: null)
                 ));
             services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            //services.AddTransient<PaymentService>();
             services.AddSingleton<IMailer, Mailer>();
             services.AddAzureClients(builder =>
             {
                 builder.AddBlobServiceClient(Configuration["ConnectionStrings:AzureBlobStorage:blob"], preferMsi: true);
                 builder.AddQueueServiceClient(Configuration["ConnectionStrings:AzureBlobStorage:queue"], preferMsi: true);
             });
+            var scope = services.BuildServiceProvider().GetService<IServiceScopeFactory>();
+            using (var sc = scope.CreateScope())
+            {
+                var serv = sc.ServiceProvider.GetService<Seeder>();
+                serv.Seed();
+            }
 
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             // global cors policy
             //app.UseCors(x => x
             //    .AllowAnyOrigin()
@@ -138,6 +156,8 @@ namespace Backend_UMR_Work_Program
                 app.UseExceptionHandler("/error");
                 app.UseHsts();
             }
+
+            RotativaConfiguration.Setup((Microsoft.AspNetCore.Hosting.IHostingEnvironment)env);
 
             //app.UseExceptionHandler(
             //    options =>

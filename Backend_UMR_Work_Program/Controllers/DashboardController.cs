@@ -139,6 +139,7 @@
 
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using Backend_UMR_Work_Program.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -153,11 +154,13 @@ namespace Backend_UMR_Work_Program.Controllers
     [Route("api/[controller]")]
     public class DashboardController : ControllerBase
     {
+        public readonly HelperService _helperService;
         public WKP_DBContext _context;
 
-        public DashboardController(WKP_DBContext context)
+        public DashboardController(WKP_DBContext context, HelperService helperService)
         {
             _context = context;
+            _helperService = helperService;
         }
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -193,14 +196,14 @@ namespace Backend_UMR_Work_Program.Controllers
                         companyDashboard_Data = new CompanyReportModel()
                         {
                             concessionName = key.FirstOrDefault().OML_Name,
-                            oil_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_Oil)),
-                            AG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_AG)),
-                            NAG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_NAG)),
-                            condensate_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => double.Parse(x.Company_Annual_Condensate)),
-                            oil_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualOilProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualOilProduction)),
-                            AG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasAGProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualOilProduction)),
-                            NAG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualOilProduction)),
-                            condensate_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualCondensateProduction != null).Sum(x => double.Parse(x?.Company_Reserves_AnnualCondensateProduction))
+                            oil_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_Oil)),
+                            AG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_AG)),
+                            NAG_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_NAG)),
+                            condensate_NetProduction = data.reserve.Where(x => x.Year_of_WP == year).Sum(x => _helperService.TryParseDouble(x.Company_Annual_Condensate)),
+                            oil_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualOilProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualOilProduction)),
+                            AG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasAGProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualOilProduction)),
+                            NAG_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualOilProduction)),
+                            condensate_Reserves = data.reserveStatus.Where(x => x.Year_of_WP == year && x.Company_Reserves_AnnualCondensateProduction != null).Sum(x => _helperService.TryParseDouble(x?.Company_Reserves_AnnualCondensateProduction))
 
                         };
                         companyDashboard_Data.totalNetProduction = companyDashboard_Data.oil_NetProduction + companyDashboard_Data.AG_NetProduction + companyDashboard_Data.NAG_NetProduction + companyDashboard_Data.condensate_NetProduction;
@@ -247,14 +250,14 @@ namespace Backend_UMR_Work_Program.Controllers
                         companyDashboard_Data = new CompanyReportModel()
                         {
                             concessionName = key.FirstOrDefault().conc.OML_Name,
-                            oil_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_Oil)),
-                            AG_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_AG)),
-                            NAG_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_NAG)),
-                            condensate_NetProduction = key.Where(x => x.year == year).Sum(x => double.Parse(x.reserve.Company_Annual_Condensate)),
-                            oil_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualOilProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
-                            AG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasAGProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
-                            NAG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
-                            condensate_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualCondensateProduction != null).Sum(x => double.Parse(x.reserveStatus?.Company_Reserves_AnnualCondensateProduction))
+                            oil_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_Oil)),
+                            AG_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_AG)),
+                            NAG_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_NAG)),
+                            condensate_NetProduction = key.Where(x => x.year == year).Sum(x => _helperService.TryParseDouble(x.reserve.Company_Annual_Condensate)),
+                            oil_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualOilProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
+                            AG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasAGProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
+                            NAG_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualGasNAGProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualOilProduction)),
+                            condensate_Reserves = key.Where(x => x.year == year && x.reserveStatus.Company_Reserves_AnnualCondensateProduction != null).Sum(x => _helperService.TryParseDouble(x.reserveStatus?.Company_Reserves_AnnualCondensateProduction))
                         };
                         companyDashboard_Data.totalNetProduction = companyDashboard_Data.oil_NetProduction + companyDashboard_Data.AG_NetProduction + companyDashboard_Data.NAG_NetProduction + companyDashboard_Data.condensate_NetProduction;
                         companyDashboard_Data.totalReserves = companyDashboard_Data.oil_Reserves + companyDashboard_Data.AG_Reserves + companyDashboard_Data.NAG_Reserves + companyDashboard_Data.condensate_Reserves;
@@ -330,15 +333,15 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil) + Convert.ToDouble(a.Company_Reserves_Condensate)).ToListAsync()).Sum();
-                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_AG) + Convert.ToDouble(a.Company_Reserves_NAG)).ToListAsync()).Sum();
+                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
+                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_AG.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_NAG.Replace(",", ""))).ToListAsync()).Sum();
                     prodCost = (await (from a in _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs where a.Year_of_WP == year select Convert.ToDouble(a.INDIRECT_COST_Actual) + Convert.ToDouble(a.DIRECT_COST_Actual)).ToListAsync()).Sum();
                 }
                 else
                 {
-                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil) + Convert.ToDouble(a.Company_Reserves_Condensate)).ToListAsync()).Sum();
-                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_AG) + Convert.ToDouble(a.Company_Reserves_NAG)).ToListAsync()).Sum();
-                    prodCost = (await (from a in _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.INDIRECT_COST_Actual) + Convert.ToDouble(a.DIRECT_COST_Actual)).ToListAsync()).Sum();
+                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
+                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_AG.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_NAG.Replace(",", ""))).ToListAsync()).Sum();
+                    prodCost = (await (from a in _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.INDIRECT_COST_Actual.Replace(",", "")) + Convert.ToDouble(a.DIRECT_COST_Actual.Replace(",", ""))).ToListAsync()).Sum();
                 }
                 return new { reserveOilCondensate = Math.Round(reserveOilCondensate), reserveAGNAG = Math.Round(reserveAGNAG), prodCost = Math.Round(prodCost)} ;
             }
@@ -355,7 +358,19 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var months = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.Production_month).ToListAsync()).Distinct();
             foreach (var month in months) {
-                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Production_month == month && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production)).ToListAsync()).Sum();
+                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Production_month == month && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production.Replace(",", ""))).ToListAsync()).Sum();
+                ProdList.Add(new {prodMonth = prodMonth, month = month});
+            }
+            return ProdList;
+        }
+        
+        [HttpGet("COMPANY_MONTHLY_PRODUCTION_PROPOSED")]
+        public async Task<object> COMPANY_MONTHLY_PRODUCTION_PROPOSED(string year)
+        {
+            var ProdList = new List<object>();
+            var months = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.Production_month).ToListAsync()).Distinct();
+            foreach (var month in months) {
+                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.Production_month == month && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {prodMonth = prodMonth, month = month});
             }
             return ProdList;
@@ -367,7 +382,19 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var contractList = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.OML_Name).ToListAsync()).Distinct();
             foreach (var conType in contractList) {
-                var prod = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production)).ToListAsync()).Sum();
+                var prod = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production.Replace(",", ""))).ToListAsync()).Sum();
+                ProdList.Add(new {omlname = conType, prod = prod});
+            }
+            return ProdList;
+        }
+        
+        [HttpGet("COMPANY_CONCESSION_PRODUCTION_PROPOSED")]
+        public async Task<object> COMPANY_CONCESSION_PRODUCTION_PROPOSED(string year)
+        {
+            var ProdList = new List<object>();
+            var contractList = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.OML_Name).ToListAsync()).Distinct();
+            foreach (var conType in contractList) {
+                var prod = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Production.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {omlname = conType, prod = prod});
             }
             return ProdList;
@@ -379,7 +406,19 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var contractList = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select a.OML_Name).ToListAsync()).Distinct();
             foreach (var conType in contractList) {
-                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil) + Convert.ToDouble(a.Company_Reserves_Condensate)).ToListAsync()).Sum();
+                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
+                ProdList.Add(new {omlname = conType, reserve = reserve});
+            }
+            return ProdList;
+        }
+        
+        [HttpGet("COMPANY_PRODUCTION_OIL_CONDENSATE_PROPOSED")]
+        public async Task<object> COMPANY_PRODUCTION_OIL_CONDENSATE_PROPOSED(string year)
+        {
+            var ProdList = new List<object>();
+            var contractList = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.OML_Name).ToListAsync()).Distinct();
+            foreach (var conType in contractList) {
+                var reserve = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Company_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Condensate.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {omlname = conType, reserve = reserve});
             }
             return ProdList;
@@ -391,10 +430,24 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var contractList = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select a.OML_Name).ToListAsync()).Distinct();
             foreach (var conType in contractList) {
-                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_AG) + Convert.ToDouble(a.Company_Reserves_NAG)).ToListAsync()).Sum();
+                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_AG.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_NAG.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {omlname = conType, reserve = reserve});
             }
             return ProdList;
+        }
+
+        [HttpGet("COMPANY_GAS_PRODUCTION_ACTIVITIE_PROPOSED")]
+        public async Task<object> COMPANY_GAS_PRODUCTION_ACTIVITIE_PROPOSED(string year)
+        {
+            var ProdList = new List<object>();
+            var contractList = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select a.OML_Name).ToListAsync()).Distinct();
+            foreach (var conType in contractList)
+            {
+                var reserve = (await (from a in _context.GAS_PRODUCTION_ACTIVITIEs where a.OML_Name == conType && a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.proposed_production.Replace(",", ""))).ToListAsync()).Sum();
+                ProdList.Add(new { omlname = conType, reserve = reserve });
+            }
+            return ProdList;
+            
         }
 
 
@@ -404,7 +457,7 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var months = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Year_of_WP == year select a.Production_month).ToListAsync()).Distinct();
             foreach (var month in months) {
-                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Production_month == month && a.Year_of_WP == year select Convert.ToDouble(a.Production)).ToListAsync()).Sum();
+                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Production_month == month && a.Year_of_WP == year select Convert.ToDouble(a.Production.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {prodMonth = prodMonth, month = month});
             }
             return ProdList;
@@ -416,7 +469,7 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var terrains = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Year_of_WP == year select a.Terrain).ToListAsync()).Distinct();
             foreach (var terrain in terrains) {
-                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Terrain == terrain && a.Year_of_WP == year select Convert.ToDouble(a.Production)).ToListAsync()).Sum();
+                var prodMonth = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Terrain == terrain && a.Year_of_WP == year select Convert.ToDouble(a.Production.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {prodMonth = prodMonth, terrain = terrain});
             }
             return ProdList;
@@ -429,7 +482,7 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var terrains = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Company_Reserves_Year == year select a.Terrain).ToListAsync()).Distinct();
             foreach (var terrain in terrains) {
-                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Terrain == terrain && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil) + Convert.ToDouble(a.Company_Reserves_Condensate)).ToListAsync()).Sum();
+                var reserve = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Terrain == terrain && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {terrain = terrain, reserve = reserve});
             }
             return ProdList;
@@ -441,7 +494,7 @@ namespace Backend_UMR_Work_Program.Controllers
             var ProdList = new List<object>();
             var contractTypes = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Year_of_WP == year select a.Contract_Type).ToListAsync()).Distinct();
             foreach (var contractType in contractTypes) {
-                var reserve = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Contract_Type == contractType && a.Year_of_WP == year select Convert.ToDouble(a.Production)).ToListAsync()).Sum();
+                var reserve = (await (from a in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities where a.Contract_Type == contractType && a.Year_of_WP == year select Convert.ToDouble(a.Production.Replace(",", ""))).ToListAsync()).Sum();
                 ProdList.Add(new {contractType = contractType, prod = reserve});
             }
             return ProdList;

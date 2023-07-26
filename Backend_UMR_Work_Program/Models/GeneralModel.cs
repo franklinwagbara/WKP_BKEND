@@ -1,4 +1,7 @@
 ﻿using Backend_UMR_Work_Program.DataModels;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Quartz;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Backend_UMR_Work_Program.Models
 {
@@ -38,22 +41,8 @@ namespace Backend_UMR_Work_Program.Models
 		public static string Modification = "MODIFICATION";
 		public static string ActualYear = "Actual Year";
 		public static string ProposedYear = "Proposed Year";
-		public static string PaymentPending = "Payment Confirmation Pending";
-		public static string PaymentCompleted = "PaymentCompleted";
-		public static string Approved = "Approved";
-		public static string Submitted = "Submitted";
-		public static string Processing = "Processing";
-		public static string Rejected = "Rejected";
 		public static string OML = "OML";
 		public static string OPL = "OPL";
-		public static string Initiated = "Initiated";
-		public static string Completed = "Completed";
-		public static string Submit = "Submit";
-		public static string Push = "Push";
-		public static string FinalApproval = "FinalApproval";
-		public static string Approve = "Approve";
-		public static string Reject = "Reject";
-		public static string Delegate = "Delegate";
 		public static string PLANNING_CODE = "ER&SP";
 		public static string HSE_CODE = "HSE&C";
 		public static string LEGAL_CODE = "LGL";
@@ -61,19 +50,210 @@ namespace Backend_UMR_Work_Program.Models
 		public static string EXPOLRATION_CODE = "E&AM";
 		public static string DEVELOPMENT_CODE = "ER&SP";
 		public static string CORPORATE_SERVICE_CODE = "ER&SP";
-		public static string Reviewer = "Reviewer";
-		public static string Supervisor = "Supervisor";
-		public static string Approval = "Approving Authority";
-		public static string FinalApprovalAuthority = "Final Approving Authority";
+		public static string Activated = "Activated";
+		public static string Deactivated = "Deactivated";
+
+		public static class SBU
+		{
+			public const string Accounts = "Accounts";
+			public const string Legal = "Legal";
+		}
+
+		public static class SBU_CODES
+		{
+			public const string WPA = "WPA";
+		}
+
+		public static class RoleName
+		{
+			public const string Accountant = "Accountant";
+		}
+
+        //Application, Payment statuses
+        public static class MAIN_APPLICATION_STATUS
+        {
+
+            public const string Approved = "Approved";
+
+            public const string Rejected = "Rejected";
+
+            public const string ApprovedByFinalAuthority = "Approved By Final Authority";
+            public const string ApprovedByFinalApprovingAuthority = "Approved By Final Approving Authority";
+
+            public const string ReturnedToCompany = "Returned To Company";
+            public const string ReturnedToStaff = "Returned To Staff";
+
+            public const string Processing = "Processing";
+
+            public const string SubmittedByCompany = "Submitted By Company";
+
+            public const string NotSubmitted = "Not Submitted";
+
+            //public static string ApprovalByFinalAuthority = "Approval By Final Authority";
+            //public static string ApprovalByFinalApprovingAuthority = "Approval By Final Approving Authority";
+            //public static string SentBackToCompany = "Sent Back To Company";
+            //public static string SubmissionByCompany = "Submission By Company";
+            //public static string SentBackToStaff = "Sent Back To Staff";
+        }
+
+		public static class APPLICATION_HISTORY_STATUS
+		{
+            public const string ReviewerApproved = "Reviewer Approved";
+            public const string SuppervisorApproved = "Supervisor Approved";
+            public const string ManagerApproved = "Manager Approved";
+            public const string FinalAuthorityApproved = "Final Authority Approved";
+            public const string FinalApprovingAuthorityApproved = "Final Approving Authority Approved";
+            public const string DirectorApproved = "Director Approved";
+            public const string DeputyDirectorApproved = "Deputy Director Approved";
+
+            public const string ReturnedToCompany = "Returned To Company";
+            public const string ReturnedToStaff = "Returned To Staff";
+
+			public const string AddedComment = "Added Comment";
+			
+			//public static string SentBackToCompany = "Application Sent Back To Company";
+			//public static string SentBackToStaff = "Application Sent Back To Staff";
+        }
+
+        public class MyViewModel
+        {
+            public string Description { get; set; }
+            public string Title { get; set; }
+        }
+
+        public static class DESK_PROCESS_STATUS
+        {
+            public const string FinalAuthorityApproved = "Final Authority Approved";
+            public const string FinalApprovingAuthorityApproved = "Final Approving Authority Approved";
+            public const string Pushed = "Pushed";
+            public const string SubmittedByStaff = "Submitted By Staff";
+            public const string Processing = "Processing";
+            public const string SubmittedByCompany = "Submitted By Company";
+        }
+
+        public static class PAYMENT_STATUS
+		{
+            public const string PaymentPending = "Payment Confirmation Pending";
+            public const string PaymentCompleted = "Payment Completed";
+        }
+
+		public static class APPLICATION_ACTION
+		{
+            public const string ReturnToCompany = "Return To Company";
+            public const string ReturnToStaff = "Return To Staff";
+			public const string SubmitApplication = "Submit Application";
+
+            public static string Initiate = "Initiate";
+            public static string Complete = "Complete";
+            public static string Submit = "Submit";
+            public static string Push = "Push";
+            public static string Approve = "Approve";
+            public static string Reject = "Reject";
+            public static string Delegate = "Delegate";
+            public static string AddAComment = "Add a Comment";
+            public static string Move = "Move";
+
+            //public static string SendBackToCompany = "Send Back To Company";
+            //public static string SendBackToStaff = "Send Back To Staff";
+        }
+
+		public static class PAYMENT_CATEGORY
+		{
+            public const string MainPayment = "Main Payment";
+            public const string OtherPayment = "Other Payment";
+            public const string SecondaryPayment = "Secondary Payment";
+        }
+
+		public static class TYPE_OF_FEE
+		{
+			public const string NoFee = "No Fee";
+            public const string SubmissionFee = "Submission Fee";
+            public const string LateSubmissionFee = "Late Submission Fee";
+            public const string ModificationFee = "Modification Fee";
+        }
+
+        //public static class APPLICATION_STATUS__OLD
+        //{
+        //    public static string PaymentPending = "Payment Confirmation Pending";
+        //    public static string PaymentCompleted = "Payment Completed";
+        //    public static string SubmissionFee = "Submission Fee";
+        //    public static string LateSubmissionFee = "Late Submission Fee";
+        //    public static string ModificationFee = "Modification Fee";
+        //    public static string MainPayment = "Main Payment";
+        //    public static string OtherPayment = "Other Payment";
+        //    public static string SecondaryPayment = "Secondary Payment";
+
+        //    public static string Approved = "Approved";
+        //    public static string SubmissionByCompany = "Submission By Company";
+
+        //    public static string SubmissionByStaff = "Submission By Staff";
+        //    public static string ApprovalByFinalAuthority = "Approval By Final Authority";
+        //    public static string ApprovalByFinalApprovingAuthority = "Approval By Final Approving Authority";
+        //    public static string Pushed = "Pushed";
+        //    public static string Processing = "Processing";
+        //    public static string Rejected = "Rejected";
+        //    public static string SendBackToCompany = "Send Back To Company";
+        //    public static string SendBackToStaff = "Send Back To Staff";
+        //    public static string NotSubmitted = "Not Submitted";
+        //    public static string SentBackToCompany = "Sent Back To Company";
+        //    public static string SentBackToStaff = "Sent Back To Staff";
+
+        //    public static string ReviewerApproved = "Reviewer Approved";
+        //    public static string SuppervisorApproved = "Supervisor Approved";
+        //    public static string ManagerApproved = "Manager Approved";
+        //    public static string FinalAuthorityApproved = "Final Authority Approved";
+        //    public static string DirectorApproved = "Director Approved";
+        //    public static string DeputyDirectorApproved = "Deputy Director Approved";
+        //}
 
 
+        //Process flow constants
 
-		//Added by Musa for Testing
-		//public static string CompanyId { get; set; }
-		//public static string WKPCompanyName { get; set; }
-		//public static string WKPCompanyEmail { get; set; }
-		//public static string WKUserRole { get; set; }
-		//public static string WKPCompanyNumber { get; set; }
+        public static class PROCESS_CONSTANTS{
+			public static string Initiated = "Initiated";
+			public static string Completed = "Completed";
+			public static string Submit = "Submit";
+			public static string SubmissionByCompany = "Submission By Company";
+			public static string Submitted = "Submitted";
+			public static string Push = "Push";
+			public static string ApprovedByEC = "Approved By EC";
+			public static string FinalApproval = "FinalApproval";
+			public static string Approve = "Approve";
+			public static string Reject = "Reject";
+			public static string Delegate = "Delegate";
+			public static string Reviewer = "Reviewer";
+			public static string Supervisor = "Supervisor";
+			public static string Approval = "Approving Authority";
+			public static string FinalApprovalAuthority = "Final Approving Authority";
+			public static string AddAComment = "Add a Comment";
+			public static string Move = "Move";
+		}
+
+		public static class ROLE
+		{
+			public static string AD = "AD";
+			public static string Admin = "Admin";
+			public static string Company = "Company";
+			public static string DD = "DD";
+			public static string ExecutiveCommissioner = "Executive Commissioner";
+			public static string FinalAuthority = "Final Authority";
+			public static string FinalApproval = "Final Approval";
+			public static string Reviewer = "Reviewer";
+			public static string SuperAdmin = "SuperAdmin";
+			public static string Supervisor = "Supervisor";
+			public static string WPAMGR = "WPA MGR";
+        }
+		
+
+		public static string CurrencyNGN = "NGN";
+		public static string CurrencyUSD = "USD";
+
+        //public static object APPLICATION_STATUS { get; internal set; }
+
+        public struct Currency { 
+			public static string NGN = "NGN";
+			public static string USD = "USD";
+		}
 
 		public class ActionModel
 		{
@@ -202,7 +382,32 @@ namespace Backend_UMR_Work_Program.Models
 			public string Error { get; set; }
 
 		}
-		public class WorkProgrammeReport2_Model
+
+        public static class ENGAGEMENT_SCHEDULE_STATUS
+        {
+
+			//STATUS OPTIONS
+            public const string OnCompanyDesk = "On Company Desk";
+            public const string OnAdminDesk = "On Admin Desk";
+            public const string Approved = "Approved";
+
+
+
+
+            //COMPLETED OPTIONS
+            public const string NoActionYet = "No Action Yet";
+            public const string Processing = "Processing";
+            public const string CompletlyScheduled = "Completly Scheduled";
+
+
+			//ACTION OPTION
+			public const string ScheduledEngagement = "Scheduled Engagement";
+			public const string UpdatedEngagement = "Updated Engagement";
+            public const string AcceptedEngagement = "Accepted Engagement";
+
+        }
+
+        public class WorkProgrammeReport2_Model
 		{
 			public List<Sum_GEOPHYSICAL_ACTIVITIES_ACQUISITION> Seismic_Data_Approved_and_Acquired { get; set; }
 			public object Seismic_Data_Approved_and_Acquired_PREVIOUS { get; set; }
@@ -344,6 +549,9 @@ namespace Backend_UMR_Work_Program.Models
 			public List<SubmittedDocument> Document { get; set; }
 			public List<StrategicBusinessUnit> SBU { get; set; }
 			public List<Table_Detail> SBU_TableDetails { get; set; }
+			public List<Staff_Model> currentDesks { get; set; }
+			public List<ApplicationSBUApproval> SBUApprovals { get; set; }	
+			public List<staff> staffs { get; set; }
 		}
 		public class Staff_Model
 		{
@@ -353,6 +561,7 @@ namespace Backend_UMR_Work_Program.Models
 			public string Staff_Role { get; set; }
 			public int Sort { get; set; }
 			public int Desk_ID { get; set; }
+			public int StaffID { get; set; }
 		}
 
 		public class ApplicationDeskHistory_Model
@@ -2463,8 +2672,10 @@ namespace Backend_UMR_Work_Program.Models
 			public const string DuplicatePassword = "14";
 			public const string OtpExpired = "15";
 			public const string ExtraPaymentAlreadyExist = "16";
-
-
+			public const string MissingParameter = "17";
+			public const string InvalidParameterPassed = "18";
+			public const string PaymentAlreadyExists = "19";
+			public const string PaymentDoesNotExist = "20";
 		}
 		public class ResponseCodes
 		{

@@ -1,20 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using Backend_UMR_Work_Program.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Backend_UMR_Work_Program.DataModels;
 
 public partial class WKP_DBContext : DbContext
 {
+    public IConfiguration _configuration { get; }
     public WKP_DBContext()
     {
     }
 
-    public WKP_DBContext(DbContextOptions<WKP_DBContext> options)
+    public WKP_DBContext(DbContextOptions<WKP_DBContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
+    public virtual DbSet<AccountDesk> AccountDesks { get; set; }
+    public virtual DbSet<ReturnedApplication> ReturnedApplications { get; set; }
+    public virtual DbSet<LateSubmission> LateSubmission { get; set; }
+    public virtual DbSet<Fee> Fees { get; set; }
+    public virtual DbSet<TypeOfPayments> TypeOfPayments { get; set; }
+    public virtual DbSet<Payments> Payments { get; set; }
+    public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals { get; set; }
+    public virtual DbSet<SBU_Submission> SBU_Submissions { get; set; }
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSEs { get; set; }
 
     public virtual DbSet<ADMIN_ACCIDENT_INCIDENCE_REPORT_CONSEQUENCE> ADMIN_ACCIDENT_INCIDENCE_REPORT_CONSEQUENCEs { get; set; }
@@ -52,6 +64,7 @@ public partial class WKP_DBContext : DbContext
     public virtual DbSet<ADMIN_CONCESSION_STATUS> ADMIN_CONCESSION_STATUSes { get; set; }
 
     public virtual DbSet<ADMIN_DATETIME_PRESENTATION> ADMIN_DATETIME_PRESENTATIONs { get; set; }
+    public virtual DbSet<EnagementScheduledHistory> EnagementScheduledHistorys { get;set; }
 
     public virtual DbSet<ADMIN_DEVELOPMENT_PLAN_STATUS> ADMIN_DEVELOPMENT_PLAN_STATUSes { get; set; }
 
@@ -222,6 +235,8 @@ public partial class WKP_DBContext : DbContext
     public virtual DbSet<ConcessionSituationTwo> ConcessionSituationTwos { get; set; }
 
     public virtual DbSet<Contract_Type> Contract_Types { get; set; }
+
+    public virtual DbSet<DECOMMISSIONING_ABANDONMENT> DECOMMISSIONING_ABANDONMENTs { get; set; }
 
     public virtual DbSet<DRILLING_EACH_WELL_COST> DRILLING_EACH_WELL_COSTs { get; set; }
 
@@ -929,10 +944,39 @@ public partial class WKP_DBContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=tcp:staging-servers.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=serveradmin;Password=*123*brandonetech#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+        => optionsBuilder.UseSqlServer(_configuration["Data:Wkpconnect:ConnectionString"]);
 
+    
+    //"Server=tcp:workprogram.database.windows.net,1433;Initial Catalog=workprogram;Persist Security Info=False;User ID=workprogram;Password=Br@nd0ne;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ApplicationSBUApproval>(entity =>
+        {
+            entity.ToTable("ApplicationSBUApproval");
+
+            //entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.Property(e => e.AppId).HasColumnName("AppId");
+            entity.Property(e => e.StaffID).HasColumnName("StaffID");
+            entity.Property(e => e.Comment).HasColumnName("Comment");
+            entity.Property(e => e.Status).HasColumnName("Status");
+            entity.Property(e => e.AppAction).HasColumnName("AppAction");
+            entity.Property(e => e.DeskID).HasColumnName("DeskID");
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<SBU_Submission>(entity =>
+        {
+            entity.ToTable("SBU_Submission");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.ProcessStatus).HasMaxLength(100);
+            entity.Property(e => e.SBU_ID).HasColumnName("SBU_ID");
+            entity.Property(e => e.StaffID).HasColumnName("StaffID");
+        });
+
         modelBuilder.Entity<ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE>(entity =>
         {
             entity.ToTable("ADMIN_ACCIDENT_INCIDENCE_REPORT_CAUSE");
@@ -4358,7 +4402,7 @@ public partial class WKP_DBContext : DbContext
             entity.Property(e => e.proposed_year)
                 .HasMaxLength(300)
                 .IsUnicode(false);
-            entity.Property(e => e.spud_date).HasColumnType("date");
+            //entity.Property(e => e.spud_date).HasColumnType("date");
             entity.Property(e => e.well_cost)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -6480,6 +6524,16 @@ public partial class WKP_DBContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.RemarkIfNoEMP)
                 .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.eMUploadName)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.eMUploadPath)
+                .IsUnicode(false);
+            entity.Property(e => e.OSCPUploadName)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.OSCPUploadPath)
                 .IsUnicode(false);
             entity.Property(e => e.Updated_by)
                 .HasMaxLength(100)
@@ -9744,9 +9798,8 @@ public partial class WKP_DBContext : DbContext
             entity.Property(e => e.Project_Stage)
                 .HasMaxLength(500)
                 .IsUnicode(false);
-            entity.Property(e => e.Project_Timeline)
-                .HasMaxLength(500)
-                .IsUnicode(false);
+            entity.Property(e => e.Project_Timeline_StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Project_Timeline_EndDate).HasColumnType("datetime");
             entity.Property(e => e.Proposed_Capital_Expenditure_NGN)
                 .HasMaxLength(500)
                 .IsUnicode(false);

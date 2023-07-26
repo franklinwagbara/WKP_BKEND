@@ -31,15 +31,18 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+//RotativaConfiguration.Setup(env);
+
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 //}
 
 app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
+app.UseAuthentication();
 app.UseAuthorization();
 //app.MapControllers();
 

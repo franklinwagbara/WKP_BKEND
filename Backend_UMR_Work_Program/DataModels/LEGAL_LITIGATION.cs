@@ -37,6 +37,10 @@ public partial class LEGAL_LITIGATION
 
     public string? Any_orders_made_so_far_by_the_court { get; set; }
 
+    public string? Any_subsisting_orders_of_court { get; set; }
+
+    public string? Order_of_the_court { get; set; }
+
     public string? Potential_outcome { get; set; }
 
     public string? Created_by { get; set; }

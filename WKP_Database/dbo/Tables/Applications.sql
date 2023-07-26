@@ -6,7 +6,7 @@
     [FieldID]          INT            NULL,
     [CategoryID]       INT            NOT NULL,
     [YearOfWKP]        INT            NOT NULL,
-    [Status]           NVARCHAR (25)  NOT NULL,
+    [Status]           NVARCHAR (100)  NOT NULL,
     [PaymentStatus]    VARCHAR (50)   NOT NULL,
     [CurrentDesk]      INT            NULL,
     [Submitted]        BIT            NULL,
@@ -19,6 +19,9 @@
     [DeletedAt]        DATETIME       NULL,
     [FlowStageId]      INT            NULL,
     [CurrentUserEmail] NVARCHAR (100) NULL,
+    [ProcessingStage]  NCHAR (100)    NULL,
     CONSTRAINT [PK_Applications] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
