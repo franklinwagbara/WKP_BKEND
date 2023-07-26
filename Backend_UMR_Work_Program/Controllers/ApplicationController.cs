@@ -115,6 +115,10 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpPost("ADD_COMMENT_BY_COMPANY")]
         public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
+            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, false, WKPCompanyNumber, true);
+
+        [HttpPost("ADD_COMMENT_BY_STAFF")]
+        public async Task<WebApiResponse> ADD_COMMENT_BY_STAFF(int appId, int? staffId, string comment, string? selectedTables)
             => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
 
         [HttpGet("GET_SENDBACK_COMMENTS")]
@@ -135,6 +139,11 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpPost("SUBMIT_APPLICATION")]
         public async Task<WebApiResponse> SubmitApplication(int appId) => await _applicationService.SubmitApplication(appId);
+
+        [HttpPost("RETURN_APPLICATION_TO_STAFF")]
+        public async Task<object> ReturnApplicationToStaff(/*[FromBody] ActionModel model,*/ int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
+            => await _applicationService.ReturnApplicationToStaff(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber, WKPCompanyName, WKPCompanyEmail);
+
 
         //Rework
         [HttpGet("All-Applications")] //For general application view
@@ -412,6 +421,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
+                                           StaffID = stf.StaffID
                                        }).ToListAsync();
 
                 var staffs = await _context.staff.ToListAsync();
@@ -462,9 +472,6 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-        [HttpPost("RETURN_APPLICATION_TO_STAFF")]
-        public async Task<object> ReturnApplicationToStaff(/*[FromBody] ActionModel model,*/ int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
-            => await _applicationService.ReturnApplicationToStaff(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber, WKPCompanyName, WKPCompanyEmail);
 
         // [HttpPost("ApproveApplication")]
         // public async Task<object> ApproveApplication(int deskID, string comment, string[] selectedApps)
