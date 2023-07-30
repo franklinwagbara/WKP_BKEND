@@ -11,8 +11,8 @@ namespace Backend_UMR_Work_Program.Models
         public int? ConcessionId { get; set; }
         public int? FieldId { get; set; }
         public int TypeOfPaymentId { get; set; }
-        public string AmountNGN { get; set; }
-        public string AmountUSD { get; set; }
+        public string? AmountNGN { get; set; }
+        public string? AmountUSD { get; set; }
         public DateTime TransactionDate { get; set; }
         public string? TransactionId { get; set; }
         public string? RRR { get; set; }
@@ -22,7 +22,7 @@ namespace Backend_UMR_Work_Program.Models
         public string? AccountNumber { get; set; }
         public string? BankCode { get; set; }
         public string? Status { get; set; }
-        public string Currency { get; set; }
+        public string? Currency { get; set; }
         public DateTime? PaymentDate { get; set; }
 
         [ForeignKey("TypeOfPaymentId")]

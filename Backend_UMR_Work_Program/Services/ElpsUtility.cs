@@ -234,7 +234,6 @@ namespace Backend_UMR_Work_Program.Services
 				var encrpt = $"{_appSettings.AppEmail}{_appSettings.SecreteKey}";
 				var apiHash = MyUtils.GenerateSha512(encrpt);
 				var request = new RestRequest($"/api/Accounts/Staff/{email}/{_appSettings.AppEmail}/{apiHash}", Method.Get);
-				;
 
 				var client = new RestClient(_appSettings.elpsBaseUrl);
 				//_generalLogger.LogRequest($"{"About to GetCompanyDetail On Elps with Email => "}{" "}{" - "}{DateTime.Now}", false, directory);

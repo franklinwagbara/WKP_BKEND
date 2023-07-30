@@ -110,6 +110,7 @@ namespace Backend_UMR_Work_Program.Models
             public const string ReturnedToStaff = "Returned To Staff";
 
 			public const string AddedComment = "Added Comment";
+			public const string CompanyReSubmitted = "Company Resubmitted";
 			
 			//public static string SentBackToCompany = "Application Sent Back To Company";
 			//public static string SentBackToStaff = "Application Sent Back To Staff";
@@ -152,6 +153,7 @@ namespace Backend_UMR_Work_Program.Models
             public static string Delegate = "Delegate";
             public static string AddAComment = "Add a Comment";
             public static string Move = "Move";
+			public static string CompanyReSubmit = "Company Resubmit";
 
             //public static string SendBackToCompany = "Send Back To Company";
             //public static string SendBackToStaff = "Send Back To Staff";
