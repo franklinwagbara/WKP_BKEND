@@ -905,10 +905,17 @@ namespace Backend_UMR_Work_Program.Services
                             //Save Application history
                             _helperService.SaveApplicationHistory(application.Id, currentStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToCompany, comment, RejectedTables, false, null, APPLICATION_ACTION.ReturnToCompany);
 
+                            //send email to staff
                             string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                             string content = $"{WKPCompanyName} returned WORK PROGRAM application for year {application.YearOfWKP}.";
                             var emailMsg = _helperService.SaveMessage(application.Id, currentStaff.StaffID, subject, content, "Staff");
-                            var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.FirstName, emailMsg, null);
+                            var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.Name, emailMsg, null);
+
+                            //send email to company
+                            string subject2 = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) was returned.";
+                            string content2 = $"You WORK PROGRAM application for year {application.YearOfWKP} was returned.";
+                            var emailMsg2 = _helperService.SaveMessage(application.Id, Company.Id, subject, content, "Company");
+                            var sendEmail2 = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
 
                             _helperService.LogMessages("Returned application with REF : " + application.ReferenceNo, WKPCompanyEmail);
                         }
@@ -1281,7 +1288,7 @@ namespace Backend_UMR_Work_Program.Services
                     return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Application does not exist.", StatusCode = ResponseCodes.RecordNotFound };
 
                 var payment = await _dbContext.Payments.Include(x => x.PaymentType).Where(x => x.AppId == app.Id && x.PaymentType.Category == PAYMENT_CATEGORY.OtherPayment).FirstOrDefaultAsync();
-                var returnedApp = await _dbContext.ReturnedApplications.Where(x => x.AppId == app.Id).FirstOrDefaultAsync();
+                var returnedApp = await _dbContext.ReturnedApplications.Include(x => x.Staff).Where(x => x.AppId == app.Id).FirstOrDefaultAsync();
                 if (payment == null)
                     return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Payment does not exist.", StatusCode = ResponseCodes.RecordNotFound };
 
@@ -1297,6 +1304,21 @@ namespace Backend_UMR_Work_Program.Services
                     "Company has resubmitted the Application.", returnedApp?.SelectedTables, true, app.Company.Id, APPLICATION_ACTION.CompanyReSubmit, true);
 
                 //Send email to both staff and company affected
+                //sending mail to company
+                string subject = $"Re-Submission of WORK PROGRAM application with ref: {app.ReferenceNo} ({app.Concession.Concession_Held} - {app.YearOfWKP}).";
+                string content = $"{app.Company.NAME} re-submitted WORK PROGRAM application for year {app.YearOfWKP} with Reference Number {app.ReferenceNo}.";
+                var emailMsg = _helperService.SaveMessage(app.Id, app.Company.Id, subject, content, "Company");
+                var sendEmail = _helperService.SendEmailMessage(app.Company.EMAIL, app.Company.NAME, emailMsg, null);
+
+
+                //sending mail to staff
+                string subject2 = $"Re-Submission of WORK PROGRAM application with ref: {app.ReferenceNo} ({app.Concession.Concession_Held} - {app.YearOfWKP}).";
+                string content2 = $"{app.Company.NAME} re-submitted WORK PROGRAM application for year {app.YearOfWKP} with Reference Number {app.ReferenceNo}.";
+                var emailMsg2 = _helperService.SaveMessage(app.Id, returnedApp.Staff.StaffID, subject, content, "Staff");
+                var sendEmail2 = _helperService.SendEmailMessage(returnedApp.Staff.StaffEmail, returnedApp.Staff.Name, emailMsg, null);
+
+                _helperService.LogMessages("Re-submitted application with REF : " + app.ReferenceNo, app.Company.EMAIL);
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = $"{app.Concession.ConcessionName}/{app.Field?.Field_Name}", Message = "Application was successfully resubmitted!", StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
