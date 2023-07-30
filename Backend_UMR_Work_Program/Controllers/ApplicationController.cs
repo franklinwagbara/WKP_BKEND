@@ -147,14 +147,9 @@ namespace Backend_UMR_Work_Program.Controllers
             => await _applicationService.ReturnApplicationToStaff(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber, WKPCompanyName, WKPCompanyEmail);
 
         [HttpPost("RESUBMIT_APPLICATION_WITHOUT_FEE")]
-        public async Task<IActionResult> ReSubmitApplicationWithoutFee(int? concessionId, int? fieldId)
+        public async Task<WebApiResponse> ReSubmitApplicationWithoutFee(int? concessionId, int? fieldId)
         {
-            var res = await _applicationService.ReSubmitApplicationWithoutFee(concessionId, fieldId);
-
-            if (res.ResponseCode != AppResponseCodes.Success)
-                return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
-
-            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
+            return await _applicationService.ReSubmitApplicationWithoutFee(concessionId, fieldId);
         }
 
         //Rework

@@ -47,6 +47,12 @@ public partial class staff
     [ForeignKey("Staff_SBU")]
     public StrategicBusinessUnit? StrategicBusinessUnit { get; set; }
 
+    [NotMapped]
+    private string _name;
+
+    [NotMapped]
+    public string? Name { get { return LastName + ", " + FirstName; } set { _name = value; } }
+
     //[ForeignKey("Id")]
     //public Role? Role { get; set; }
 }
