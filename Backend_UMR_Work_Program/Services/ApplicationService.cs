@@ -210,7 +210,7 @@ namespace Backend_UMR_Work_Program.Services
                             string emailSubject = $"{year} submission of WORK PROGRAM application for {company.COMPANY_NAME} field - {field?.Field_Name} : {app.ReferenceNo}";
                             string emailContent = $"{company.COMPANY_NAME} have submitted their WORK PROGRAM application for year {year}.";
                             var emailMessage = _helperService.SaveMessage(app.Id, staff.StaffID, emailSubject, emailContent, "Staff");
-                            //var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
+                            var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
 
                             _helperService.LogMessages("Submission of application with REF : " + app.ReferenceNo, company.EMAIL);
                         }
@@ -235,7 +235,7 @@ namespace Backend_UMR_Work_Program.Services
                     string subject = $"{year} submission of WORK PROGRAM application for field - {field?.Field_Name} : {app.ReferenceNo}";
                     string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
                     var emailMsg = _helperService.SaveMessage(app.Id, Convert.ToInt32(company.Id), subject, content, "Company");
-                    //var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
+                    var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
                     var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
 
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
@@ -507,18 +507,13 @@ namespace Backend_UMR_Work_Program.Services
 
                     if(submittedApp != null)
                     {
-                        var returnToCompanyAppHistory = await _dbContext.ApplicationDeskHistories
-                                        .Where(x => x.AppId == submittedApp.Id 
-                                        && x.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany).FirstOrDefaultAsync();
-
-                        var selectedTables = returnToCompanyAppHistory?.SelectedTables?.Split('|').ToList();
+                        var returnApp = await _dbContext.ReturnedApplications.Where(x => x.AppId == submittedApp.Id).FirstOrDefaultAsync();
+                        var selectedTables = returnApp?.SelectedTables?.Split('|').ToList();
 
                         var res = new FormLock
                         {
                             disableSubmission = submittedApp != null,
-                            enableReSubmission = returnToCompanyAppHistory != null 
-                                                && (returnToCompanyAppHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany 
-                                                || submittedApp.PaymentStatus == PAYMENT_STATUS.PaymentPending) ? true : false,
+                            enableReSubmission = returnApp == null ? false : true,
                             formsToBeEnabled = selectedTables
                         };
 
@@ -913,7 +908,7 @@ namespace Backend_UMR_Work_Program.Services
                             string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                             string content = $"{WKPCompanyName} returned WORK PROGRAM application for year {application.YearOfWKP}.";
                             var emailMsg = _helperService.SaveMessage(application.Id, currentStaff.StaffID, subject, content, "Staff");
-                            //var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.FirstName, emailMsg, null);
+                            var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.FirstName, emailMsg, null);
 
                             _helperService.LogMessages("Returned application with REF : " + application.ReferenceNo, WKPCompanyEmail);
                         }
@@ -1274,6 +1269,40 @@ namespace Backend_UMR_Work_Program.Services
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while rejecting application." + e.Message.ToString(), StatusCode = ResponseCodes.Badrequest };
             }
 
+        }
+
+        public async Task<WebApiResponse> ReSubmitApplicationWithoutFee(int? concessionId, int? fieldId)
+        {
+            try
+            {
+                var app = await _dbContext.Applications.Include(x => x.Company).Include(x => x.Concession).Include(x => x.Field).Where(x => x.ConcessionID == concessionId && x.FieldID == fieldId).FirstOrDefaultAsync();
+                
+                if(app == null)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Application does not exist.", StatusCode = ResponseCodes.RecordNotFound };
+
+                var payment = await _dbContext.Payments.Include(x => x.PaymentType).Where(x => x.AppId == app.Id && x.PaymentType.Category == PAYMENT_CATEGORY.OtherPayment).FirstOrDefaultAsync();
+                var returnedApp = await _dbContext.ReturnedApplications.Where(x => x.AppId == app.Id).FirstOrDefaultAsync();
+                if (payment == null)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Payment does not exist.", StatusCode = ResponseCodes.RecordNotFound };
+
+                //Delete NO FEE payment record
+                _dbContext.Payments.Remove(payment);
+                _dbContext.ReturnedApplications.Remove(returnedApp);
+
+                app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
+                _dbContext.Applications.Update(app);
+                _dbContext.SaveChanges();
+
+                _helperService.SaveApplicationHistory(app.Id, app.Company.Id, APPLICATION_HISTORY_STATUS.CompanyReSubmitted, 
+                    "Company has resubmitted the Application.", returnedApp?.SelectedTables, true, app.Company.Id, APPLICATION_ACTION.CompanyReSubmit, true);
+
+                //Send email to both staff and company affected
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = $"{app.Concession.ConcessionName}/{app.Field?.Field_Name}", Message = "Application was successfully resubmitted!", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while rejecting application." + e.Message.ToString(), StatusCode = ResponseCodes.Badrequest };
+            }
         }
 
         //[HttpPost("ApproveApplication")]

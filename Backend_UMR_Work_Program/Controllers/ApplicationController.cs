@@ -35,6 +35,7 @@ namespace Backend_UMR_Work_Program.Controllers
         private readonly AppProcessFlowService _appProcessFlowService;
         private readonly ApplicationService _applicationService;
         private readonly HelperService _helperService;
+        private readonly AppSettings _appSettings;
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
@@ -56,6 +57,7 @@ namespace Backend_UMR_Work_Program.Controllers
             _appProcessFlowService = appProcessFlowService;
             _applicationService = applicationService;
             _helperService = helperService;
+            _appSettings = appsettings.Value;
         }
 
 
@@ -144,6 +146,16 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> ReturnApplicationToStaff(/*[FromBody] ActionModel model,*/ int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
             => await _applicationService.ReturnApplicationToStaff(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber, WKPCompanyName, WKPCompanyEmail);
 
+        [HttpPost("RESUBMIT_APPLICATION_WITHOUT_FEE")]
+        public async Task<IActionResult> ReSubmitApplicationWithoutFee(int? concessionId, int? fieldId)
+        {
+            var res = await _applicationService.ReSubmitApplicationWithoutFee(concessionId, fieldId);
+
+            if (res.ResponseCode != AppResponseCodes.Success)
+                return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
+
+            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
+        }
 
         //Rework
         [HttpGet("All-Applications")] //For general application view
@@ -399,13 +411,14 @@ namespace Backend_UMR_Work_Program.Controllers
                                        join rol in _context.Roles on stf.RoleID equals rol.id
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
                                        where dsk.HasWork == true && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
-                                       select new Staff_Model
+                                       select new 
                                        {
                                            Desk_ID = dsk.DeskID,
                                            Staff_Name = stf.LastName + ", " + stf.FirstName,
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
+                                           deskStatus = dsk.ProcessStatus
                                        }).ToListAsync();
 
                 var staffDesk = await (from dsk in _context.MyDesks

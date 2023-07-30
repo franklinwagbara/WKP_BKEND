@@ -52,7 +52,6 @@ namespace Backend_UMR_Work_Program.Services
                 _dbContext.ReturnedApplications.Add(rApp);
 
                 //update application status
-                //app.Status = GeneralModel.APPLICATION_STATUS.SentBackToCompany;
                 app.PaymentStatus = typeOfPayment.Name == TYPE_OF_FEE.NoFee? app.PaymentStatus : PAYMENT_STATUS.PaymentPending;
                 app.UpdatedAt= DateTime.Now;
 
