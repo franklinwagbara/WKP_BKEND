@@ -899,6 +899,7 @@ namespace Backend_UMR_Work_Program.Services
                             //Update Staffs Desk
                             //todo: update desk status
                             staffDesk.Comment = comment;
+                            staffDesk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToCompany;
                             _dbContext.MyDesks.Update(staffDesk);
                             _dbContext.SaveChanges();
 

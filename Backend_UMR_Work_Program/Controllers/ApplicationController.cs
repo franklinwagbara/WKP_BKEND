@@ -422,14 +422,15 @@ namespace Backend_UMR_Work_Program.Controllers
                                        join rol in _context.Roles on stf.RoleID equals rol.id
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
                                        where admin.Id == WKPCompanyNumber && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
-                                          select new Staff_Model
+                                          select new
                                        {
                                            Desk_ID = dsk.DeskID,
                                            Staff_Name = stf.LastName + ", " + stf.FirstName,
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
-                                           StaffID = stf.StaffID
+                                           StaffID = stf.StaffID,
+                                           internalStatus = dsk.ProcessStatus
                                        }).ToListAsync();
 
                 var staffs = await _context.staff.ToListAsync();
@@ -469,6 +470,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     SBU = await _context.StrategicBusinessUnits.ToListAsync(),
                     SBUApprovals = sbuApprovals,
                     staffs = staffs,
+                    staffDesk = staffDesk[0],
                 };
 
                 return new WebApiResponse { Data = appDetails, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
