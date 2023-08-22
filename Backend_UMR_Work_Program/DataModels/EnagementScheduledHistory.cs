@@ -1,4 +1,6 @@
-﻿namespace Backend_UMR_Work_Program.DataModels
+﻿using Backend_UMR_Work_Program.Models;
+
+namespace Backend_UMR_Work_Program.DataModels
 {
     public class EnagementScheduledHistory
     {
@@ -23,7 +25,7 @@
         public EnagementScheduledHistory()
         {
             createdTime = DateTime.Now;
-            action = "Scheduled Engagement";
+            action = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.ScheduledEngagement;
             comment = "Request for an engangement";
             MEETINGROOM = "Not Yet Selected";
 

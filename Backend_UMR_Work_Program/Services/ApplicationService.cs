@@ -210,7 +210,7 @@ namespace Backend_UMR_Work_Program.Services
                             string emailSubject = $"{year} submission of WORK PROGRAM application for {company.COMPANY_NAME} field - {field?.Field_Name} : {app.ReferenceNo}";
                             string emailContent = $"{company.COMPANY_NAME} have submitted their WORK PROGRAM application for year {year}.";
                             var emailMessage = _helperService.SaveMessage(app.Id, staff.StaffID, emailSubject, emailContent, "Staff");
-                            //var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
+                            var sendEmail2 = _helperService.SendEmailMessage(staff.StaffEmail, staff.FirstName, emailMessage, null);
 
                             _helperService.LogMessages("Submission of application with REF : " + app.ReferenceNo, company.EMAIL);
                         }
@@ -235,7 +235,7 @@ namespace Backend_UMR_Work_Program.Services
                     string subject = $"{year} submission of WORK PROGRAM application for field - {field?.Field_Name} : {app.ReferenceNo}";
                     string content = $"You have successfully submitted your WORK PROGRAM application for year {year}, and it is currently being reviewed.";
                     var emailMsg = _helperService.SaveMessage(app.Id, Convert.ToInt32(company.Id), subject, content, "Company");
-                    //var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
+                    var sendEmail = _helperService.SendEmailMessage(company.EMAIL, company.COMPANY_NAME, emailMsg, null);
                     var responseMsg = field != null ? $"{year} Application for field {field?.Field_Name} has been submitted successfully." : $"{year} Application for concession: ({concession.ConcessionName}) has been submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
 
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
@@ -266,7 +266,6 @@ namespace Backend_UMR_Work_Program.Services
         {
             try
             {
-
                 staff staffActing = (from stf in _dbContext.staff
                                         join dsk in _dbContext.MyDesks on stf.StaffID equals dsk.StaffID
                                         where dsk.DeskID == deskID
@@ -280,9 +279,9 @@ namespace Backend_UMR_Work_Program.Services
                         string appID = b.Replace('[', ' ').Replace(']', ' ').Trim();
                         int appId = int.Parse(appID);
                         //get current staff desk
-                        var staffDesk = _dbContext.MyDesks.Include(x => x.Staff).Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
-                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
-                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var staffDesk = await _dbContext.MyDesks.Include(x => x.Staff).Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefaultAsync();
+                        var application = await _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefaultAsync();
+                        var Company = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefaultAsync();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
                         var ownerOfDesk = await _dbContext.staff.Where(x => x.StaffID == staffDesk.StaffID).FirstOrDefaultAsync();
 
@@ -335,7 +334,6 @@ namespace Backend_UMR_Work_Program.Services
                                         Comment = comment,
                                         LastJobDate = DateTime.Now,
                                         ProcessStatus = DESK_PROCESS_STATUS.SubmittedByStaff,
-
                                     };
 
                                     deskTemp = desk;
@@ -348,7 +346,6 @@ namespace Backend_UMR_Work_Program.Services
                                 await _helperService.UpdateDeskAfterPush(staffDesk, comment, DESK_PROCESS_STATUS.Pushed);
 
                                 _helperService.SaveApplicationHistory(application.Id, staffActing.StaffID, DESK_PROCESS_STATUS.Pushed, comment, null, false, null, PROCESS_CONSTANTS.Push);
-                                //_helperService.SaveApplicationHistory(application.Id, staffActing.StaffID, GeneralModel.APPLICATION_STATUS.Pushed, comment, null, false, null, GeneralModel.PROCESS_CONSTANTS.Push);
 
                                 string subject = $"Push action was taken for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                 string content = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) has been pushed by a staff to the next processing level.";
@@ -510,18 +507,13 @@ namespace Backend_UMR_Work_Program.Services
 
                     if(submittedApp != null)
                     {
-                        var returnToCompanyAppHistory = await _dbContext.ApplicationDeskHistories
-                                        .Where(x => x.AppId == submittedApp.Id 
-                                        && x.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany).FirstOrDefaultAsync();
-
-                        var selectedTables = returnToCompanyAppHistory?.SelectedTables?.Split('|').ToList();
+                        var returnApp = await _dbContext.ReturnedApplications.Where(x => x.AppId == submittedApp.Id).FirstOrDefaultAsync();
+                        var selectedTables = returnApp?.SelectedTables?.Split('|').ToList();
 
                         var res = new FormLock
                         {
                             disableSubmission = submittedApp != null,
-                            enableReSubmission = returnToCompanyAppHistory != null 
-                                                && (returnToCompanyAppHistory.Status == APPLICATION_HISTORY_STATUS.ReturnedToCompany 
-                                                || submittedApp.PaymentStatus == PAYMENT_STATUS.PaymentPending) ? true : false,
+                            enableReSubmission = returnApp == null ? false : true,
                             formsToBeEnabled = selectedTables
                         };
 
@@ -907,16 +899,24 @@ namespace Backend_UMR_Work_Program.Services
                             //Update Staffs Desk
                             //todo: update desk status
                             staffDesk.Comment = comment;
+                            staffDesk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToCompany;
                             _dbContext.MyDesks.Update(staffDesk);
                             _dbContext.SaveChanges();
 
                             //Save Application history
                             _helperService.SaveApplicationHistory(application.Id, currentStaff.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToCompany, comment, RejectedTables, false, null, APPLICATION_ACTION.ReturnToCompany);
 
+                            //send email to staff
                             string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                             string content = $"{WKPCompanyName} returned WORK PROGRAM application for year {application.YearOfWKP}.";
                             var emailMsg = _helperService.SaveMessage(application.Id, currentStaff.StaffID, subject, content, "Staff");
-                            //var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.FirstName, emailMsg, null);
+                            var sendEmail = _helperService.SendEmailMessage(currentStaff.StaffEmail, currentStaff.Name, emailMsg, null);
+
+                            //send email to company
+                            string subject2 = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) was returned.";
+                            string content2 = $"You WORK PROGRAM application for year {application.YearOfWKP} was returned.";
+                            var emailMsg2 = _helperService.SaveMessage(application.Id, Company.Id, subject, content, "Company");
+                            var sendEmail2 = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
 
                             _helperService.LogMessages("Returned application with REF : " + application.ReferenceNo, WKPCompanyEmail);
                         }
@@ -1045,8 +1045,8 @@ namespace Backend_UMR_Work_Program.Services
                         var targetStaff = await _dbContext.staff.Where<staff>(s => s.StaffID == targetStaffID && s.DeleteStatus != true).FirstOrDefaultAsync();
                         var sourceStaffDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == sourceStaff.StaffID && d.AppId == appId).FirstOrDefaultAsync();
                         var targetStaffDesk = await _dbContext.MyDesks.Where<MyDesk>(d => d.StaffID == targetStaff.StaffID && d.AppId == appId).FirstOrDefaultAsync();
-                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
-                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var application = await _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefaultAsync();
+                        var Company = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefaultAsync();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
 
                         if (sourceStaff == null || targetStaff == null || appID == null)
@@ -1104,24 +1104,21 @@ namespace Backend_UMR_Work_Program.Services
                         var save = await _dbContext.SaveChangesAsync();
                         if (save > 0)
                         {
-                            var result = await _helperService.DeleteDeskByDeskId(sourceDesk.DeskID);
-                            //await _helpersController.UpdateDeskAfterMove(sourceDesk, sourceDesk.Comment, STAFF_DESK_STATUS.MOVED);
+                            await _helperService.DeleteDeskByDeskId(sourceDesk.DeskID);
                         }
 
-                        //_helpersController.SaveHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null);
                         _helperService.SaveApplicationHistory(application.Id, sourceStaffID, sourceDesk.ProcessStatus, sourceDesk.Comment, null, false, null, APPLICATION_ACTION.Move);
-
 
                         string subject = $"Re-assignment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
 
                         //Send mail to target Staff
                         string content = "Application with REF : " + application.ReferenceNo + " was moved from " + sourceStaff.LastName + ", " + sourceStaff.FirstName + "'s desk to " + targetStaff.LastName + ", " + targetStaff.FirstName;
                         var emailMsg = _helperService.SaveMessage(application.Id, targetStaffID, subject, content, "Staff");
-                        //var sendEmail = _helperService.SendEmailMessage(targetStaff.StaffEmail, targetStaff.LastName + ", " + targetStaff.FirstName, emailMsg, null);
+                        var sendEmail = _helperService.SendEmailMessage(targetStaff.StaffEmail, targetStaff.LastName + ", " + targetStaff.FirstName, emailMsg, null);
 
                         //Send mail to source staff
                         var emailMsg_Source = _helperService.SaveMessage(application.Id, sourceStaffID, subject, content, "Staff");
-                        //var sendEmail_Source = _helperService.SendEmailMessage(sourceStaff.StaffEmail, sourceStaff.LastName + ", " + sourceStaff.FirstName, emailMsg_Source, null);
+                        var sendEmail_Source = _helperService.SendEmailMessage(sourceStaff.StaffEmail, sourceStaff.LastName + ", " + sourceStaff.FirstName, emailMsg_Source, null);
 
                         _helperService.LogMessages("Application with REF : " + application.ReferenceNo + " was moved from " + sourceStaff.LastName + ", " + sourceStaff.FirstName + "'s desk to " + targetStaff.LastName + ", " + targetStaff.FirstName);
                     }
@@ -1167,19 +1164,18 @@ namespace Backend_UMR_Work_Program.Services
                     {
                         int appId = b != "undefined" ? int.Parse(b) : 0;
 
-                        var LoggedInStaff = (from stf in _dbContext.staff
-                                             join admin in _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
-                                             join role in _dbContext.Roles on stf.RoleID equals role.id
-                                             where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true
-                                             select stf).FirstOrDefault();
+                        var LoggedInStaff = await (from stf in _dbContext.staff join admin in
+                                                   _dbContext.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id 
+                                                   join role in _dbContext.Roles on stf.RoleID equals role.id 
+                                                   where stf.AdminCompanyInfo_ID == WKPCompanyNumber && stf.DeleteStatus != true select stf).FirstOrDefaultAsync();
 
-                        var staffDesk = _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefault();
-                        var application = _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefault();
-                        var Company = _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefault();
+                        var staffDesk = await _dbContext.MyDesks.Where(a => a.DeskID == deskID && a.AppId == appId).FirstOrDefaultAsync();
+                        var application = await _dbContext.Applications.Where(a => a.Id == appId).FirstOrDefaultAsync();
+                        var Company = await _dbContext.ADMIN_COMPANY_INFORMATIONs.Where(p => p.Id == application.CompanyID).FirstOrDefaultAsync();
                         var concession = await (from d in _dbContext.ADMIN_CONCESSIONS_INFORMATIONs where d.Consession_Id == application.ConcessionID select d).FirstOrDefaultAsync();
 
-                        var LoggedInStaffSBU = _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefault();
-                        var LoggedInStaffRole = _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefault();
+                        var LoggedInStaffSBU = await _dbContext.StrategicBusinessUnits.Where<StrategicBusinessUnit>(s => s.Id == LoggedInStaff.Staff_SBU).FirstOrDefaultAsync();
+                        var LoggedInStaffRole = await _dbContext.Roles.Where<Role>(r => r.id == LoggedInStaff.RoleID).FirstOrDefaultAsync();
                         string returnedTables = await _processFlowService.getTableNames(selectedTables);
 
                         //Determine if the app is on a reviewer's desk
@@ -1187,7 +1183,7 @@ namespace Backend_UMR_Work_Program.Services
 
                         if ((LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER1 || LoggedInStaffSBU?.Tier == PROCESS_TIER.TIER2) && fromWPAReviewer != true)
                         {
-                            var staffWithAppOnDesk = (from stf in _dbContext.staff where stf.StaffID == staffDesk.StaffID select stf).FirstOrDefault();
+                            var staffWithAppOnDesk = await (from stf in _dbContext.staff where stf.StaffID == staffDesk.StaffID select stf).FirstOrDefaultAsync();
                             var staffWithAppOnDeskSBU = await (from sb in _dbContext.StrategicBusinessUnits where sb.Id == staffWithAppOnDesk.Staff_SBU select sb).FirstOrDefaultAsync();
 
                             var targetDesk = await _dbContext.MyDesks.Where(x => x.StaffID == staffDesk.FromStaffID && x.AppId == appId).FirstOrDefaultAsync();
@@ -1281,6 +1277,55 @@ namespace Backend_UMR_Work_Program.Services
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while rejecting application." + e.Message.ToString(), StatusCode = ResponseCodes.Badrequest };
             }
 
+        }
+
+        public async Task<WebApiResponse> ReSubmitApplicationWithoutFee(int? concessionId, int? fieldId)
+        {
+            try
+            {
+                var app = await _dbContext.Applications.Include(x => x.Company).Include(x => x.Concession).Include(x => x.Field).Where(x => x.ConcessionID == concessionId && x.FieldID == fieldId).FirstOrDefaultAsync();
+                
+                if(app == null)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Application does not exist.", StatusCode = ResponseCodes.RecordNotFound };
+
+                var payment = await _dbContext.Payments.Include(x => x.PaymentType).Where(x => x.AppId == app.Id && x.PaymentType.Category == PAYMENT_CATEGORY.OtherPayment).FirstOrDefaultAsync();
+                var returnedApp = await _dbContext.ReturnedApplications.Include(x => x.Staff).Where(x => x.AppId == app.Id).FirstOrDefaultAsync();
+                if (payment == null)
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Payment does not exist.", StatusCode = ResponseCodes.RecordNotFound };
+
+                //Delete NO FEE payment record
+                _dbContext.Payments.Remove(payment);
+                _dbContext.ReturnedApplications.Remove(returnedApp);
+
+                app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
+                _dbContext.Applications.Update(app);
+                _dbContext.SaveChanges();
+
+                _helperService.SaveApplicationHistory(app.Id, app.Company.Id, APPLICATION_HISTORY_STATUS.CompanyReSubmitted, 
+                    "Company has resubmitted the Application.", returnedApp?.SelectedTables, true, app.Company.Id, APPLICATION_ACTION.CompanyReSubmit, true);
+
+                //Send email to both staff and company affected
+                //sending mail to company
+                string subject = $"Re-Submission of WORK PROGRAM application with ref: {app.ReferenceNo} ({app.Concession.Concession_Held} - {app.YearOfWKP}).";
+                string content = $"{app.Company.NAME} re-submitted WORK PROGRAM application for year {app.YearOfWKP} with Reference Number {app.ReferenceNo}.";
+                var emailMsg = _helperService.SaveMessage(app.Id, app.Company.Id, subject, content, "Company");
+                var sendEmail = _helperService.SendEmailMessage(app.Company.EMAIL, app.Company.NAME, emailMsg, null);
+
+
+                //sending mail to staff
+                string subject2 = $"Re-Submission of WORK PROGRAM application with ref: {app.ReferenceNo} ({app.Concession.Concession_Held} - {app.YearOfWKP}).";
+                string content2 = $"{app.Company.NAME} re-submitted WORK PROGRAM application for year {app.YearOfWKP} with Reference Number {app.ReferenceNo}.";
+                var emailMsg2 = _helperService.SaveMessage(app.Id, returnedApp.Staff.StaffID, subject, content, "Staff");
+                var sendEmail2 = _helperService.SendEmailMessage(returnedApp.Staff.StaffEmail, returnedApp.Staff.Name, emailMsg, null);
+
+                _helperService.LogMessages("Re-submitted application with REF : " + app.ReferenceNo, app.Company.EMAIL);
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Data = $"{app.Concession.ConcessionName}/{app.Field?.Field_Name}", Message = "Application was successfully resubmitted!", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"An error occured while rejecting application." + e.Message.ToString(), StatusCode = ResponseCodes.Badrequest };
+            }
         }
 
         //[HttpPost("ApproveApplication")]

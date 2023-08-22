@@ -58,7 +58,7 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> GetPaymentSummarySubmission() => await _paymentService.GetPaymentSummarySubmission();
 
         [HttpGet("GET_EXTRA_PAYMENT_SUMMARY_SUBMISSION")]
-        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int concessionId, int fieldId) => await _paymentService.GetExtraPaymentSummarySubmission(concessionId, fieldId);
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int? concessionId, int? fieldId) => await _paymentService.GetExtraPaymentSummarySubmission(concessionId, fieldId);
 
         [HttpGet("GET_TYPE_OF_PAYMENTS")]
         public async Task<WebApiResponse> Get_Type_Of_Payments() => await _paymentService.GetTypesOfPayments();
@@ -74,6 +74,27 @@ namespace Backend_UMR_Work_Program.Controllers
                     Convert.ToDecimal(amountNGN), 
                     serviceCharge, concessionId, year,  
                     fieldId, PAYMENT_CATEGORY.MainPayment);
+
+                return new WebApiResponse { Data = rrr, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
+
+        [HttpPost("GENERATE_RRR_EXTRA_PAYMENT")]
+        public async Task<WebApiResponse> GenerateRRRExtraPayment(int appId, string amountNGN, string serviceCharge, int concessionId, int year, int? fieldId)
+        {
+            try
+            {
+                var rrr = await _paymentService.GenerateRRR(
+                    appId,
+                    Convert.ToInt32(WKPCompanyNumber),
+                    Convert.ToDecimal(amountNGN),
+                    serviceCharge, concessionId, year,
+                    fieldId, PAYMENT_CATEGORY.OtherPayment);
 
                 return new WebApiResponse { Data = rrr, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
@@ -130,6 +151,15 @@ namespace Backend_UMR_Work_Program.Controllers
             return await _paymentService.CreateUSDPayment(model, PAYMENT_CATEGORY.MainPayment);
         }
 
+        [HttpPost("CREATE_USD_EXTRA_PAYMENT_SUBMISSION")]
+        public async Task<WebApiResponse> CreateUSDExtraPayment([FromBody] USDPaymentDTO model)
+        {
+            model.CompanyNumber = (int)WKPCompanyNumber;
+            model.CompanyEmail = WKPCompanyEmail;
+
+            return await _paymentService.CreateUSDPayment(model, PAYMENT_CATEGORY.OtherPayment);
+        }
+
         [HttpPost("CONFIRM_USD_PAYMENT_SUBMISSION")]
         public async Task<WebApiResponse> ConfirmUSDPayment([FromForm] USDPaymentDTO model)
         {
@@ -146,7 +176,28 @@ namespace Backend_UMR_Work_Program.Controllers
                     file.ContentType, $"PaymentDocuments/{model.PaymentEvidenceFileName}",
                     model.PaymentEvidenceFileName.ToUpper(), (int)WKPCompanyNumber, int.Parse(model.Year.ToString()));
 
-                return await _paymentService.ConfirmUSDPayment(model, PAYMENT_CATEGORY.MainPayment);
+                return await _paymentService.ProcessUSDPaymentEvidence(model, PAYMENT_CATEGORY.MainPayment);
+            }
+            else return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = "File Not Provided.", StatusCode = ResponseCodes.Badrequest };
+        }
+
+        [HttpPost("CONFIRM_USD_EXTRA_PAYMENT_SUBMISSION")]
+        public async Task<WebApiResponse> ConfirmUSDExtraPayment([FromForm] USDPaymentDTO model)
+        {
+            model.CompanyNumber = (int)WKPCompanyNumber;
+            model.CompanyEmail = WKPCompanyEmail;
+
+            var file = Request.Form.Files.Count > 0 ? Request.Form.Files[0] : null;
+
+            if (file != null)
+            {
+                model.PaymentEvidenceFileName = file.FileName;
+                model.PaymentEvidenceFilePath = await _blobService.UploadFileBlobAsync(
+                    "documents", file.OpenReadStream(),
+                    file.ContentType, $"PaymentDocuments/{model.PaymentEvidenceFileName}",
+                    model.PaymentEvidenceFileName.ToUpper(), (int)WKPCompanyNumber, int.Parse(model.Year.ToString()));
+
+                return await _paymentService.ProcessUSDPaymentEvidence(model, PAYMENT_CATEGORY.OtherPayment);
             }
             else return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = "File Not Provided.", StatusCode = ResponseCodes.Badrequest };
         }
@@ -208,15 +259,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
         }
 
-        [HttpPost("RESUBMISSION_FOR_NO_FEE")]
-        public async Task<IActionResult> ReSubmissionForNoFee(int appId)
-        {
-            var res = await _paymentService.ReSubmissionForNoFee(appId);
+        //[HttpPost("RESUBMISSION_FOR_NO_FEE")]
+        //public async Task<IActionResult> ReSubmissionForNoFee(int appId)
+        //{
+        //    var res = await _paymentService.ReSubmissionForNoFee(appId);
 
-            if (res.ResponseCode != AppResponseCodes.Success)
-                return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
+        //    if (res.ResponseCode != AppResponseCodes.Success)
+        //        return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
 
-            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
-        }
+        //    return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
+        //}
     }
 }

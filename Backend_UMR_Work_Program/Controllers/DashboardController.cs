@@ -333,14 +333,14 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
-                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_AG.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_NAG.Replace(",", ""))).ToListAsync()).Sum();
+                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
+                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_AG.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_NAG.Replace(",", ""))).ToListAsync()).Sum();
                     prodCost = (await (from a in _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs where a.Year_of_WP == year select Convert.ToDouble(a.INDIRECT_COST_Actual) + Convert.ToDouble(a.DIRECT_COST_Actual)).ToListAsync()).Sum();
                 }
                 else
                 {
-                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
-                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Company_Reserves_Year == year select Convert.ToDouble(a.Company_Reserves_AG.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_NAG.Replace(",", ""))).ToListAsync()).Sum();
+                    reserveOilCondensate = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_Oil.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_Condensate.Replace(",", ""))).ToListAsync()).Sum();
+                    reserveAGNAG = (await (from a in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.Company_Reserves_AG.Replace(",", "")) + Convert.ToDouble(a.Company_Reserves_NAG.Replace(",", ""))).ToListAsync()).Sum();
                     prodCost = (await (from a in _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs where a.COMPANY_ID == WKPCompanyId && a.Year_of_WP == year select Convert.ToDouble(a.INDIRECT_COST_Actual.Replace(",", "")) + Convert.ToDouble(a.DIRECT_COST_Actual.Replace(",", ""))).ToListAsync()).Sum();
                 }
                 return new { reserveOilCondensate = Math.Round(reserveOilCondensate), reserveAGNAG = Math.Round(reserveAGNAG), prodCost = Math.Round(prodCost)} ;

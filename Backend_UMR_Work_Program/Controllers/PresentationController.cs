@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
+using Grpc.Core;
 using LinqToDB;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -178,7 +179,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                if(time !=null && date != null)
+                if (time != null && date != null)
                 {
                     var CurrentYear = DateTime.Now.Year.ToString();
                     string Date_Conversion = date.ToString("dddd , dd MMMM yyyy");
@@ -266,6 +267,70 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+        [HttpPost("ADDSCHEDULEHISTORY")]
+        public async Task<WebApiResponse> ADDSCHEDULEHISTORY([FromBody] EnagementScheduledHistory scheduledHistory, int id)
+        {
+
+            try
+            {
+                if (scheduledHistory != null && (id != null || id == 0))
+                {
+                    scheduledHistory.actionBy = WKPUserEmail;
+                    scheduledHistory.action = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.UpdatedEngagement;
+
+                    var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).FirstOrDefault();
+
+                    if (checkSchedule == null)
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, schedule doesn't exist ", StatusCode = ResponseCodes.Failure };
+                    }
+                    else
+                    {
+
+                        checkSchedule.Date_Updated = DateTime.Now;
+                        checkSchedule.Submitted = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.Processing;
+                        checkSchedule.adminAproved = !checkSchedule.adminAproved;
+                        checkSchedule.companyAproved = !checkSchedule.companyAproved;
+                        checkSchedule.STATUS = checkSchedule.STATUS == ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk ? ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk : ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
+                        checkSchedule.Histories.Add(scheduledHistory);
+                        checkSchedule.numOfHistories = ((await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).ToListAsync()).Count) + 1;
+
+
+                        _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+
+
+                        var myTime = await _context.SaveChangesAsync();
+
+
+                        if (myTime > 0)
+                        {
+                            //var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was updated successfully.", StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to update this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                        }
+                    }
+                }
+
+
+
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Invalid entry.", StatusCode = ResponseCodes.Failure };
+
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+
+
+
+
 
 
         //Added by Musa
@@ -282,7 +347,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
                 //check if date has been scheduled by another company
-                if (checkCompanyPresentation!=null)
+                if (checkCompanyPresentation != null)
                 {
                     return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "successful", Data = checkCompanyPresentation, StatusCode = ResponseCodes.Success };
                 }
@@ -369,7 +434,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var PPTX = "pptx";
                     var PPT = "ppt";
 
-                    if (document_FileExtension.ToLower() != PPTX.ToLower() && document_FileExtension.ToLower()!=PPT.ToLower())
+                    if (document_FileExtension.ToLower() != PPTX.ToLower() && document_FileExtension.ToLower() != PPT.ToLower())
                     {
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Only pptx or ppt are allowed. Please select Presentation file", StatusCode = ResponseCodes.Failure };
                     }
@@ -483,6 +548,25 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
+
+        [HttpGet("MEETING_ROOMS")]
+        public async Task<object> Get_MEETING_ROOMS()
+        {
+            try
+            {
+                var meetingRooms = await _context.ADMIN_MEETING_ROOMs.Select(a => a.MEETING_ROOM).Distinct().ToListAsync();
+
+                if (meetingRooms == null)
+                    meetingRooms = new List<string>();
+
+                return new { meetingRooms = meetingRooms };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
         [HttpGet("SCRIBES_&_CHAIRMEN")]
         public async Task<WebApiResponse> scribes(string year)
         {
@@ -534,7 +618,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (checkSchedule != null)
                 {
 
-                    if(checkSchedule?.Histories.Count>1)
+                    if (checkSchedule?.Histories.Count > 1)
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities and can't be deleted", StatusCode = ResponseCodes.Success };
 
 
@@ -545,7 +629,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     if (myTime > 0)
                     {
-                       
+
                         string successMsg = Messager.ShowMessage(GeneralModel.Delete);
                         return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
                     }
@@ -566,7 +650,7 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-       
+
 
         [HttpGet("EngagementHistories")]
         public async Task<WebApiResponse> GetEngagementHistories(int Id)

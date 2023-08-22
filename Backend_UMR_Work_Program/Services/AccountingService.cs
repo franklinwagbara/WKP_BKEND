@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
-using LinqToDB;
+using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using Syncfusion.XlsIO.Implementation;
@@ -165,12 +166,28 @@ namespace Backend_UMR_Work_Program.Services
             {
                 var desk = await UpdatedAccountDeskToConfirmedPayment(deskId);
 
-                var app = await _context.Applications.Where(x => x.Id == desk.AppId).FirstOrDefaultAsync();
+                var app = await _context.Applications.Include(x => x.Concession).Include(x => x.Field).Include(x => x.Company).Where(x => x.Id == desk.AppId).FirstOrDefaultAsync();
 
                 app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
                 _context.Applications.Update(app);
                 //await _context.SaveChangesAsync();
 
+                var typeOfPayment = await _context.TypeOfPayments.Where(x => x.Id == desk.Payment.TypeOfPaymentId).FirstOrDefaultAsync();
+
+                if(typeOfPayment.Category == PAYMENT_CATEGORY.OtherPayment)
+                {
+                    var returnedApp = await _context.ReturnedApplications.Where(x => x.AppId == app.Id).FirstOrDefaultAsync();
+                    _context.ReturnedApplications.Remove(returnedApp);
+                    _context.SaveChanges();
+
+                    //send mail to company
+                    string subject = $"{app.YearOfWKP} Re-Submission of WORK PROGRAM application for field - {app.Field?.Field_Name} : {app.ReferenceNo}";
+                    string content = $"You have successfully Re-Submitted your WORK PROGRAM application for year {app.YearOfWKP}, and it is currently being reviewed.";
+                    var emailMsg = _helperService.SaveMessage(app.Id, Convert.ToInt32(app.Company.Id), subject, content, "Company");
+                    var sendEmail = _helperService.SendEmailMessage(app.Company.EMAIL, app.Company.COMPANY_NAME, emailMsg, null);
+                    var responseMsg = app.Field != null ? $"{app.YearOfWKP} Application for field {app.Field?.Field_Name} has been re-submitted successfully." : $"{app.YearOfWKP} Application for concession: ({app.Concession.ConcessionName}) has been re-submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
+                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
+                }
                 var submitRes = await _applicationService.SubmitApplication(desk.AppId);
 
                 if (submitRes.ResponseCode != AppResponseCodes.Success)

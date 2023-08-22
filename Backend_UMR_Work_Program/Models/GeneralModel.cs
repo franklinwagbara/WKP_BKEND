@@ -1,5 +1,6 @@
 ﻿using Backend_UMR_Work_Program.DataModels;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Quartz;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Backend_UMR_Work_Program.Models
@@ -109,6 +110,7 @@ namespace Backend_UMR_Work_Program.Models
             public const string ReturnedToStaff = "Returned To Staff";
 
 			public const string AddedComment = "Added Comment";
+			public const string CompanyReSubmitted = "Company Resubmitted";
 			
 			//public static string SentBackToCompany = "Application Sent Back To Company";
 			//public static string SentBackToStaff = "Application Sent Back To Staff";
@@ -151,6 +153,7 @@ namespace Backend_UMR_Work_Program.Models
             public static string Delegate = "Delegate";
             public static string AddAComment = "Add a Comment";
             public static string Move = "Move";
+			public static string CompanyReSubmit = "Company Resubmit";
 
             //public static string SendBackToCompany = "Send Back To Company";
             //public static string SendBackToStaff = "Send Back To Staff";
@@ -397,6 +400,13 @@ namespace Backend_UMR_Work_Program.Models
             public const string NoActionYet = "No Action Yet";
             public const string Processing = "Processing";
             public const string CompletlyScheduled = "Completly Scheduled";
+
+
+			//ACTION OPTION
+			public const string ScheduledEngagement = "Scheduled Engagement";
+			public const string UpdatedEngagement = "Updated Engagement";
+            public const string AcceptedEngagement = "Accepted Engagement";
+
         }
 
         public class WorkProgrammeReport2_Model
@@ -553,6 +563,7 @@ namespace Backend_UMR_Work_Program.Models
 			public string Staff_Role { get; set; }
 			public int Sort { get; set; }
 			public int Desk_ID { get; set; }
+			public int StaffID { get; set; }
 		}
 
 		public class ApplicationDeskHistory_Model
