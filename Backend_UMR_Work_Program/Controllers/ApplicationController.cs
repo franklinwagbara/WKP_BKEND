@@ -67,7 +67,6 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GetProcessingApplications/staffId")] //For general application view
         public async Task<WebApiResponse> GetProcessingApplications(int staffId) => await _applicationService.GetProcessingApplications(staffId);
 
-
         [HttpGet("GetProcessingApplicationsOnMyDesk")] //For general application view
         public async Task<WebApiResponse> GetProcessingApplicationsOnMyDesk() => await _applicationService.GetProcessingApplicationsOnMyDesk(WKPCompanyEmail);
 
@@ -390,7 +389,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                         ID = x.Id,
                                         Staff_Name = x.Staff.LastName + ", " + x.Staff.FirstName,
                                         Staff_Email = x.Staff.StaffEmail,
+                                        Staff = x.Staff,
                                         Staff_SBU = _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().SBU_Name,
+                                        Staff_SBUID = _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().Id,
                                         Staff_Role = _context.Roles.Where(r => r.id == x.Staff.RoleID).FirstOrDefault().RoleName,
                                         Comment = x.Comment,
                                         Date = x.ActionDate,
@@ -399,6 +400,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                         CompanyDetails = companyDetails,
                                         Status = x.Status,
                                         Action = x.AppAction,
+                                        SelectedTables = x.SelectedTables,
                                     }).ToListAsync();
 
                 var currentDesks = await (from dsk in _context.MyDesks
@@ -443,6 +445,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                    select sbu).FirstOrDefault();
 
                 var getSBU_TablesToDisplay = await _context.Table_Details.Where(x => x.SBU_ID.Contains(getStaffSBU.Id.ToString())).ToListAsync();
+
+                var selectedTables = appHistory.Find(x => x.Staff.Staff_SBU == getStaffSBU.Id);
 
                 var sbuApprovals = new List<ApplicationSBUApproval>();
                 
