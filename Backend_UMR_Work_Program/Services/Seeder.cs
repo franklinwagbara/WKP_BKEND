@@ -19,7 +19,7 @@ namespace Backend_UMR_Work_Program.Services
             _dbContext = wKP_DBContext;
             _serviceProvider = serviceProvider;
 
-            //Seed();
+            Seed();
         }
 
         public void Seed()
