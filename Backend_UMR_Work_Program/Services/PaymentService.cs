@@ -537,7 +537,7 @@ namespace Backend_UMR_Work_Program.Services
             }
             catch (Exception e)
             {
-                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", Data = e?.StackTrace, StatusCode = ResponseCodes.InternalError };
             }
 
         }
