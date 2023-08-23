@@ -19,7 +19,7 @@ namespace Backend_UMR_Work_Program.Services
             _dbContext = wKP_DBContext;
             _serviceProvider = serviceProvider;
 
-            //Seed();
+            Seed();
         }
 
         public void Seed()
@@ -59,5 +59,10 @@ namespace Backend_UMR_Work_Program.Services
                 throw ex;
             }
         }
+
+        //private void SeedSuperAdminStaff()
+        //{
+        //    if(_dbContext.ADMIN_COMPANY_INFORMATIONs)
+        //}
     }
 }
