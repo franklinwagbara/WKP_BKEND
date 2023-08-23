@@ -25,6 +25,7 @@ namespace Backend_UMR_Work_Program.Services
         public void Seed()
         {
             SeedTypeOfPayments();
+            SeedApplicationCategories();
         }
 
         private void SeedTypeOfPayments()
