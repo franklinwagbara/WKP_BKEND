@@ -60,9 +60,35 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
-        //private void SeedSuperAdminStaff()
-        //{
-        //    if(_dbContext.ADMIN_COMPANY_INFORMATIONs)
-        //}
+        private void SeedApplicationCategories()
+        {
+            try
+            {
+                var types = new List<List<string>> {
+                    new List<string>{ APP_CATEGORIES.New },
+                    new List<string>{ APP_CATEGORIES.New },
+                    };
+
+                types.ForEach(t =>
+                {
+                    if (_dbContext.ApplicationCategories.Where(x => x.Name == t[0]).FirstOrDefault() == null)
+                    {
+                        var appCat = new ApplicationCategory
+                        {
+                            Name = t[0],
+                        };
+
+                        _dbContext.ApplicationCategories.Add(appCat);
+                    }
+                });
+
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }
