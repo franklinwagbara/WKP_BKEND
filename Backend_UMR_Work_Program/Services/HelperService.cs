@@ -383,7 +383,7 @@ namespace Backend_UMR_Work_Program.Services
                 application.FieldID = fieldId ?? null;
                 application.CompanyID = companyId;
                 application.CurrentUserEmail = companyEmail;
-                application.CategoryID = _dbContext.ApplicationCategories.Where(x => x.Name == GeneralModel.New).FirstOrDefault().Id;
+                application.CategoryID = _dbContext.ApplicationCategories.Where(x => x.Name == APP_CATEGORIES.New).FirstOrDefault().Id;
                 application.Status = status ?? MAIN_APPLICATION_STATUS.NotSubmitted;
                 application.PaymentStatus = paymentStatus ?? PAYMENT_STATUS.PaymentPending;
                 application.CurrentDesk = currentDeskID ?? null; //to change
