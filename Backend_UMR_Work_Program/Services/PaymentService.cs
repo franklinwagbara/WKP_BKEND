@@ -507,11 +507,13 @@ namespace Backend_UMR_Work_Program.Services
                 var paymentExist = await _context.Payments.Include(x => x.PaymentType).Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo && x.PaymentType.Category == paymentCategory).FirstOrDefaultAsync();
 
                 if (paymentExist != null) 
-                    return new WebApiResponse { Data = new { OrderId = app.ReferenceNo, 
-                                AccountNumber = AccountNumber, AccountName = BankName, BankName = Bank }, 
-                                ResponseCode = AppResponseCodes.PaymentAlreadyExists, 
-                                Message = $"This payment record has already been created.", 
-                                StatusCode = ResponseCodes.Success };
+                    return new WebApiResponse { 
+                        Data = new { OrderId = app.ReferenceNo, 
+                            AccountNumber = AccountNumber, AccountName = BankName, 
+                            BankName = Bank 
+                        }, 
+                        ResponseCode = AppResponseCodes.PaymentAlreadyExists, 
+                        Message = $"This payment record has already been created.", StatusCode = ResponseCodes.Success };
 
                 var paymentType = await _context.TypeOfPayments.Where(x => x.Category == paymentCategory).FirstOrDefaultAsync();
                 var newPayment = new AppPaymentViewModel()
@@ -537,7 +539,7 @@ namespace Backend_UMR_Work_Program.Services
             }
             catch (Exception e)
             {
-                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", Data = e?.StackTrace, StatusCode = ResponseCodes.InternalError };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", Data = e.StackTrace, StatusCode = ResponseCodes.InternalError };
             }
 
         }

@@ -174,11 +174,11 @@ namespace Backend_UMR_Work_Program.Models
             public const string ModificationFee = "Modification Fee";
         }
 
-		public static class APP_CATEGORIES
-		{
-			public const string New = "New";
-			public const string Old = "Old";
-		}
+        public static class APP_CATEGORIES
+        {
+            public const string New = "New";
+            public const string Old = "Old";
+        }
 
         //public static class APPLICATION_STATUS__OLD
         //{
