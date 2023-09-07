@@ -1,13 +1,11 @@
 ﻿
 using Backend_UMR_Work_Program.Models;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.DTOs;
+using WKP.Contracts.Fee;
+using WKP.Application.Fee.Commands;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -15,6 +13,8 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
     {
         public MappingProfiles()
         {
+            CreateMap<AddFeeRequest, AddFeeCommand>().ReverseMap();
+
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();
 

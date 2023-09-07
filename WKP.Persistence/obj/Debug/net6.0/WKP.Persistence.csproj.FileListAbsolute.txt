@@ -1,0 +1,12 @@
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\bin\Debug\net6.0\WKP.Persistence.deps.json
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\bin\Debug\net6.0\WKP.Persistence.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\bin\Debug\net6.0\WKP.Persistence.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\WKP.Persistence.csproj.AssemblyReference.cache
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\WKP.Persistence.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\WKP.Persistence.AssemblyInfoInputs.cache
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\WKP.Persistence.AssemblyInfo.cs
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\WKP.Persistence.csproj.CoreCompileInputs.cache
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\WKP.Persistence.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\refint\WKP.Persistence.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\WKP.Persistence.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Persistence\obj\Debug\net6.0\ref\WKP.Persistence.dll

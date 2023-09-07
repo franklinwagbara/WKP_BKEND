@@ -1,0 +1,12 @@
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\bin\Debug\net6.0\WKP.Contracts.deps.json
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\bin\Debug\net6.0\WKP.Contracts.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\bin\Debug\net6.0\WKP.Contracts.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\WKP.Contracts.csproj.AssemblyReference.cache
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\WKP.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\WKP.Contracts.AssemblyInfoInputs.cache
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\WKP.Contracts.AssemblyInfo.cs
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\WKP.Contracts.csproj.CoreCompileInputs.cache
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\WKP.Contracts.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\refint\WKP.Contracts.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\WKP.Contracts.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Contracts\obj\Debug\net6.0\ref\WKP.Contracts.dll
