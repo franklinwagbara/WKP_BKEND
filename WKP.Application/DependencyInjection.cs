@@ -1,6 +1,7 @@
 using BuberDinner.Api.Mapping;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using WKP.Application.Common.Helpers;
 
 namespace WKP.Application
 {
@@ -10,6 +11,7 @@ namespace WKP.Application
         {
             services.AddMappings();
             services.AddMediatR(typeof(DependencyInjection).Assembly);
+            services.AddTransient<AppHelper>();
             
             return services;
         }

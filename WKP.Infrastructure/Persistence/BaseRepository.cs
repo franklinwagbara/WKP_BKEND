@@ -86,6 +86,24 @@ namespace WKP.Infrastructure.Persistence
             return await query.ToListAsync();
         }
 
+        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? filter = null, IEnumerable<string>? includeProperties = null)
+        {
+            IQueryable<TEntity> query = _dbSet;
+            
+            if(includeProperties != null && includeProperties.Any())
+            {
+                foreach(var item in includeProperties)
+                {
+                    query = query.Include(item);
+                }
+            }
+
+            if(filter != null)
+                query = query.Where(filter);
+
+            return await query.FirstOrDefaultAsync();
+        }
+
         public virtual Task Update(TEntity entity)
         {
             if(_context.Entry(entity).State != EntityState.Detached)

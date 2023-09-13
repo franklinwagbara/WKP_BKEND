@@ -23,5 +23,10 @@ namespace WKP.Domain.Entities
 
 		public int StaffID { get; set; }
     	public staff Staff {get; set;}
+
+		public static class NavigationProperty
+        {
+            public static string Staff = "Staff";
+        }
 	}
 }

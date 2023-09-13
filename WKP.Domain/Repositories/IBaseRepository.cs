@@ -12,6 +12,9 @@ namespace WKP.Domain.Repositories
             IEnumerable<string>? includeProperties = null,
             int? take = null,
             int? skip = null);
+        Task<TEntity?> GetAsync(
+            Expression<Func<TEntity, bool>>? filter = null,
+            IEnumerable<string>? includeProperties = null);
         Task<TEntity> AddAsync(TEntity entity);
         Task DeleteAsync(object id);
         Task DeleteAsync(TEntity entity);

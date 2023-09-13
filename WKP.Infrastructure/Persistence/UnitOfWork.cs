@@ -19,6 +19,8 @@ namespace WKP.Infrastructure.Persistence
         public ISBURepository SBURepository { get; private set; }
         public IStaffRepository StaffRepository { get; private set; }
         public ITypeOfPaymentRepository TypeOfPaymentRepository { get; private set; }
+        public IAuditRepository AuditRepository { get; private set; }
+        public IMessageRepository MessageRepository { get; private set; }
 
         public UnitOfWork(WKPContext context)
         {
@@ -32,6 +34,8 @@ namespace WKP.Infrastructure.Persistence
             SBURepository = new SBURepository(context);
             StaffRepository = new StaffRepository(context);
             TypeOfPaymentRepository = new TypeOfPaymentRepository(context);
+            AuditRepository = new AuditRepository(context);
+            MessageRepository = new MessageRepository(context); 
         }
 
         public void BeginTransaction()

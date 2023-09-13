@@ -18,6 +18,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using WKP.Application.Application.Commands.OpenApplication;
 using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Queries.GetProcessingApplications;
 using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
@@ -94,7 +95,12 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpGet("OpenApplication")]
-        public async Task<WebApiResponse> OpenApplication(int deskId) => await _applicationService.OpenApplication(deskId);
+        public async Task<IApiResponse> OpenApplication(OpenApplicationRequest request)
+        {
+            var command = _mapper.Map<OpenApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
 
         [HttpPost("PushApplication")]
         public async Task<WebApiResponse> PushApplication(int deskID, string comment, string[] selectedApps) => await _applicationService.PushApplication(deskID, comment, selectedApps);

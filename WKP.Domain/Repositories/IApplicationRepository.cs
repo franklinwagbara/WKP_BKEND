@@ -8,5 +8,6 @@ namespace WKP.Domain.Repositories
         Task<int> GetAllSubAppCount();
         Task<int> GetAllRejectedAppCount();
         Task<IEnumerable<object>> GetProcesingAppsByStaffId(int StaffId);
+        Task<Application?> GetApplicationById(int AppId);
     }
 }

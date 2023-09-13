@@ -16,6 +16,8 @@ namespace WKP.Infrastructure.Context
         public virtual DbSet<MyDesk> Desks { get; set;}
         public virtual DbSet<ADMIN_CONCESSIONS_INFORMATION> Concessions {get; set;}
         public virtual DbSet<COMPANY_FIELD> Fields { get; set;} 
+        public virtual DbSet<AuditTrail> AuditTrails { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
 
         public WKPContext(DbContextOptions<WKPContext> options): base(options){}
 
@@ -248,6 +250,17 @@ namespace WKP.Infrastructure.Context
                     .IsUnicode(false);
                 entity.Property(e => e.Field_Name)
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AuditTrail>(entity =>
+            {
+                entity.HasKey(e => e.AuditLogID).HasName("PK_AuditTrail");
+
+                entity.Property(e => e.AuditAction).IsUnicode(false);
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.UserID)
+                    .HasMaxLength(80)
                     .IsUnicode(false);
             });
         }

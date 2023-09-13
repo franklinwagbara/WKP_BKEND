@@ -8,6 +8,7 @@ using WKP.Contracts.Fee;
 using WKP.Application.Fee.Commands;
 using WKP.Contracts.Application;
 using WKP.Application.Application.Queries.GetDashboardData;
+using WKP.Application.Application.Commands.OpenApplication;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -18,6 +19,9 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<AddFeeRequest, AddFeeCommand>().ReverseMap();
             CreateMap<GetDashboardDataRequest, GetDashboardDataQuery>()
             .ForMember(x => x.CompanyNumber, opt => opt.MapFrom(src => src.CompanyNumber))
+            .ReverseMap();
+            CreateMap<OpenApplicationRequest, OpenApplicationCommand>()
+            .ForMember(x => x.DeskId, opt => opt.MapFrom(src => src.DeskId))
             .ReverseMap();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();

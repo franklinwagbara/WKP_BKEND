@@ -41,6 +41,11 @@ namespace WKP.Infrastructure.Persistence
             return result;
         }
 
+        public async Task<Domain.Entities.Application?> GetApplicationById(int AppId)
+        {
+            return await _context.Applications.Where(a => a.Id == AppId).FirstOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<object>> GetProcesingAppsByStaffId(int StaffId)
         {
             var result = await (from app in _context.Applications

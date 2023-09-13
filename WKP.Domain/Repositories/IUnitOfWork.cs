@@ -11,6 +11,9 @@ namespace WKP.Domain.Repositories
         public ISBURepository SBURepository { get; }
         public IStaffRepository StaffRepository { get; }
         public ITypeOfPaymentRepository TypeOfPaymentRepository { get; }
+        public IAuditRepository AuditRepository { get; }
+        public IMessageRepository MessageRepository { get;}
+
 
 
         void BeginTransaction();

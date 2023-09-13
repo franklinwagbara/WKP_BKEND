@@ -14,6 +14,11 @@ namespace WKP.Infrastructure.Persistence
             _context = context;
         }
 
+        public async Task<MyDesk?> GetDeskByDeskId(int DeskId)
+        {
+            return await _context.Desks.Where(d => d.DeskID == DeskId).FirstOrDefaultAsync();
+        }
+
         public async Task<int> GetStaffAppProcessingDeskCount(int StaffId)
         {
             return await _context.Desks.Where(

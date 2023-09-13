@@ -6,5 +6,6 @@ namespace WKP.Domain.Repositories
     {
        Task<int> GetStaffDeskCount(int StaffId); 
        Task<int> GetStaffAppProcessingDeskCount(int StaffId);
+       Task<MyDesk?> GetDeskByDeskId(int DeskId);
     }
 }

@@ -20,6 +20,7 @@ namespace WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk
             {
                 var curStaff = await _unitOfWork.StaffRepository.GetStaffByCompanyEmail(request.CompanyEmail);
                 var apps = await _unitOfWork.ApplicationRepository.GetProcesingAppsByStaffId(StaffId: curStaff.StaffID);
+                
                 return new ApplicationResult(apps);
             }
             catch (Exception ex)

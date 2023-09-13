@@ -1,8 +1,11 @@
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
+using WKP.Infrastructure.GeneralServices.Implementations;
+using WKP.Infrastructure.GeneralServices.Interfaces;
 using WKP.Infrastructure.Persistence;
 
 namespace WKP.Infrastructure
@@ -21,6 +24,13 @@ namespace WKP.Infrastructure
 
             services.AddScoped<IFeeRepository, FeeRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IEmailAuditMessage, EmailAuditMessage>();
+            services.AddScoped<EmailHelper>();
+
+            //HangFire setup
+            services.AddHangfire(x => x.UseSqlServerStorage(configuration["Data:Wkpconnect:ConnectionString"]));
+            services.AddHangfireServer();
+
             return services;
        }
     }
