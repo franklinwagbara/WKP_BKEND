@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "JOKLtUoKu00qSTU9c2P1+40ZgRxtVYiFqBbHteraPJyoXUAevDCD27hH+zSf3GroCqL7Ii6qpPTSh7Xs8OPEGA==",
+  "dgSpecHash": "kyyxvw5YD0DBSHMdVshm7GCOs9DnT0pTO5PXHss0k0go/e4AAPLpi0579Q1gWfvberpjjGs6fcfzp/KzkgwWuA==",
   "success": true,
-  "projectFilePath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\BrandOneTech\\.nuget\\packages\\erroror\\1.2.1\\erroror.1.2.1.nupkg.sha512"
+  ],
   "logs": []
 }

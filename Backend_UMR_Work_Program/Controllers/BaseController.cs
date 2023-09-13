@@ -1,32 +1,51 @@
 ﻿using AutoMapper;
-using Backend_UMR_Work_Program.DataModels;
-using Backend_UMR_Work_Program.Services;
+using Backend_UMR_Work_Program.Common.Implementations;
+using Backend_UMR_Work_Program.Common.Interfaces;
+using ErrorOr;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WKP.Application.Application.Common;
+using WKP.Application.Fee.Common;
 
 namespace Backend_UMR_Work_Program.Controllers
 {
     public class BaseController: Controller
     {
-        public WKP_DBContext _context;
-        public IConfiguration _configuration;
-        IHttpContextAccessor _httpContextAccessor;
-        private readonly IMapper _mapper;
-        private readonly HelperService _helperService;
-        private readonly AccountingService _accountingService;
+        public string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
+        public string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
+        public string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
+        public string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
 
-        private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
-        private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
-        private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
-        private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
-
-        public BaseController(WKP_DBContext context, IConfiguration configuration, IMapper mapper, HelperService helperService, AccountingService accountingService)
+        public static IApiResponse Response(ErrorOr<FeeResult> result)
         {
-            _context = context;
-            _configuration = configuration;
-            _mapper = mapper;
-            _helperService = helperService;
-            _accountingService = accountingService;
+            return result.Match(
+                res => SuccessResponse.ResponseObject(res),
+                errors => FailResponse.ResponseObject(errors)
+            );
+        }
+        public static IApiResponse Response(ErrorOr<DashboardResult> result)
+        {
+            return result.Match(
+                res => SuccessResponse.ResponseObject(res.Result),
+                errors => FailResponse.ResponseObject(errors)
+            );
+        }
+
+        public static IApiResponse Response(ErrorOr<ApplicationResult> result)
+        {
+            return result.Match(
+                res => SuccessResponse.ResponseObject(res.Result),
+                errors => FailResponse.ResponseObject(errors)
+            );
+        }
+
+        public static IApiResponse EnumerableResponse(ErrorOr<FeeListResult> result)
+        {
+            return result.Match(
+                res => SuccessResponse.ResponseObject(res),
+                errors => FailResponse.ResponseObject(errors)
+            );
         }
     }
 }

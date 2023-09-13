@@ -6,6 +6,8 @@ using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.DTOs;
 using WKP.Contracts.Fee;
 using WKP.Application.Fee.Commands;
+using WKP.Contracts.Application;
+using WKP.Application.Application.Queries.GetDashboardData;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -14,6 +16,9 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
         public MappingProfiles()
         {
             CreateMap<AddFeeRequest, AddFeeCommand>().ReverseMap();
+            CreateMap<GetDashboardDataRequest, GetDashboardDataQuery>()
+            .ForMember(x => x.CompanyNumber, opt => opt.MapFrom(src => src.CompanyNumber))
+            .ReverseMap();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();

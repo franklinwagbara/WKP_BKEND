@@ -1,24 +1,27 @@
 ﻿using AutoMapper;
+using Backend_UMR_Work_Program.Common.Interfaces;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Models.Enurations;
 using Backend_UMR_Work_Program.Services;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Math;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-//using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using Rotativa.AspNetCore;
-using Syncfusion.XlsIO.Implementation;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using WKP.Application.Application.Queries.GetDashboardData;
+using WKP.Application.Application.Queries.GetProcessingApplications;
+using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
+using WKP.Contracts.Application;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Controllers
@@ -26,8 +29,9 @@ namespace Backend_UMR_Work_Program.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
 
-    public class ApplicationController : Controller
+    public class ApplicationController : BaseController
     {
+        public readonly ISender _mediator;
         public WKP_DBContext _context;
         public IConfiguration _configuration;
         IHttpContextAccessor _httpContextAccessor;
@@ -43,12 +47,15 @@ namespace Backend_UMR_Work_Program.Controllers
         private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
         private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
 
-        public ApplicationController(WKP_DBContext context, IConfiguration configuration, 
+        public ApplicationController(
+            WKP_DBContext context, 
+            IConfiguration configuration, 
             IMapper mapper, 
             IOptions<AppSettings> appsettings,
             ApplicationService applicationService,
             AppProcessFlowService appProcessFlowService,
-            HelperService helperService
+            HelperService helperService,
+            ISender mediator
             )
         {
             _context = context;
@@ -58,17 +65,33 @@ namespace Backend_UMR_Work_Program.Controllers
             _applicationService = applicationService;
             _helperService = helperService;
             _appSettings = appsettings.Value;
+            _mediator = mediator;
         }
 
 
         [HttpGet("GetDashboardData")]
-        public async Task<object> GetDashboardData() => await _applicationService.GetDashboardData((int)WKPCompanyNumber);
+        public async Task<IApiResponse> GetDashboardData() 
+        {
+            var query = _mapper.Map<GetDashboardDataQuery>(new GetDashboardDataRequest((int)WKPCompanyNumber));
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("GetProcessingApplications/staffId")] //For general application view
-        public async Task<WebApiResponse> GetProcessingApplications(int staffId) => await _applicationService.GetProcessingApplications(staffId);
+        public async Task<IApiResponse> GetProcessingApplicationsByStaffId(GetProcessingApplicationsByStaffIdRequest request)
+        {
+            var query = _mapper.Map<GetProcessingApplicationsByStaffIdQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("GetProcessingApplicationsOnMyDesk")] //For general application view
-        public async Task<WebApiResponse> GetProcessingApplicationsOnMyDesk() => await _applicationService.GetProcessingApplicationsOnMyDesk(WKPCompanyEmail);
+        public async Task<IApiResponse> GetProcessingApplicationsOnMyDesk()
+        {
+            var query = _mapper.Map<GetProcessingAppsOnMyDeskQuery>(new GetProcessingAppsOnMyDeskQuery(WKPCompanyEmail));
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("OpenApplication")]
         public async Task<WebApiResponse> OpenApplication(int deskId) => await _applicationService.OpenApplication(deskId);

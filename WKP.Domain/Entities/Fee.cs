@@ -7,5 +7,10 @@ namespace WKP.Domain.Entities
         public string AmountUSD { get; set; } = string.Empty;
         public int TypeOfPaymentId { get; set; } 
         public TypeOfPayments? TypeOfPayment { get; set; }
+
+        public static class NavigationProperty
+        {
+            public static string TypeOfPayments = "TypeOfPayment";
+        }
     }
 }

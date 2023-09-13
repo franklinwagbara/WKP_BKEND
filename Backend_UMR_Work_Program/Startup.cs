@@ -16,6 +16,7 @@ using Backend_UMR_Work_Program.Controllers.Authentications;
 using Backend_UMR_Work_Program.DataModels;
 using Rotativa.AspNetCore;
 using WKP.Application;
+using WKP.Infrastructure;
 
 namespace Backend_UMR_Work_Program
 {
@@ -49,7 +50,8 @@ namespace Backend_UMR_Work_Program
             services.AddControllers();
 
             //Register Project DependencyInjection files
-            services.AddApplication();
+            services.AddApplication()
+                    .AddInfrastructure((ConfigurationManager)Configuration);
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);

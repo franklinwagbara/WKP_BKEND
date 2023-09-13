@@ -1,3 +1,4 @@
+using BuberDinner.Api.Mapping;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,6 +8,7 @@ namespace WKP.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            services.AddMappings();
             services.AddMediatR(typeof(DependencyInjection).Assembly);
             
             return services;

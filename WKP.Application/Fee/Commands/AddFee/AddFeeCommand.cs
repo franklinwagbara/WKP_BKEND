@@ -1,3 +1,4 @@
+using ErrorOr;
 using MediatR;
 using WKP.Application.Fee.Common;
 
@@ -8,5 +9,5 @@ namespace WKP.Application.Fee.Commands
         string AmountNGN,
         string AmountUSD, 
         int TypeOfPaymentId
-    ): IRequest<FeeResult>;
+    ): IRequest<ErrorOr<FeeResult>>;
 }

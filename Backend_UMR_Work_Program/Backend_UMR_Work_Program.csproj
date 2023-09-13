@@ -56,6 +56,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WKP.Contracts\WKP.Contracts.csproj" />
     <ProjectReference Include="..\WKP.Application\WKP.Application.csproj" />
+    <ProjectReference Include="..\WKP.Infrastructure\WKP.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
