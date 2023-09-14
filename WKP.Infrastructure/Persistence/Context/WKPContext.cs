@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WKP.Domain.Entities;
+using WKP.Infrastructure.Persistence;
 
 namespace WKP.Infrastructure.Context
 {
@@ -18,6 +19,10 @@ namespace WKP.Infrastructure.Context
         public virtual DbSet<COMPANY_FIELD> Fields { get; set;} 
         public virtual DbSet<AuditTrail> AuditTrails { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<ApplicationProccess> AppProcessFlow { get; set; }
+        public virtual DbSet<ApplicationDeskHistory> ApplicationDeskHistories { get; set; }
+        public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals{ get; set; }
 
         public WKPContext(DbContextOptions<WKPContext> options): base(options){}
 
@@ -262,6 +267,75 @@ namespace WKP.Infrastructure.Context
                 entity.Property(e => e.UserID)
                     .HasMaxLength(80)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasKey(e => e.RoleId);
+
+                entity.ToTable("Role");
+
+                entity.Property(e => e.RoleId)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+                entity.Property(e => e.Description)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.RoleName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+                entity.Property(e => e.id).ValueGeneratedOnAdd();
+
+                // entity.HasMany(d => d.Funcs).WithMany(p => p.Roles)
+                //     .UsingEntity<Dictionary<string, object>>(
+                //         "RoleFunctionalityRef",
+                //         r => r.HasOne<Functionality>().WithMany()
+                //             .HasForeignKey("FuncId")
+                //             .OnDelete(DeleteBehavior.ClientSetNull)
+                //             .HasConstraintName("FK_RoleFunctionalityRef_Functionality"),
+                //         l => l.HasOne<Role>().WithMany()
+                //             .HasForeignKey("RoleId")
+                //             .OnDelete(DeleteBehavior.ClientSetNull)
+                //             .HasConstraintName("FK_RoleFunctionalityRef_Role"),
+                //         j =>
+                //         {
+                //             j.HasKey("RoleId", "FuncId");
+                //             j.ToTable("RoleFunctionalityRef");
+                //         });
+            });
+
+            modelBuilder.Entity<ApplicationProccess>(entity =>
+            {
+                entity.ToTable("ApplicationProccesses");
+                entity.HasKey(e => e.ProccessID).HasName("PK_WorkProccess_");
+
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.CreatedBy).HasMaxLength(500);
+                entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+                entity.Property(e => e.DeletedBy).HasMaxLength(500);
+                entity.Property(e => e.ProcessAction).HasMaxLength(100);
+                entity.Property(e => e.ProcessStatus).HasMaxLength(100);
+                //entity.Property(e => e.TargetTo).HasMaxLength(500);
+                //entity.Property(e => e.TriggeredBy).HasMaxLength(500);
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+                entity.Property(e => e.UpdatedBy).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<ApplicationSBUApproval>(entity =>
+            {
+                entity.ToTable("ApplicationSBUApproval");
+
+                //entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AppId).HasColumnName("AppId");
+                entity.Property(e => e.StaffID).HasColumnName("StaffID");
+                entity.Property(e => e.Comment).HasColumnName("Comment");
+                entity.Property(e => e.Status).HasColumnName("Status");
+                entity.Property(e => e.AppAction).HasColumnName("AppAction");
+                entity.Property(e => e.DeskID).HasColumnName("DeskID");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             });
         }
     }

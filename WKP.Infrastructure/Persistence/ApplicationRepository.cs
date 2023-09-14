@@ -41,6 +41,15 @@ namespace WKP.Infrastructure.Persistence
             return result;
         }
 
+        public async Task<Domain.Entities.Application?> GetAppByIdWithAll(int AppId)
+        {
+            return await _context.Applications
+                                    .Include(x => x.Concession)
+                                    .Include(x => x.Field)
+                                    .Include(x => x.Company)
+                                    .Where((a) => a.Id == AppId).FirstOrDefaultAsync();
+        }
+
         public async Task<Domain.Entities.Application?> GetApplicationById(int AppId)
         {
             return await _context.Applications.Where(a => a.Id == AppId).FirstOrDefaultAsync();

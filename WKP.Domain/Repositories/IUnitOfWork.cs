@@ -13,7 +13,10 @@ namespace WKP.Domain.Repositories
         public ITypeOfPaymentRepository TypeOfPaymentRepository { get; }
         public IAuditRepository AuditRepository { get; }
         public IMessageRepository MessageRepository { get;}
-
+        public IRoleRepository RoleRepository { get; }
+        public IAppProcessFlowRepo AppProcessFlowRepo { get; }  
+        public IAppDeskHistoryRepository AppDeskHistoryRepository { get; }
+        public IAppSBUApprovalRepository AppSBUApprovalRepository { get; }
 
 
         void BeginTransaction();

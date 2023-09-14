@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
@@ -21,10 +22,14 @@ namespace WKP.Infrastructure.Persistence
         public ITypeOfPaymentRepository TypeOfPaymentRepository { get; private set; }
         public IAuditRepository AuditRepository { get; private set; }
         public IMessageRepository MessageRepository { get; private set; }
+        public IRoleRepository RoleRepository { get; private set; }
+        public IAppProcessFlowRepo AppProcessFlowRepo { get; private set; } 
+        public IAppDeskHistoryRepository AppDeskHistoryRepository { get; private set; }
+        public IAppSBUApprovalRepository AppSBUApprovalRepository { get; private set; }
 
         public UnitOfWork(WKPContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(_context));
             AdminCompanyInformationRepository = new AdminCompanyInformationRepository(context);
             ApplicationRepository = new ApplicationRepository(context); 
             DeskRepository = new DeskRepository(context);
@@ -36,6 +41,10 @@ namespace WKP.Infrastructure.Persistence
             TypeOfPaymentRepository = new TypeOfPaymentRepository(context);
             AuditRepository = new AuditRepository(context);
             MessageRepository = new MessageRepository(context); 
+            RoleRepository = new RoleRepository(context);   
+            AppProcessFlowRepo = new AppProcessFlowRepo(context);
+            AppDeskHistoryRepository = new AppDeskHistoryRepository(context);
+            AppSBUApprovalRepository = new AppSBUApprovalRepository(context);
         }
 
         public void BeginTransaction()
@@ -68,14 +77,15 @@ namespace WKP.Infrastructure.Persistence
             return await _context.SaveChangesAsync();
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected async virtual Task Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
                     // dispose managed state (managed objects)
-                    _context.Dispose();
+                    _transaction?.Dispose();
+                    await _context.DisposeAsync();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
@@ -91,10 +101,10 @@ namespace WKP.Infrastructure.Persistence
         //     Dispose(disposing: false);
         // }
 
-        public void Dispose()
+        public async void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
+            await Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
     }

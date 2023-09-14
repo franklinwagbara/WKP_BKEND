@@ -1,5 +1,6 @@
 using Backend_UMR_Work_Program.Common.Interfaces;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_UMR_Work_Program.Common.Implementations
 {
@@ -37,9 +38,9 @@ namespace Backend_UMR_Work_Program.Common.Implementations
         ///     Response return from API response
         /// </summary>
         /// <value> object </value>
-        public IApiResponse Response(object Data, string? Message, int? StatusCode, string? ResponseCode)
+        public IActionResult Response(object Data, string? Message, int? StatusCode, string? ResponseCode)
         {
-            return new ApiResponse { Data = Data, Message = Message, ResponseCode = ResponseCode, StatusCode = StatusCode ?? StatusCodes.Status200OK };
+            return new OkObjectResult(new ApiResponse { Data = Data, Message = Message, ResponseCode = ResponseCode, StatusCode = StatusCode ?? StatusCodes.Status200OK });
         }
     }
 }

@@ -9,6 +9,7 @@ using WKP.Application.Fee.Commands;
 using WKP.Contracts.Application;
 using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Commands.OpenApplication;
+using WKP.Application.Application.Commands.PushApplicationCommand;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -23,6 +24,7 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<OpenApplicationRequest, OpenApplicationCommand>()
             .ForMember(x => x.DeskId, opt => opt.MapFrom(src => src.DeskId))
             .ReverseMap();
+            CreateMap<PushApplicationRequest, PushApplicationCommand>().ReverseMap();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();

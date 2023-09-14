@@ -1,4 +1,5 @@
 using Backend_UMR_Work_Program.Common.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backend_UMR_Work_Program.Common.Implementations
 {
@@ -13,9 +14,12 @@ namespace Backend_UMR_Work_Program.Common.Implementations
         /// <returns>
         ///     IApiResponse
         /// </returns>
-        public IApiResponse Response(object? Data, string? Message, int? StatusCode, string? ResponseCode)
+        public IActionResult Response(object? Data, string? Message, int? StatusCode, string? ResponseCode)
         {
-            return new ApiResponse{Data = Data, Message = Message, StatusCode = StatusCode ?? StatusCodes.Status500InternalServerError, ResponseCode = ResponseCode};
+            return new ObjectResult(new ApiResponse{Data = Data, Message = Message, StatusCode = StatusCode ?? StatusCodes.Status500InternalServerError, ResponseCode = ResponseCode})
+            {
+                StatusCode = StatusCode ?? StatusCodes.Status500InternalServerError
+            };
         }
 
         /// <summary>
@@ -24,9 +28,9 @@ namespace Backend_UMR_Work_Program.Common.Implementations
         /// <returns>
         ///     IApiResponse
         /// </returns>
-        public static IApiResponse ResponseObject(object? Data = null, string? Message = null, int? StatusCode = null, string? ResponseCode = null)
+        public static IActionResult ResponseObject(object? Data = null, string? Message = null, int? StatusCode = null, string? ResponseCode = null)
         {
-            return new SuccessResponse().Response(Data, Message, StatusCode, ResponseCode);
+            return new FailResponse().Response(Data, Message, StatusCode, ResponseCode);
         }
     }
 }

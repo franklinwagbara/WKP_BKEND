@@ -2,8 +2,10 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WKP.Application.Common.Interfaces;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
+using WKP.Infrastructure.GeneralServices;
 using WKP.Infrastructure.GeneralServices.Implementations;
 using WKP.Infrastructure.GeneralServices.Interfaces;
 using WKP.Infrastructure.Persistence;
@@ -26,6 +28,8 @@ namespace WKP.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IEmailAuditMessage, EmailAuditMessage>();
             services.AddScoped<EmailHelper>();
+            services.AddTransient<IStaffNotifier, StaffNotifier>();
+            services.AddTransient<ICompanyNotifier, CompanyNotifier>();
 
             //HangFire setup
             services.AddHangfire(x => x.UseSqlServerStorage(configuration["Data:Wkpconnect:ConnectionString"]));

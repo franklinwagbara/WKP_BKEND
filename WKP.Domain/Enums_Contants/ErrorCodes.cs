@@ -9,5 +9,6 @@ namespace WKP.Domain.Enums_Contants
     {
         public static string InternalFailure = "Internal.Failure";
         public static string NotFound = "Not.Found";
+        public static string InvalidParameterPassed = "Invalid.Parameter.Passes";
     }
 }

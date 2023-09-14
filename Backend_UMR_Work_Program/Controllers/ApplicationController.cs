@@ -4,8 +4,6 @@ using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Models.Enurations;
 using Backend_UMR_Work_Program.Services;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Math;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +17,7 @@ using System.Data.SqlClient;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using WKP.Application.Application.Commands.OpenApplication;
+using WKP.Application.Application.Commands.PushApplicationCommand;
 using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Queries.GetProcessingApplications;
 using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
@@ -71,7 +70,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
 
         [HttpGet("GetDashboardData")]
-        public async Task<IApiResponse> GetDashboardData() 
+        public async Task<IActionResult> GetDashboardData() 
         {
             var query = _mapper.Map<GetDashboardDataQuery>(new GetDashboardDataRequest((int)WKPCompanyNumber));
             var result = await _mediator.Send(query);
@@ -79,7 +78,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpGet("GetProcessingApplications/staffId")] //For general application view
-        public async Task<IApiResponse> GetProcessingApplicationsByStaffId(GetProcessingApplicationsByStaffIdRequest request)
+        public async Task<IActionResult> GetProcessingApplicationsByStaffId(GetProcessingApplicationsByStaffIdRequest request)
         {
             var query = _mapper.Map<GetProcessingApplicationsByStaffIdQuery>(request);
             var result = await _mediator.Send(query);
@@ -87,7 +86,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpGet("GetProcessingApplicationsOnMyDesk")] //For general application view
-        public async Task<IApiResponse> GetProcessingApplicationsOnMyDesk()
+        public async Task<IActionResult> GetProcessingApplicationsOnMyDesk()
         {
             var query = _mapper.Map<GetProcessingAppsOnMyDeskQuery>(new GetProcessingAppsOnMyDeskQuery(WKPCompanyEmail));
             var result = await _mediator.Send(query);
@@ -95,7 +94,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpGet("OpenApplication")]
-        public async Task<IApiResponse> OpenApplication(OpenApplicationRequest request)
+        public async Task<IActionResult> OpenApplication(OpenApplicationRequest request)
         {
             var command = _mapper.Map<OpenApplicationCommand>(request);
             var result = await _mediator.Send(command);
@@ -103,7 +102,12 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("PushApplication")]
-        public async Task<WebApiResponse> PushApplication(int deskID, string comment, string[] selectedApps) => await _applicationService.PushApplication(deskID, comment, selectedApps);
+        public async Task<IActionResult> PushApplication(PushApplicationRequest request)
+        {
+            var command = _mapper.Map<PushApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
 
         [HttpGet("GetLockForms")]
         public async Task<WebApiResponse> GetLockForms(int year, int concessionId, int fieldId) => await _applicationService.LockForms(year, concessionId, fieldId);
@@ -413,15 +417,15 @@ namespace Backend_UMR_Work_Program.Controllers
                 var companyDetails = await _context.ADMIN_COMPANY_DETAILs.Where(x => x.EMAIL == company.EMAIL).FirstOrDefaultAsync();
 
                 var appHistory = await _context.ApplicationDeskHistories.Include(x => x.Staff).Include(x => x.Company).Where(x => x.AppId == appID)
-                                    .Select( x => new
+                                    .Select(x => new
                                     {
                                         ID = x.Id,
-                                        Staff_Name = x.Staff.LastName + ", " + x.Staff.FirstName,
-                                        Staff_Email = x.Staff.StaffEmail,
+                                        Staff_Name = x.Staff != null ? x.Staff.LastName + ", " + x.Staff.FirstName : "",
+                                        Staff_Email = x.Staff != null ? x.Staff.StaffEmail : "",
                                         Staff = x.Staff,
-                                        Staff_SBU = _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().SBU_Name,
+                                        Staff_SBU = x.Staff != null ? _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().SBU_Name : "",
                                         Staff_SBUID = _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().Id,
-                                        Staff_Role = _context.Roles.Where(r => r.id == x.Staff.RoleID).FirstOrDefault().RoleName,
+                                        Staff_Role = x.Staff != null? _context.Roles.Where(r => r.id == x.Staff.RoleID).FirstOrDefault().RoleName: "",
                                         Comment = x.Comment,
                                         Date = x.ActionDate,
                                         ActionByCompany = x.ActionByCompany,
@@ -430,7 +434,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                         Status = x.Status,
                                         Action = x.AppAction,
                                         SelectedTables = x.SelectedTables,
-                                    }).ToListAsync();
+                                    })
+                                    .ToListAsync();
 
                 var currentDesks = await (from dsk in _context.MyDesks
                                        join stf in _context.staff on dsk.StaffID equals stf.StaffID

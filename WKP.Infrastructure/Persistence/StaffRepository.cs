@@ -27,5 +27,25 @@ namespace WKP.Infrastructure.Persistence
             
             return staff;
         }
+
+        public async Task<staff?> GetStaffByDeskId(int deskId)
+        {
+            var result = await (from stf in _context.Staffs
+                                join dsk in _context.Desks 
+                                        on stf.StaffID equals dsk.StaffID
+                                where dsk.DeskID == deskId
+                                select stf).FirstOrDefaultAsync();
+            return result;
+        }
+
+        public async Task<staff?> GetStaffByIdWithSBU(int StaffId)
+        {
+            return await _context.Staffs.Include(x => x.StrategicBusinessUnit).Where(x => x.StaffID == StaffId).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<int>?> GetStaffIdsByRoleSBU(int? RoleId, int? SBUId)
+        {
+           return await _context.Staffs.Where(x => x.RoleID==RoleId && x.Staff_SBU==SBUId && x.DeleteStatus !=true).Select(x => x.StaffID).ToListAsync();
+        }
     }
 }

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace Backend_UMR_Work_Program.Common.Interfaces
 {
     /// <summary>
@@ -8,7 +10,7 @@ namespace Backend_UMR_Work_Program.Common.Interfaces
         /// <summary>
         ///     Specifies the response type
         /// </summary>
-        /// <returns>IApiResponse</returns>
-        IApiResponse Response(object Data, string? Message, int? StatusCode, string? ResponseCode);
+        /// <returns>IActionResult</returns>
+        IActionResult Response(object Data, string? Message, int? StatusCode, string? ResponseCode);
     }
 }

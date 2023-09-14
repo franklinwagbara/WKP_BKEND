@@ -37,7 +37,7 @@ namespace Backend_UMR_Work_Program.Controllers
         /// </summary>
         /// <returns> ApiResponse object </returns>
         [HttpGet("GET_FEES")]
-        public async Task<IApiResponse> GetFees(GetFeesRequest request)
+        public async Task<IActionResult> GetFees(GetFeesRequest request)
         {
             var query = _mapper.Map<GetFeesQuery>(request);
             var result = await _mediator.Send(query);
@@ -50,7 +50,7 @@ namespace Backend_UMR_Work_Program.Controllers
         /// <param name="request"></param>
         /// <returns> ApiResponse object </returns>
         [HttpPost("ADD_FEE")]
-        public async Task<IApiResponse> AddFee([FromBody]AddFeeRequest request)
+        public async Task<IActionResult> AddFee([FromBody]AddFeeRequest request)
         {
             var command = _mapper.Map<AddFeeCommand>(request);
             var result = await _mediator.Send(command);
@@ -62,7 +62,7 @@ namespace Backend_UMR_Work_Program.Controllers
         /// </summary>
         /// <returns> ApiResponse object </returns>
         [HttpGet("GET_OTHER_FEES")]
-        public async Task<IApiResponse> GetOtherFees(GetOtherFeesRequest request)
+        public async Task<IActionResult> GetOtherFees(GetOtherFeesRequest request)
         {
             var query = _mapper.Map<GetOtherFeesQuery>(request);
             var result = await _mediator.Send(query);
@@ -75,7 +75,7 @@ namespace Backend_UMR_Work_Program.Controllers
         /// <param name="request">Id of the fee</param>
         /// <returns> ApiResponse object </returns>
         [HttpDelete("DELETE_FEE")]
-        public async Task<IApiResponse> DeleteFee(DeleteFeeCommand request)
+        public async Task<IActionResult> DeleteFee(DeleteFeeCommand request)
         {
             var result = await _mediator.Send(request);
             return Response(result);

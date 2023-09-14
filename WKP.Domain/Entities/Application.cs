@@ -23,9 +23,16 @@ namespace WKP.Domain.Entities
 		public bool? DeleteStatus { get; set; }
 		public DateTime? DeletedAt { get; set; }
 
-		public ADMIN_CONCESSIONS_INFORMATION Concession { get; set; }
-		public ADMIN_COMPANY_INFORMATION Company { get; set; }
-		public COMPANY_FIELD Field { get; set; }
+		public ADMIN_CONCESSIONS_INFORMATION? Concession { get; set; }
+		public ADMIN_COMPANY_INFORMATION? Company { get; set; }
+		public COMPANY_FIELD? Field { get; set; }
+
+		public static class NavigationProperty
+        {
+            public static string Concession = "Concession";
+            public static string Company = "Company";
+            public static string Field = "Field";
+        }
 
 		//To track application processing stages
 		//public string ProcessingStage { get; set; } = null!;
