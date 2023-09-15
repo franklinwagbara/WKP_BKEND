@@ -94,6 +94,7 @@ namespace WKP.Infrastructure.GeneralServices.Implementations
 
                 client.UseDefaultCredentials = false;
                 client.EnableSsl = true;
+                client.Timeout = 300000;
                 client.Credentials = new NetworkCredential(_username, _password); 
                 mail.From = new MailAddress(_emailFrom);
                 mail.To.Add(new MailAddress(RecipientEmail, RecipientName));

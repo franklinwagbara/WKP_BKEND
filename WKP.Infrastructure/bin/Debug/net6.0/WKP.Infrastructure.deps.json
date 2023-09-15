@@ -924,6 +924,7 @@
         "dependencies": {
           "MediatR": "11.1.0",
           "MediatR.Extensions.Microsoft.DependencyInjection": "11.1.0",
+          "Microsoft.EntityFrameworkCore": "7.0.4",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
           "WKP.Domain": "1.0.0",
           "Mapster": "7.3.0",
@@ -935,6 +936,7 @@
       },
       "WKP.Domain/1.0.0": {
         "dependencies": {
+          "Microsoft.EntityFrameworkCore": "7.0.4",
           "ErrorOr": "1.2.1"
         },
         "runtime": {

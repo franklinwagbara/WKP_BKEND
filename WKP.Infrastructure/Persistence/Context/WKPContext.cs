@@ -22,7 +22,8 @@ namespace WKP.Infrastructure.Context
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<ApplicationProccess> AppProcessFlow { get; set; }
         public virtual DbSet<ApplicationDeskHistory> ApplicationDeskHistories { get; set; }
-        public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals{ get; set; }
+        public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals { get; set; }
+        public virtual DbSet<AppStatus> AppStatuses { get; set; }
 
         public WKPContext(DbContextOptions<WKPContext> options): base(options){}
 
@@ -336,6 +337,21 @@ namespace WKP.Infrastructure.Context
                 entity.Property(e => e.DeskID).HasColumnName("DeskID");
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<StrategicBusinessUnit>(entity =>
+            {
+                entity.ToTable("StrategicBusinessUnits");
+
+                entity.Property(e => e.SBU_Code).HasMaxLength(10);
+                entity.Property(e => e.SBU_Name)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AppStatus>(entity =>
+            {
+                entity.ToTable("AppStatus");
             });
         }
     }

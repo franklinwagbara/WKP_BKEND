@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
@@ -26,6 +27,7 @@ namespace WKP.Infrastructure.Persistence
         public IAppProcessFlowRepo AppProcessFlowRepo { get; private set; } 
         public IAppDeskHistoryRepository AppDeskHistoryRepository { get; private set; }
         public IAppSBUApprovalRepository AppSBUApprovalRepository { get; private set; }
+        public IAppStatusRepository AppStatusRepository { get; private set; }
 
         public UnitOfWork(WKPContext context)
         {
@@ -45,11 +47,25 @@ namespace WKP.Infrastructure.Persistence
             AppProcessFlowRepo = new AppProcessFlowRepo(context);
             AppDeskHistoryRepository = new AppDeskHistoryRepository(context);
             AppSBUApprovalRepository = new AppSBUApprovalRepository(context);
+            AppStatusRepository = new AppStatusRepository(context);
         }
+
+        public DatabaseFacade ContextDatabase() => _context.Database;
 
         public void BeginTransaction()
         {
             _transaction = _context.Database.BeginTransaction();
+        }
+
+        public async Task ExecuteTransaction(Func<Task> func)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
+            {
+                BeginTransaction();
+                await func();
+                await Commit();
+            });
         }
 
         public async Task<bool> Commit()

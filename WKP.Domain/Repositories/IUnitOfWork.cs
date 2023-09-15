@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
+
 namespace WKP.Domain.Repositories
 {
     public interface IUnitOfWork: IDisposable
@@ -17,8 +19,11 @@ namespace WKP.Domain.Repositories
         public IAppProcessFlowRepo AppProcessFlowRepo { get; }  
         public IAppDeskHistoryRepository AppDeskHistoryRepository { get; }
         public IAppSBUApprovalRepository AppSBUApprovalRepository { get; }
+        public IAppStatusRepository AppStatusRepository { get; }
 
 
+        public Task ExecuteTransaction(Func<Task> func);
+        DatabaseFacade ContextDatabase();
         void BeginTransaction();
         Task<bool> Commit();
         void Rollback();

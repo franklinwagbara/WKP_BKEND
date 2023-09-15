@@ -1,4 +1,5 @@
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\bin\Debug\net6.0\WKP.Domain.deps.json
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\bin\Debug\net6.0\WKP.Domain.runtimeconfig.json
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\bin\Debug\net6.0\WKP.Domain.dll
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\bin\Debug\net6.0\WKP.Domain.pdb
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\obj\Debug\net6.0\WKP.Domain.csproj.AssemblyReference.cache
@@ -9,4 +10,5 @@ C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domai
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\obj\Debug\net6.0\WKP.Domain.dll
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\obj\Debug\net6.0\refint\WKP.Domain.dll
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\obj\Debug\net6.0\WKP.Domain.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\obj\Debug\net6.0\WKP.Domain.genruntimeconfig.cache
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Domain\obj\Debug\net6.0\ref\WKP.Domain.dll

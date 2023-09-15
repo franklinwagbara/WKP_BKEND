@@ -1,6 +1,7 @@
 using ErrorOr;
 using Mapster;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using WKP.Application.Application.Common;
 using WKP.Application.Common.Interfaces;
 using WKP.Domain.Entities;
@@ -58,33 +59,37 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
                         {
                             foreach (var appFlow in appFlows)
                             {
-                                var targetRoles_SBUs = await _unitOfWork.StaffRepository.GetStaffIdsByRoleSBU(appFlow.TargetedToRole, appFlow.TargetedToSBU);
-                                var deskTemp = await _helper.GetNextStaffDesk(targetRoles_SBUs.ToList(), appId);
-
-                                if (deskTemp != null)
-                                    await UpdateDesk(request.Comment, appId, staffDesk.StaffID, appFlow, deskTemp, DESK_PROCESS_STATUS.SubmittedByStaff);
-                                else
+                                await _unitOfWork.ExecuteTransaction(async () =>
                                 {
-                                    MyDesk desk = await CreateNewDesk(request.Comment, appId, staffDesk, appFlow, deskTemp);
-                                    deskTemp = desk;
-                                }
+                                    var targetRoles_SBUs = await _unitOfWork.StaffRepository.GetStaffIdsByRoleSBU(appFlow.TargetedToRole, appFlow.TargetedToSBU);
+                                    var deskTemp = await _helper.GetNextStaffDesk(targetRoles_SBUs.ToList(), appId);
 
-                                await _helper.UpdateDeskAfterPush(staffDesk, request.Comment, DESK_PROCESS_STATUS.Pushed);
-                                await _helper.SaveApplicationHistory(app.Id, staffDesk.Staff.StaffID, DESK_PROCESS_STATUS.Pushed, request.Comment, null, false, null, PROCESS_CONSTANTS.Push);
-                                
-                                //Sending notifications to Actor Staff
-                                _staffNotifier.Init(staffDesk.Staff, app, app.Concession, app.Field);
-                                await _staffNotifier.SendPushNotification();
+                                    if (deskTemp != null)
+                                        await UpdateDesk(request.Comment, appId, staffDesk.StaffID, appFlow, deskTemp, DESK_PROCESS_STATUS.SubmittedByStaff);
+                                    else
+                                    {
+                                        MyDesk desk = await CreateNewDesk(request.Comment, appId, staffDesk, appFlow, deskTemp);
+                                        deskTemp = desk;
+                                    }
 
-                                //Sending notifications to Receiver Staff
-                                var recStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(deskTemp.StaffID);
+                                    await _helper.UpdateDeskAfterPush(staffDesk, request.Comment, DESK_PROCESS_STATUS.Pushed);
+                                    await _helper.SaveApplicationHistory(app.Id, staffDesk.Staff.StaffID, DESK_PROCESS_STATUS.Pushed, request.Comment, null, false, null, PROCESS_CONSTANTS.Push);
 
-                                if(recStaff != null){
-                                    _staffNotifier.Init(recStaff, app, app.Concession, app.Field);
+                                    //Sending notifications to Actor Staff
+                                    _staffNotifier.Init(staffDesk.Staff, app, app.Concession, app.Field);
                                     await _staffNotifier.SendPushNotification();
-                                }
 
-                                await _unitOfWork.SaveChangesAsync();
+                                    //Sending notifications to Receiver Staff
+                                    var recStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(deskTemp.StaffID);
+
+                                    if (recStaff != null)
+                                    {
+                                        _staffNotifier.Init(recStaff, app, app.Concession, app.Field);
+                                        await _staffNotifier.SendPushNotification();
+                                    }
+
+                                    await UpdateAppStatus(app, deskTemp, recStaff, DESK_PROCESS_STATUS.SubmittedByStaff);
+                                });
 
                                 return new ApplicationResult(null, $"Application for concession {app.Concession.Concession_Held} has been pushed successfully.");
                             }
@@ -93,34 +98,37 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
                         {
                             foreach (var appFlow in appFlowECs)
                             {
+                                await _unitOfWork.ExecuteTransaction(async () =>
+                                {
+                                    var targetRoles_SBUs = await _unitOfWork.StaffRepository.GetStaffIdsByRoleSBU(appFlow.TargetedToRole, appFlow.TargetedToSBU);
+                                    var deskTemp = await _helper.GetNextStaffDesk_EC(targetRoles_SBUs.ToList(), appId);
 
-                                var targetRoles_SBUs = await _unitOfWork.StaffRepository.GetStaffIdsByRoleSBU(appFlow.TargetedToRole, appFlow.TargetedToSBU);
-                                var deskTemp = await _helper.GetNextStaffDesk_EC(targetRoles_SBUs.ToList(), appId);
+                                    if (deskTemp.DeskID != -1)
+                                        await UpdateDesk(request.Comment, appId, staffDesk.StaffID, appFlow, deskTemp, DESK_PROCESS_STATUS.FinalAuthorityApproved);
+                                    else
+                                        deskTemp = await _unitOfWork.DeskRepository.GetDeskByStaffIdAppIdWithStaff(deskTemp.StaffID, deskTemp.AppId, true);
 
-                                if (deskTemp.DeskID != -1)
-                                    await UpdateDesk(request.Comment, appId, staffDesk.StaffID, appFlow, deskTemp, DESK_PROCESS_STATUS.FinalAuthorityApproved);
-                                else
-                                    deskTemp = await _unitOfWork.DeskRepository.GetDeskByStaffIdAppIdWithStaff(deskTemp.StaffID, deskTemp.AppId, true);
+                                    await _helper.UpdateDeskAfterPush(staffDesk, request.Comment, DESK_PROCESS_STATUS.Pushed);
+                                    _helper.SaveApplicationHistory(appId, staffDesk.StaffID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved, request.Comment, null, false, null, APPLICATION_ACTION.Approve);
 
-                                await _helper.UpdateDeskAfterPush(staffDesk, request.Comment, DESK_PROCESS_STATUS.Pushed);
-                                _helper.SaveApplicationHistory(appId, staffDesk.StaffID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved, request.Comment, null, false, null, APPLICATION_ACTION.Approve);
+                                    //Update Final Authority Approvals Table
+                                    await _helper.UpdateApprovalTable(appId, request.Comment, staffDesk.StaffID, (int)staffDesk.Staff.Staff_SBU, staffDesk.DeskID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved);
 
-                                //Update Final Authority Approvals Table
-                                await _helper.UpdateApprovalTable(appId, request.Comment, staffDesk.StaffID, (int)staffDesk.Staff.Staff_SBU, staffDesk.DeskID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved);
+                                    //Sending notifications to Actor Staff
+                                    _staffNotifier.Init(actingStaff, app, app.Concession, app.Field);
+                                    await _staffNotifier.SendApprovalNotification();
 
-                                //Sending notifications to Actor Staff
-                                _staffNotifier.Init(actingStaff, app, app.Concession, app.Field);
-                                await _staffNotifier.SendApprovalNotification();
+                                    //Sending notifications to Receiver Staff
+                                    var recStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(deskTemp.StaffID);
 
-                                //Sending notifications to Receiver Staff
-                                var recStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(deskTemp.StaffID);
+                                    if (recStaff != null)
+                                    {
+                                        _staffNotifier.Init(recStaff, app, app.Concession, app.Field);
+                                        await _staffNotifier.SendPushNotification();
+                                    }
 
-                                if(recStaff != null){
-                                    _staffNotifier.Init(recStaff, app, app.Concession, app.Field);
-                                    await _staffNotifier.SendPushNotification();
-                                }
-
-                                await _unitOfWork.SaveChangesAsync();
+                                    await UpdateAppStatus(app, deskTemp, recStaff, DESK_PROCESS_STATUS.SubmittedByStaff);
+                                });
 
                                 return new ApplicationResult(null, $"Application for concession {app.Concession.Concession_Held} has been approved by Final Authority successfully.");
                             }
@@ -140,6 +148,36 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
             catch (Exception ex) 
             {
                 return Error.Failure(code: ErrorCodes.InternalFailure, description: ex.Message);
+            }
+        }
+
+        private async Task UpdateAppStatus(Domain.Entities.Application app, MyDesk desk, staff staff, string InternalStatus)
+        {
+            if(app is null || app.Id is 0)
+                throw new Exception("AppId can not be null.");
+            
+            var appStatus = await _unitOfWork.AppStatusRepository.GetByAppIdSBUId(app.Id, (int)staff.Staff_SBU);
+            if (appStatus != null)
+            {
+                appStatus.InternalStatus = InternalStatus;
+                appStatus.DeskId = desk != null? desk.DeskID: 0;
+                appStatus.UpdatedAt = DateTime.Now;
+                await _unitOfWork.AppStatusRepository.Update(appStatus);
+            }
+            else
+            {
+                var newStatus = new AppStatus
+                {
+                    AppId = app.Id,
+                    CompanyId = app.CompanyID,
+                    FieldId = app.FieldID ?? null,
+                    ConcessionId = app.ConcessionID ?? throw new Exception("Concession cannot be null."),
+                    SBUId = staff.Staff_SBU,
+                    DeskId = desk != null? desk.DeskID: 0,
+                    Status = app.Status,
+                    InternalStatus = InternalStatus
+                };
+                await _unitOfWork.AppStatusRepository.AddAsync(newStatus);
             }
         }
 
