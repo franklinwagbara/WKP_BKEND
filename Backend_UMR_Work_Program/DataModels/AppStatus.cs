@@ -11,6 +11,7 @@ namespace Backend_UMR_Work_Program.DataModels
         public int ConcessionId { get; set; }
         public int SBUID { get; set; }
         public int DeskId { get; set; }
+        public string Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         //Navigation properties

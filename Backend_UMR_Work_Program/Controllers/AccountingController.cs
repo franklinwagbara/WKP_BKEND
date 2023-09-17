@@ -41,6 +41,6 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(int deskId) => await _accountingService.GetPaymentOnDesk(deskId);
 
         [HttpGet("CONFIRM_USD_PAYMENT")]
-        public async Task<WebApiResponse> ConfirmUSDPayment(int deskId) => await _accountingService.ConfirmUSDPayment(deskId);
+        public async Task<IActionResult> ConfirmUSDPayment(int deskId) => await _accountingService.ConfirmUSDPayment(deskId);
     }
 }
