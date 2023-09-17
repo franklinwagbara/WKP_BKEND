@@ -350,7 +350,7 @@ namespace Backend_UMR_Work_Program.Services
                                 string subject = $"Push action was taken for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                 string content = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) has been pushed by a staff to the next processing level.";
                                 var emailMsg = _helperService.SaveMessage(application.Id, staffActing.StaffID, subject, content, "Staff");
-                                //var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
+                                var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
 
                                 _helperService.LogMessages($"Push action was taken for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).");
                                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been pushed successfully.", StatusCode = ResponseCodes.Success };
@@ -398,7 +398,7 @@ namespace Backend_UMR_Work_Program.Services
                                 string subject = $"Approval from Final Athority for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                 string content = $"WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}) has been approved approved by Final Authority to the next processing level.";
                                 var emailMsg = _helperService.SaveMessage(application.Id, staffActing.StaffID, subject, content, "Staff");
-                                //var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
+                                var sendEmail = _helperService.SendEmailMessage(staffActing.StaffEmail, staffActing.FirstName, emailMsg, null);
 
                                 _helperService.LogMessages($"Approval from Final Athority for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).");
                                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"Application for concession {concession.Concession_Held} has been approved by Final Authority successfully.", StatusCode = ResponseCodes.Success };
@@ -1204,7 +1204,7 @@ namespace Backend_UMR_Work_Program.Services
                             string subject = $"Comment for WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                             string content = $"{staffWithAppOnDeskSBU?.SBU_Name} made comment on the WORK PROGRAM application with Reference Number: {application.ReferenceNo}. See comment :- " + comment;
                             var emailMsg = _helperService.SaveMessage(application.Id, Company.Id, subject, content, "Company");
-                            //var sendEmail = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
+                            var sendEmail = _helperService.SendEmailMessage(Company.EMAIL, Company.NAME, emailMsg, null);
 
                             return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = $"The Application {concession.Concession_Held} has been returned to staff.", StatusCode = ResponseCodes.Success };
                         }
@@ -1251,7 +1251,7 @@ namespace Backend_UMR_Work_Program.Services
                                     string subject = $"Returned WORK PROGRAM application with ref: {application.ReferenceNo} ({concession.Concession_Held} - {application.YearOfWKP}).";
                                     string content = $"{WKPCompanyName} returned WORK PROGRAM application for year {application.YearOfWKP} with Reference Number {application.ReferenceNo}.";
                                     var emailMsg = _helperService.SaveMessage(application.Id, staffWithAppOnDesk.StaffID, subject, content, "Staff");
-                                    //var sendEmail = _helperService.SendEmailMessage(staffWithAppOnDesk.StaffEmail, staffWithAppOnDesk.FirstName, emailMsg, null);
+                                    var sendEmail = _helperService.SendEmailMessage(staffWithAppOnDesk.StaffEmail, staffWithAppOnDesk.FirstName, emailMsg, null);
                                     _helperService.LogMessages("Returned application with REF : " + application.ReferenceNo, WKPCompanyEmail);
                                 }
 

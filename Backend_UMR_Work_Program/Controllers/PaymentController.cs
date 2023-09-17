@@ -5,6 +5,7 @@ using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Services;
 using DocumentFormat.OpenXml.Bibliography;
 using LinqToDB;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using Syncfusion.XlsIO.Implementation;
 using System.Security.Claims;
+using WKP.Application.Features.Application.Commands.SubmitApplication;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -31,6 +33,7 @@ namespace Backend_UMR_Work_Program.Controllers
         public IHttpContextAccessor _httpContext;
         private readonly AppSettings _appSettings;
         private readonly BlobService _blobService;
+        private readonly ISender _mediator;
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
@@ -42,7 +45,8 @@ namespace Backend_UMR_Work_Program.Controllers
             IMapper mapper, IHttpContextAccessor httpAccessor, 
             IOptions<AppSettings> appsettings, PaymentService paymentService,
             ApplicationService applicationService, 
-            BlobService blobService
+            BlobService blobService,
+            ISender mediator
             )
         {
             _context = context;
@@ -52,6 +56,7 @@ namespace Backend_UMR_Work_Program.Controllers
             _applicationService = applicationService;
             _appSettings = appsettings.Value;
             _blobService = blobService;
+            _mediator = mediator;
         }
 
         [HttpGet("GET_PAYMENT_SUMMARY_SUBMISSION")]
@@ -248,7 +253,8 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (paymenRes.ResponseCode != AppResponseCodes.Success)
                     return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = "Could not verify payment.", StatusCode = ResponseCodes.Badrequest };
 
-                var submitRes = await _applicationService.SubmitApplication(payment.AppId);
+                // var submitRes = await _applicationService.SubmitApplication(payment.AppId);
+                var submitRes = await _mediator.Send(new SubmitApplicationCommand(appId));
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = paymenRes.Message, StatusCode = ResponseCodes.Success };
             }
