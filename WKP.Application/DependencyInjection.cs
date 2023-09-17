@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using WKP.Application.Application.Common;
 using WKP.Application.Common.Helpers;
+using WKP.Application.Features.Common;
 
 namespace WKP.Application
 {
@@ -14,6 +15,7 @@ namespace WKP.Application
             services.AddMediatR(typeof(DependencyInjection).Assembly);
             services.AddTransient<AppHelper>();
             services.AddTransient<Helper>();
+            services.AddTransient<AppStatusHelper>();
             
             return services;
         }

@@ -43,7 +43,7 @@ namespace Backend_UMR_Work_Program.Controllers
         public static IActionResult EnumerableResponse(ErrorOr<FeeListResult> result)
         {
             return result.Match(
-                res => SuccessResponse.ResponseObject(res),
+                res => SuccessResponse.ResponseObject(res.Fees),
                 errors => FailResponse.ResponseObject(errors)
             );
         }

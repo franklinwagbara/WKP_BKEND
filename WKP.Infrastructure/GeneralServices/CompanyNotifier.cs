@@ -30,6 +30,17 @@ namespace WKP.Infrastructure.GeneralServices
             _isInitialized = true;
         }
 
+        public Task SendSubmitNotification()
+        {
+            CheckInit();
+            
+            string subject = $"{App.YearOfWKP} submission of WORK PROGRAM application for {App.Company.COMPANY_NAME} field - {App.Field?.Field_Name} : {App.ReferenceNo}";
+            string content = $"{App.Company.COMPANY_NAME} have submitted their WORK PROGRAM application for year {App.YearOfWKP}.";
+        
+            SendNotification(subject, content);
+            return Task.CompletedTask;
+        }
+
         public Task SendApprovalNotification()
         {
             CheckInit();
@@ -55,7 +66,7 @@ namespace WKP.Infrastructure.GeneralServices
             CheckInit();
 
             string subject = $"WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession.Concession_Held} - {App.YearOfWKP}) was returned.";
-            string content = $"You WORK PROGRAM application for year {App.YearOfWKP} was returned.";
+            string content = $"Your WORK PROGRAM application for year {App.YearOfWKP} was returned.";
 
             SendNotification(subject, content);
             return Task.CompletedTask;

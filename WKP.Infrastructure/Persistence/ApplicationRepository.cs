@@ -81,5 +81,43 @@ namespace WKP.Infrastructure.Persistence
             
             return result;
         }
+        public async Task<IEnumerable<Domain.Entities.Application>?> GetAllSubmittedApps()
+        {
+            return await _context.Applications
+                        .Include(x => x.Concession)
+                        .Include(x => x.Field)
+                        .Include(x => x.Company)
+                        .Where( a => 
+                            a.DeleteStatus != true && 
+                            a.Status != MAIN_APPLICATION_STATUS.NotSubmitted
+                        )
+                        .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Domain.Entities.Application>?> GetAllAppsByCompanyId(int CompanyId)
+        {
+            return await _context.Applications
+                        .Include(x => x.Concession)
+                        .Include(x => x.Field)
+                        .Include(x => x.Company)
+                        .Where( a => 
+                            a.DeleteStatus != true && 
+                            a.CompanyID == CompanyId
+                        )
+                        .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Domain.Entities.ReturnedApplication>?> GetReturnedAppsByCompanyId(int CompanyId)
+        {
+            return await _context.ReturnedApplications
+                        .Include(x => x.Application)
+                        .ThenInclude(x => x.Concession)
+                        .Include(x => x.Application)
+                        .ThenInclude(x => x.Field)
+                        .Include(x => x.Staff)
+                        .ThenInclude(x => x.StrategicBusinessUnit)
+                        .Where(x => x.Application.CompanyID == CompanyId)
+                        .ToListAsync();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Mapster;
 using WKP.Application.Fee.Commands;
+using WKP.Domain.DTOs.Application;
 
 namespace WKP.Application.Fee
 {

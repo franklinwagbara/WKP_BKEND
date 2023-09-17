@@ -13,6 +13,75 @@ namespace WKP.Application.Application.Common
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<MyDesk> DropAppOnStaffDesk(int appID, staff staff, int FromStaffID, int FromStaffSBU, int FromStaffRoleID, int processID, string status)
+        {
+            try
+            {
+                MyDesk drop = new MyDesk()
+                {
+                    ProcessID = processID,
+                    AppId = appID,
+                    StaffID = staff.StaffID,
+                    FromStaffID = FromStaffID,
+                    FromSBU = FromStaffSBU,
+                    FromRoleId = FromStaffRoleID,
+                    HasWork = true,
+                    HasPushed = false,
+                    CreatedAt = DateTime.Now,
+                    ProcessStatus = status,
+                    LastJobDate = DateTime.Now,
+                };
+                var newDesk = await _unitOfWork.DeskRepository.AddAsync(drop);
+                await _unitOfWork.SaveChangesAsync();
+                return newDesk;
+            }
+            catch (Exception){ throw; }
+        }
+
+        public async Task<List<staff>> GetReviewerStaffs(List<ApplicationProccess> appFlows)
+        {
+            try
+            {
+                var staffLists = new List<staff>();
+                foreach (var item in appFlows)
+                {
+                    var staffs = (await _unitOfWork.StaffRepository.GetAsync((s) => s.Staff_SBU == item.TargetedToSBU && s.RoleID == item.TargetedToRole, null, null)).ToList();
+
+                    if (staffs.Count <= 0) break;
+
+                    var isFound = false;
+                    var choosenStaff = staffs.Count > 0 ? staffs[0] : new staff();
+                    var choosenDesk = new MyDesk() { LastJobDate = DateTime.Now };
+
+                    foreach (var staff in staffs)
+                    {
+                        var desk = (await _unitOfWork.DeskRepository
+                                    .GetAsync(
+                                        d => d.StaffID == staff.StaffID && d.HasWork == true, 
+                                        (o) => o.OrderByDescending(x => x.LastJobDate))
+                                   ).FirstOrDefault();
+
+                        if (desk == null)
+                        {
+                            staffLists.Add(staff);
+                            isFound = true;
+                            break;
+                        }
+
+                        choosenStaff = desk.LastJobDate < choosenDesk.LastJobDate ? staff : choosenStaff;
+                        choosenDesk = desk.LastJobDate < choosenDesk.LastJobDate ? desk : choosenDesk;
+                    }
+
+                    if (!isFound)
+                    {
+                        staffLists.Add(choosenStaff);
+                    }
+                }
+                return staffLists;
+            }
+            catch (Exception) { throw; }
+        }
+
         public async Task<MyDesk> GetNextStaffDesk(List<int> staffIds, int appId)
         {
             try

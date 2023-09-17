@@ -13,13 +13,21 @@ namespace WKP.Infrastructure.Persistence
             _context = context;
         }
 
-        public async Task<IEnumerable<ApplicationProccess>> GetAppProcessFlowBySBU_Role_Action(string ProcessStatus, int TriggeredByRole = 0, int triggeredBySBU = 0)
+        public async Task<IEnumerable<ApplicationProccess>> GetAppProcessFlowBySBU_Role_Action(string Action, int TriggeredByRole = 0, int triggeredBySBU = 0)
         {
             return await _context.AppProcessFlow
             .Where(
                 x => x.TriggeredByRole==TriggeredByRole 
                 && x.TriggeredBySBU==triggeredBySBU 
-                && x.ProcessAction==ProcessStatus 
+                && x.ProcessAction==Action 
+                && x.DeleteStatus != true ).ToListAsync();
+        }
+
+        public async Task<IEnumerable<ApplicationProccess>> GetAppFlowByAction(string Action)
+        {
+            return await _context.AppProcessFlow
+            .Where(
+                x => x.ProcessAction==Action 
                 && x.DeleteStatus != true ).ToListAsync();
         }
     }

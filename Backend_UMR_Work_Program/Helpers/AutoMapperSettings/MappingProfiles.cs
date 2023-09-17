@@ -10,6 +10,12 @@ using WKP.Contracts.Application;
 using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Commands.OpenApplication;
 using WKP.Application.Application.Commands.PushApplicationCommand;
+using WKP.Application.Fee.Queries.GetOtherFees;
+using WKP.Contracts.Features.Application;
+using WKP.Application.Features.Application.Queries.GetAllApplications;
+using WKP.Application.Features.Application.Queries.GetAllApplicationsCompany;
+using WKP.Application.Features.Application.Queries.GetReturnedApplications;
+using WKP.Application.Features.Application.Commands.SubmitApplication;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -25,9 +31,14 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             .ForMember(x => x.DeskId, opt => opt.MapFrom(src => src.DeskId))
             .ReverseMap();
             CreateMap<PushApplicationRequest, PushApplicationCommand>().ReverseMap();
+            CreateMap<GetAllApplicationsRequest, GetAllApplicationsQuery>().ReverseMap();
+            CreateMap<GetAllApplicationsCompanyRequest, GetAllApplicationsCompanyQuery>();
+            CreateMap<GetReturnedApplicationsRequest, GetReturnedApplicationsQuery>();
+            CreateMap<SubmitApplicationRequest, SubmitApplicationCommand>();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();
+            CreateMap<GetOtherFeesRequest, GetOtherFeesQuery>().ReverseMap();
 
             CreateMap<UserMaster, UserMasterModel>().ReverseMap();
             CreateMap<CONCESSION_SITUATION, CONCESSION_SITUATION_Model>().ReverseMap();
