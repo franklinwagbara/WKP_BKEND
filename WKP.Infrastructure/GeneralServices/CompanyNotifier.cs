@@ -96,7 +96,7 @@ namespace WKP.Infrastructure.GeneralServices
                 Seen = false,
                 CompanyName = App?.Company.COMPANY_NAME ?? "---",
                 CategoryName = "New",
-                Field = Field.Field_Name ?? "---",
+                Field = Field != null? Field.Field_Name: "---",
                 Concession = Concession.ConcessionName ?? "---",
                 DateSubmitted = DateTime.Now
             };
