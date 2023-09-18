@@ -1,5 +1,6 @@
 using Backend_UMR_Work_Program;
 using Backend_UMR_Work_Program.Services;
+using Hangfire;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,7 @@ app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHangfireDashboard();
 //app.MapControllers();
 
 app.MapControllers();

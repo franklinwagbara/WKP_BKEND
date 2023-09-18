@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
+using Backend_UMR_Work_Program.Common.Implementations;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
 using DocumentFormat.OpenXml.Bibliography;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using Syncfusion.XlsIO.Implementation;
+using WKP.Application.Features.Application.Commands.SubmitApplication;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Services
@@ -20,6 +24,7 @@ namespace Backend_UMR_Work_Program.Services
         private readonly HelperService _helperService;
         private readonly PaymentService _paymentService;
         private readonly ApplicationService _applicationService;
+        private readonly ISender _mediator;
 
         public AccountingService(
             IMapper mapper,
@@ -29,7 +34,8 @@ namespace Backend_UMR_Work_Program.Services
             IOptions<AppSettings> appsettings,
             HelperService helperService,
             PaymentService paymentService,
-            ApplicationService applicationService
+            ApplicationService applicationService,
+            ISender mediator
             )
         {
             _mapper = mapper;
@@ -39,6 +45,7 @@ namespace Backend_UMR_Work_Program.Services
             _helperService = helperService;
             _paymentService = paymentService;
             _applicationService = applicationService;
+            _mediator = mediator;
         }
 
         public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(string staffEmail)
@@ -47,13 +54,40 @@ namespace Backend_UMR_Work_Program.Services
             {
                 var staff = await _context.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
 
+                //var desks = await (from accDesk in _context.AccountDesks
+                //                   join payment in _context.Payments on accDesk.AppId equals payment.AppId into paymentGroup
+                //                   from payment in paymentGroup.DefaultIfEmpty()
+                //                   join app in _context.Applications on accDesk.AppId equals app.Id
+                //                   join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
+                //                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
+                //                   from field in fieldGroup.DefaultIfEmpty()
+                //                   join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
+                //                   join stf in _context.staff on accDesk.StaffID equals stf.StaffID
+                //                   where accDesk.StaffID == staff.StaffID
+                //                   select new
+                //                   {
+                //                       Year = app.YearOfWKP,
+                //                       ReferenceNumber = app.ReferenceNo,
+                //                       ConcessionName = conc.ConcessionName,
+                //                       FieldName = field != null ? field.Field_Name : null,
+                //                       CompanyName = comp.COMPANY_NAME,
+                //                       CompanyEmail = comp.EMAIL,
+                //                       EvidenceFilePath = payment != null? payment.PaymentEvidenceFilePath: null,
+                //                       EvidenceFileName = payment != null? payment.PaymentEvidenceFileName: null,
+                //                       Desk = accDesk,
+                //                       Payment = payment != null ? payment : null,
+                //                       Application = app,
+                //                       Staff = stf,
+                //                       Concession = conc,
+                //                       Field = field,
+                //                       PaymentStatus = accDesk.ProcessStatus,
+                //                       SubmittedAt = accDesk.CreatedAt
+                //                   }).ToListAsync();
+
                 var desks = await (from accDesk in _context.AccountDesks
                                    join payment in _context.Payments on accDesk.AppId equals payment.AppId into paymentGroup
                                    from payment in paymentGroup.DefaultIfEmpty()
                                    join app in _context.Applications on accDesk.AppId equals app.Id
-                                   join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
-                                   from field in fieldGroup.DefaultIfEmpty()
                                    join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
                                    join stf in _context.staff on accDesk.StaffID equals stf.StaffID
                                    where accDesk.StaffID == staff.StaffID
@@ -61,18 +95,18 @@ namespace Backend_UMR_Work_Program.Services
                                    {
                                        Year = app.YearOfWKP,
                                        ReferenceNumber = app.ReferenceNo,
-                                       ConcessionName = conc.ConcessionName,
-                                       FieldName = field != null ? field.Field_Name : null,
+                                       ConcessionName = app.Concession.Concession_Held,
+                                       FieldName = app.Field != null ? app.Field.Field_Name : null,
                                        CompanyName = comp.COMPANY_NAME,
                                        CompanyEmail = comp.EMAIL,
-                                       EvidenceFilePath = payment != null? payment.PaymentEvidenceFilePath: null,
-                                       EvidenceFileName = payment != null? payment.PaymentEvidenceFileName: null,
+                                       EvidenceFilePath = payment != null ? payment.PaymentEvidenceFilePath : null,
+                                       EvidenceFileName = payment != null ? payment.PaymentEvidenceFileName : null,
                                        Desk = accDesk,
                                        Payment = payment != null ? payment : null,
                                        Application = app,
                                        Staff = stf,
-                                       Concession = conc,
-                                       Field = field,
+                                       Concession = app.Concession,
+                                       Field = app.Field,
                                        PaymentStatus = accDesk.ProcessStatus,
                                        SubmittedAt = accDesk.CreatedAt
                                    }).ToListAsync();
@@ -160,7 +194,7 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
-        public async Task<WebApiResponse> ConfirmUSDPayment(int deskId)
+        public async Task<IActionResult> ConfirmUSDPayment(int deskId)
         {
             try
             {
@@ -186,18 +220,27 @@ namespace Backend_UMR_Work_Program.Services
                     var emailMsg = _helperService.SaveMessage(app.Id, Convert.ToInt32(app.Company.Id), subject, content, "Company");
                     var sendEmail = _helperService.SendEmailMessage(app.Company.EMAIL, app.Company.COMPANY_NAME, emailMsg, null);
                     var responseMsg = app.Field != null ? $"{app.YearOfWKP} Application for field {app.Field?.Field_Name} has been re-submitted successfully." : $"{app.YearOfWKP} Application for concession: ({app.Concession.ConcessionName}) has been re-submitted successfully.\nIn the case multiple fields, please also ensure that submissions are made to cater for them.";
-                    return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
+
+                    // return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = responseMsg, StatusCode = ResponseCodes.Success };
+                    return SuccessResponse.ResponseObject(null, responseMsg, StatusCodes.Status200OK);
                 }
-                var submitRes = await _applicationService.SubmitApplication(desk.AppId);
+                // var submitRes = await _applicationService.SubmitApplication(desk.AppId);
+                var submitRes = await _mediator.Send(new SubmitApplicationCommand(desk.AppId));
 
-                if (submitRes.ResponseCode != AppResponseCodes.Success)
-                    return submitRes;
+                return submitRes.Match(
+                        res => SuccessResponse.ResponseObject(res.Result, res.Message),
+                        errors => FailResponse.ResponseObject(errors[0])
+                    );
 
-                return submitRes;
+                // if (submitRes.ResponseCode != AppResponseCodes.Success)
+                //     return submitRes;
+
+                // return submitRes;
             }
             catch (Exception e)
             {
-                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+                // return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+                return FailResponse.ResponseObject(null, e.Message, StatusCodes.Status500InternalServerError);
             }
         }
     }

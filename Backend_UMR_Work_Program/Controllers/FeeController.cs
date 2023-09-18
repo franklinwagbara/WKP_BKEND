@@ -1,45 +1,84 @@
 ﻿using AutoMapper;
-using Backend_UMR_Work_Program.DataModels;
-using Backend_UMR_Work_Program.DTOs;
-using Backend_UMR_Work_Program.Services;
+using Backend_UMR_Work_Program.Common.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using static Backend_UMR_Work_Program.Models.GeneralModel;
+using WKP.Application.Fee.Commands;
+using WKP.Application.Fee.Commands.DeleteFee;
+using WKP.Application.Fee.Queries.GetFees;
+using WKP.Application.Fee.Queries.GetOtherFees;
+using WKP.Contracts.Fee;
 
 namespace Backend_UMR_Work_Program.Controllers
 {
+    /// <summary>
+    ///     Fee controller
+    /// </summary>
     [Route("api/[controller]")]
-    public class FeeController: Controller
+    public class FeeController: BaseController
     {
-        public WKP_DBContext _context;
-        public IConfiguration _configuration;
-        IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
-        private readonly FeeService _feeService;
+        private readonly ISender _mediator;
 
-        private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
-        private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
-        private string? WKPCompanyEmail => User.FindFirstValue(ClaimTypes.Email);
-        private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
-
-        public FeeController(WKP_DBContext context, IConfiguration configuration, IMapper mapper, HelperService helperService, AccountingService accountingService, FeeService feeService)
+        /// <summary>
+        ///     Fee controller constructor
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="mediator"></param>        
+        public FeeController(
+            IMapper mapper,
+            ISender mediator)
         {
-            _context = context;
-            _configuration = configuration;
             _mapper = mapper;
-            _feeService = feeService;
+            _mediator = mediator;
         }
 
+        /// <summary>
+        ///     Get all fees
+        /// </summary>
+        /// <returns> ApiResponse object </returns>
         [HttpGet("GET_FEES")]
-        public async Task<WebApiResponse> GetFees() => await _feeService.GetFees();
+        public async Task<IActionResult> GetFees(GetFeesRequest request)
+        {
+            var query = _mapper.Map<GetFeesQuery>(request);
+            var result = await _mediator.Send(query);
+            return EnumerableResponse(result);
+        }
 
+        /// <summary>
+        ///     Add a new fee
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns> ApiResponse object </returns>
         [HttpPost("ADD_FEE")]
-        public async Task<WebApiResponse> AddFee([FromBody]FeeDTO fee) => await _feeService.AddFee(fee);
+        public async Task<IActionResult> AddFee([FromBody]AddFeeRequest request)
+        {
+            var command = _mapper.Map<AddFeeCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
 
+        /// <summary>
+        ///     Get Other payment fee types
+        /// </summary>
+        /// <returns> ApiResponse object </returns>
         [HttpGet("GET_OTHER_FEES")]
-        public async Task<WebApiResponse> GetOtherFees() => await _feeService.GetOtherFees();
+        public async Task<IActionResult> GetOtherFees(GetOtherFeesRequest request)
+        {
+            var query = _mapper.Map<GetOtherFeesQuery>(request);
+            var result = await _mediator.Send(query);
+            return EnumerableResponse(result);
+        }
 
+        /// <summary>
+        ///     Delete a fee
+        /// </summary>
+        /// <param name="request">Id of the fee</param>
+        /// <returns> ApiResponse object </returns>
         [HttpDelete("DELETE_FEE")]
-        public async Task<WebApiResponse> DeleteFee(int id) => await _feeService.DeleteFee(id);
+        public async Task<IActionResult> DeleteFee(DeleteFeeCommand request)
+        {
+            var result = await _mediator.Send(request);
+            return Response(result);
+        }
     }
 }

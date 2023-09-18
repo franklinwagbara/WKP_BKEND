@@ -1,7 +1,4 @@
-﻿using Backend_UMR_Work_Program.DataModels;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Backend_UMR_Work_Program.Models
+﻿namespace Backend_UMR_Work_Program.Models
 {
     public class Fee
     {
