@@ -13,6 +13,34 @@ namespace WKP.Application.Application.Common
             _unitOfWork = unitOfWork;
         }
 
+        public int[]? ParseSBUIDs(string[] SBU_IDs) 
+        {
+            try
+            {
+                var SBU_IDs_int = new int[SBU_IDs.Length];
+
+                var tempSBUs = new List<string>();
+                foreach (string s in SBU_IDs)
+                {
+                    if (s != null && s != "undefined")
+                        tempSBUs.Add(s);
+                }
+
+                if (tempSBUs.Count > 0)
+                {
+                    for (int i = 0; i < tempSBUs.Count; i++)
+                        SBU_IDs_int[i] = int.Parse(tempSBUs[i]);
+                }
+                else
+                {
+                    SBU_IDs_int = null;
+                }
+
+                return SBU_IDs_int;
+            }
+            catch (Exception){ throw; }
+        }
+
         public async Task<MyDesk> DropAppOnStaffDesk(int appID, staff staff, int FromStaffID, int FromStaffSBU, int FromStaffRoleID, int processID, string status)
         {
             try
@@ -187,6 +215,24 @@ namespace WKP.Application.Application.Common
 			}
 		}
 
+        public async Task<MyDesk> UpdateDeskAfterReject(MyDesk desk, string? comment, string? processStatus)
+        {
+            try
+            {
+                desk.HasPushed = false;
+                desk.HasWork = false;
+                desk.UpdatedAt = DateTime.Now;
+                desk.Comment = comment;
+                desk.ProcessStatus = processStatus;
+
+                await _unitOfWork.DeskRepository.Update(desk);
+                await _unitOfWork.SaveChangesAsync();
+
+                return desk;
+            }
+            catch (Exception){ throw; }
+        }
+
         public async Task SaveApplicationHistory(int appId, int? staffId, string? status, string comment, string? selectedTables, bool? actionByCompany, int? companyId, string? action, bool? isPublic = false)
         {
             try
@@ -257,6 +303,29 @@ namespace WKP.Application.Application.Common
             catch (Exception){ throw; }
         }
 
+        public async Task<string> getTableNames(string[] tableIds)
+        {
+            try
+            {
+                string RejectedTables = "";
+                if (tableIds.Count() > 0)
+                {
+                    foreach (var id in tableIds)
+                    {
+                        int tableID = id != "undefined" ? int.Parse(id) : 0;
+                        var SBU_TablesToDisplay = await _unitOfWork.TableDetailRepository
+                                                        .GetById(tableID);
+
+                        if (SBU_TablesToDisplay is not null)
+                            RejectedTables = RejectedTables != "" ? $"{RejectedTables}|{SBU_TablesToDisplay.TableSchema}" : SBU_TablesToDisplay.TableSchema;
+
+                    }
+                }
+
+                return RejectedTables;
+            }
+            catch (Exception){ throw; }
+        }
 
         private async Task<MyDesk> CreateNewDesk(int appId, int staffId)
         {

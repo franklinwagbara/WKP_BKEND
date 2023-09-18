@@ -20,6 +20,7 @@ namespace WKP.Domain.Repositories
         public IAppDeskHistoryRepository AppDeskHistoryRepository { get; }
         public IAppSBUApprovalRepository AppSBUApprovalRepository { get; }
         public IAppStatusRepository AppStatusRepository { get; }
+        public ITableDetailRepository TableDetailRepository {get; }
 
 
         public Task ExecuteTransaction(Func<Task> func);

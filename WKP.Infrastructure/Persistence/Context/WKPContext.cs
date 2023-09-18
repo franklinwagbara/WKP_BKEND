@@ -24,6 +24,7 @@ namespace WKP.Infrastructure.Context
         public virtual DbSet<ApplicationDeskHistory> ApplicationDeskHistories { get; set; }
         public virtual DbSet<ApplicationSBUApproval> ApplicationSBUApprovals { get; set; }
         public virtual DbSet<AppStatus> AppStatuses { get; set; }
+        public virtual DbSet<Table_Detail> TableDetails { get; set; }
 
         public WKPContext(DbContextOptions<WKPContext> options): base(options){}
 
@@ -352,6 +353,21 @@ namespace WKP.Infrastructure.Context
             modelBuilder.Entity<AppStatus>(entity =>
             {
                 entity.ToTable("AppStatus");
+            });
+
+            modelBuilder.Entity<Table_Detail>(entity =>
+            {
+                entity.HasKey(e => e.TableId);
+
+                entity.Property(e => e.SBU_ID)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+                entity.Property(e => e.TableName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+                entity.Property(e => e.TableSchema)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
             });
         }
     }

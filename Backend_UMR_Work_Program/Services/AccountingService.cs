@@ -204,7 +204,7 @@ namespace Backend_UMR_Work_Program.Services
 
                 app.PaymentStatus = PAYMENT_STATUS.PaymentCompleted;
                 _context.Applications.Update(app);
-                //await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
                 var typeOfPayment = await _context.TypeOfPayments.Where(x => x.Id == desk.Payment.TypeOfPaymentId).FirstOrDefaultAsync();
 

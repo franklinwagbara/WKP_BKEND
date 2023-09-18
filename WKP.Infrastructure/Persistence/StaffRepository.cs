@@ -28,6 +28,16 @@ namespace WKP.Infrastructure.Persistence
             return staff;
         }
 
+        public async Task<staff?> GetStaffByCompanyNumberWithSBU(int companyNumber)
+        {
+            var staff = await (from stf in _context.Staffs.Include(x => x.StrategicBusinessUnit)
+                                join admin in _context.ADMIN_COMPANY_INFORMATIONs on stf.AdminCompanyInfo_ID equals admin.Id
+                                where stf.AdminCompanyInfo_ID == companyNumber && stf.DeleteStatus != true
+                                select stf).FirstOrDefaultAsync();
+            
+            return staff;
+        }
+
         public async Task<staff?> GetStaffByDeskId(int deskId)
         {
             var result = await (from stf in _context.Staffs
@@ -47,5 +57,13 @@ namespace WKP.Infrastructure.Persistence
         {
            return await _context.Staffs.Where(x => x.RoleID==RoleId && x.Staff_SBU==SBUId && x.DeleteStatus !=true).Select(x => x.StaffID).ToListAsync();
         }
+
+        // public Task<staff?> GetStaffByDeskAppIdWithAll(int DeskId, int AppId)
+        // {
+        //     return await _context.Staffs
+        //             .Include(x => x.StrategicBusinessUnit)
+        //             .Include(x => x.Role)
+        //             .Where(x => x.De)
+        // }
     }
 }
