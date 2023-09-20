@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Backend_UMR_Work_Program.Common.Interfaces;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
-using Backend_UMR_Work_Program.Models.Enurations;
 using Backend_UMR_Work_Program.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,6 +19,7 @@ using WKP.Application.Application.Commands.PushApplicationCommand;
 using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Queries.GetProcessingApplications;
 using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
+using WKP.Application.Features.Application.Commands.ReturnAppToStaff;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
 using WKP.Application.Features.Application.Queries.GetAllApplications;
 using WKP.Application.Features.Application.Queries.GetAllApplicationsCompany;
@@ -146,6 +145,15 @@ namespace Backend_UMR_Work_Program.Controllers
             return Response(result);
         }
 
+        [HttpPost("RETURN_APPLICATION_TO_STAFF")]
+        public async Task<IActionResult> ReturnApplicationToStaff(int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
+        {
+            var request = new ReturnAppToStaffRequest(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber);
+            var command = _mapper.Map<ReturnAppToStaffCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
+
         [HttpGet("GetAllApplicationsScopedToSBU")]
         public async Task<WebApiResponse> GetAllApplicationsScopedToSBU() => await _applicationService.GetAllApplicationsScopedToSBU(WKPCompanyEmail);
 
@@ -195,10 +203,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpGet("IS_APPLICATION_RETURNED")]
         public async Task<WebApiResponse> IsApplicationReturned(int appId) => await _applicationService.IsApplicationReturned(appId);
-
-        [HttpPost("RETURN_APPLICATION_TO_STAFF")]
-        public async Task<object> ReturnApplicationToStaff(/*[FromBody] ActionModel model,*/ int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
-            => await _applicationService.ReturnApplicationToStaff(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber, WKPCompanyName, WKPCompanyEmail);
 
         [HttpPost("RESUBMIT_APPLICATION_WITHOUT_FEE")]
         public async Task<WebApiResponse> ReSubmitApplicationWithoutFee(int? concessionId, int? fieldId)

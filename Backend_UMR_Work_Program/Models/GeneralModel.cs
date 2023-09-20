@@ -62,6 +62,7 @@ namespace Backend_UMR_Work_Program.Models
 		public static class SBU_CODES
 		{
 			public const string WPA = "WPA";
+			public const string ACCOUNTS = "Accounts";
 		}
 
 		public static class RoleName
@@ -136,6 +137,7 @@ namespace Backend_UMR_Work_Program.Models
 		{
             public const string PaymentPending = "Payment Confirmation Pending";
             public const string PaymentCompleted = "Payment Completed";
+			public const string PaymentRejected = "Payment Rejected";
         }
 
 		public static class APPLICATION_ACTION

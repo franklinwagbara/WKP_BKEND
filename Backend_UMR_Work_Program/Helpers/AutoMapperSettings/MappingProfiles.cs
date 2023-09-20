@@ -16,6 +16,10 @@ using WKP.Application.Features.Application.Queries.GetAllApplications;
 using WKP.Application.Features.Application.Queries.GetAllApplicationsCompany;
 using WKP.Application.Features.Application.Queries.GetReturnedApplications;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
+using WKP.Application.Features.Application.Commands.ReturnAppToStaff;
+using WKP.Contracts.Features.Accounting;
+using WKP.Application.Features.Accounting.Queries;
+using WKP.Application.Features.Accounting.Queries.GetAllUSDPaymentApprovals;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -35,6 +39,10 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<GetAllApplicationsCompanyRequest, GetAllApplicationsCompanyQuery>();
             CreateMap<GetReturnedApplicationsRequest, GetReturnedApplicationsQuery>();
             CreateMap<SubmitApplicationRequest, SubmitApplicationCommand>();
+            CreateMap<ReturnAppToStaffRequest, ReturnAppToStaffCommand>();
+            CreateMap<GetAppPaymentsOnMyDeskRequest, GetAppPaymentsOnMyDeskQuery>();
+            CreateMap<GetAllAppPaymentsRequest, GetAllAppPaymentsQuery>();
+            CreateMap<GetAllUSDPaymentApprovalsRequest, GetAllUSDPaymentApprovalsQuery>();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();

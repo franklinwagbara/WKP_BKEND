@@ -1236,7 +1236,8 @@ namespace Backend_UMR_Work_Program.Services
                                     _helperService.UpdateApprovalTable(appId, comment, desk.StaffID, desk.DeskID, (int)desk.Staff.Staff_SBU, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
 
                                     //If there is still approval(s) by atleast one other FA then still keep the application on the wpa rev desk.
-                                    var foundApproval = _dbContext.ApplicationSBUApprovals.Where(x => x.AppId == appId && x.Status == DESK_PROCESS_STATUS.FinalAuthorityApproved).FirstOrDefault();
+                                    var foundApproval = _dbContext.ApplicationSBUApprovals
+                                        .Where(x => x.AppId == appId && x.Status == DESK_PROCESS_STATUS.FinalAuthorityApproved).FirstOrDefault();
 
                                     if(foundApproval != null)
                                     {
