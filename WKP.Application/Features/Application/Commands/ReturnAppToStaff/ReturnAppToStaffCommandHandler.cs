@@ -27,7 +27,7 @@ namespace WKP.Application.Features.Application.Commands.ReturnAppToStaff
             {
                 if(request.SelectedApps is not null)
                 {
-                    var SBUIds = _helper.ParseSBUIDs(request.SBU_IDs) ?? throw new Exception("No SBU Ids was provided.");
+                    var SBUIds = _helper.ParseSBUIDs(request.SBU_IDs);
 
                     foreach(var SA in request.SelectedApps)
                     {
@@ -58,10 +58,14 @@ namespace WKP.Application.Features.Application.Commands.ReturnAppToStaff
                         }
                         else
                         {
-                            await ReturnAppToStaffFromWPAReviewer();
+                            return await ReturnAppToStaffFromWPAReviewer(staffDesk, app, SBUIds, request.Comment, returnedTables);
                         }
                     }
                 }
+                else
+                    return Error.Failure(code: ErrorCodes.InternalFailure, description: "Error: No action was carried out on this application.");
+                
+                return Error.Failure(code: ErrorCodes.InternalFailure, description: "Error: No action was carried out on this application.");
             }
             catch (Exception e)
             {
@@ -82,6 +86,86 @@ namespace WKP.Application.Features.Application.Commands.ReturnAppToStaff
             await _unitOfWork.SaveChangesAsync();
             await _helper.UpdateDeskAfterReject(SourceDesk, Comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
             await _helper.SaveApplicationHistory(App.Id, StaffActing.StaffID, APPLICATION_HISTORY_STATUS.ReturnedToStaff, Comment, ReturnedTables, false, null, APPLICATION_ACTION.ReturnToStaff);
+        }
+
+        private async Task<ApplicationResult> ReturnAppToStaffFromWPAReviewer(MyDesk actingStaffDesk, Domain.Entities.Application App, int[]? SBUIds, string Comment, string ReturnedTables)
+        {
+            var finalAuthorityDesks = await GetAffectedFinalAuthDesks(App, SBUIds);
+            
+            if(finalAuthorityDesks is not null && finalAuthorityDesks.Count > 0)
+            {
+                foreach(var desk in finalAuthorityDesks)
+                {
+                    await UpdateAuthorityDesk(Comment, desk);
+
+                    await _helper.UpdateDeskAfterReject(actingStaffDesk, Comment, APPLICATION_HISTORY_STATUS.ReturnedToStaff);
+                    await _helper.SaveApplicationHistory(
+                        App.Id, actingStaffDesk.StaffID, 
+                        APPLICATION_HISTORY_STATUS.ReturnedToStaff, 
+                        Comment, ReturnedTables, false, null, 
+                        APPLICATION_ACTION.ReturnToStaff);
+                    await _helper.UpdateApprovalTable(
+                        App.Id, Comment, desk.StaffID, 
+                        desk.DeskID, (int)desk.Staff.Staff_SBU, 
+                        APPLICATION_HISTORY_STATUS.ReturnedToStaff);
+
+                    //If there is still approval(s) by atleast one other FA then still keep the application on the wpa rev desk.
+                    var foundApproval = await _unitOfWork.AppSBUApprovalRepository
+                            .GetAsync(
+                                (x) => x.AppId == App.Id && x.Status == DESK_PROCESS_STATUS.FinalAuthorityApproved,
+                                null
+                            );
+                    
+                    if(foundApproval is not null)
+                    {
+                        actingStaffDesk.HasWork = true;
+                        await _unitOfWork.DeskRepository.Update(actingStaffDesk);
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+
+                    //Notify staff
+                    var targetStaff = await _unitOfWork.StaffRepository
+                        .GetStaffByIdWithSBU(desk.StaffID);
+
+                    _staffNotifier.Init(targetStaff, App, App.Concession, App.Field);
+                    _staffNotifier.SendReturnNotification();
+                }
+
+                return new ApplicationResult(null, "Application(s) has been sent back successfully.");
+            }
+            else throw new Exception("Error: No application ID was passed for this action to be completed.");
+        }
+
+        private async Task UpdateAuthorityDesk(string Comment, MyDesk desk)
+        {
+            desk.HasWork = true;
+            desk.UpdatedAt = DateTime.Now;
+            desk.Comment = Comment;
+            desk.ProcessStatus = APPLICATION_HISTORY_STATUS.ReturnedToStaff;
+            await _unitOfWork.DeskRepository.Update(desk);
+        }
+
+        private async Task<List<MyDesk>> GetAffectedFinalAuthDesks(Domain.Entities.Application App, int[]? SBUIDs)
+        {
+            if(App is null) throw new Exception("Application can not be null.");
+
+            if(SBUIDs is null || SBUIDs.Length == 0) throw new Exception("You must provide atleast one SBU for this operation.");
+
+            var finalAuthorityApprovals = (await _unitOfWork.AppSBUApprovalRepository
+                .GetListByAppIdIncludeStaff(App.Id) ?? throw new Exception("No Final Authority was found for this operation"))
+                .ToList();
+            
+            var finalAuthorityDesks = new List<MyDesk>();
+
+            foreach(var SBUId in SBUIDs)
+            {
+                var apr = finalAuthorityApprovals.Find(x => x.Staff.Staff_SBU == SBUId);
+                var tempDesk = await _unitOfWork.DeskRepository.GetDeskByDeskIdIncludeStaff((int)apr.DeskID);
+                finalAuthorityDesks.Add(tempDesk);
+            }
+
+            return finalAuthorityDesks;
         }
     }
 }

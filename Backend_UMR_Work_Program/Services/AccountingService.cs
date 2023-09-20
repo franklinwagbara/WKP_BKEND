@@ -2,13 +2,10 @@
 using Backend_UMR_Work_Program.Common.Implementations;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
-using DocumentFormat.OpenXml.Bibliography;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
-using Syncfusion.XlsIO.Implementation;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
@@ -54,36 +51,6 @@ namespace Backend_UMR_Work_Program.Services
             {
                 var staff = await _context.staff.Where(x => x.StaffEmail == staffEmail).FirstOrDefaultAsync();
 
-                //var desks = await (from accDesk in _context.AccountDesks
-                //                   join payment in _context.Payments on accDesk.AppId equals payment.AppId into paymentGroup
-                //                   from payment in paymentGroup.DefaultIfEmpty()
-                //                   join app in _context.Applications on accDesk.AppId equals app.Id
-                //                   join conc in _context.ADMIN_CONCESSIONS_INFORMATIONs on app.ConcessionID equals conc.Consession_Id
-                //                   join field in _context.COMPANY_FIELDs on app.FieldID equals field.Field_ID into fieldGroup
-                //                   from field in fieldGroup.DefaultIfEmpty()
-                //                   join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
-                //                   join stf in _context.staff on accDesk.StaffID equals stf.StaffID
-                //                   where accDesk.StaffID == staff.StaffID
-                //                   select new
-                //                   {
-                //                       Year = app.YearOfWKP,
-                //                       ReferenceNumber = app.ReferenceNo,
-                //                       ConcessionName = conc.ConcessionName,
-                //                       FieldName = field != null ? field.Field_Name : null,
-                //                       CompanyName = comp.COMPANY_NAME,
-                //                       CompanyEmail = comp.EMAIL,
-                //                       EvidenceFilePath = payment != null? payment.PaymentEvidenceFilePath: null,
-                //                       EvidenceFileName = payment != null? payment.PaymentEvidenceFileName: null,
-                //                       Desk = accDesk,
-                //                       Payment = payment != null ? payment : null,
-                //                       Application = app,
-                //                       Staff = stf,
-                //                       Concession = conc,
-                //                       Field = field,
-                //                       PaymentStatus = accDesk.ProcessStatus,
-                //                       SubmittedAt = accDesk.CreatedAt
-                //                   }).ToListAsync();
-
                 var desks = await (from accDesk in _context.AccountDesks
                                    join payment in _context.Payments on accDesk.AppId equals payment.AppId into paymentGroup
                                    from payment in paymentGroup.DefaultIfEmpty()
@@ -118,6 +85,8 @@ namespace Backend_UMR_Work_Program.Services
                 return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
             }
         }
+
+
 
         public async Task<WebApiResponse> GetPaymentOnDesk(int deskId)
         {

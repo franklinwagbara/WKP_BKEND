@@ -11,8 +11,6 @@ namespace WKP.Application.Features.Application.Commands.ReturnAppToStaff
         string[] SBU_IDs, 
         string[] SelectedTables, 
         bool FromWPAReviewer, 
-        int CompanyId, 
-        string CompanyName, 
-        string CompanyEmail
+        int CompanyId
     ): IRequest<ErrorOr<ApplicationResult>>;
 }

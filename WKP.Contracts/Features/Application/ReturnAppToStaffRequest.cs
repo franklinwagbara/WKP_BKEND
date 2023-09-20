@@ -7,8 +7,6 @@ namespace WKP.Contracts.Features.Application
         string[] SBU_IDs, 
         string[] SelectedTables, 
         bool FromWPAReviewer, 
-        int CompanyId, 
-        string CompanyName, 
-        string CompanyEmail
+        int CompanyId
     );
 }
