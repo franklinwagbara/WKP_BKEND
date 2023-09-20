@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
@@ -28,6 +29,9 @@ namespace WKP.Infrastructure.Persistence
         public IAppDeskHistoryRepository AppDeskHistoryRepository { get; private set; }
         public IAppSBUApprovalRepository AppSBUApprovalRepository { get; private set; }
         public IAppStatusRepository AppStatusRepository { get; private set; }
+        public ITableDetailRepository TableDetailRepository { get; private set; }
+        public IAccountDeskRepository AccountDeskRepository { get; private set; }
+        public IPaymentRepository PaymentRepository { get; private set; }
 
         public UnitOfWork(WKPContext context)
         {
@@ -48,6 +52,9 @@ namespace WKP.Infrastructure.Persistence
             AppDeskHistoryRepository = new AppDeskHistoryRepository(context);
             AppSBUApprovalRepository = new AppSBUApprovalRepository(context);
             AppStatusRepository = new AppStatusRepository(context);
+            TableDetailRepository = new TableDetailRepository(context);
+            AccountDeskRepository = new AccountDeskRepository(context);
+            PaymentRepository = new PaymentRepository(context);
         }
 
         public DatabaseFacade ContextDatabase() => _context.Database;

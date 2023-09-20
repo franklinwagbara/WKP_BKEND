@@ -19,6 +19,11 @@ namespace WKP.Infrastructure.Persistence
             return await _context.Desks.Where(d => d.DeskID == DeskId).FirstOrDefaultAsync();
         }
 
+        public async Task<MyDesk?> GetDeskByDeskIdIncludeStaff(int DeskId)
+        {
+            return await _context.Desks.Include(x => x.Staff).Where(d => d.DeskID == DeskId).FirstOrDefaultAsync();
+        }
+
         public async Task<MyDesk?> GetDeskByDeskIdAppIdWithStaff(int DeskId, int AppId, bool? HasWork = null)
         {
             if(HasWork == null)

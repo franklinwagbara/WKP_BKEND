@@ -15,6 +15,12 @@ namespace WKP.Application.Features.Common
         {
             if(app is null || app.Id is 0)
                 throw new Exception("AppId can not be null.");
+
+            if(MainStatus is not null)
+            {
+                app.Status = MainStatus ?? app.Status;
+                await _unitOfWork.ApplicationRepository.Update(app);
+            }
             
             var appStatus = await _unitOfWork.AppStatusRepository.GetByAppIdSBUId(app.Id, (int)staff.Staff_SBU);
             if (appStatus != null)
@@ -40,9 +46,11 @@ namespace WKP.Application.Features.Common
                 };
                 await _unitOfWork.AppStatusRepository.AddAsync(newStatus);
             }
+
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateMainAppStatus(Domain.Entities.Application app, string? Status = null)
+        public async Task UpdateMainAppStatusOnSubmit(Domain.Entities.Application app, string? Status = null)
         {
             app.Status = Status ?? MAIN_APPLICATION_STATUS.SubmittedByCompany;
             app.SubmittedAt = DateTime.Now;
