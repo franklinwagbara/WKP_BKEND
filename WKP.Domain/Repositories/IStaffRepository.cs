@@ -9,5 +9,7 @@ namespace WKP.Domain.Repositories
         Task<staff?> GetStaffByDeskId(int deskId);
         Task<IEnumerable<int>?> GetStaffIdsByRoleSBU(int? RoleId, int? SBUId);
         Task<staff?> GetStaffByIdWithSBU(int StaffId);
+        public Task<staff?> GetStaffByCompanyNumberWithSBU(int companyNumber);
+        // Task<staff?> GetStaffByDeskAppIdWithAll(int DeskId, int AppId);
     }
 }

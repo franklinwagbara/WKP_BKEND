@@ -29,6 +29,9 @@ namespace WKP.Domain.Entities
         [ForeignKey("Staff_SBU")]
         public StrategicBusinessUnit? StrategicBusinessUnit { get; set; }
 
+        // [ForeignKey("RoleID")]
+        // public Role? Role { get; set; }
+
         [NotMapped]
         private string _name;
 

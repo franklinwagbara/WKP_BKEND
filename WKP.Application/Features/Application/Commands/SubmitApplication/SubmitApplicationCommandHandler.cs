@@ -72,6 +72,8 @@ namespace WKP.Application.Features.Application.Commands.SubmitApplication
 
                             await _appStatusHelper.UpdateAppStatus(app, newDesk, staff, 
                                 MAIN_APPLICATION_STATUS.SubmittedByCompany, MAIN_APPLICATION_STATUS.SubmittedByCompany);
+                            
+                            await _appStatusHelper.UpdateMainAppStatusOnSubmit(app, MAIN_APPLICATION_STATUS.SubmittedByCompany);
 
                             _staffNotifier.Init(staff, app, app.Concession, app.Field);
                             await _staffNotifier.SendSubmitNotification();
