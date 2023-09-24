@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WKP.Domain.Entities;
 using WKP.Domain.Enums_Contants;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
@@ -57,30 +58,31 @@ namespace WKP.Infrastructure.Persistence
 
         public async Task<IEnumerable<object>> GetProcesingAppsByStaffId(int StaffId)
         {
-            var result = await (from app in _context.Applications
-                                          join comp in _context.ADMIN_COMPANY_INFORMATIONs on app.CompanyID equals comp.Id
-                                          join dsk in _context.Desks on app.Id equals dsk.AppId
-                                          join field in _context.Fields on app.FieldID equals field.Field_ID
-                                          join con in _context.Concessions on app.ConcessionID equals con.Consession_Id
-                                          where dsk.StaffID == StaffId && dsk.ProcessStatus == DESK_PROCESS_STATUS.Processing
-                                          select new 
-                                          {
-                                              Id = app.Id,
-                                              FieldID = app.FieldID,
-                                              ConcessionID = app.ConcessionID,
-                                              ConcessionName = con.ConcessionName,
-                                              FieldName = field != null ? field.Field_Name : null,
-                                              ReferenceNo = app.ReferenceNo,
-                                              CreatedAt = app.CreatedAt,
-                                              SubmittedAt = app.SubmittedAt,
-                                              CompanyName = comp.COMPANY_NAME,
-                                              Status = app.Status,
-                                              PaymentStatus = app.PaymentStatus,
-                                              YearOfWKP = app.YearOfWKP
-                                          }).ToListAsync();
-            
+            var result = await (from dsk in _context.Desks 
+                                join app in _context.Applications
+                                    .Include(x => x.Concession)
+                                    .Include(x => x.Field).Include(x => x.Company)
+                                    on dsk.AppId equals app.Id
+                                where dsk.StaffID == StaffId && dsk.ProcessStatus == DESK_PROCESS_STATUS.Processing
+                                select new
+                                {
+                                    Id = app.Id,
+                                    FieldID = app.FieldID,
+                                    ConcessionID = app.ConcessionID,
+                                    ConcessionName = app.Concession.ConcessionName,
+                                    FieldName = app.Field != null ? app.Field.Field_Name : null,
+                                    ReferenceNo = app.ReferenceNo,
+                                    CreatedAt = app.CreatedAt,
+                                    SubmittedAt = app.SubmittedAt,
+                                    CompanyName = app.Company.COMPANY_NAME,
+                                    Status = app.Status,
+                                    PaymentStatus = app.PaymentStatus,
+                                    YearOfWKP = app.YearOfWKP
+                                }).ToListAsync();
+
             return result;
         }
+
         public async Task<IEnumerable<Domain.Entities.Application>?> GetAllSubmittedApps()
         {
             return await _context.Applications
@@ -107,7 +109,7 @@ namespace WKP.Infrastructure.Persistence
                         .ToListAsync();
         }
 
-        public async Task<IEnumerable<Domain.Entities.ReturnedApplication>?> GetReturnedAppsByCompanyId(int CompanyId)
+        public async Task<IEnumerable<ReturnedApplication>?> GetReturnedAppsByCompanyId(int CompanyId)
         {
             return await _context.ReturnedApplications
                         .Include(x => x.Application)
@@ -118,6 +120,30 @@ namespace WKP.Infrastructure.Persistence
                         .ThenInclude(x => x.StrategicBusinessUnit)
                         .Where(x => x.Application.CompanyID == CompanyId)
                         .ToListAsync();
+        }
+
+        public async Task<IEnumerable<object>> GetAllAppsScopedToSBU(staff Staff)
+        {
+            var result = await (from app in _context.Applications.Include(x => x.Field).Include(x => x.Concession).Include(x => x.Company)
+                                        join dsk in _context.Desks.Include(x => x.Staff) on app.Id equals dsk.AppId
+                                        where app.DeleteStatus != true && dsk.Staff.Staff_SBU == Staff.Staff_SBU 
+                                        select new 
+                                        {
+                                            Id = app.Id,
+                                            FieldID = app.FieldID,
+                                            ConcessionID = app.ConcessionID,
+                                            ConcessionName = app.Concession.ConcessionName,
+                                            FieldName = app.Field != null ? app.Field.Field_Name : null,
+                                            ReferenceNo = app.ReferenceNo,
+                                            CreatedAt = app.CreatedAt,
+                                            SubmittedAt = app.SubmittedAt,
+                                            CompanyName = app.Company.COMPANY_NAME,
+                                            Status = app.Status,
+                                            PaymentStatus = app.PaymentStatus,
+                                            YearOfWKP = app.YearOfWKP
+                                        }).ToListAsync();
+            
+            return result;
         }
     }
 }
