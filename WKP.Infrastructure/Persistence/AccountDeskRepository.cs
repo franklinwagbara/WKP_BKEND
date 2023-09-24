@@ -140,7 +140,7 @@ namespace WKP.Infrastructure.Persistence
 
         public async Task<int> GetPaymentRejectionCount()
         {
-            return await _context.AccountDesks.Where(x => x.isApproved == false).CountAsync();
+            return await _context.AccountDesks.Where(x => x.ProcessStatus == PAYMENT_STATUS.PaymentRejected).CountAsync();
         }
     }
 }
