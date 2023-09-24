@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using WKP.Application.Application.Common;
 using WKP.Application.Common.Helpers;
+using WKP.Application.Common.Interfaces;
 using WKP.Application.Features.Common;
+using WKP.Infrastructure.GeneralServices.Interfaces;
 
 namespace WKP.Application
 {

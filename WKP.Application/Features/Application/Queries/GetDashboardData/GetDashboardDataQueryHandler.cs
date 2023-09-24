@@ -42,7 +42,7 @@ namespace WKP.Application.Application.Queries.GetDashboardData
         {
             var deskCount = await _unitOfWork.DeskRepository.GetStaffDeskCount(CurrentStaff.StaffID);
             var allProcessingCount = await _unitOfWork.DeskRepository.GetStaffAppProcessingDeskCount(CurrentStaff.StaffID);
-            var allApplicationsCountSBU = await _unitOfWork.ApplicationRepository.GetAllSubAppCountBySBU(CurrentStaff.StaffID);
+            var allApplicationsCountSBU = await _unitOfWork.ApplicationRepository.GetAllSubAppCountBySBU((int)CurrentStaff.Staff_SBU);
             var allApplicationsCount = await _unitOfWork.ApplicationRepository.GetAllSubAppCount();
 
             var allRejectionsCount = await _unitOfWork.ApplicationRepository.GetAllRejectedAppCount();
