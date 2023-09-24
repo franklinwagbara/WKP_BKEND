@@ -126,7 +126,7 @@ namespace WKP.Infrastructure.Persistence
         {
             var result = await (from app in _context.Applications.Include(x => x.Field).Include(x => x.Concession).Include(x => x.Company)
                                         join dsk in _context.Desks.Include(x => x.Staff) on app.Id equals dsk.AppId
-                                        where app.DeleteStatus != true && dsk.Staff.Staff_SBU == Staff.Staff_SBU 
+                                        where app.DeleteStatus != true && dsk.Staff.Staff_SBU == Staff.Staff_SBU && dsk.HasWork == true
                                         select new 
                                         {
                                             Id = app.Id,
