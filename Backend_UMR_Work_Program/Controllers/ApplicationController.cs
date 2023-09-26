@@ -512,7 +512,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
-                                           deskStatus = dsk.ProcessStatus
+                                           deskStatus = dsk.ProcessStatus,
+                                           internalStatus = dsk.ProcessStatus,
+                                           SBU_Code = sbu.SBU_Code
                                        }).ToListAsync();
 
                 var staffDesk = await (from dsk in _context.MyDesks
@@ -571,7 +573,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     SBU = await _context.StrategicBusinessUnits.ToListAsync(),
                     SBUApprovals = sbuApprovals,
                     // staffs = staffs,
-                    staffDesk = staffDesk[0],
+                    staffDesk = staffDesk.FirstOrDefault(),
                     StaffSBU = getStaffSBU,
                 };
 
