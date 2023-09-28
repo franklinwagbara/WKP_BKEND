@@ -67,7 +67,171 @@ namespace Backend_UMR_Work_Program.Controllers
                 yearlist.Add((now - i));
             }
             return yearlist;
+
         }
+
+
+
+
+
+
+        [HttpPost("ADDSCHEDULEHISTORY")]
+        public async Task<WebApiResponse> ADDSCHEDULEHISTORY([FromBody] EnagementScheduledHistory scheduledHistory, int id)
+        {
+
+            try
+            {
+                if (scheduledHistory != null && (id != null || id == 0))
+                {
+                    scheduledHistory.actionBy = WKPCompanyEmail;
+                    scheduledHistory.action = GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.UpdatedEngagement;
+
+                    var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).FirstOrDefault();
+
+                    if (checkSchedule == null)
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Sorry, schedule doesn't exist ", StatusCode = ResponseCodes.Failure };
+                    }
+                    else
+                    {
+
+                        checkSchedule.Date_Updated = DateTime.Now;
+                        checkSchedule.Submitted = ENGAGEMENT_SCHEDULE_STATUS.Processing;
+                        checkSchedule.adminAproved = !checkSchedule.adminAproved;
+                        checkSchedule.companyAproved = !checkSchedule.companyAproved;
+                        checkSchedule.STATUS = checkSchedule.STATUS == ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk ? ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk : ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
+                        checkSchedule.Histories.Add(scheduledHistory);
+                        checkSchedule.MEETINGROOM = scheduledHistory.MEETINGROOM;
+                        checkSchedule.comment = scheduledHistory.comment;
+                        checkSchedule.numOfHistories = ((await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == id).ToListAsync()).Count) + 1;
+                        checkSchedule.wp_time = scheduledHistory.wp_time;
+                        checkSchedule.wp_date = scheduledHistory.wp_date;
+
+                        _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+
+
+                        var myTime = await _context.SaveChangesAsync();
+
+
+                        if (myTime > 0)
+                        {
+                            //var companyPresentations = _context.ADMIN_DATETIME_PRESENTATIONs.Where(x => x.COMPANY_ID == WKPUserId).ToListAsync();
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "A presentation schedule was updated successfully.", StatusCode = ResponseCodes.Success };
+                        }
+                        else
+                        {
+                            return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to update this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                        }
+                    }
+                }
+
+
+
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "Invalid entry.", StatusCode = ResponseCodes.Failure };
+
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+        }
+
+
+
+
+
+        [HttpPatch("ACCEPT_SCHEDULE_PRESENTATION_DATETIME")]
+        public async Task<WebApiResponse> ACCEPT_SCHEDULE_PRESENTATION_DATETIME(int Id)
+        {
+            try
+            {
+                var checkSchedule = _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).FirstOrDefault();
+
+                if (checkSchedule != null)
+                {
+
+                    if (checkSchedule?.isDeleted == true)
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "This Engagement has activities and can't be approved", StatusCode = ResponseCodes.Success };
+
+
+                    if (WKUserRole == GeneralModel.Admin)
+                    {
+                        checkSchedule.adminAproved = true;
+
+                    }
+                    else
+                    {
+                        checkSchedule.companyAproved = true;
+
+                    }
+
+
+
+                    if (checkSchedule?.adminAproved == true && checkSchedule?.companyAproved == true)
+                    {
+                        checkSchedule.STATUS = ENGAGEMENT_SCHEDULE_STATUS.Approved;
+                        checkSchedule.Submitted = ENGAGEMENT_SCHEDULE_STATUS.CompletlyScheduled;
+                    }
+                    else{
+                        checkSchedule.STATUS = checkSchedule.STATUS == ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk ? ENGAGEMENT_SCHEDULE_STATUS.OnCompanyDesk : ENGAGEMENT_SCHEDULE_STATUS.OnAdminDesk;
+                        checkSchedule.Submitted = ENGAGEMENT_SCHEDULE_STATUS.Processing;
+
+                    }
+
+                    var scheduledHistory = new EnagementScheduledHistory()
+                    {
+                       
+                        MEETINGROOM = checkSchedule.MEETINGROOM,
+                        wp_date = checkSchedule.wp_date,
+                        action= GeneralModel.ENGAGEMENT_SCHEDULE_STATUS.AcceptedEngagement,
+                        wp_time=checkSchedule.wp_time,
+                        actionBy=WKPCompanyEmail,
+                        comment= ENGAGEMENT_SCHEDULE_STATUS.CompletlyScheduled
+                };
+
+
+                    checkSchedule.Date_Updated = DateTime.Now;
+                    checkSchedule.Histories.Add(scheduledHistory);
+                    checkSchedule.comment = scheduledHistory.comment;
+                    checkSchedule.numOfHistories = ((await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).ToListAsync()).Count) + 1;
+                    
+                    
+
+
+                    _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
+                    var myTime = await _context.SaveChangesAsync();
+
+
+                    if (myTime > 0)
+                    {
+
+                        string successMsg = Messager.ShowMessage(GeneralModel.Update);
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = successMsg, StatusCode = ResponseCodes.Success };
+                    }
+                    else
+                    {
+                        return new WebApiResponse { ResponseCode = AppResponseCodes.Failed, Message = "An error occured while trying to update this presentation schedule.", StatusCode = ResponseCodes.Failure };
+
+                    }
+                }
+                return new WebApiResponse { ResponseCode = AppResponseCodes.RecordNotFound, Message = "Schedule record cannot be found", StatusCode = ResponseCodes.RecordNotFound };
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+                //return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+
+            }
+        }
+
+
+
+
+
+
 
         [HttpGet("GETCOMPLETEDPAGES")]
         public async Task<object> GETCOMPLETEDPAGES(string omlname, string year, string fieldname)
@@ -126,7 +290,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 isStep2 = false;
             }
 
-            var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs 
+            var step3 = await (from a in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs
                                join b in _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs on a.OML_Name equals b.OML_Name
                                join d in _context.FACILITIES_PROJECT_PERFORMANCEs on a.OML_Name equals d.OML_Name
                                join c in _context.BUDGET_CAPEX_OPices on a.OML_Name equals c.OML_Name //where c.Item_Type == "Capex"
@@ -648,11 +812,11 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 var concessionField = GET_CONCESSION_FIELD(omlName, fieldName);
 
-                
+
                 List<string> proposedWells = new List<string>();
                 if ((concessionField?.Consession_Type == "OML" || concessionField?.Consession_Type == "PML") && concessionField.Field_Name != null)
                 {
-                    proposedWells = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.COMPANY_ID == WKPCompanyId && d.OML_Name == omlName && d.Field_ID == concessionField.Field_ID && d.Year_of_WP ==year select d.WellName).ToListAsync();
+                    proposedWells = await (from d in _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs where d.COMPANY_ID == WKPCompanyId && d.OML_Name == omlName && d.Field_ID == concessionField.Field_ID && d.Year_of_WP == year select d.WellName).ToListAsync();
                 }
                 else
                 {
@@ -2453,7 +2617,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     geophysical_activities_acquisition_model.Actual_year = year;
                     geophysical_activities_acquisition_model.proposed_year = (int.Parse(year) + 1).ToString();
                     geophysical_activities_acquisition_model.OML_ID = concessionField?.Concession_ID.ToString();
-                    
+
 
                     if (action == GeneralModel.Insert)
                     {
@@ -6267,7 +6431,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     }
                     else
                     {
-                        getData = await (from c in _context.RESERVES_REPLACEMENT_RATIOs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year select c).FirstOrDefaultAsync();
+                        getData = await (from c in _context.RESERVES_REPLACEMENT_RATIOs where c.OML_Name == omlName && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year && c.Trend_Year == reserves_replacement_model.Trend_Year select c).FirstOrDefaultAsync();
                     }
 
 

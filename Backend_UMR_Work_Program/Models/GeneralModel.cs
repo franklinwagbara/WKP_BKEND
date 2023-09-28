@@ -1,5 +1,6 @@
 ﻿using Backend_UMR_Work_Program.DataModels;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Quartz;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Backend_UMR_Work_Program.Models
@@ -397,6 +398,13 @@ namespace Backend_UMR_Work_Program.Models
             public const string NoActionYet = "No Action Yet";
             public const string Processing = "Processing";
             public const string CompletlyScheduled = "Completly Scheduled";
+
+
+			//ACTION OPTION
+			public const string ScheduledEngagement = "Scheduled Engagement";
+			public const string UpdatedEngagement = "Updated Engagement";
+            public const string AcceptedEngagement = "Accepted Engagement";
+
         }
 
         public class WorkProgrammeReport2_Model
@@ -553,6 +561,7 @@ namespace Backend_UMR_Work_Program.Models
 			public string Staff_Role { get; set; }
 			public int Sort { get; set; }
 			public int Desk_ID { get; set; }
+			public int StaffID { get; set; }
 		}
 
 		public class ApplicationDeskHistory_Model
