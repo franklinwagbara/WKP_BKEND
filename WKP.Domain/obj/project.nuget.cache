@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "zGbSUKhxmqTSUkK5qFmPryYHaZEz8gNqvlbq5h7c8w/oujP/Z1J+wDI4k+ICoqX9b33wX1mI1bruiAjQ6mmLuw==",
+  "dgSpecHash": "k6XfkflP+Sy6eDseGZDDwjp9RV5CzkdL5X1f8iLjefBYEFZAJN3P75EsM6hLLZkkatoZmVJhUeLrqYARGy3DWg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj",
+  "projectFilePath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\erroror\\1.2.1\\erroror.1.2.1.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

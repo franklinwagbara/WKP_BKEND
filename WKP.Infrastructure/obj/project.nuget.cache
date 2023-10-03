@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6fQbmEgZvlxrCaCj8RgE5aYeWYYRaNXJa419h5YxluSjR42YPLIOUkyIJopa40zuR7KBi543raumEhqq/6dBwA==",
+  "dgSpecHash": "VCLBDnLkAJfndg/0YLg199tSE6KrBcwyfP6smcgzTibX1+zPHYg4aSvOlteIjA5W4sFkM4DkrxzmxUjUmihNJQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Infrastructure\\WKP.Infrastructure.csproj",
+  "projectFilePath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Infrastructure\\WKP.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

@@ -190,6 +190,12 @@ namespace Backend_UMR_Work_Program.Controllers
             return Response(result);
         }
 
+        [HttpGet("ApproveApplication")]
+        public async Task<IActionResult> ApproveApplication()
+        {
+            
+        }
+
         //Rework
         [HttpGet("GetAppsOnMyDesk")]
         public async Task<object> GetAppsOnMyDesk() => await _applicationService.GetAppsOnMyDesk((int)WKPCompanyNumber);

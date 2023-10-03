@@ -38,17 +38,27 @@ namespace WKP.Application.Application.Commands.OpenApplication
 
                 if(app is null)
                    return Error.NotFound(code: ErrorCodes.NotFound, description: $"Application Desk with Id {staffDesk.AppId} was not found.");
+
+                var appStatus = await _unitOfWork.AppStatusRepository.GetByAppIdSBUId(app.Id, (int)staffDesk.Staff.Staff_SBU);
+
+                if(appStatus is null)
+                   return Error.NotFound(code: ErrorCodes.NotFound, description: $"Application Status with Id {staffDesk.AppId} and SBU {staffDesk.Staff.Staff_SBU} was not found.");
                    
-                staffDesk.ProcessStatus = _appHelper.IsIncomingDeskStatus(staffDesk.ProcessStatus) ? DESK_PROCESS_STATUS.Processing : staffDesk.ProcessStatus;
-                app.Status = _appHelper.IsIncomingDeskStatus(app.Status)? DESK_PROCESS_STATUS.Processing : app.Status;
+                await _unitOfWork.ExecuteTransaction(async () => 
+                {
+                    staffDesk.ProcessStatus = _appHelper.IsIncomingDeskStatus(staffDesk.ProcessStatus) ? DESK_PROCESS_STATUS.Processing : staffDesk.ProcessStatus;
+                    appStatus.InternalStatus = staffDesk.ProcessStatus;
+                    app.Status = _appHelper.IsIncomingDeskStatus(app.Status)? DESK_PROCESS_STATUS.Processing : app.Status;
 
-                await _unitOfWork.DeskRepository.Update(staffDesk);
-                await _unitOfWork.ApplicationRepository.Update(app);
-                await _unitOfWork.SaveChangesAsync();
+                    await _unitOfWork.DeskRepository.Update(staffDesk);
+                    await _unitOfWork.ApplicationRepository.Update(app);
+                    await _unitOfWork.AppStatusRepository.Update(appStatus);
+                    await _unitOfWork.SaveChangesAsync();
 
-                await _emailAuditMessage.LogAudit(
-                    $"{staffDesk.Staff.FirstName}, {staffDesk.Staff.LastName} opened application with Reference No. {app.ReferenceNo}.", 
-                    staffDesk.Staff.StaffEmail);
+                    await _emailAuditMessage.LogAudit(
+                        $"{staffDesk.Staff.FirstName}, {staffDesk.Staff.LastName} opened application with Reference No. {app.ReferenceNo}.", 
+                        staffDesk.Staff.StaffEmail);
+                });   
 
                 return new ApplicationResult(staffDesk);
             }

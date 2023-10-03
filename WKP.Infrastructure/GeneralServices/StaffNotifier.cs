@@ -52,6 +52,17 @@ namespace WKP.Infrastructure.GeneralServices
             return Task.CompletedTask;
         }
 
+        public Task SendFinalApprovalNotification()
+        {
+            CheckInit();
+
+            string subject = $"Approval from Final Approving Athority for WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}).";
+            string content = $"WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}) has been approved approved by Final Approving Authority.";
+
+            SendNotification(subject, content);
+            return Task.CompletedTask;
+        }
+
         public Task SendPushNotification()
         {
             CheckInit();
