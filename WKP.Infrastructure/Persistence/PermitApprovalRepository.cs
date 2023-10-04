@@ -3,6 +3,7 @@ using WKP.Application.Common.Interfaces;
 using WKP.Domain.Entities;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
+using WKP.Infrastructure.GeneralServices;
 
 namespace WKP.Infrastructure.Persistence
 {
@@ -10,10 +11,10 @@ namespace WKP.Infrastructure.Persistence
     {
         private readonly WKPContext _context;
         private readonly IRNGenerator RNGenerator;
-        public PermitApprovalRepository(WKPContext context, IRNGenerator rNGenerator) : base(context)
+        public PermitApprovalRepository(WKPContext context) : base(context)
         {
             _context = context;
-            RNGenerator = rNGenerator;
+            RNGenerator = new RNGenerator();
         }
 
         public async Task<int> GetAllApprovalCount()
