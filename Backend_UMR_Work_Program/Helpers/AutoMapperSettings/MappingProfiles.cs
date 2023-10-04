@@ -22,6 +22,7 @@ using WKP.Application.Features.Accounting.Queries;
 using WKP.Application.Features.Accounting.Queries.GetAllUSDPaymentApprovals;
 using WKP.Application.Features.Application.Commands.SendBackApplicationToCompany;
 using WKP.Application.Features.Application.Queries.GetAllAppsScopedToSBU;
+using WKP.Application.Features.Application.Commands.ApproveApplication;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -47,6 +48,7 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<GetAllUSDPaymentApprovalsRequest, GetAllUSDPaymentApprovalsQuery>();
             CreateMap<SendBackApplicationToCompanyRequest, SendBackApplicationToCompanyCommand>();
             CreateMap<GetAllAppsScopedToSBURequest, GetAllAppsScopedToSBUQuery>();
+            CreateMap<ApproveApplicationRequest, ApproveApplicationCommand>();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();
