@@ -13870,11 +13870,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
+      "projectUniqueName": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
       "projectName": "Backend_UMR_Work_Program",
-      "projectPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
+      "projectPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\Backend_UMR_Work_Program.csproj",
       "packagesPath": "C:\\Users\\BrandOneTech\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\obj\\",
+      "outputPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\Backend_UMR_Work_Program\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\",
@@ -13896,14 +13896,14 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj": {
-              "projectPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj"
+            "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj": {
+              "projectPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj"
             },
-            "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Contracts\\WKP.Contracts.csproj": {
-              "projectPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Contracts\\WKP.Contracts.csproj"
+            "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Contracts\\WKP.Contracts.csproj": {
+              "projectPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Contracts\\WKP.Contracts.csproj"
             },
-            "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Infrastructure\\WKP.Infrastructure.csproj": {
-              "projectPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Infrastructure\\WKP.Infrastructure.csproj"
+            "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Infrastructure\\WKP.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Infrastructure\\WKP.Infrastructure.csproj"
             }
           }
         }

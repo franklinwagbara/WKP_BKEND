@@ -2860,11 +2860,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj",
+      "projectUniqueName": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj",
       "projectName": "WKP.Application",
-      "projectPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj",
+      "projectPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj",
       "packagesPath": "C:\\Users\\BrandOneTech\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\obj\\",
+      "outputPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\",
@@ -2886,8 +2886,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj": {
-              "projectPath": "c:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj"
+            "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj": {
+              "projectPath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Domain\\WKP.Domain.csproj"
             }
           }
         }

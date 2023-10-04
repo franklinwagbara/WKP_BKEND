@@ -34,9 +34,13 @@ namespace WKP.Application.Features.Application.Commands.ApproveApplication
 
                 await _unitOfWork.ExecuteTransaction(async () => 
                 {
+                    string comment = "The Final Approving Authority approves this submission.";
+                    //update approval table
+                    await _unitOfWork.PermitApprovalRepository.AddAsync(app, app.Company, actingStaff.StaffEmail);
+
                     await _appStatusHelper.UpdateAppStatus(app, staffDesk, actingStaff, MAIN_APPLICATION_STATUS.Approved, MAIN_APPLICATION_STATUS.Approved);
-                    await _helper.SaveApplicationHistory(app.Id, actingStaff.StaffID, APPLICATION_HISTORY_STATUS.FinalApprovingAuthorityApproved, null, null, false, null, APPLICATION_ACTION.Approve, true);
-                    await _helper.UpdateDeskAfterPush(staffDesk, null, MAIN_APPLICATION_STATUS.Approved);
+                    await _helper.SaveApplicationHistory(app.Id, actingStaff.StaffID, APPLICATION_HISTORY_STATUS.FinalApprovingAuthorityApproved, comment, null, false, null, APPLICATION_ACTION.Approve, true);
+                    await _helper.UpdateDeskAfterPush(staffDesk, comment, MAIN_APPLICATION_STATUS.Approved);
 
                     _staffNotifier.Init(actingStaff, app, app.Concession, app.Field);
                     await _staffNotifier.SendFinalApprovalNotification();

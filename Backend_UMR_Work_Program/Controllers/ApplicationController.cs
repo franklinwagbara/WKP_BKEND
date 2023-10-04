@@ -19,6 +19,7 @@ using WKP.Application.Application.Commands.PushApplicationCommand;
 using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Queries.GetProcessingApplications;
 using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
+using WKP.Application.Features.Application.Commands.ApproveApplication;
 using WKP.Application.Features.Application.Commands.ReturnAppToStaff;
 using WKP.Application.Features.Application.Commands.SendBackApplicationToCompany;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
@@ -190,10 +191,13 @@ namespace Backend_UMR_Work_Program.Controllers
             return Response(result);
         }
 
-        [HttpGet("ApproveApplication")]
-        public async Task<IActionResult> ApproveApplication()
+        [HttpPost("ApproveApplication")]
+        public async Task<IActionResult> ApproveApplication(int AppId)
         {
-            
+            var request = new ApproveApplicationRequest(AppId, WKPCompanyEmail);
+            var command = _mapper.Map<ApproveApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
         }
 
         //Rework

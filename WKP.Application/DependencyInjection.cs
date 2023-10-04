@@ -5,7 +5,6 @@ using WKP.Application.Application.Common;
 using WKP.Application.Common.Helpers;
 using WKP.Application.Common.Interfaces;
 using WKP.Application.Features.Common;
-using WKP.Infrastructure.GeneralServices.Interfaces;
 
 namespace WKP.Application
 {
@@ -18,7 +17,7 @@ namespace WKP.Application
             services.AddTransient<AppHelper>();
             services.AddTransient<Helper>();
             services.AddTransient<AppStatusHelper>();
-            
+            services.AddScoped<IRNGenerator>();
             return services;
         }
     }
