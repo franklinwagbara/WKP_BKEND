@@ -17,7 +17,6 @@ namespace WKP.Application
             services.AddTransient<AppHelper>();
             services.AddTransient<Helper>();
             services.AddTransient<AppStatusHelper>();
-            services.AddScoped<IRNGenerator>();
             return services;
         }
     }

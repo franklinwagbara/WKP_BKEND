@@ -31,6 +31,7 @@ namespace WKP.Infrastructure
             services.AddTransient<IStaffNotifier, StaffNotifier>();
             services.AddTransient<ICompanyNotifier, CompanyNotifier>();
             services.AddTransient<IAppLogger, EmailAuditMessage>();
+            services.AddScoped<IRNGenerator, RNGenerator>();
 
             //HangFire setup
             services.AddHangfire(x => x.UseSqlServerStorage(configuration["Data:Wkpconnect:ConnectionString"]));
