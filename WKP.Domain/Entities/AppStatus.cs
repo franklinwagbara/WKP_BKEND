@@ -31,5 +31,7 @@ namespace WKP.Domain.Entities
 
         [ForeignKey(nameof(DeskId))]
         public MyDesk? Desk { get; set; }
+        [ForeignKey(nameof(AppId))]
+        public Application? Application { get; set; }
     }
 }

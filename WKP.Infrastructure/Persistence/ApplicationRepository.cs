@@ -142,6 +142,11 @@ namespace WKP.Infrastructure.Persistence
                                             PaymentStatus = app.PaymentStatus,
                                             YearOfWKP = app.YearOfWKP
                                         }).ToListAsync();
+
+            // var result = await _context.AppStatuses
+            //     .Include(x => x.AppId).Include(x => x.Concession)
+            //     .Include(x => x.Company).Include(x => x.Field)
+            //     .Where( x => x.SBUId == Staff.Staff_SBU)
             
             return result;
         }
