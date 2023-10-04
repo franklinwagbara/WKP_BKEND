@@ -30,6 +30,7 @@ namespace WKP.Infrastructure
             services.AddScoped<EmailHelper>();
             services.AddTransient<IStaffNotifier, StaffNotifier>();
             services.AddTransient<ICompanyNotifier, CompanyNotifier>();
+            services.AddTransient<IAppLogger, EmailAuditMessage>();
 
             //HangFire setup
             services.AddHangfire(x => x.UseSqlServerStorage(configuration["Data:Wkpconnect:ConnectionString"]));

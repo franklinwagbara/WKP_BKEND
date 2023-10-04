@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "oGhilt7u/6XKxPQVZDUh005DOatHwLsOiYCYzHVnD/35QF2BbsL/Dw1c2yfA3RZeKOfLfPPcZpqWjDgibWLphQ==",
+  "dgSpecHash": "45XnnUCHxNw7Z2SzJJ7iujtfLhjIpPtfG6t2e4xxmUSeLgMf+AznAPNvtatlqt5VJZd4kQigVUn7HZhL2PqDIQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,7 @@
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\7.0.4\\microsoft.entityframeworkcore.analyzers.7.0.4.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\7.0.0\\microsoft.extensions.caching.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.extensions.caching.memory\\7.0.0\\microsoft.extensions.caching.memory.7.0.0.nupkg.sha512",
+    "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\7.0.0\\microsoft.extensions.configuration.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\7.0.0\\microsoft.extensions.dependencyinjection.7.0.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\7.0.0\\microsoft.extensions.dependencyinjection.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.extensions.logging\\7.0.0\\microsoft.extensions.logging.7.0.0.nupkg.sha512",

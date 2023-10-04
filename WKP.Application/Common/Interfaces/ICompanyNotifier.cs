@@ -11,6 +11,7 @@ namespace WKP.Application.Common.Interfaces
             COMPANY_FIELD Field);
         Task SendPushNotification();
         Task SendApprovalNotification();
+        Task SendFinalApprovalNotification();
         Task SendReturnNotification();
         Task SendRejectNotification(); 
         Task SendSubmitNotification();

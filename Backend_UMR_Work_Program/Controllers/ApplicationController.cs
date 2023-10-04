@@ -19,10 +19,13 @@ using WKP.Application.Application.Commands.PushApplicationCommand;
 using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Queries.GetProcessingApplications;
 using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
+using WKP.Application.Features.Application.Commands.ApproveApplication;
 using WKP.Application.Features.Application.Commands.ReturnAppToStaff;
+using WKP.Application.Features.Application.Commands.SendBackApplicationToCompany;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
 using WKP.Application.Features.Application.Queries.GetAllApplications;
 using WKP.Application.Features.Application.Queries.GetAllApplicationsCompany;
+using WKP.Application.Features.Application.Queries.GetAllAppsScopedToSBU;
 using WKP.Application.Features.Application.Queries.GetReturnedApplications;
 using WKP.Contracts.Application;
 using WKP.Contracts.Features.Application;
@@ -154,8 +157,48 @@ namespace Backend_UMR_Work_Program.Controllers
             return Response(result);
         }
 
+        [HttpPost("SendBackApplicationToCompany")]
+        public async Task<IActionResult> SendBackApplicationToCompany(
+            int deskID, 
+            string comment, 
+            string[] selectedApps, 
+            string[] selectedTables, 
+            int TypeOfPaymentId, 
+            string AmountNGN, 
+            string AmountUSD)
+        {
+            var request = new SendBackApplicationToCompanyRequest(
+                deskID, 
+                comment, 
+                selectedApps, 
+                selectedTables, 
+                TypeOfPaymentId, 
+                AmountNGN, 
+                AmountUSD, 
+                (int)WKPCompanyNumber, 
+                WKPCompanyEmail);
+            var command = _mapper.Map<SendBackApplicationToCompanyCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
+
         [HttpGet("GetAllApplicationsScopedToSBU")]
-        public async Task<WebApiResponse> GetAllApplicationsScopedToSBU() => await _applicationService.GetAllApplicationsScopedToSBU(WKPCompanyEmail);
+        public async Task<IActionResult> GetAllApplicationsScopedToSBU()
+        {
+            var request = new GetAllAppsScopedToSBURequest((int)WKPCompanyNumber);
+            var query = _mapper.Map<GetAllAppsScopedToSBUQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpPost("ApproveApplication")]
+        public async Task<IActionResult> ApproveApplication(int AppId)
+        {
+            var request = new ApproveApplicationRequest(AppId, WKPCompanyEmail);
+            var command = _mapper.Map<ApproveApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
 
         //Rework
         [HttpGet("GetAppsOnMyDesk")]
@@ -175,10 +218,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpGet("GetSentBackApplications")]
         public async Task<object> GetSentBackApplications() => await _applicationService.GetSentBackApplications((int)WKPCompanyNumber);
-
-        [HttpPost("SendBackApplicationToCompany")]
-        public async Task<object> SendBackApplicationToCompany(int deskID, string comment, string[] selectedApps, string[] selectedTables, int TypeOfPaymentId, string AmountNGN, string AmountUSD)
-            => await _applicationService.SendBackApplicationToCompany(deskID, comment, selectedApps, selectedTables, TypeOfPaymentId, AmountNGN, AmountUSD, (int)WKPCompanyNumber, WKPCompanyEmail, WKPCompanyName);
 
         [HttpPost("ADD_COMMENT_BY_COMPANY")]
         public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
@@ -483,7 +522,9 @@ namespace Backend_UMR_Work_Program.Controllers
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
-                                           deskStatus = dsk.ProcessStatus
+                                           deskStatus = dsk.ProcessStatus,
+                                           internalStatus = dsk.ProcessStatus,
+                                           SBU_Code = sbu.SBU_Code
                                        }).ToListAsync();
 
                 var staffDesk = await (from dsk in _context.MyDesks
@@ -542,7 +583,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     SBU = await _context.StrategicBusinessUnits.ToListAsync(),
                     SBUApprovals = sbuApprovals,
                     // staffs = staffs,
-                    staffDesk = staffDesk[0],
+                    staffDesk = staffDesk.FirstOrDefault(),
                     StaffSBU = getStaffSBU,
                 };
 

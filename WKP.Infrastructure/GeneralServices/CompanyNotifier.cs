@@ -80,6 +80,17 @@ namespace WKP.Infrastructure.GeneralServices
             _emailAuditMessage.SendEmail(Company.EMAIL, Company.NAME, msg, null);
         }
 
+        public Task SendFinalApprovalNotification()
+        {
+            CheckInit();
+
+            string subject = $"Approval from Final Approving Athority for WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}).";
+            string content = $"DUMMY CONDITIONAL APPROVAL FOR YOUR 2023 ANNUAL WORK PROGRAMME SUBMISSION";
+
+            SendNotification(subject, content);
+            return Task.CompletedTask;
+        }
+
         private void CheckInit()
         {
             if(!_isInitialized) throw new Exception("Values not initialized - The 'Init()' was not invoked.");

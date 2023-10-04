@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+using WKP.Domain.DTOs.Payment;
 using WKP.Domain.Entities;
 using WKP.Domain.Enums_Contants;
 using WKP.Domain.Repositories;
@@ -7,10 +9,23 @@ namespace WKP.Application.Application.Common
     public class Helper
     {
         private IUnitOfWork _unitOfWork;
+        public IConfiguration _configuration;
+        private string BankName;
+        private string AccountNumber;
+        private string BankCode;
+        private string Bank;
+        private string elpsBase;
 
-        public Helper(IUnitOfWork unitOfWork)
+        public Helper(IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
+
+            BankName = $"{_configuration.GetSection("Payment").GetSection("BankName").Value}";
+            AccountNumber = $"{_configuration.GetSection("Payment").GetSection("Account").Value}";
+            BankCode = $"{_configuration.GetSection("Payment").GetSection("BankCode").Value}";
+            Bank = $"{_configuration.GetSection("Payment").GetSection("Bank").Value}";
+            elpsBase = $"{_configuration.GetSection("Payment").GetSection("elpsBaseUrl").Value}";
         }
 
         public int[]? ParseSBUIDs(string[] SBU_IDs) 
@@ -39,6 +54,54 @@ namespace WKP.Application.Application.Common
                 return SBU_IDs_int;
             }
             catch (Exception){ throw; }
+        }
+
+        public async Task<bool> SendBackApplicationToCompany(
+            ADMIN_COMPANY_INFORMATION Company, 
+            Domain.Entities.Application app, staff staff, int TypeOfPaymentId, string AmountNGN, 
+            string AmountUSD, string comment, string selectedTables)
+        {
+            try
+            {
+                var typeOfPayment = await _unitOfWork.TypeOfPaymentRepository.GetAsync((t) => t.Id == TypeOfPaymentId, null);
+
+                //Add fee for payment by company
+                var payment = new PaymentDTO
+                {
+                    AppId = app.Id,
+                    CompanyNumber = Company.Id,
+                    ConcessionId = (int)app.ConcessionID,
+                    FieldId = app.FieldID,
+                    TypeOfPayment = TypeOfPaymentId,
+                    AmountNGN = AmountNGN,
+                    AmountUSD = AmountUSD,
+                    ServiceCharge = "0"
+                };
+
+                await _unitOfWork.PaymentRepository.AddAsync(payment, AccountNumber);
+
+                var rApp = new ReturnedApplication
+                {
+                    AppId = app.Id,
+                    StaffId = staff.StaffID,
+                    SelectedTables = selectedTables,
+                    Comment = comment
+                };
+
+                await _unitOfWork.ReturnedApplicationRepository.AddAsync(rApp);
+
+                //update application status
+                app.PaymentStatus = typeOfPayment.Name == TYPE_OF_FEE.NoFee? app.PaymentStatus : PAYMENT_STATUS.PaymentPending;
+                app.UpdatedAt= DateTime.Now;
+
+                await _unitOfWork.ApplicationRepository.Update(app);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<MyDesk> DropAppOnStaffDesk(int appID, staff staff, int FromStaffID, int FromStaffSBU, int FromStaffRoleID, int processID, string status)

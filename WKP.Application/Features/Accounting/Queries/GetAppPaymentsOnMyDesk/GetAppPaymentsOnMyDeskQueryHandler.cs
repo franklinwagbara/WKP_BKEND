@@ -16,7 +16,7 @@ namespace WKP.Application.Features.Accounting.Queries
 
         public async Task<ErrorOr<AccountingResult>> Handle(GetAppPaymentsOnMyDeskQuery request, CancellationToken cancellationToken)
         {
-            var payments = await _unitOfWork.AccountDeskRepository.GetAppPaymentsOnStaffDesk(request.StaffEmail);
+            var payments = await _unitOfWork.AccountDeskRepository.GetAppPendingPaymentsOnStaffDesk(request.StaffEmail);
             return new AccountingResult(payments, "Success");
         }
     }
