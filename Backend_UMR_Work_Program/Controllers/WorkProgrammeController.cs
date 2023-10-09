@@ -13998,52 +13998,63 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 var listObject = new List<object>();
                 var concessions = await (from a in _context.ADMIN_CONCESSIONS_INFORMATIONs where a.Company_ID == WKPCompanyId && a.DELETED_STATUS == null select a).Distinct().ToListAsync();
-                foreach (var concession in concessions)
+
+                concessions.ForEach(con =>
                 {
-                    var concessionFields = await (from d in _context.COMPANY_FIELDs where d.Concession_ID == concession.Consession_Id && d.DeletedStatus != true select d).ToListAsync();
-                    bool isEditable = true;
-                    if (concessionFields.Count > 0)
+                    listObject.Add(new
                     {
-                        foreach (var field in concessionFields)
-                        {
-                            var checkApplication = await (from ap in _context.Applications
-                                                          where ap.YearOfWKP == DateTime.Now.Year && ap.FieldID == field.Field_ID && ap.DeleteStatus != true
-                                                          select ap).FirstOrDefaultAsync();
-                            isEditable = true;
-                            if (checkApplication != null)
-                            {
-                                var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
-                                if (NRejectApp == null)
-                                    isEditable = false;
-                            }
+                        con = con.Concession_Held,
+                        isEditable = true
+                    }); 
+                });
 
-                        }
+                //foreach (var concession in concessions)
+                //{
+                //    var concessionFields = await (from d in _context.COMPANY_FIELDs where d.Concession_ID == concession.Consession_Id && d.DeletedStatus != true select d).ToListAsync();
+                //    bool isEditable = true;
+                //    if (concessionFields.Count > 0)
+                //    {
+                //        foreach (var field in concessionFields)
+                //        {
+                //            var checkApplication = await (from ap in _context.Applications
+                //                                          where ap.YearOfWKP == DateTime.Now.Year && ap.FieldID == field.Field_ID && ap.DeleteStatus != true
+                //                                          select ap).FirstOrDefaultAsync();
+                //            isEditable = true;
+                //            if (checkApplication != null)
+                //            {
+                //                var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
+                //                if (NRejectApp == null)
+                //                    isEditable = false;
+                //            }
 
-                        listObject.Add(new
-                        {
-                            con = concession.Concession_Held,
-                            isEditable = isEditable
-                        });
-                    }
-                    else
-                    {
-                        var checkApplication = await (from ap in _context.Applications
-                                                      where ap.YearOfWKP == DateTime.Now.Year && ap.ConcessionID == concession.Consession_Id && ap.DeleteStatus != true
-                                                      select ap).FirstOrDefaultAsync();
-                        isEditable = true;
-                        if (checkApplication != null)
-                        {
-                            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
-                            if (NRejectApp == null)
-                                isEditable = false;
-                        }
-                        listObject.Add(new
-                        {
-                            con = concession.Concession_Held,
-                            isEditable = isEditable
-                        });
-                    }
-                }
+                //        }
+
+                //        listObject.Add(new
+                //        {
+                //            con = concession.Concession_Held,
+                //            isEditable = isEditable
+                //        });
+                //    }
+                //    else
+                //    {
+                //        var checkApplication = await (from ap in _context.Applications
+                //                                      where ap.YearOfWKP == DateTime.Now.Year && ap.ConcessionID == concession.Consession_Id && ap.DeleteStatus != true
+                //                                      select ap).FirstOrDefaultAsync();
+                //        isEditable = true;
+                //        if (checkApplication != null)
+                //        {
+                //            var NRejectApp = await _context.SBU_ApplicationComments.Where(x => x.AppID == checkApplication.Id && x.ActionStatus == GeneralModel.PROCESS_CONSTANTS.Initiated).FirstOrDefaultAsync();
+                //            if (NRejectApp == null)
+                //                isEditable = false;
+                //        }
+                //        listObject.Add(new
+                //        {
+                //            con = concession.Concession_Held,
+                //            isEditable = isEditable
+                //        });
+                //    }
+                //}
+
                 return new { listObject };
             }
             catch (Exception e)

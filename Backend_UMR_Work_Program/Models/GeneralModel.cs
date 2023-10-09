@@ -62,6 +62,7 @@ namespace Backend_UMR_Work_Program.Models
 		public static class SBU_CODES
 		{
 			public const string WPA = "WPA";
+			public const string ACCOUNTS = "Accounts";
 		}
 
 		public static class RoleName
@@ -110,6 +111,7 @@ namespace Backend_UMR_Work_Program.Models
             public const string ReturnedToStaff = "Returned To Staff";
 
 			public const string AddedComment = "Added Comment";
+			public const string CompanyReSubmitted = "Company Resubmitted";
 			
 			//public static string SentBackToCompany = "Application Sent Back To Company";
 			//public static string SentBackToStaff = "Application Sent Back To Staff";
@@ -135,6 +137,7 @@ namespace Backend_UMR_Work_Program.Models
 		{
             public const string PaymentPending = "Payment Confirmation Pending";
             public const string PaymentCompleted = "Payment Completed";
+			public const string PaymentRejected = "Payment Rejected";
         }
 
 		public static class APPLICATION_ACTION
@@ -152,6 +155,7 @@ namespace Backend_UMR_Work_Program.Models
             public static string Delegate = "Delegate";
             public static string AddAComment = "Add a Comment";
             public static string Move = "Move";
+			public static string CompanyReSubmit = "Company Resubmit";
 
             //public static string SendBackToCompany = "Send Back To Company";
             //public static string SendBackToStaff = "Send Back To Staff";
@@ -170,6 +174,12 @@ namespace Backend_UMR_Work_Program.Models
             public const string SubmissionFee = "Submission Fee";
             public const string LateSubmissionFee = "Late Submission Fee";
             public const string ModificationFee = "Modification Fee";
+        }
+
+        public static class APP_CATEGORIES
+        {
+            public const string New = "New";
+            public const string Old = "Old";
         }
 
         //public static class APPLICATION_STATUS__OLD

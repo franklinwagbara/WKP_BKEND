@@ -1,24 +1,34 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
-using Backend_UMR_Work_Program.Models.Enurations;
 using Backend_UMR_Work_Program.Services;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Math;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-//using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using Rotativa.AspNetCore;
-using Syncfusion.XlsIO.Implementation;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using WKP.Application.Application.Commands.OpenApplication;
+using WKP.Application.Application.Commands.PushApplicationCommand;
+using WKP.Application.Application.Queries.GetDashboardData;
+using WKP.Application.Application.Queries.GetProcessingApplications;
+using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
+using WKP.Application.Features.Application.Commands.ApproveApplication;
+using WKP.Application.Features.Application.Commands.ReturnAppToStaff;
+using WKP.Application.Features.Application.Commands.SendBackApplicationToCompany;
+using WKP.Application.Features.Application.Commands.SubmitApplication;
+using WKP.Application.Features.Application.Queries.GetAllApplications;
+using WKP.Application.Features.Application.Queries.GetAllApplicationsCompany;
+using WKP.Application.Features.Application.Queries.GetAllAppsScopedToSBU;
+using WKP.Application.Features.Application.Queries.GetReturnedApplications;
+using WKP.Contracts.Application;
+using WKP.Contracts.Features.Application;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Controllers
@@ -26,8 +36,9 @@ namespace Backend_UMR_Work_Program.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
 
-    public class ApplicationController : Controller
+    public class ApplicationController : BaseController
     {
+        public readonly ISender _mediator;
         public WKP_DBContext _context;
         public IConfiguration _configuration;
         IHttpContextAccessor _httpContextAccessor;
@@ -35,6 +46,7 @@ namespace Backend_UMR_Work_Program.Controllers
         private readonly AppProcessFlowService _appProcessFlowService;
         private readonly ApplicationService _applicationService;
         private readonly HelperService _helperService;
+        private readonly AppSettings _appSettings;
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
@@ -42,12 +54,15 @@ namespace Backend_UMR_Work_Program.Controllers
         private string? WKUserRole => User.FindFirstValue(ClaimTypes.Role);
         private int? WKPCompanyNumber => Convert.ToInt32(User.FindFirstValue(ClaimTypes.PrimarySid));
 
-        public ApplicationController(WKP_DBContext context, IConfiguration configuration, 
+        public ApplicationController(
+            WKP_DBContext context, 
+            IConfiguration configuration, 
             IMapper mapper, 
             IOptions<AppSettings> appsettings,
             ApplicationService applicationService,
             AppProcessFlowService appProcessFlowService,
-            HelperService helperService
+            HelperService helperService,
+            ISender mediator
             )
         {
             _context = context;
@@ -56,39 +71,134 @@ namespace Backend_UMR_Work_Program.Controllers
             _appProcessFlowService = appProcessFlowService;
             _applicationService = applicationService;
             _helperService = helperService;
+            _appSettings = appsettings.Value;
+            _mediator = mediator;
         }
 
 
         [HttpGet("GetDashboardData")]
-        public async Task<object> GetDashboardData() => await _applicationService.GetDashboardData((int)WKPCompanyNumber);
+        public async Task<IActionResult> GetDashboardData() 
+        {
+            var query = _mapper.Map<GetDashboardDataQuery>(new GetDashboardDataRequest((int)WKPCompanyNumber));
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("GetProcessingApplications/staffId")] //For general application view
-        public async Task<WebApiResponse> GetProcessingApplications(int staffId) => await _applicationService.GetProcessingApplications(staffId);
-
+        public async Task<IActionResult> GetProcessingApplicationsByStaffId(GetProcessingApplicationsByStaffIdRequest request)
+        {
+            var query = _mapper.Map<GetProcessingApplicationsByStaffIdQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("GetProcessingApplicationsOnMyDesk")] //For general application view
-        public async Task<WebApiResponse> GetProcessingApplicationsOnMyDesk() => await _applicationService.GetProcessingApplicationsOnMyDesk(WKPCompanyEmail);
+        public async Task<IActionResult> GetProcessingApplicationsOnMyDesk()
+        {
+            var query = _mapper.Map<GetProcessingAppsOnMyDeskQuery>(new GetProcessingAppsOnMyDeskQuery(WKPCompanyEmail));
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("OpenApplication")]
-        public async Task<WebApiResponse> OpenApplication(int deskId) => await _applicationService.OpenApplication(deskId);
+        public async Task<IActionResult> OpenApplication(OpenApplicationRequest request)
+        {
+            var command = _mapper.Map<OpenApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
 
         [HttpPost("PushApplication")]
-        public async Task<WebApiResponse> PushApplication(int deskID, string comment, string[] selectedApps) => await _applicationService.PushApplication(deskID, comment, selectedApps);
-
-        [HttpGet("GetLockForms")]
-        public async Task<WebApiResponse> GetLockForms(int year, int concessionId, int fieldId) => await _applicationService.LockForms(year, concessionId, fieldId);
+        public async Task<IActionResult> PushApplication(PushApplicationRequest request)
+        {
+            var command = _mapper.Map<PushApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
 
         [HttpGet("GetAllApplications")]
-        public async Task<WebApiResponse> GetAllApplications() => await _applicationService.GetAllApplications();
+        public async Task<IActionResult> GetAllApplications(GetAllApplicationsRequest request)
+        {
+            var query = _mapper.Map<GetAllApplicationsQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("GetAllApplicationsCompany")]
-        public async Task<WebApiResponse> GetAllApplicationsCompany() => await _applicationService.GetAllApplicationsCompany((int)WKPCompanyNumber);
-
-        [HttpGet("GetAllApplicationsScopedToSBU")]
-        public async Task<WebApiResponse> GetAllApplicationsScopedToSBU() => await _applicationService.GetAllApplicationsScopedToSBU(WKPCompanyEmail);
+        public async Task<IActionResult> GetAllApplicationsCompany()
+        {
+            var query = _mapper.Map<GetAllApplicationsCompanyQuery>(new GetAllApplicationsCompanyRequest((int)WKPCompanyNumber));
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
 
         [HttpGet("GetReturnedApplications")]
-        public async Task<object> GetReturnedApplications() => await _applicationService.GetReturnedApplications((int) WKPCompanyNumber);
+        public async Task<object> GetReturnedApplications()
+        {
+            var query = _mapper.Map<GetReturnedApplicationsQuery>(new GetReturnedApplicationsRequest((int)WKPCompanyNumber));
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpPost("SUBMIT_APPLICATION")]
+        public async Task<IActionResult> SubmitApplication(SubmitApplicationRequest request) 
+        {
+            var command = _mapper.Map<SubmitApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
+
+        [HttpPost("RETURN_APPLICATION_TO_STAFF")]
+        public async Task<IActionResult> ReturnApplicationToStaff(int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
+        {
+            var request = new ReturnAppToStaffRequest(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber);
+            var command = _mapper.Map<ReturnAppToStaffCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
+
+        [HttpPost("SendBackApplicationToCompany")]
+        public async Task<IActionResult> SendBackApplicationToCompany(
+            int deskID, 
+            string comment, 
+            string[] selectedApps, 
+            string[] selectedTables, 
+            int TypeOfPaymentId, 
+            string AmountNGN, 
+            string AmountUSD)
+        {
+            var request = new SendBackApplicationToCompanyRequest(
+                deskID, 
+                comment, 
+                selectedApps, 
+                selectedTables, 
+                TypeOfPaymentId, 
+                AmountNGN, 
+                AmountUSD, 
+                (int)WKPCompanyNumber, 
+                WKPCompanyEmail);
+            var command = _mapper.Map<SendBackApplicationToCompanyCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
+
+        [HttpGet("GetAllApplicationsScopedToSBU")]
+        public async Task<IActionResult> GetAllApplicationsScopedToSBU()
+        {
+            var request = new GetAllAppsScopedToSBURequest((int)WKPCompanyNumber);
+            var query = _mapper.Map<GetAllAppsScopedToSBUQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpPost("ApproveApplication")]
+        public async Task<IActionResult> ApproveApplication(int AppId)
+        {
+            var request = new ApproveApplicationRequest(AppId, WKPCompanyEmail);
+            var command = _mapper.Map<ApproveApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
 
         //Rework
         [HttpGet("GetAppsOnMyDesk")]
@@ -109,17 +219,13 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("GetSentBackApplications")]
         public async Task<object> GetSentBackApplications() => await _applicationService.GetSentBackApplications((int)WKPCompanyNumber);
 
-        [HttpPost("SendBackApplicationToCompany")]
-        public async Task<object> SendBackApplicationToCompany(int deskID, string comment, string[] selectedApps, string[] selectedTables, int TypeOfPaymentId, string AmountNGN, string AmountUSD)
-            => await _applicationService.SendBackApplicationToCompany(deskID, comment, selectedApps, selectedTables, TypeOfPaymentId, AmountNGN, AmountUSD, (int)WKPCompanyNumber, WKPCompanyEmail, WKPCompanyName);
-
         [HttpPost("ADD_COMMENT_BY_COMPANY")]
         public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
-            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, false, WKPCompanyNumber, true);
+            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
 
         [HttpPost("ADD_COMMENT_BY_STAFF")]
-        public async Task<WebApiResponse> ADD_COMMENT_BY_STAFF(int appId, int? staffId, string comment, string? selectedTables)
-            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
+        public async Task<WebApiResponse> ADD_COMMENT_BY_STAFF(int appId, int? staffId, string comment, string? selectedTables, bool? isPublic)
+            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, false, WKPCompanyNumber, isPublic);
 
         [HttpGet("GET_SENDBACK_COMMENTS")]
         public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId, bool isPublic) => await _applicationService.GetReturnToCompanyComments(appId, isPublic);
@@ -137,13 +243,14 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("IS_APPLICATION_RETURNED")]
         public async Task<WebApiResponse> IsApplicationReturned(int appId) => await _applicationService.IsApplicationReturned(appId);
 
-        [HttpPost("SUBMIT_APPLICATION")]
-        public async Task<WebApiResponse> SubmitApplication(int appId) => await _applicationService.SubmitApplication(appId);
+        [HttpPost("RESUBMIT_APPLICATION_WITHOUT_FEE")]
+        public async Task<WebApiResponse> ReSubmitApplicationWithoutFee(int? concessionId, int? fieldId)
+        {
+            return await _applicationService.ReSubmitApplicationWithoutFee(concessionId, fieldId);
+        }
 
-        [HttpPost("RETURN_APPLICATION_TO_STAFF")]
-        public async Task<object> ReturnApplicationToStaff(/*[FromBody] ActionModel model,*/ int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
-            => await _applicationService.ReturnApplicationToStaff(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber, WKPCompanyName, WKPCompanyEmail);
-
+        [HttpGet("GetLockForms")]
+        public async Task<WebApiResponse> GetLockForms(int year, int concessionId, int fieldId) => await _applicationService.LockForms(year, concessionId, fieldId);
 
         //Rework
         [HttpGet("All-Applications")] //For general application view
@@ -363,28 +470,35 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             try
             {
-                var application = (from ap in _context.Applications where ap.Id == appID && ap.DeleteStatus != true select ap).FirstOrDefault();
+                // var application = (from ap in _context.Applications where ap.Id == appID && ap.DeleteStatus != true select ap).FirstOrDefault();
+
+                var application = await _context.Applications
+                            .Include(x => x.Company)
+                            .Include(x => x.Concession)
+                            .Include(x => x.Field)
+                            .Where(ap => ap.Id == appID && ap.DeleteStatus != true).FirstOrDefaultAsync();
 
                 if (application == null)
-                {
                     return BadRequest(new { message = "Sorry, this application details could not be found." });
-                }
 
-                var field = await _context.COMPANY_FIELDs.Where(x => x.Field_ID == application.FieldID).FirstOrDefaultAsync();
+                // var field = await _context.COMPANY_FIELDs.Where(x => x.Field_ID == application.FieldID).FirstOrDefaultAsync();
+                // var concession = await _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == application.ConcessionID).FirstOrDefaultAsync();
+                // var company = await _context.ADMIN_COMPANY_INFORMATIONs.Where(x => x.Id == application.CompanyID).FirstOrDefaultAsync();
 
-                var concession = await _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(x => x.Consession_Id == application.ConcessionID).FirstOrDefaultAsync();
+                var companyDetails = await _context.ADMIN_COMPANY_DETAILs.Where(x => x.EMAIL == application.Company.EMAIL).FirstOrDefaultAsync();
 
-                var company = await _context.ADMIN_COMPANY_INFORMATIONs.Where(x => x.Id == application.CompanyID).FirstOrDefaultAsync();
-                var companyDetails = await _context.ADMIN_COMPANY_DETAILs.Where(x => x.EMAIL == company.EMAIL).FirstOrDefaultAsync();
-
-                var appHistory = await _context.ApplicationDeskHistories.Include(x => x.Staff).Include(x => x.Company).Where(x => x.AppId == appID)
-                                    .Select( x => new
+                var appHistory = await _context.ApplicationDeskHistories.Include(x => x.Staff).ThenInclude(x => x.StrategicBusinessUnit).Include(x => x.Company).Where(x => x.AppId == appID)
+                                    .Select(x => new
                                     {
                                         ID = x.Id,
-                                        Staff_Name = x.Staff.LastName + ", " + x.Staff.FirstName,
-                                        Staff_Email = x.Staff.StaffEmail,
-                                        Staff_SBU = _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().SBU_Name,
-                                        Staff_Role = _context.Roles.Where(r => r.id == x.Staff.RoleID).FirstOrDefault().RoleName,
+                                        Staff_Name = x.Staff != null ? x.Staff.LastName + ", " + x.Staff.FirstName : "",
+                                        Staff_Email = x.Staff != null ? x.Staff.StaffEmail : "",
+                                        // Staff = x.Staff,
+                                        // Staff_SBU = x.Staff != null ? _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().SBU_Name : "",
+                                        Staff_SBU = x.Staff != null ? x.Staff.StrategicBusinessUnit.SBU_Name: null,
+                                        // Staff_SBUID = _context.StrategicBusinessUnits.Where(s => s.Id == x.Staff.Staff_SBU).FirstOrDefault().Id,
+                                        Staff_SBUID = x.Staff != null? x.Staff.Staff_SBU: null,
+                                        Staff_Role = x.Staff != null? _context.Roles.Where(r => r.id == x.Staff.RoleID).FirstOrDefault().RoleName: "",
                                         Comment = x.Comment,
                                         Date = x.ActionDate,
                                         ActionByCompany = x.ActionByCompany,
@@ -392,20 +506,25 @@ namespace Backend_UMR_Work_Program.Controllers
                                         CompanyDetails = companyDetails,
                                         Status = x.Status,
                                         Action = x.AppAction,
-                                    }).ToListAsync();
+                                        SelectedTables = x.SelectedTables,
+                                    })
+                                    .ToListAsync();
 
                 var currentDesks = await (from dsk in _context.MyDesks
                                        join stf in _context.staff on dsk.StaffID equals stf.StaffID
                                        join rol in _context.Roles on stf.RoleID equals rol.id
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
                                        where dsk.HasWork == true && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
-                                       select new Staff_Model
+                                       select new 
                                        {
                                            Desk_ID = dsk.DeskID,
                                            Staff_Name = stf.LastName + ", " + stf.FirstName,
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
+                                           deskStatus = dsk.ProcessStatus,
+                                           internalStatus = dsk.ProcessStatus,
+                                           SBU_Code = sbu.SBU_Code
                                        }).ToListAsync();
 
                 var staffDesk = await (from dsk in _context.MyDesks
@@ -414,19 +533,20 @@ namespace Backend_UMR_Work_Program.Controllers
                                        join rol in _context.Roles on stf.RoleID equals rol.id
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
                                        where admin.Id == WKPCompanyNumber && dsk.AppId == appID && stf.ActiveStatus != false && stf.DeleteStatus != true
-                                          select new Staff_Model
+                                          select new
                                        {
                                            Desk_ID = dsk.DeskID,
                                            Staff_Name = stf.LastName + ", " + stf.FirstName,
                                            Staff_Email = stf.StaffEmail,
                                            Staff_SBU = sbu.SBU_Name,
                                            Staff_Role = rol.RoleName,
-                                           StaffID = stf.StaffID
+                                           StaffID = stf.StaffID,
+                                           internalStatus = dsk.ProcessStatus
                                        }).ToListAsync();
 
-                var staffs = await _context.staff.ToListAsync();
+                // var staffs = await _context.staff.ToListAsync();
 
-                var documents = await _context.SubmittedDocuments.Where(x => x.CreatedBy == application.CompanyID.ToString() && x.YearOfWKP == application.YearOfWKP).Take(10).ToListAsync();
+                // var documents = await _context.SubmittedDocuments.Where(x => x.CreatedBy == application.CompanyID.ToString() && x.YearOfWKP == application.YearOfWKP).Take(10).ToListAsync();
 
                 var getStaffSBU = (from stf in _context.staff
                                    join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
@@ -435,11 +555,13 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 var getSBU_TablesToDisplay = await _context.Table_Details.Where(x => x.SBU_ID.Contains(getStaffSBU.Id.ToString())).ToListAsync();
 
+                var selectedTables = appHistory.Find(x => x.Staff_SBUID == getStaffSBU.Id);
+
                 var sbuApprovals = new List<ApplicationSBUApproval>();
                 
                 if(getStaffSBU.Tier == 2 && appID != null)
                 {
-                    sbuApprovals = await _context.ApplicationSBUApprovals.Where(x => x.AppId == appID).ToListAsync();
+                    sbuApprovals = await _context.ApplicationSBUApprovals.Include(x => x.Staff).Where(x => x.AppId == appID).ToListAsync();
                 }
                 else
                 {
@@ -449,18 +571,20 @@ namespace Backend_UMR_Work_Program.Controllers
                 var appDetails = new 
                 {
                     Application = application,
-                    Field = field,
-                    Concession = concession,
-                    Company = company,
+                    // Field = application.Field,
+                    // Concession = application.Concession,
+                    // Company = application.Company,
                     CompanyDetails = companyDetails,
                     Staff = staffDesk,
                     currentDesks = currentDesks,
                     Application_History = appHistory.OrderByDescending(x => x.ID).ToList(),
-                    Document = documents,
+                    // Document = documents,
                     SBU_TableDetails = getSBU_TablesToDisplay,
                     SBU = await _context.StrategicBusinessUnits.ToListAsync(),
                     SBUApprovals = sbuApprovals,
-                    staffs = staffs,
+                    // staffs = staffs,
+                    staffDesk = staffDesk.FirstOrDefault(),
+                    StaffSBU = getStaffSBU,
                 };
 
                 return new WebApiResponse { Data = appDetails, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };

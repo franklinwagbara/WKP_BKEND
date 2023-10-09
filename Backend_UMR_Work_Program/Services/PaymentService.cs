@@ -146,16 +146,16 @@ namespace Backend_UMR_Work_Program.Services
             
         }
 
-        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int concessionId, int fieldId)
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int? concessionId, int? fieldId)
         {
             try
             {
-                var payment = await _context.Payments.Include(x => x.PaymentType).Where(x => x.ConcessionId == concessionId && x.FieldId == fieldId && x.Status == PAYMENT_STATUS.PaymentPending).FirstOrDefaultAsync();
+                var payment = await _context.Payments.Where(x => x.FieldId == fieldId && x.ConcessionId == concessionId && x.Status == PAYMENT_STATUS.PaymentPending).FirstOrDefaultAsync();
 
-                if(payment == null)
+                if (payment == null)
                     return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = "Error: Payment detail not found", StatusCode = ResponseCodes.RecordNotFound };
 
-                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Id == payment.Id).ToListAsync();
+                var fees = await _context.Fees.Include(s => s.TypeOfPayment).Where(x => x.TypeOfPayment.Id == payment.TypeOfPaymentId).ToListAsync();
 
                 if(fees.Count == 1 && fees[0].TypeOfPayment.Name == TYPE_OF_FEE.NoFee)
                     return new WebApiResponse { Data = null, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
@@ -376,14 +376,14 @@ namespace Backend_UMR_Work_Program.Services
                                     }
                                     else
                                     {
-                                        var mainPaymentType = await _context.TypeOfPayments.Where(x => x.Category == paymentCategory).FirstOrDefaultAsync();
+                                        var paymentType = await _context.TypeOfPayments.Where(x => x.Category == paymentCategory).FirstOrDefaultAsync();
                                         var newPayment = new AppPaymentViewModel()
                                         {
                                             AppId = app.Id,
                                             CompanyNumber = app.CompanyID,
                                             ConcessionId = (int)app.ConcessionID,
                                             FieldId = app.FieldID,
-                                            TypeOfPayment = mainPaymentType.Id,
+                                            TypeOfPayment = paymentType.Id,
                                             AmountNGN = amountNGN.ToString(),
                                             AmountUSD = "",
                                             OrderId = orderId,
@@ -442,7 +442,7 @@ namespace Backend_UMR_Work_Program.Services
             }
         }
 
-        public async Task<WebApiResponse> ConfirmUSDPayment(USDPaymentDTO model, string? paymentCategory)
+        public async Task<WebApiResponse> ProcessUSDPaymentEvidence(USDPaymentDTO model, string? paymentCategory)
         {
             try
             {
@@ -462,7 +462,7 @@ namespace Backend_UMR_Work_Program.Services
                         PAYMENT_STATUS.PaymentPending, null, false);
                 }
 
-                var paymentExist = await _context.Payments.Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo).FirstOrDefaultAsync();
+                var paymentExist = await _context.Payments.Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo && x.PaymentType.Category == paymentCategory).FirstOrDefaultAsync();
 
                 if (paymentExist == null) return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = $"This payment record does not exist.", StatusCode = ResponseCodes.Badrequest };
 
@@ -504,18 +504,25 @@ namespace Backend_UMR_Work_Program.Services
                         PAYMENT_STATUS.PaymentPending, null, false);
                 }
 
-                var paymentExist = await _context.Payments.Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo).FirstOrDefaultAsync();
+                var paymentExist = await _context.Payments.Include(x => x.PaymentType).Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo && x.PaymentType.Category == paymentCategory).FirstOrDefaultAsync();
 
-                if (paymentExist != null) return new WebApiResponse { Data = new { OrderId = app.ReferenceNo, AccountNumber = AccountNumber, AccountName = BankName, BankName = Bank }, ResponseCode = AppResponseCodes.PaymentAlreadyExists, Message = $"This payment record has already been created.", StatusCode = ResponseCodes.Success };
+                if (paymentExist != null) 
+                    return new WebApiResponse { 
+                        Data = new { OrderId = app.ReferenceNo, 
+                            AccountNumber = AccountNumber, AccountName = BankName, 
+                            BankName = Bank 
+                        }, 
+                        ResponseCode = AppResponseCodes.PaymentAlreadyExists, 
+                        Message = $"This payment record has already been created.", StatusCode = ResponseCodes.Success };
 
-                var mainPaymentType = await _context.TypeOfPayments.Where(x => x.Category == paymentCategory).FirstOrDefaultAsync();
+                var paymentType = await _context.TypeOfPayments.Where(x => x.Category == paymentCategory).FirstOrDefaultAsync();
                 var newPayment = new AppPaymentViewModel()
                 {
                     AppId = app.Id,
                     CompanyNumber = app.CompanyID,
                     ConcessionId = (int)app.ConcessionID,
                     FieldId = app.FieldID,
-                    TypeOfPayment = mainPaymentType.Id,
+                    TypeOfPayment = paymentType.Id,
                     AmountNGN = "",
                     AmountUSD = model.AmountUSD,
                     OrderId = app.ReferenceNo,
@@ -532,7 +539,7 @@ namespace Backend_UMR_Work_Program.Services
             }
             catch (Exception e)
             {
-                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", StatusCode = ResponseCodes.InternalError };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message}", Data = e.StackTrace, StatusCode = ResponseCodes.InternalError };
             }
 
         }

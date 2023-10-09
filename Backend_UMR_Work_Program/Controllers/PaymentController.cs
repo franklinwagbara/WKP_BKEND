@@ -3,15 +3,14 @@ using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.DTOs;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Services;
-using DocumentFormat.OpenXml.Bibliography;
 using LinqToDB;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
-using Syncfusion.XlsIO.Implementation;
 using System.Security.Claims;
+using WKP.Application.Features.Application.Commands.SubmitApplication;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -31,6 +30,7 @@ namespace Backend_UMR_Work_Program.Controllers
         public IHttpContextAccessor _httpContext;
         private readonly AppSettings _appSettings;
         private readonly BlobService _blobService;
+        private readonly ISender _mediator;
 
         private string? WKPCompanyId => User.FindFirstValue(ClaimTypes.NameIdentifier);
         private string? WKPCompanyName => User.FindFirstValue(ClaimTypes.Name);
@@ -42,7 +42,8 @@ namespace Backend_UMR_Work_Program.Controllers
             IMapper mapper, IHttpContextAccessor httpAccessor, 
             IOptions<AppSettings> appsettings, PaymentService paymentService,
             ApplicationService applicationService, 
-            BlobService blobService
+            BlobService blobService,
+            ISender mediator
             )
         {
             _context = context;
@@ -52,13 +53,14 @@ namespace Backend_UMR_Work_Program.Controllers
             _applicationService = applicationService;
             _appSettings = appsettings.Value;
             _blobService = blobService;
+            _mediator = mediator;
         }
 
         [HttpGet("GET_PAYMENT_SUMMARY_SUBMISSION")]
         public async Task<WebApiResponse> GetPaymentSummarySubmission() => await _paymentService.GetPaymentSummarySubmission();
 
         [HttpGet("GET_EXTRA_PAYMENT_SUMMARY_SUBMISSION")]
-        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int concessionId, int fieldId) => await _paymentService.GetExtraPaymentSummarySubmission(concessionId, fieldId);
+        public async Task<WebApiResponse> GetExtraPaymentSummarySubmission(int? concessionId, int? fieldId) => await _paymentService.GetExtraPaymentSummarySubmission(concessionId, fieldId);
 
         [HttpGet("GET_TYPE_OF_PAYMENTS")]
         public async Task<WebApiResponse> Get_Type_Of_Payments() => await _paymentService.GetTypesOfPayments();
@@ -74,6 +76,27 @@ namespace Backend_UMR_Work_Program.Controllers
                     Convert.ToDecimal(amountNGN), 
                     serviceCharge, concessionId, year,  
                     fieldId, PAYMENT_CATEGORY.MainPayment);
+
+                return new WebApiResponse { Data = rrr, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+            }
+            catch (Exception ex)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + ex.Message, StatusCode = ResponseCodes.InternalError };
+            }
+
+        }
+
+        [HttpPost("GENERATE_RRR_EXTRA_PAYMENT")]
+        public async Task<WebApiResponse> GenerateRRRExtraPayment(int appId, string amountNGN, string serviceCharge, int concessionId, int year, int? fieldId)
+        {
+            try
+            {
+                var rrr = await _paymentService.GenerateRRR(
+                    appId,
+                    Convert.ToInt32(WKPCompanyNumber),
+                    Convert.ToDecimal(amountNGN),
+                    serviceCharge, concessionId, year,
+                    fieldId, PAYMENT_CATEGORY.OtherPayment);
 
                 return new WebApiResponse { Data = rrr, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
             }
@@ -130,6 +153,15 @@ namespace Backend_UMR_Work_Program.Controllers
             return await _paymentService.CreateUSDPayment(model, PAYMENT_CATEGORY.MainPayment);
         }
 
+        [HttpPost("CREATE_USD_EXTRA_PAYMENT_SUBMISSION")]
+        public async Task<WebApiResponse> CreateUSDExtraPayment([FromBody] USDPaymentDTO model)
+        {
+            model.CompanyNumber = (int)WKPCompanyNumber;
+            model.CompanyEmail = WKPCompanyEmail;
+
+            return await _paymentService.CreateUSDPayment(model, PAYMENT_CATEGORY.OtherPayment);
+        }
+
         [HttpPost("CONFIRM_USD_PAYMENT_SUBMISSION")]
         public async Task<WebApiResponse> ConfirmUSDPayment([FromForm] USDPaymentDTO model)
         {
@@ -146,7 +178,28 @@ namespace Backend_UMR_Work_Program.Controllers
                     file.ContentType, $"PaymentDocuments/{model.PaymentEvidenceFileName}",
                     model.PaymentEvidenceFileName.ToUpper(), (int)WKPCompanyNumber, int.Parse(model.Year.ToString()));
 
-                return await _paymentService.ConfirmUSDPayment(model, PAYMENT_CATEGORY.MainPayment);
+                return await _paymentService.ProcessUSDPaymentEvidence(model, PAYMENT_CATEGORY.MainPayment);
+            }
+            else return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = "File Not Provided.", StatusCode = ResponseCodes.Badrequest };
+        }
+
+        [HttpPost("CONFIRM_USD_EXTRA_PAYMENT_SUBMISSION")]
+        public async Task<WebApiResponse> ConfirmUSDExtraPayment([FromForm] USDPaymentDTO model)
+        {
+            model.CompanyNumber = (int)WKPCompanyNumber;
+            model.CompanyEmail = WKPCompanyEmail;
+
+            var file = Request.Form.Files.Count > 0 ? Request.Form.Files[0] : null;
+
+            if (file != null)
+            {
+                model.PaymentEvidenceFileName = file.FileName;
+                model.PaymentEvidenceFilePath = await _blobService.UploadFileBlobAsync(
+                    "documents", file.OpenReadStream(),
+                    file.ContentType, $"PaymentDocuments/{model.PaymentEvidenceFileName}",
+                    model.PaymentEvidenceFileName.ToUpper(), (int)WKPCompanyNumber, int.Parse(model.Year.ToString()));
+
+                return await _paymentService.ProcessUSDPaymentEvidence(model, PAYMENT_CATEGORY.OtherPayment);
             }
             else return new WebApiResponse { ResponseCode = AppResponseCodes.MissingParameter, Message = "File Not Provided.", StatusCode = ResponseCodes.Badrequest };
         }
@@ -197,7 +250,8 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (paymenRes.ResponseCode != AppResponseCodes.Success)
                     return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = "Could not verify payment.", StatusCode = ResponseCodes.Badrequest };
 
-                var submitRes = await _applicationService.SubmitApplication(payment.AppId);
+                // var submitRes = await _applicationService.SubmitApplication(payment.AppId);
+                var submitRes = await _mediator.Send(new SubmitApplicationCommand(appId));
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = paymenRes.Message, StatusCode = ResponseCodes.Success };
             }
@@ -208,15 +262,15 @@ namespace Backend_UMR_Work_Program.Controllers
 
         }
 
-        [HttpPost("RESUBMISSION_FOR_NO_FEE")]
-        public async Task<IActionResult> ReSubmissionForNoFee(int appId)
-        {
-            var res = await _paymentService.ReSubmissionForNoFee(appId);
+        //[HttpPost("RESUBMISSION_FOR_NO_FEE")]
+        //public async Task<IActionResult> ReSubmissionForNoFee(int appId)
+        //{
+        //    var res = await _paymentService.ReSubmissionForNoFee(appId);
 
-            if (res.ResponseCode != AppResponseCodes.Success)
-                return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
+        //    if (res.ResponseCode != AppResponseCodes.Success)
+        //        return Redirect($"{_appSettings.LoginUrl}/company/payment-failed/{0}/{0}/{0}/{res.Message}");
 
-            return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
-        }
+        //    return Redirect($"{_appSettings.LoginUrl}/company/payment-successfull/{res.Data}");
+        //}
     }
 }

@@ -1,14 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Services;
@@ -16,17 +7,16 @@ using System.Net;
 using System.Text;
 using Microsoft.Extensions.Azure;
 using Azure.Core.Extensions;
-using System;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using Backend_UMR_Work_Program.Controllers;
-using AutoMapper;
 using Backend_UMR_Work_Program.Helpers.AutoMapperSettings;
 using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Controllers.Authentications;
 using Backend_UMR_Work_Program.DataModels;
 using Rotativa.AspNetCore;
+using WKP.Application;
+using WKP.Infrastructure;
 
 namespace Backend_UMR_Work_Program
 {
@@ -56,11 +46,17 @@ namespace Backend_UMR_Work_Program
 
             services.AddMvc();
             //AddJsonOptions(opt => { opt.JsonSerializerOptions.IgnoreNullValues = true; });
+            
             services.AddControllers();
+
+            //Register Project DependencyInjection files
+            services.AddApplication()
+                    .AddInfrastructure((ConfigurationManager)Configuration);
+
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
-            // configure jwt authentication
+            // configure jwt authentication normal
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
             services.AddAuthentication(x =>
