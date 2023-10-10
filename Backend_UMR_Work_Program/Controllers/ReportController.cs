@@ -946,29 +946,45 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                string previousYear = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string twoYearsAgo = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string proposedYear = year != null ? (int.Parse(year) + 1).ToString() : "";
+                if (!string.IsNullOrEmpty(year))
+                {
+                    string previousYear = year != null ? (int.Parse(year) - 1).ToString() : "";
+                    string twoYearsAgo = year != null ? (int.Parse(year) - 1).ToString() : "";
+                    string proposedYear = year != null ? (int.Parse(year) + 1).ToString() : "";
 
-                WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Exploration = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == year && x.Category == GeneralModel.Exploration).ToListAsync();
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Exploration = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == year && x.Category == GeneralModel.Exploration).ToListAsync();
 
-                WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Appraisal = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == year && x.Category.ToLower().Contains(GeneralModel.Appraisal.ToLower())).ToListAsync();
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Appraisal = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == year && x.Category.ToLower().Contains(GeneralModel.Appraisal.ToLower())).ToListAsync();
 
-                WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Development = await _context.WP_COUNT_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == year && x.Category == GeneralModel.Development).ToListAsync();
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Development = await _context.WP_COUNT_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == year && x.Category == GeneralModel.Development).ToListAsync();
 
-                WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Exploration_PY = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == proposedYear && x.Category == GeneralModel.Exploration).ToListAsync();
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Exploration_PY = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == proposedYear && x.Category == GeneralModel.Exploration).ToListAsync();
 
-                WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Appraisal_PY = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == proposedYear && x.Category.ToLower().Contains(GeneralModel.Appraisal.ToLower())).ToListAsync();
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Appraisal_PY = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == proposedYear && x.Category.ToLower().Contains(GeneralModel.Appraisal.ToLower())).ToListAsync();
 
-                WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Development_PY = await _context.WP_COUNT_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == proposedYear && x.Category == GeneralModel.Development).ToListAsync();
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Development_PY = await _context.WP_COUNT_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Year_of_WP == proposedYear && x.Category == GeneralModel.Development).ToListAsync();
+                }
+                else
+                {
+
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Exploration = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Category == GeneralModel.Exploration).ToListAsync();
+
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Appraisal = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Category.ToLower().Contains(GeneralModel.Appraisal.ToLower())).ToListAsync();
+
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Development = await _context.WP_COUNT_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Category == GeneralModel.Development).ToListAsync();
+
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Exploration_PY = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Category == GeneralModel.Exploration).ToListAsync();
+
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Appraisal_PY = await _context.Sum_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Category.ToLower().Contains(GeneralModel.Appraisal.ToLower())).ToListAsync();
+
+                    WKP_Report2.DRILLING_OPERATIONS_CATEGORIES_OF_WELLS_Development_PY = await _context.WP_COUNT_DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.Category == GeneralModel.Development).ToListAsync();
+                }
 
             }
 
             catch (Exception e)
             {
-
                 return BadRequest(new { message = e.Message });
-
             }
 
             return WKP_Report2;
@@ -980,13 +996,18 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                string previousYear = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string twoYearsAgo = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string proposedYear = year != null ? (int.Parse(year) + 1).ToString() : "";
+                if (!string.IsNullOrEmpty(year))
+                {
+                    WKP_Report2.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS_PY = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.Year_of_WP == year && x.Actual_Proposed == "Actual Year").ToListAsync();
+                }
+                else
+                {
+                    WKP_Report2.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.ToListAsync();
 
-                WKP_Report2.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS_PY = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.Year_of_WP == year && x.Actual_Proposed == "Actual Year").ToListAsync();
+                    WKP_Report2.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTS_PY = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.Actual_Proposed == "Actual Year").ToListAsync();
+                }
 
             }
 
@@ -1001,28 +1022,30 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> GET_NIGERIA_CONTENT(string year)
         {
             WorkProgrammeReport2_Model WKP_Report2 = new WorkProgrammeReport2_Model();
-
             try
             {
-                string previousYear = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string twoYearsAgo = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string proposedYear = year != null ? (int.Parse(year) + 1).ToString() : "";
+                if (!string.IsNullOrEmpty(year))
+                {
+                    WKP_Report2.NIGERIA_CONTENT_TRAINING_PY = await _context.NIGERIA_CONTENT_Trainings.Where(x => x.Year_of_WP == year && x.Actual_Proposed == "Proposed Year").ToListAsync();
 
-                WKP_Report2.NIGERIA_CONTENT_TRAINING_PY = await _context.NIGERIA_CONTENT_Trainings.Where(x => x.Year_of_WP == year && x.Actual_Proposed == "Proposed Year").ToListAsync();
+                    WKP_Report2.NIGERIA_CONTENT_TRAINING = await _context.NIGERIA_CONTENT_Trainings.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.NIGERIA_CONTENT_TRAINING = await _context.NIGERIA_CONTENT_Trainings.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.NIGERIA_CONTENT_UPLOAD_SUCESSION_PLAN = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.Where(x => x.Year_of_WP == year).ToListAsync();
+                }
+                else
+                {
+                    WKP_Report2.NIGERIA_CONTENT_TRAINING_PY = await _context.NIGERIA_CONTENT_Trainings.Where(x => x.Actual_Proposed == "Proposed Year").ToListAsync();
 
-                WKP_Report2.NIGERIA_CONTENT_UPLOAD_SUCESSION_PLAN = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.NIGERIA_CONTENT_TRAINING = await _context.NIGERIA_CONTENT_Trainings.ToListAsync();
 
+                    WKP_Report2.NIGERIA_CONTENT_UPLOAD_SUCESSION_PLAN = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.ToListAsync();
+                }
             }
 
             catch (Exception e)
             {
-
-                return "Error : " + e.Message;
-
+                return BadRequest("Error : " + e.Message);
             }
-
             return WKP_Report2;
         }
 
@@ -1033,41 +1056,59 @@ namespace Backend_UMR_Work_Program.Controllers
 
             try
             {
-                string previousYear = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string twoYearsAgo = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string proposedYear = year != null ? (int.Parse(year) + 1).ToString() : "";
+                if (!string.IsNullOrEmpty(year))
+                {
+                    string previousYear = year != null ? (int.Parse(year) - 1).ToString() : "";
+                    string twoYearsAgo = year != null ? (int.Parse(year) - 1).ToString() : "";
+                    string proposedYear = year != null ? (int.Parse(year) + 1).ToString() : "";
 
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_NEW_TECHNOLOGY_CONFORMITY_ASSESSMENT = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_NEW_TECHNOLOGY_CONFORMITY_ASSESSMENT = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_OPERATING_FACILITIES = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_Operating_Facilities.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_OPERATING_FACILITIES = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_Operating_Facilities.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE_CURRENT_PLANNED = await _context.WP_RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE_CURRENT_PLANNEDs.Where(x => x.Fiveyear_Projection_Year == proposedYear).ToListAsync();
 
-                WKP_Report2.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE_CURRENT_PLANNED = await _context.WP_RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE_CURRENT_PLANNEDs.Where(x => x.Fiveyear_Projection_Year == proposedYear).ToListAsync();
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_PROPOSEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
 
-                WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_PROPOSEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_C_TYPE_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_CONTRACT_TYPE_PROPOSEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
 
-                WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_C_TYPE_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_CONTRACT_TYPE_PROPOSEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_By_month_year_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_By_month_year_PROPOSEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
 
-                WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_By_month_year_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_By_month_year_PROPOSEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                    //error WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_by_Terrain_PLANNED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_by_Terrain_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
 
-                //error WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_by_Terrain_PLANNED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_by_Terrain_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_Pivotted_PRODUCTION_BRKDWN_PLANNED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_Pivotted_by_company_productionmonth_year_breakdown_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
 
-                WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_Pivotted_PRODUCTION_BRKDWN_PLANNED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_Pivotted_by_company_productionmonth_year_breakdown_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                    //error WKP_Report2.GAS_PRODUCTION_ACTIVITIES_produced_utilized_flared_PLANNED = await _context.WP_GAS_PRODUCTION_ACTIVITIES_produced_utilized_flared_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
 
-                //error WKP_Report2.GAS_PRODUCTION_ACTIVITIES_produced_utilized_flared_PLANNED = await _context.WP_GAS_PRODUCTION_ACTIVITIES_produced_utilized_flared_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                    WKP_Report2.GAS_PRODUCTION_ACTIVITIES_contract_type_basis_PLANNED = await _context.WP_GAS_PRODUCTION_ACTIVITIES_contract_type_basis_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                }
+                else
+                {
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_NEW_TECHNOLOGY_CONFORMITY_ASSESSMENT = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.ToListAsync();
 
-                WKP_Report2.GAS_PRODUCTION_ACTIVITIES_contract_type_basis_PLANNED = await _context.WP_GAS_PRODUCTION_ACTIVITIES_contract_type_basis_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_OPERATING_FACILITIES = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_Operating_Facilities.ToListAsync();
 
+                    WKP_Report2.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE_CURRENT_PLANNED = await _context.WP_RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE_CURRENT_PLANNEDs.ToListAsync();
 
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_PROPOSEDs.ToListAsync();
+
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_C_TYPE_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_CONTRACT_TYPE_PROPOSEDs.ToListAsync();
+
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_By_month_year_PROPOSED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_By_month_year_PROPOSEDs.ToListAsync();
+
+                    //error WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_by_Terrain_PLANNED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_OIL_PRODUCTION_by_Terrain_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+
+                    WKP_Report2.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_Pivotted_PRODUCTION_BRKDWN_PLANNED = await _context.WP_OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_Pivotted_by_company_productionmonth_year_breakdown_PLANNEDs.ToListAsync();
+
+                    //error WKP_Report2.GAS_PRODUCTION_ACTIVITIES_produced_utilized_flared_PLANNED = await _context.WP_GAS_PRODUCTION_ACTIVITIES_produced_utilized_flared_PLANNEDs.Where(x => x.Year_of_WP == proposedYear).ToListAsync();
+
+                    WKP_Report2.GAS_PRODUCTION_ACTIVITIES_contract_type_basis_PLANNED = await _context.WP_GAS_PRODUCTION_ACTIVITIES_contract_type_basis_PLANNEDs.ToListAsync();
+                }
             }
-
             catch (Exception e)
             {
-
-                return "Error : " + e.Message;
-
+                return BadRequest("Error : " + e.Message);
             }
-
             return WKP_Report2;
         }
 
@@ -1075,31 +1116,37 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> GET_BUDGET(string year)
         {
             WorkProgrammeReport2_Model WKP_Report2 = new WorkProgrammeReport2_Model();
-
             try
             {
-                string previousYear = year != null ? (int.Parse(year) - 1).ToString() : "";
-                string proposedYear = year != null ? (int.Parse(year) + 1).ToString() : "";
+                if (!string.IsNullOrEmpty(year))
+                {
+                    WKP_Report2.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIES = await _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIES = await _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.BUDGET_PERFORMANCE_DEVELOPMENT_DRILLING_ACTIVITIES = await _context.BUDGET_PERFORMANCE_DEVELOPMENT_DRILLING_ACTIVITIEs.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.BUDGET_PERFORMANCE_DEVELOPMENT_DRILLING_ACTIVITIES = await _context.BUDGET_PERFORMANCE_DEVELOPMENT_DRILLING_ACTIVITIEs.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECT = await _context.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECTs.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECT = await _context.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECTs.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.BUDGET_PERFORMANCE_PRODUCTION_COST = await _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs.Where(x => x.Year_of_WP == year).ToListAsync();
 
-                WKP_Report2.BUDGET_PERFORMANCE_PRODUCTION_COST = await _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.STRATEGIC_PLANS_ON_COMPANY_BASIS = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Where(x => x.Year_of_WP == year).ToListAsync();
+                }
+                else
+                {
+                    WKP_Report2.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIES = await _context.BUDGET_PERFORMANCE_EXPLORATORY_ACTIVITIEs.ToListAsync();
 
-                WKP_Report2.STRATEGIC_PLANS_ON_COMPANY_BASIS = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Where(x => x.Year_of_WP == year).ToListAsync();
+                    WKP_Report2.BUDGET_PERFORMANCE_DEVELOPMENT_DRILLING_ACTIVITIES = await _context.BUDGET_PERFORMANCE_DEVELOPMENT_DRILLING_ACTIVITIEs.ToListAsync();
 
+                    WKP_Report2.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECT = await _context.BUDGET_PERFORMANCE_FACILITIES_DEVELOPMENT_PROJECTs.ToListAsync();
+
+                    WKP_Report2.BUDGET_PERFORMANCE_PRODUCTION_COST = await _context.BUDGET_PERFORMANCE_PRODUCTION_COSTs.ToListAsync();
+
+                    WKP_Report2.STRATEGIC_PLANS_ON_COMPANY_BASIS = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.ToListAsync();
+                }
             }
-
             catch (Exception e)
             {
-
-                return "Error : " + e.Message;
-
+                return BadRequest("Error : " + e.Message);
             }
-
             return WKP_Report2;
         }
 
