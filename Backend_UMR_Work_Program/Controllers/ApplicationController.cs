@@ -20,6 +20,7 @@ using WKP.Application.Application.Queries.GetDashboardData;
 using WKP.Application.Application.Queries.GetProcessingApplications;
 using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
 using WKP.Application.Features.Application.Commands.ApproveApplication;
+using WKP.Application.Features.Application.Commands.MoveApplication;
 using WKP.Application.Features.Application.Commands.ReturnAppToStaff;
 using WKP.Application.Features.Application.Commands.SendBackApplicationToCompany;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
@@ -27,6 +28,8 @@ using WKP.Application.Features.Application.Queries.GetAllApplications;
 using WKP.Application.Features.Application.Queries.GetAllApplicationsCompany;
 using WKP.Application.Features.Application.Queries.GetAllAppsScopedToSBU;
 using WKP.Application.Features.Application.Queries.GetReturnedApplications;
+using WKP.Application.Features.Application.Queries.GetStaffDesksByStaffID;
+using WKP.Application.Features.Application.Queries.GetStaffsAppInfoWithSBURoleId;
 using WKP.Contracts.Application;
 using WKP.Contracts.Features.Application;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
@@ -200,15 +203,33 @@ namespace Backend_UMR_Work_Program.Controllers
             return Response(result);
         }
 
+        [HttpGet("GetStaffsAppInfoWithSBURoleId")]
+        public async Task<IActionResult> GetStaffsAppInfoWithSBURoleId(GetStaffsAppInfoWithSBURoleIdRequest request)
+        {
+            var query = _mapper.Map<GetStaffsAppInfoWithSBURoleIdQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpGet("GetStaffDesksByStaffID")]
+        public async Task<IActionResult> GetAppsOnMyDeskByStaffID(GetStaffDesksByStaffIDRequest request)
+        {
+            var query = _mapper.Map<GetStaffDesksByStaffIDQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpPost("MoveApplication")]
+        public async Task<IActionResult> MoveApplication(MoveApplicationRequest request)
+        {
+            var query = _mapper.Map<MoveApplicationCommand>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
         //Rework
         [HttpGet("GetAppsOnMyDesk")]
         public async Task<object> GetAppsOnMyDesk() => await _applicationService.GetAppsOnMyDesk((int)WKPCompanyNumber);
-
-        [HttpGet("GetStaffDesksBySBUAndRole")]
-        public async Task<object> GetAppsOnMyDeskBySBUAndRole(int sbuID, int roleID) => await _applicationService.GetAppsOnMyDeskBySBUAndRole(sbuID, roleID);
-
-        [HttpGet("GetStaffDesksByStaffID")]
-        public async Task<object> GetAppsOnMyDeskByStaffID(int staffID) => await _applicationService.GetAppsOnMyDeskByStaffID(staffID);
 
         [HttpGet("All-Companies")]
         public async Task<object> AllCompanies() => await _applicationService.AllCompanies(WKPCompanyEmail);
@@ -235,10 +256,6 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpGet("GET_ACCOUNT_DESK")]
         public async Task<WebApiResponse> GetAccountDesk() => await _applicationService.GetAccountDesk(WKPCompanyEmail);
-
-        [HttpPost("MoveApplication")]
-        public async Task<WebApiResponse> MoveApplication(int sourceStaffID, int targetStaffID, string[] selectedApps)
-            => await _applicationService.MoveApplication(sourceStaffID, targetStaffID, selectedApps);
 
         [HttpGet("IS_APPLICATION_RETURNED")]
         public async Task<WebApiResponse> IsApplicationReturned(int appId) => await _applicationService.IsApplicationReturned(appId);

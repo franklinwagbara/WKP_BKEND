@@ -23,6 +23,9 @@ using WKP.Application.Features.Accounting.Queries.GetAllUSDPaymentApprovals;
 using WKP.Application.Features.Application.Commands.SendBackApplicationToCompany;
 using WKP.Application.Features.Application.Queries.GetAllAppsScopedToSBU;
 using WKP.Application.Features.Application.Commands.ApproveApplication;
+using WKP.Application.Features.Application.Queries.GetStaffsAppInfoWithSBURoleId;
+using WKP.Application.Features.Application.Queries.GetStaffDesksByStaffID;
+using WKP.Application.Features.Application.Commands.MoveApplication;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -49,6 +52,9 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<SendBackApplicationToCompanyRequest, SendBackApplicationToCompanyCommand>();
             CreateMap<GetAllAppsScopedToSBURequest, GetAllAppsScopedToSBUQuery>();
             CreateMap<ApproveApplicationRequest, ApproveApplicationCommand>();
+            CreateMap<GetStaffsAppInfoWithSBURoleIdRequest, GetStaffsAppInfoWithSBURoleIdQuery>();
+            CreateMap<GetStaffDesksByStaffIDRequest, GetStaffDesksByStaffIDQuery>();
+            CreateMap<MoveApplicationRequest, MoveApplicationCommand>();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();
