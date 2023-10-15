@@ -166,9 +166,6 @@ namespace Backend_UMR_Work_Program.Controllers
                         checkSchedule.companyAproved = true;
 
                     }
-
-
-
                     if (checkSchedule?.adminAproved == true && checkSchedule?.companyAproved == true)
                     {
                         checkSchedule.STATUS = ENGAGEMENT_SCHEDULE_STATUS.Approved;
@@ -189,16 +186,13 @@ namespace Backend_UMR_Work_Program.Controllers
                         wp_time=checkSchedule.wp_time,
                         actionBy=WKPCompanyEmail,
                         comment= ENGAGEMENT_SCHEDULE_STATUS.CompletlyScheduled
-                };
+                    };
 
 
                     checkSchedule.Date_Updated = DateTime.Now;
                     checkSchedule.Histories.Add(scheduledHistory);
                     checkSchedule.comment = scheduledHistory.comment;
                     checkSchedule.numOfHistories = ((await _context.ADMIN_DATETIME_PRESENTATIONs.Where(c => c.Id == Id).ToListAsync()).Count) + 1;
-                    
-                    
-
 
                     _context.ADMIN_DATETIME_PRESENTATIONs.Update(checkSchedule);
                     var myTime = await _context.SaveChangesAsync();

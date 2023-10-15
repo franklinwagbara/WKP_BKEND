@@ -30,6 +30,19 @@ namespace WKP.Infrastructure.GeneralServices
             _isInitialized = true;
         }
 
+        public Task SendMoveNotification(bool? isSource = false)
+        {
+            CheckInit();
+            
+            string subject = $"Re-assignment for WORK PROGRAM application with ref: {App.ReferenceNo} ({App.Concession.Concession_Held} - {App.YearOfWKP}).";
+            string content = $"Application with REF : {App.ReferenceNo} has been moved to your desk from {Staff.LastName}, {Staff.FirstName} desk";
+
+            if(isSource == true) content = $"Application with REF : {App.ReferenceNo} has been moved from your desk to {Staff.LastName}, {Staff.FirstName} desk";
+        
+            SendNotification(subject, content);
+            return Task.CompletedTask;
+        }
+
         public Task SendSubmitNotification()
         {
             CheckInit();

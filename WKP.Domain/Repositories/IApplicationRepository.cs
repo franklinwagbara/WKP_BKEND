@@ -1,4 +1,3 @@
-using WKP.Domain.DTOs.Application;
 using WKP.Domain.Entities;
 
 namespace WKP.Domain.Repositories
@@ -15,5 +14,7 @@ namespace WKP.Domain.Repositories
         Task<IEnumerable<Application>?> GetAllSubmittedApps();
         Task<IEnumerable<Application>?> GetAllAppsByCompanyId(int CompanyId);
         Task<IEnumerable<ReturnedApplication>?> GetReturnedAppsByCompanyId(int CompanyId);
+        Task<IEnumerable<object>> GetStaffsAppInfoWithSBURoleId(int SBUId, int RoleId);
+        Task<IEnumerable<object>> GetAppsOnMyDeskByStaffID(int StaffId);
     }
 }

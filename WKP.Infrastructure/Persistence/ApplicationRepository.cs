@@ -150,5 +150,39 @@ namespace WKP.Infrastructure.Persistence
             
             return result;
         }
+
+        public async Task<IEnumerable<object>> GetStaffsAppInfoWithSBURoleId(int SBUId, int RoleId)
+        {
+            var result = await _context.Desks.Include(x => x.Staff)
+                    .Where(x => x.Staff.Staff_SBU == SBUId && x.Staff.RoleID == RoleId)
+                    .GroupBy(x => x.StaffID)
+                    .Select(x => new
+                    {
+                        deskCount = x.Count(),
+                        processingCount = x.Count(
+                            x => x.ProcessStatus != DESK_PROCESS_STATUS.SubmittedByCompany 
+                            || x.ProcessStatus != DESK_PROCESS_STATUS.SubmittedByStaff),
+                        staff = x.ToList()[0].Staff
+                    }).ToListAsync();
+            return result;
+        }
+
+        public async Task<IEnumerable<object>> GetAppsOnMyDeskByStaffID(int StaffId)
+        {
+            var result = await (from desk in _context.Desks.Include(x => x.Staff)
+                                join app in _context.Applications
+                                    .Include(x => x.Company)
+                                    .Include(x => x.Concession)
+                                    .Include(x => x.Field) 
+                                    on desk.AppId equals app.Id
+                                where desk.StaffID == StaffId && desk.HasWork == true
+                                select new 
+                                {
+                                    Staff = desk.Staff,
+                                    Desk = desk,
+                                    Application = app
+                                }).ToListAsync();
+            return result;
+        }
     }
 }
