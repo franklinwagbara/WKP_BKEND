@@ -775,29 +775,29 @@ namespace Backend_UMR_Work_Program.Services
             }
         #endregion
 
-        public async Task<WebApiResponse> GetAppsOnMyDeskBySBUAndRole(int sbuID, int roleID)
-        {
-            try
-            {
-                //var staffs = _context.staff.Where<staff>(s => s.Staff_SBU == sbuID && s.RoleID == roleID).ToList();
-                var staffDesks = await (from desk in _dbContext.MyDesks
-                                        join staff in _dbContext.staff on desk.StaffID equals staff.StaffID
-                                        join app in _dbContext.Applications.Include(a => a.Company).Include(a => a.Concession).Include(a => a.Field) on desk.AppId equals app.Id
-                                        where staff.Staff_SBU == sbuID && staff.RoleID == roleID && desk.HasWork == true
-                                        select new DeskStaffAppsModel
-                                        {
-                                            Staff = staff,
-                                            Desk = desk,
-                                            Application = app
-                                        }).ToListAsync();
+        // public async Task<WebApiResponse> GetAppsOnMyDeskBySBUAndRole(int sbuID, int roleID)
+        // {
+        //     try
+        //     {
+        //         //var staffs = _context.staff.Where<staff>(s => s.Staff_SBU == sbuID && s.RoleID == roleID).ToList();
+        //         var staffDesks = await (from desk in _dbContext.MyDesks
+        //                                 join staff in _dbContext.staff on desk.StaffID equals staff.StaffID
+        //                                 join app in _dbContext.Applications.Include(a => a.Company).Include(a => a.Concession).Include(a => a.Field) on desk.AppId equals app.Id
+        //                                 where staff.Staff_SBU == sbuID && staff.RoleID == roleID && desk.HasWork == true
+        //                                 select new DeskStaffAppsModel
+        //                                 {
+        //                                     Staff = staff,
+        //                                     Desk = desk,
+        //                                     Application = app
+        //                                 }).ToListAsync();
 
-                return new WebApiResponse { Data = staffDesks, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
-            }
-            catch (Exception e)
-            {
-                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
-            }
-        }
+        //         return new WebApiResponse { Data = staffDesks, ResponseCode = AppResponseCodes.Success, Message = "Success", StatusCode = ResponseCodes.Success };
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = $"Error: {e.Message.ToString()}", StatusCode = ResponseCodes.InternalError };
+        //     }
+        // }
 
         public async Task<WebApiResponse> GetAppsOnMyDeskByStaffID(int staffID)
         {
