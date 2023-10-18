@@ -15,5 +15,6 @@ namespace WKP.Application.Common.Interfaces
         Task SendReturnNotification();
         Task SendRejectNotification();
         Task SendSubmitNotification();
+        Task SendMoveNotification(bool? isSource = false);
     }
 }
