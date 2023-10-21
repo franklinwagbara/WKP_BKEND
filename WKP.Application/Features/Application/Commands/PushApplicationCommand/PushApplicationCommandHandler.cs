@@ -118,7 +118,7 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
             }
             else
             {
-                exPath += " 4 ";
+                exPath += " 4 // " + JsonSerializer.Serialize(deskTemp) + " // ";
                 deskTemp = await _unitOfWork.DeskRepository.GetDeskByStaffIdAppIdWithStaff(deskTemp.StaffID, deskTemp.AppId, true);
                 exPath += " 5 ";
             }
