@@ -154,7 +154,7 @@ namespace WKP.Infrastructure.Persistence
         public async Task<IEnumerable<object>> GetStaffsAppInfoWithSBURoleId(int SBUId, int RoleId)
         {
             var result = await _context.Desks.Include(x => x.Staff)
-                    .Where(x => x.Staff.Staff_SBU == SBUId && x.Staff.RoleID == RoleId)
+                    .Where(x => x.Staff.Staff_SBU == SBUId && x.Staff.RoleID == RoleId && x.HasWork == true)
                     .GroupBy(x => x.StaffID)
                     .Select(x => new
                     {
