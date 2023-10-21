@@ -232,7 +232,7 @@ namespace WKP.Application.Application.Common
 						var res = new MyDesk
 						{
 							DeskID = -1,
-							StaffID = staffId,
+							StaffID = desk.StaffID,
 							AppId = appId,
 						};
 
