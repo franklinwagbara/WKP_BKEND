@@ -94,7 +94,7 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
             }
             catch (Exception ex) 
             {
-                return Error.Failure(code: ErrorCodes.InternalFailure, description: ex.Message);
+                return Error.Failure(code: ErrorCodes.InternalFailure, description: ex.Message + ex.StackTrace?.ToString());
             }
         }
 
