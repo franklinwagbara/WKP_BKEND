@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ErrorOr;
 using Mapster;
 using MediatR;
@@ -18,6 +19,9 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
         private readonly Helper _helper;
         private readonly IStaffNotifier _staffNotifier;
         private readonly AppStatusHelper _appStatusHelper;
+
+            string exPath = "";
+
 
         public PushApplicationCommandHandler(IUnitOfWork unitOfWork, Helper helper, IStaffNotifier staffNotifier, AppStatusHelper appStatusHelper)
         {
@@ -94,32 +98,52 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
             }
             catch (Exception ex) 
             {
-                return Error.Failure(code: ErrorCodes.InternalFailure, description: ex.Message + ex.StackTrace?.ToString());
+                return Error.Failure(code: ErrorCodes.InternalFailure, description: exPath + ex.Message + ex.StackTrace?.ToString());
             }
         }
 
         private async Task PushAppFromECToNexDesk(PushApplicationCommand request, staff actingStaff, MyDesk staffDesk, Domain.Entities.Application? app, ApplicationProccess appFlow)
         {
+
             var targetRoles_SBUs = await _unitOfWork.StaffRepository.GetStaffIdsByRoleSBU(appFlow.TargetedToRole, appFlow.TargetedToSBU);
             var deskTemp = await _helper.GetNextStaffDesk_EC(targetRoles_SBUs.ToList(), app.Id);
 
+            exPath += " 1 ";
+
             if (deskTemp.DeskID != -1)
+            {
+                exPath += " 2 ";
                 await UpdateDesk(request.Comment, app.Id, staffDesk.StaffID, appFlow, deskTemp, DESK_PROCESS_STATUS.FinalAuthorityApproved);
+                exPath += " 3 ";
+            }
             else
+            {
+                exPath += " 4 ";
                 deskTemp = await _unitOfWork.DeskRepository.GetDeskByStaffIdAppIdWithStaff(deskTemp.StaffID, deskTemp.AppId, true);
+                exPath += " 5 ";
+            }
 
             await _helper.UpdateDeskAfterPush(staffDesk, request.Comment, DESK_PROCESS_STATUS.Pushed);
             await _helper.SaveApplicationHistory(app.Id, staffDesk.StaffID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved, request.Comment, null, false, null, APPLICATION_ACTION.Approve);
 
+                exPath += " 6 // " + JsonSerializer.Serialize(deskTemp) + " // " ;
+
             //Update Final Authority Approvals Table
             await _helper.UpdateApprovalTable(app.Id, request.Comment, staffDesk.StaffID, (int)staffDesk.Staff.Staff_SBU, staffDesk.DeskID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved);
 
+                exPath += " 7 ";
+            
             //Sending notifications to Actor Staff
             _staffNotifier.Init(actingStaff, app, app.Concession, app.Field);
             await _staffNotifier.SendApprovalNotification();
 
+                exPath += " 8 ";
+
+
             //Sending notifications to Receiver Staff
             var recStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(deskTemp.StaffID);
+
+                exPath += " 9 ";
 
             if (recStaff != null)
             {
@@ -127,7 +151,11 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
                 await _staffNotifier.SendPushNotification();
             }
 
+                exPath += " 10 ";
+
             await _appStatusHelper.UpdateAppStatus(app, deskTemp, recStaff, DESK_PROCESS_STATUS.SubmittedByStaff);
+
+                exPath += " 11 ";
         }
 
         private async Task PushAppToNextDesk(PushApplicationCommand request, MyDesk staffDesk, Domain.Entities.Application? app, ApplicationProccess appFlow)
