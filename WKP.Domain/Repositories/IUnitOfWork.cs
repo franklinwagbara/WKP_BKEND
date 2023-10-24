@@ -23,6 +23,7 @@ namespace WKP.Domain.Repositories
         public ITableDetailRepository TableDetailRepository {get; }
         public IAccountDeskRepository AccountDeskRepository { get; }
         public IPaymentRepository PaymentRepository { get; }
+        public ISubmissionRejectionRepository SubmissionRejectionRepository { get; }
 
 
         public Task ExecuteTransaction(Func<Task> func);
