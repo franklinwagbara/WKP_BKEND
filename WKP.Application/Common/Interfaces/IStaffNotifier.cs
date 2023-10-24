@@ -12,6 +12,7 @@ namespace WKP.Application.Common.Interfaces
         Task SendPushNotification();
         Task SendApprovalNotification();
         Task SendFinalApprovalNotification();
+        Task SendFinalRejectionNotification(string comment);
         Task SendReturnNotification();
         Task SendRejectNotification();
         Task SendSubmitNotification();

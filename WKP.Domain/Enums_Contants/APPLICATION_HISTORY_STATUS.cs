@@ -7,6 +7,7 @@ namespace WKP.Domain.Enums_Contants
         public const string ManagerApproved = "Manager Approved";
         public const string FinalAuthorityApproved = "Final Authority Approved";
         public const string FinalApprovingAuthorityApproved = "Final Approving Authority Approved";
+        public const string FinalApprovingAuthorityRejected = "Final Approving Authority Rejected";
         public const string DirectorApproved = "Director Approved";
         public const string DeputyDirectorApproved = "Deputy Director Approved";
 

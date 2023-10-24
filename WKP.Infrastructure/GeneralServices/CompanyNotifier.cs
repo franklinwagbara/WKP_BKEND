@@ -91,6 +91,18 @@ namespace WKP.Infrastructure.GeneralServices
             return Task.CompletedTask;
         }
 
+        public Task SendFinalRejectionNotification(string comment)
+        {
+            CheckInit();
+
+            string subject = $"Rejection from Final Approving Athority for WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}).";
+            string content = $"DUMMY REJECTION FOR YOUR 2023 ANNUAL WORK PROGRAMME SUBMISSION"
+                + $"Reason: {comment}";
+
+            SendNotification(subject, content);
+            return Task.CompletedTask;
+        }
+
         private void CheckInit()
         {
             if(!_isInitialized) throw new Exception("Values not initialized - The 'Init()' was not invoked.");

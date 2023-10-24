@@ -27,6 +27,7 @@ namespace WKP.Infrastructure.Context
         public virtual DbSet<Table_Detail> TableDetails { get; set; }
         public virtual DbSet<AccountDesk> AccountDesks { get; set; }
         public virtual DbSet<Payments> Payments { get; set; }
+        public virtual DbSet<SubmissionRejection> SubmissionRejections { get; set; }
 
         public WKPContext(DbContextOptions<WKPContext> options): base(options){}
 
@@ -372,6 +373,11 @@ namespace WKP.Infrastructure.Context
                 entity.Property(e => e.TableSchema)
                     .HasMaxLength(250)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SubmissionRejection>(entity =>
+            {
+                entity.ToTable("SubmissionRejection");
             });
         }
     }
