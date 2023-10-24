@@ -1,5 +1,6 @@
 using Mapster;
 using WKP.Domain.DTOs.Application;
+using WKP.Domain.Entities;
 
 namespace WKP.Application.Mapping
 {
@@ -30,6 +31,9 @@ namespace WKP.Application.Mapping
                 .Map(d => d.SBU_Comment, s => s.Comment)
                 .Map(d => d.Comment, s => s.Comment)
                 .Map(d => d.SBU_Tables, s => s.SelectedTables);
+
+            config.NewConfig<PermitApproval, ApprovalDTO>();
+            config.NewConfig<SubmissionRejection, RejectionDTO>();
         }
     }
 }

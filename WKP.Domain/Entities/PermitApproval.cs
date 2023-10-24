@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WKP.Domain.Entities
 {
     public class PermitApproval
@@ -14,5 +16,11 @@ namespace WKP.Domain.Entities
         public bool IsPrinted { get; set; }
         public string? ApprovedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
+
+        [ForeignKey(nameof(AppID))]
+        public Application? Application { get; set; }
+
+        [ForeignKey(nameof(CompanyID))]
+        public ADMIN_COMPANY_INFORMATION? Company { get; set; }
     }
 }

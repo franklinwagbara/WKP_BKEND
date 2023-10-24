@@ -59,7 +59,7 @@ namespace WKP.Infrastructure.GeneralServices
             CheckInit();
 
             string subject = $"Approval from Final Athority for WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}).";
-            string content = $"WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}) has been approved approved by Final Authority to the next processing level.";
+            string content = $"WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}) has been approved by Final Authority to the next processing level.";
 
             SendNotification(subject, content);
             return Task.CompletedTask;
@@ -70,7 +70,19 @@ namespace WKP.Infrastructure.GeneralServices
             CheckInit();
 
             string subject = $"Approval from Final Approving Athority for WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}).";
-            string content = $"WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}) has been approved approved by Final Approving Authority.";
+            string content = $"WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}) has been approved by Final Approving Authority.";
+
+            SendNotification(subject, content);
+            return Task.CompletedTask;
+        }
+
+        public Task SendFinalRejectionNotification(string comment)
+        {
+            CheckInit();
+
+            string subject = $"Rejection from Final Approving Athority for WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}).";
+            string content = $"WORK PROGRAM application with ref: {App.ReferenceNo} ({Concession?.Concession_Held} - {App.YearOfWKP}) has been approved by Final Approving Authority."
+                + $"Reason: {comment}";
 
             SendNotification(subject, content);
             return Task.CompletedTask;

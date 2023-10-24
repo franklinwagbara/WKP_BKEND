@@ -21,12 +21,15 @@ using WKP.Application.Application.Queries.GetProcessingApplications;
 using WKP.Application.Application.Queries.GetProcessingAppsOnMyDesk;
 using WKP.Application.Features.Application.Commands.ApproveApplication;
 using WKP.Application.Features.Application.Commands.MoveApplication;
+using WKP.Application.Features.Application.Commands.RejectApplication;
 using WKP.Application.Features.Application.Commands.ReturnAppToStaff;
 using WKP.Application.Features.Application.Commands.SendBackApplicationToCompany;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
 using WKP.Application.Features.Application.Queries.GetAllApplications;
 using WKP.Application.Features.Application.Queries.GetAllApplicationsCompany;
+using WKP.Application.Features.Application.Queries.GetAllApprovals;
 using WKP.Application.Features.Application.Queries.GetAllAppsScopedToSBU;
+using WKP.Application.Features.Application.Queries.GetAllRejections;
 using WKP.Application.Features.Application.Queries.GetReturnedApplications;
 using WKP.Application.Features.Application.Queries.GetStaffDesksByStaffID;
 using WKP.Application.Features.Application.Queries.GetStaffsAppInfoWithSBURoleId;
@@ -223,6 +226,31 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<IActionResult> MoveApplication(MoveApplicationRequest request)
         {
             var query = _mapper.Map<MoveApplicationCommand>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpPost("RejectApplication")]
+        public async Task<IActionResult> RejectApplication(int AppId, string Comment)
+        {
+            var request = new RejectApplicationRequest(AppId, WKPCompanyEmail, Comment);
+            var command = _mapper.Map<RejectApplicationCommand>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
+
+        [HttpGet("GetAllApprovals")]
+        public async Task<IActionResult> GetAllApprovals(GetAllApprovalsRequest request)
+        {
+            var query = _mapper.Map<GetAllApprovalsQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpGet("GetAllRejections")]
+        public async Task<IActionResult> GetAllRejections(GetAllRejectionsRequest request)
+        {
+            var query = _mapper.Map<GetAllRejectionsQuery>(request);
             var result = await _mediator.Send(query);
             return Response(result);
         }
