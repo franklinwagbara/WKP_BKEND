@@ -111,7 +111,7 @@ namespace Backend_UMR_Work_Program.Controllers
 			if (login.ResponseCode.Equals("00"))
 				return Redirect($"{_appSettings.LoginUrl}/login?id={login.Data}");
 
-			return Redirect($"{_appSettings.LoginUrl}/login");
+			return Json(login);
 		}
 
 		[HttpPost("Authenticate")]
