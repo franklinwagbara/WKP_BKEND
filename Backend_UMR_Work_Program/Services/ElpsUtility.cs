@@ -176,7 +176,7 @@ namespace Backend_UMR_Work_Program.Services
 			}
 			catch (Exception ex)
 			{
-				response = new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Internal error occured " + ex.ToString(), StatusCode = ResponseCodes.InternalError };
+				response = new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Internal error occured ---" + ex.ToString() + ex.StackTrace, StatusCode = ResponseCodes.InternalError };
 			}
 			return response;
 		}
