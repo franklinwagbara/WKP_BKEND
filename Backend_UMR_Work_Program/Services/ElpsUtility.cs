@@ -66,6 +66,10 @@ namespace Backend_UMR_Work_Program.Services
 
 							var OurCompany = _mapper.Map<ADMIN_COMPANY_INFORMATION_Model>(company);
 							var result = await CreateUserNew(OurCompany, _context);
+
+							if(result.ResponseCode != AppResponseCodes.Success)
+								throw new Exception(result.Message);
+								
 							company.Id = (int)result.Data;
 							//await _context.ADMIN_COMPANY_INFORMATIONs.AddAsync(company);
 
