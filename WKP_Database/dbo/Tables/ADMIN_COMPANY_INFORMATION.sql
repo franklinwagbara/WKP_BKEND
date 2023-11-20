@@ -9,7 +9,7 @@
     [STATUS_]              VARCHAR (200) NULL,
     [FLAG_PASSWORD_CHANGE] VARCHAR (500) NULL,
     [CATEGORY]             VARCHAR (50)  NULL,
-    [NAME]                 VARCHAR (50)  NULL,
+    [NAME]                 VARCHAR (500)  NULL,
     [DESIGNATION]          VARCHAR (50)  NULL,
     [PHONE_NO]             VARCHAR (50)  NULL,
     [COMPANY_ID]           VARCHAR (50)  NULL,
