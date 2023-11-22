@@ -66,7 +66,10 @@ namespace Backend_UMR_Work_Program.Services
 
 							var OurCompany = _mapper.Map<ADMIN_COMPANY_INFORMATION_Model>(company);
 							var result = await CreateUserNew(OurCompany, _context);
-							if(result.ResponseCode != "Success")
+
+							if(result.ResponseCode != AppResponseCodes.Success)
+								throw new Exception(result.Message);
+								
 							company.Id = (int)result.Data;
 							//await _context.ADMIN_COMPANY_INFORMATIONs.AddAsync(company);
 
@@ -365,7 +368,7 @@ namespace Backend_UMR_Work_Program.Services
 			}
 			catch (Exception e)
 			{
-				return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message, StatusCode = ResponseCodes.InternalError };
+				return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Failure : " + e.Message + "+++++" + e.StackTrace + "~~~~" + e.InnerException?.Message, StatusCode = ResponseCodes.InternalError };
 
 			}
 		}
