@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "45XnnUCHxNw7Z2SzJJ7iujtfLhjIpPtfG6t2e4xxmUSeLgMf+AznAPNvtatlqt5VJZd4kQigVUn7HZhL2PqDIQ==",
+  "dgSpecHash": "m3PfEGtCHsZeKRf9wsJxXroiXxNfX6eV1m8dIdQaurYKHfYAoAb/qeWIvyA9LdVZsuxkwHv2dWpEkna/qIZGIA==",
   "success": true,
   "projectFilePath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Application\\WKP.Application.csproj",
   "expectedPackageFiles": [
@@ -26,6 +26,7 @@
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0\\microsoft.extensions.primitives.7.0.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
+    "C:\\Users\\BrandOneTech\\.nuget\\packages\\restsharp\\108.0.2\\restsharp.108.0.2.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\system.collections\\4.3.0\\system.collections.4.3.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\system.diagnostics.debug\\4.3.0\\system.diagnostics.debug.4.3.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\system.dynamic.runtime\\4.3.0\\system.dynamic.runtime.4.3.0.nupkg.sha512",

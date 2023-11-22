@@ -33,6 +33,7 @@ namespace WKP.Infrastructure.Persistence
         public IAccountDeskRepository AccountDeskRepository { get; private set; }
         public IPaymentRepository PaymentRepository { get; private set; }
         public ISubmissionRejectionRepository SubmissionRejectionRepository { get; private set;}
+        public IAdminCompanyDetailsRepository AdminCompanyDetailsRepository { get; private set; }
 
         public UnitOfWork(WKPContext context)
         {
@@ -57,6 +58,7 @@ namespace WKP.Infrastructure.Persistence
             AccountDeskRepository = new AccountDeskRepository(context);
             PaymentRepository = new PaymentRepository(context);
             SubmissionRejectionRepository = new SubmissionRejectionRepository(context);
+            AdminCompanyDetailsRepository = new AdminCompanyDetailsRepository(context);
         }
 
         public DatabaseFacade ContextDatabase() => _context.Database;

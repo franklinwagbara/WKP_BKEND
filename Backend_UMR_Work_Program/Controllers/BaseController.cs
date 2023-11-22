@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using Backend_UMR_Work_Program.Common.Implementations;
-using Backend_UMR_Work_Program.Common.Interfaces;
+﻿using Backend_UMR_Work_Program.Common.Implementations;
 using ErrorOr;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WKP.Application.Account.Common;
 using WKP.Application.Application.Common;
 using WKP.Application.Features.Accounting.Common;
 using WKP.Application.Fee.Common;
@@ -34,6 +32,14 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         public static IActionResult Response(ErrorOr<ApplicationResult> result)
+        {
+            return result.Match(
+                res => SuccessResponse.ResponseObject(res.Result, res.Message),
+                errors => FailResponse.ResponseObject(errors[0])
+            );
+        }
+
+        public static IActionResult Response(ErrorOr<AccountResult> result)
         {
             return result.Match(
                 res => SuccessResponse.ResponseObject(res.Result, res.Message),

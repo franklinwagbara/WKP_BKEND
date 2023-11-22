@@ -133,16 +133,6 @@ namespace Backend_UMR_Work_Program
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // global cors policy
-            //app.UseCors(x => x
-            //    .AllowAnyOrigin()
-            //    .AllowAnyMethod()
-            //    .SetIsOriginAllowed((host) => true)
-            //    .AllowAnyHeader());
-
-            //app.UseCors("ApiCorsPolicy");
-            //app.UseMiddleware(typeof(CorsMiddleware));
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -154,27 +144,6 @@ namespace Backend_UMR_Work_Program
             }
 
             RotativaConfiguration.Setup((Microsoft.AspNetCore.Hosting.IHostingEnvironment)env);
-
-            //app.UseExceptionHandler(
-            //    options =>
-            //    {
-            //        options.Run(
-            //            async context =>
-            //            {
-            //                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            //                context.Response.ContentType = "text/html";
-            //                var ex = context.Features.Get<IExceptionHandlerFeature>();
-            //                if (ex != null)
-            //                {
-            //                    var err = $"<h1>Error: {ex.Error.Message}</h1>{ex.Error.StackTrace }";
-            //                    await context.Response.WriteAsync(err).ConfigureAwait(false);
-            //                }
-            //            });
-            //    }
-            //);
-
-
-
         }
     }
 
