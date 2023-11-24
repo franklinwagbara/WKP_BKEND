@@ -14,5 +14,7 @@ namespace WKP.Domain.Repositories
         public Task<int> GetAllPaymentCounts();
         public Task<int> GetPaymentApprovalCount();
         public Task<int> GetPaymentRejectionCount();
+        Task<IEnumerable<object>> GetDeskSummary();
+        Task<object?> GetPaymentOnDeskByDeskId(int DeskId);
     }
 }

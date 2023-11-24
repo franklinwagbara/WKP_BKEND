@@ -142,5 +142,55 @@ namespace WKP.Infrastructure.Persistence
         {
             return await _context.AccountDesks.Where(x => x.ProcessStatus == PAYMENT_STATUS.PaymentRejected).CountAsync();
         }
+
+        public async Task<IEnumerable<object>> GetDeskSummary()
+        {
+            var result = await _context.AccountDesks
+                .Include(x => x.Staff)
+                .GroupBy(x => x.StaffID)
+                .Select(x => new 
+                {
+                    deskCount = x.Count(
+                        x => x.ProcessStatus == PAYMENT_STATUS.PaymentPending
+                    ),
+                    processingCount = x.Count(
+                        x => x.ProcessStatus == PAYMENT_STATUS.PaymentPending
+                    ),
+                    staff = x.ToList()[0].Staff
+                }).ToListAsync();
+            return result;
+        }
+
+        public async Task<object?> GetPaymentOnDeskByDeskId(int DeskId)
+        {
+            var result = await _context.AccountDesks
+                .Include(x => x.Payment)
+                .Include(x => x.Application)
+                .Include( x => x.Application.Concession)
+                .Include(x => x.Application.Field)
+                .Include(x => x.Application.Company)
+                .Where(x => x.AccountDeskID == DeskId)
+                .Select( s => new 
+                {
+                    Year = s.Application.YearOfWKP,
+                    ReferenceNumber = s.Application.ReferenceNo,
+                    ConcessionName = s.Application.Concession != null? s.Application.Concession.ConcessionName: null,
+                    FieldName = s.Application.Field != null? s.Application.Field.Field_Name: null,
+                    CompanyName = s.Application.Company != null? s.Application.Company.COMPANY_NAME: null,
+                    CompanyEmail = s.Application.Company != null? s.Application.Company.EMAIL: null,
+                    EvidenceFilePath = s.Payment.PaymentEvidenceFilePath,
+                    EvidenceFileName = s.Payment.PaymentEvidenceFileName,
+                    Desk = s,
+                    Payment = s.Payment,
+                    Application = s.Application,
+                    Staff = s.Staff,
+                    Concession = s.Application.Concession,
+                    Field = s.Application.Field,
+                    PaymentStatus = s.ProcessStatus,
+                    SubmittedAt = s.CreatedAt,
+                    CompanyDetails = s
+                }).FirstOrDefaultAsync();
+            return result;
+        }
     }
 }

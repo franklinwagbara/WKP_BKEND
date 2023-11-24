@@ -74,7 +74,6 @@ namespace Backend_UMR_Work_Program.Services
 							//await _context.ADMIN_COMPANY_INFORMATIONs.AddAsync(company);
 
 						}
-
 						else
 						{
 							if (!company.EMAIL.ToLower().Equals(email.ToLower()))

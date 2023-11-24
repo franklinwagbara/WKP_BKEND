@@ -54,4 +54,5 @@ public partial class ADMIN_COMPANY_INFORMATION
     public int? ELPS_ID { get; set; }
 
     public string? CompanyAddress { get; set; }
+
 }

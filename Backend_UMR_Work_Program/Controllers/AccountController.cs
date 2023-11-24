@@ -4,6 +4,7 @@ using Backend_UMR_Work_Program.Helpers;
 using Backend_UMR_Work_Program.Models;
 using Backend_UMR_Work_Program.Services;
 using LinqToDB;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,9 @@ using Newtonsoft.Json;
 using RestSharp;
 using System.Net;
 using System.Security.Claims;
+using WKP.Application.Features.Account.Commands;
+using WKP.Application.Features.Account.Commands.ValidateLogin;
+using WKP.Contracts.Features.Account;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 using static Backend_UMR_Work_Program.Models.ViewModel;
 //using static Backend_UMR_Work_Program.Helpers.GeneralClass;
@@ -20,9 +24,10 @@ namespace Backend_UMR_Work_Program.Controllers
 {
 	// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[Route("api/[controller]")]
-	public class AccountController : ControllerBase
+	public class AccountController : BaseController
 	{
 		private Account _account;
+		private readonly ISender _mediator;
 		public WKP_DBContext _context;
 		public IConfiguration _configuration;
 		HelpersController _helpersController;
@@ -33,9 +38,12 @@ namespace Backend_UMR_Work_Program.Controllers
 		public ElpsUtility _elpsObj;
         private readonly HelperService _helperService;
 
-        public AccountController(WKP_DBContext context, IConfiguration configuration,Account account, IMapper mapper, IOptions<AppSettings> appSettings, ElpsUtility elpsObj, HelperService helperService)
+        public AccountController(
+			WKP_DBContext context, IConfiguration configuration,
+			Account account, IMapper mapper, 
+			IOptions<AppSettings> appSettings, ElpsUtility elpsObj, 
+			HelperService helperService, ISender mediator)
 		{
-			//_httpContextAccessor = httpContextAccessor;
 			_appSettings=appSettings.Value;
 			_account = account;
 			_context = context;
@@ -43,7 +51,47 @@ namespace Backend_UMR_Work_Program.Controllers
 			_mapper = mapper;
 			_elpsObj = elpsObj;
             _helperService = helperService;
+			_mediator = mediator;
         }
+
+		[HttpPost("login-redirect")]
+		public async Task<IActionResult> Login([FromForm] LoginParam loginParam)
+		{
+			var email = loginParam.Email;
+			var code = loginParam.Code;
+			var request = new ValidateLoginRequest(email, code);
+			var command = _mapper.Map<ValidateLoginCommand>(request);
+			var result = await _mediator.Send(command);
+			
+			if(result.IsError)
+				return Ok(result.FirstError.Description);
+			else
+			{
+				var user = result.Value.Result;
+				int id = 0;
+				if(user.GetType().Equals(typeof(WKP.Domain.Entities.ADMIN_COMPANY_INFORMATION)))
+				{
+					var company = user as WKP.Domain.Entities.ADMIN_COMPANY_INFORMATION;
+					id = company.Id;
+				}
+				else 
+				{
+					var staff = user as WKP.Domain.Entities.staff;
+					id = staff.AdminCompanyInfo_ID.Value;
+				}
+					
+				return Redirect($"{_appSettings.LoginUrl}/login?id={id}");
+			}
+		}
+
+		[HttpPost("UpdateCompanyDetails")]
+		public async Task<IActionResult> UpdateCompanyDetails([FromBody] UpdateCompanyDetailsRequest request)
+		{
+			var command = _mapper.Map<UpdateCompanyDetailsCommand>(request);
+			command.CreatedByEmail = WKPCompanyEmail;
+			var result = _mediator.Send(command);
+			return Response(result.Result);
+		}
 
 		[HttpGet("GetElpsStaff")]
 		public object GetElpsStaff()
@@ -101,17 +149,6 @@ namespace Backend_UMR_Work_Program.Controllers
 			{
 				return new { message = ex.Message, trace = ex.StackTrace };
 			}
-		}
-		[HttpPost("login-redirect")]
-		public async Task<IActionResult> Login([FromForm] LoginParam loginParam)
-		{
-			var email = loginParam.Email;
-			var code = loginParam.Code;
-			var login = await _elpsObj.ValidateLogin(email, code, _context, _appSettings, webApiResponse);
-			if (login.ResponseCode.Equals("00"))
-				return Redirect($"{_appSettings.LoginUrl}/login?id={login.Data}");
-
-			return Ok(login);
 		}
 
 		[HttpPost("Authenticate")]

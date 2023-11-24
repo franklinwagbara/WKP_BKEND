@@ -711,6 +711,14 @@ namespace Backend_UMR_Work_Program.Services
                     }
                 }
             }
+            
+            foreach(var staff in accountStaffs)
+            {
+                if(!desks.Any(x => x.StaffID == staff.StaffID)) {
+                    newDesk.StaffID = staff.StaffID;
+                    return newDesk;
+                }
+            }
 
             newDesk.StaffID = desks[0].StaffID;
             return newDesk;

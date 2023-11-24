@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WKP.Application.Common.Interfaces;
+using WKP.Domain.Entities;
 using WKP.Domain.Repositories;
 using WKP.Infrastructure.Context;
 using WKP.Infrastructure.GeneralServices;
@@ -32,6 +33,11 @@ namespace WKP.Infrastructure
             services.AddTransient<ICompanyNotifier, CompanyNotifier>();
             services.AddTransient<IAppLogger, EmailAuditMessage>();
             services.AddScoped<IRNGenerator, RNGenerator>();
+            services.AddScoped<IElpsService, ElpsService>();
+            services.AddScoped<IElpsConnect, ElpsConnect>();
+            services.AddScoped<IUtilsInjectable, UtilsInjectable>();
+
+            services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
             //HangFire setup
             services.AddHangfire(x => x.UseSqlServerStorage(configuration["Data:Wkpconnect:ConnectionString"]));

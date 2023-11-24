@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "6fQbmEgZvlxrCaCj8RgE5aYeWYYRaNXJa419h5YxluSjR42YPLIOUkyIJopa40zuR7KBi543raumEhqq/6dBwA==",
+  "dgSpecHash": "P7SatAQJVVFoCAoMXU2qDwP/lacpPuJ3dD3NuvwJu7Gv8B5ZkivQacrmxGZhiVOzLHjCEDpJZyQ1p1BQqCDnrQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\BrandOneTech\\source\\repos\\WorkProgramBackEnd\\WorkProgram_BEnd\\WKP.Infrastructure\\WKP.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -58,6 +58,7 @@
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\microsoft.win32.systemevents\\5.0.0\\microsoft.win32.systemevents.5.0.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\newtonsoft.json\\11.0.1\\newtonsoft.json.11.0.1.nupkg.sha512",
+    "C:\\Users\\BrandOneTech\\.nuget\\packages\\restsharp\\108.0.2\\restsharp.108.0.2.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\system.codedom\\4.4.0\\system.codedom.4.4.0.nupkg.sha512",
     "C:\\Users\\BrandOneTech\\.nuget\\packages\\system.configuration.configurationmanager\\5.0.0\\system.configuration.configurationmanager.5.0.0.nupkg.sha512",

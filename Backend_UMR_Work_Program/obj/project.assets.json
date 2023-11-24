@@ -5593,6 +5593,7 @@
           "Microsoft.EntityFrameworkCore": "7.0.4",
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
+          "RestSharp": "108.0.2",
           "WKP.Domain": "1.0.0",
           "mapster": "7.3.0",
           "mapster.DependencyInjection": "1.0.0"

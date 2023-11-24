@@ -28,6 +28,7 @@ namespace WKP.Infrastructure.Context
         public virtual DbSet<AccountDesk> AccountDesks { get; set; }
         public virtual DbSet<Payments> Payments { get; set; }
         public virtual DbSet<SubmissionRejection> SubmissionRejections { get; set; }
+        public virtual DbSet<ADMIN_COMPANY_DETAIL> ADMIN_COMPANY_DETAILs { get; set; }
 
         public WKPContext(DbContextOptions<WKPContext> options): base(options){}
 
@@ -378,6 +379,60 @@ namespace WKP.Infrastructure.Context
             modelBuilder.Entity<SubmissionRejection>(entity =>
             {
                 entity.ToTable("SubmissionRejection");
+            });
+
+            modelBuilder.Entity<ADMIN_COMPANY_DETAIL>(entity =>
+            {
+                entity.ToTable("ADMIN_COMPANY_DETAILS");
+
+                entity.Property(e => e.Address_of_Company)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+                entity.Property(e => e.Alternate_Contact_Person)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+                entity.Property(e => e.COMPANY_NAME)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+                entity.Property(e => e.CompanyId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Contact_Person)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+                entity.Property(e => e.Created_by)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Date_Created)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.EMAIL)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+                entity.Property(e => e.Email_Address)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+                entity.Property(e => e.Email_Address_alt)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+                entity.Property(e => e.FLAG)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Name_of_MD_CEO)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+                entity.Property(e => e.Phone_NO_of_MD_CEO)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+                entity.Property(e => e.Phone_No)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+                entity.Property(e => e.Phone_No_alt)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+                entity.Property(e => e.check_status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
         }
     }

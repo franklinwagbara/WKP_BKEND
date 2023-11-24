@@ -19,7 +19,13 @@ namespace WKP.Application.Features.Application.Queries.GetStaffsAppInfoWithSBURo
         {
             try
             {
-                var result = await _unitOfWork.ApplicationRepository.GetStaffsAppInfoWithSBURoleId(request.SBUId, request.RoleId);
+                var sbu = await _unitOfWork.SBURepository.GetAsync((s) => s.Id == request.SBUId, null);
+                IEnumerable<object> result = new List<object>();
+
+                if(sbu?.SBU_Code == SBU_CODES.ACCOUNTS)
+                    result = await _unitOfWork.AccountDeskRepository.GetDeskSummary();
+                else 
+                    result = await _unitOfWork.ApplicationRepository.GetStaffsAppInfoWithSBURoleId(request.SBUId, request.RoleId);
                 return new ApplicationResult(result);
             }
             catch (Exception e)

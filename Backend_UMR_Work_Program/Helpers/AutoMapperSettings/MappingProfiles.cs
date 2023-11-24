@@ -29,6 +29,8 @@ using WKP.Application.Features.Application.Commands.MoveApplication;
 using WKP.Application.Features.Application.Commands.RejectApplication;
 using WKP.Application.Features.Application.Queries.GetAllApprovals;
 using WKP.Application.Features.Application.Queries.GetAllRejections;
+using WKP.Contracts.Features.Account;
+using WKP.Application.Features.Account.Commands.ValidateLogin;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -61,6 +63,7 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<RejectApplicationRequest, RejectApplicationCommand>();
             CreateMap<GetAllApprovalsRequest, GetAllApprovalsQuery>();
             CreateMap<GetAllRejectionsRequest, GetAllRejectionsQuery>();
+            CreateMap<ValidateLoginRequest, ValidateLoginCommand>();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();

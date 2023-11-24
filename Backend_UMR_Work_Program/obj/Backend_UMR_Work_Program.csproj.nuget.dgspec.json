@@ -276,6 +276,10 @@
               "target": "Package",
               "version": "[7.0.0, )"
             },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[108.0.2, )"
+            },
             "mapster": {
               "target": "Package",
               "version": "[7.3.0, )"

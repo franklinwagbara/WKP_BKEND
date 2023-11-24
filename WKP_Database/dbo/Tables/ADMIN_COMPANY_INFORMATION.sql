@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[ADMIN_COMPANY_INFORMATION] (
     [Id]                   INT           IDENTITY (1, 1) NOT NULL,
-    [COMPANY_NAME]         VARCHAR (200) NULL,
-    [EMAIL]                VARCHAR (200) NULL,
+    [COMPANY_NAME]         VARCHAR (500) NULL,
+    [EMAIL]                VARCHAR (500) NULL,
     [PASSWORDS]            VARCHAR (500) NULL,
     [Created_by]           VARCHAR (100) NULL,
     [Date_Created]         DATETIME      NULL,
