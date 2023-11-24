@@ -240,7 +240,7 @@ namespace WKP.Infrastructure.Persistence
                     Field = s.Application.Field,
                     PaymentStatus = s.ProcessStatus,
                     SubmittedAt = s.CreatedAt,
-                    CompanyDetails = s
+                    CompanyDetails =  _context.ADMIN_COMPANY_DETAILs.FirstOrDefault(x => x.EMAIL.ToLower() == s.Application.Company.EMAIL.ToLower())
                 }).FirstOrDefaultAsync();
             return result;
         }
