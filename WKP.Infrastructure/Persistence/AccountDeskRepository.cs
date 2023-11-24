@@ -41,11 +41,63 @@ namespace WKP.Infrastructure.Persistence
                                    }).ToListAsync();
         }
 
+        public async Task<IEnumerable<AccountDeskDTO>> GetAppPaymentsOnStaffDesk(int StaffId)
+        {
+            return await (from accDesk in _context.AccountDesks.Include(x => x.Payment).Include(x => x.Staff)
+                                   join app in _context.Applications on accDesk.AppId equals app.Id
+                                   where accDesk.Staff.StaffID == StaffId
+                                   select new AccountDeskDTO
+                                   {
+                                       Year = app.YearOfWKP,
+                                       ReferenceNumber = app.ReferenceNo,
+                                       ConcessionName = app.Concession.Concession_Held,
+                                       FieldName = app.Field != null ? app.Field.Field_Name : null,
+                                       CompanyName = app.Company.COMPANY_NAME,
+                                       CompanyEmail = app.Company.EMAIL,
+                                       EvidenceFilePath = accDesk.Payment != null ? accDesk.Payment.PaymentEvidenceFilePath : null,
+                                       EvidenceFileName = accDesk.Payment != null ? accDesk.Payment.PaymentEvidenceFileName : null,
+                                       Desk = accDesk,
+                                       Payment = accDesk.Payment != null ? accDesk.Payment : null,
+                                       Application = app,
+                                       Staff = accDesk.Staff,
+                                       Concession = app.Concession,
+                                       Field = app.Field,
+                                       PaymentStatus = accDesk.ProcessStatus,
+                                       SubmittedAt = accDesk.CreatedAt
+                                   }).ToListAsync();
+        }
+
         public async Task<IEnumerable<AccountDeskDTO>> GetAppPendingPaymentsOnStaffDesk(string StaffEmail)
         {
             return await (from accDesk in _context.AccountDesks.Include(x => x.Payment).Include(x => x.Staff)
                           join app in _context.Applications on accDesk.AppId equals app.Id
                           where accDesk.Staff.StaffEmail == StaffEmail && accDesk.ProcessStatus == PAYMENT_STATUS.PaymentPending
+                          select new AccountDeskDTO
+                          {
+                              Year = app.YearOfWKP,
+                              ReferenceNumber = app.ReferenceNo,
+                              ConcessionName = app.Concession.Concession_Held,
+                              FieldName = app.Field != null ? app.Field.Field_Name : null,
+                              CompanyName = app.Company.COMPANY_NAME,
+                              CompanyEmail = app.Company.EMAIL,
+                              EvidenceFilePath = accDesk.Payment != null ? accDesk.Payment.PaymentEvidenceFilePath : null,
+                              EvidenceFileName = accDesk.Payment != null ? accDesk.Payment.PaymentEvidenceFileName : null,
+                              Desk = accDesk,
+                              Payment = accDesk.Payment != null ? accDesk.Payment : null,
+                              Application = app,
+                              Staff = accDesk.Staff,
+                              Concession = app.Concession,
+                              Field = app.Field,
+                              PaymentStatus = accDesk.ProcessStatus,
+                              SubmittedAt = accDesk.CreatedAt
+                          }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<AccountDeskDTO>> GetAppPendingPaymentsOnStaffDesk(int StaffId)
+        {
+            return await (from accDesk in _context.AccountDesks.Include(x => x.Payment).Include(x => x.Staff)
+                          join app in _context.Applications on accDesk.AppId equals app.Id
+                          where accDesk.Staff.StaffID == StaffId && accDesk.ProcessStatus == PAYMENT_STATUS.PaymentPending
                           select new AccountDeskDTO
                           {
                               Year = app.YearOfWKP,

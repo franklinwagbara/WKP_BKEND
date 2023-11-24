@@ -21,6 +21,8 @@ namespace WKP.Domain.Entities
 
         [ForeignKey("PaymentId")]
         public Payments Payment { get; set; }
+        
+        [ForeignKey("AppId")]
         public Application Application { get; set; }
         public AccountDesk()
         {

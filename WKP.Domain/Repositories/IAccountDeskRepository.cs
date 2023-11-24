@@ -6,7 +6,9 @@ namespace WKP.Domain.Repositories
     public interface IAccountDeskRepository: IBaseRepository<AccountDesk>
     {
         public Task<IEnumerable<AccountDeskDTO>> GetAppPaymentsOnStaffDesk(string StaffEmail);
+        public Task<IEnumerable<AccountDeskDTO>> GetAppPaymentsOnStaffDesk(int StaffId);
         public Task<IEnumerable<AccountDeskDTO>> GetAppPendingPaymentsOnStaffDesk(string StaffEmail);
+        public Task<IEnumerable<AccountDeskDTO>> GetAppPendingPaymentsOnStaffDesk(int StaffId);
         public Task<IEnumerable<AccountDeskDTO>> GetAllAppPayments();
         public Task<IEnumerable<AccountDeskDTO>> GetAllAppPaymentApprovals();
         public Task<int> GetDeskCount(int StaffId);
