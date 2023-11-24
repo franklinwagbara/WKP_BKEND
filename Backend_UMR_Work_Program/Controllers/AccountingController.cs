@@ -10,6 +10,7 @@ using System.Security.Claims;
 using WKP.Application.Features.Accounting.Queries;
 using WKP.Application.Features.Accounting.Queries.GetAllUSDPaymentApprovals;
 using WKP.Application.Features.Accounting.Queries.GetAppPayOnStaffDeskByStaffId;
+using WKP.Application.Features.Accounting.Queries.GetPaymentOnDeskByDeskId;
 using WKP.Contracts.Features.Accounting;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
@@ -75,7 +76,17 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpGet("GET_PAYMENT_ON_DESK")]
+        public async Task<IActionResult>  GetAppPaymentsOnMyDesk(GetPaymentOnDeskByDeskIdRequest request)
+        {
+            var query = _mapper.Map<GetPaymentOnDeskByDeskIdQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+        
         public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(int deskId) => await _accountingService.GetPaymentOnDesk(deskId);
+
+        // [HttpGet("GET_PAYMENT_ON_DESK")]
+        // public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(int deskId) => await _accountingService.GetPaymentOnDesk(deskId);
 
         [HttpGet("CONFIRM_USD_PAYMENT")]
         public async Task<IActionResult> ConfirmUSDPayment(int deskId) => await _accountingService.ConfirmUSDPayment(deskId);

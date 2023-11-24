@@ -32,6 +32,7 @@ using WKP.Application.Features.Application.Queries.GetAllRejections;
 using WKP.Contracts.Features.Account;
 using WKP.Application.Features.Account.Commands.ValidateLogin;
 using WKP.Application.Features.Accounting.Queries.GetAppPayOnStaffDeskByStaffId;
+using WKP.Application.Features.Accounting.Queries.GetPaymentOnDeskByDeskId;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -66,6 +67,7 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<GetAllRejectionsRequest, GetAllRejectionsQuery>();
             CreateMap<ValidateLoginRequest, ValidateLoginCommand>();
             CreateMap<GetAppPayOnStaffDeskByStaffIdRequest,GetAppPayOnStaffDeskByStaffIdQuery>();
+            CreateMap<GetPaymentOnDeskByDeskIdRequest, GetPaymentOnDeskByDeskIdQuery>();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();
