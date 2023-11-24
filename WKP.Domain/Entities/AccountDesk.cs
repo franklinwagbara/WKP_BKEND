@@ -21,6 +21,7 @@ namespace WKP.Domain.Entities
 
         [ForeignKey("PaymentId")]
         public Payments Payment { get; set; }
+        public Application Application { get; set; }
         public AccountDesk()
         {
             isApproved = false;

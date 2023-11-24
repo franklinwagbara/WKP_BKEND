@@ -35,6 +35,7 @@ namespace WKP.Infrastructure
             services.AddScoped<IRNGenerator, RNGenerator>();
             services.AddScoped<IElpsService, ElpsService>();
             services.AddScoped<IElpsConnect, ElpsConnect>();
+            services.AddScoped<IUtilsInjectable, UtilsInjectable>();
 
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 

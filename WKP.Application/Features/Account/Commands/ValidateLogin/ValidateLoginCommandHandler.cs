@@ -14,12 +14,14 @@ namespace WKP.Application.Features.Account.Commands.ValidateLogin
         private readonly IElpsService _elpsService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IUtilsInjectable _utils;
 
-        public ValidateLoginCommandHandler(IElpsService elpsService, IUnitOfWork unitOfWork, IMapper mapper)
+        public ValidateLoginCommandHandler(IElpsService elpsService, IUnitOfWork unitOfWork, IMapper mapper, IUtilsInjectable utilsInjectable)
         {
             _elpsService = elpsService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _utils = utilsInjectable;
         }
 
         public async Task<ErrorOr<AccountResult>> Handle(ValidateLoginCommand request, CancellationToken cancellationToken)
@@ -115,9 +117,14 @@ namespace WKP.Application.Features.Account.Commands.ValidateLogin
             else
             {
                 var wkpCompany = _mapper.Map<ADMIN_COMPANY_INFORMATION>(CompanyInfo);
+
                 wkpCompany.STATUS_ = USER_STATUS.Activated;
                 wkpCompany.Date_Created = DateTime.Now;
                 wkpCompany.Created_by = Email;
+
+                var companyCode = await GenerateCompanyCode(wkpCompany);
+                wkpCompany.COMPANY_ID = companyCode;
+
                 await _unitOfWork.AdminCompanyInformationRepository.AddAsync(wkpCompany);
                 await _unitOfWork.SaveChangesAsync();
 
@@ -141,11 +148,17 @@ namespace WKP.Application.Features.Account.Commands.ValidateLogin
             }
             else
             {
+                
                 var wkpStaff = _mapper.Map<ADMIN_COMPANY_INFORMATION>(staffInfo);
+
                 wkpStaff.COMPANY_NAME = "Admin";
                 wkpStaff.STATUS_ = USER_STATUS.Activated;
                 wkpStaff.Date_Created = DateTime.Now;
                 wkpStaff.Created_by = staffInfo.email;
+
+                var companyCode = await GenerateCompanyCode(wkpStaff);
+                wkpStaff.COMPANY_ID = companyCode;
+                
                 await _unitOfWork.AdminCompanyInformationRepository.AddAsync(wkpStaff);
 
                 var newStaff = new staff()
@@ -167,6 +180,20 @@ namespace WKP.Application.Features.Account.Commands.ValidateLogin
 
                 return wkpStaff;
             }
+        }
+
+        private async Task<string> GenerateCompanyCode(ADMIN_COMPANY_INFORMATION wkpStaff)
+        {
+            if(wkpStaff == null)
+                throw new Exception("Passed a null value as staff info.");
+            string companyCode = string.Empty;
+
+            do
+            {
+                 companyCode = _utils.GenerateCompanyCode(wkpStaff.COMPANY_NAME ?? "Admin");
+            }while(await _unitOfWork.AdminCompanyInformationRepository.GetAsync((a) => a.COMPANY_ID == companyCode, null) != null);
+
+            return companyCode;
         }
     }
 }
