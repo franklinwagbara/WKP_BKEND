@@ -9,6 +9,7 @@ using Microsoft.Identity.Client;
 using System.Security.Claims;
 using WKP.Application.Features.Accounting.Queries;
 using WKP.Application.Features.Accounting.Queries.GetAllUSDPaymentApprovals;
+using WKP.Application.Features.Accounting.Queries.GetAppPayOnStaffDeskByStaffId;
 using WKP.Contracts.Features.Accounting;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
@@ -45,6 +46,14 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             var request = new GetAppPaymentsOnMyDeskRequest(WKPCompanyEmail);
             var command = _mapper.Map<GetAppPaymentsOnMyDeskQuery>(request);
+            var result = await _mediator.Send(command);
+            return Response(result);
+        }
+        
+        [HttpGet("GET_APP_PAYMENTS_ON_STAFF_DESK_BY_STAFF_ID")]
+        public async Task<IActionResult> GetAppPayOnStaffDeskByStaffId(GetAppPayOnStaffDeskByStaffIdRequest request)
+        {
+            var command = _mapper.Map<GetAppPayOnStaffDeskByStaffIdQuery>(request);
             var result = await _mediator.Send(command);
             return Response(result);
         }
