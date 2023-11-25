@@ -83,10 +83,7 @@ namespace Backend_UMR_Work_Program.Controllers
             return Response(result);
         }
         
-        public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(int deskId) => await _accountingService.GetPaymentOnDesk(deskId);
-
-        // [HttpGet("GET_PAYMENT_ON_DESK")]
-        // public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(int deskId) => await _accountingService.GetPaymentOnDesk(deskId);
+        //public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(int deskId) => await _accountingService.GetPaymentOnDesk(deskId);
 
         [HttpGet("CONFIRM_USD_PAYMENT")]
         public async Task<IActionResult> ConfirmUSDPayment(int deskId) => await _accountingService.ConfirmUSDPayment(deskId);

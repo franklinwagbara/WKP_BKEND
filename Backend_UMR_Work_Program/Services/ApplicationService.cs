@@ -510,15 +510,17 @@ namespace Backend_UMR_Work_Program.Services
                         apps = await _dbContext.Applications.Where(x => x.YearOfWKP == year && x.ConcessionID == concessionId).ToListAsync();
 
                     var submittedApp = apps.FirstOrDefault(x => validStatues.Contains(x.Status));
+                    var appPayment = await _dbContext.AccountDesks.FirstOrDefaultAsync(x => apps.Any() && x.AppId == apps.First().Id);
 
-                    if(submittedApp != null)
+
+                    if (submittedApp != null)
                     {
                         var returnApp = await _dbContext.ReturnedApplications.Where(x => x.AppId == submittedApp.Id).FirstOrDefaultAsync();
                         var selectedTables = returnApp?.SelectedTables?.Split('|').ToList();
 
                         var res = new FormLock
                         {
-                            disableSubmission = submittedApp != null,
+                            disableSubmission = submittedApp != null || appPayment != null,
                             enableReSubmission = returnApp == null ? false : true,
                             formsToBeEnabled = selectedTables
                         };
@@ -529,7 +531,7 @@ namespace Backend_UMR_Work_Program.Services
                     {
                         var res = new FormLock
                         {
-                            disableSubmission = false,
+                            disableSubmission = appPayment != null,
                             enableReSubmission = false,
                             formsToBeEnabled = null,
                         };
