@@ -691,37 +691,48 @@ namespace Backend_UMR_Work_Program.Services
             var accountStaffs = await _dbContext.staff.Where(x => x.RoleID == accountantRole.id).ToListAsync();
             var desks = await _dbContext.AccountDesks.OrderBy(x => x.LastJobDate).ToListAsync();
 
+            var deskGroups = _dbContext.AccountDesks
+                            .GroupBy(x => x.StaffID)
+                            .Select(group => new
+                            {
+                                StaffID = group.Key,
+                                AccountDesks = group.OrderBy(x => x.LastJobDate).ToList()
+                            })
+                            .AsEnumerable()
+                            .OrderBy(group => group.AccountDesks.LastOrDefault()?.LastJobDate)
+                            .ToList();
+
             var newDesk = new AccountDesk
             {
                 CreatedAt = DateTime.Now,
             };
 
-            if(desks == null || desks.Count == 0)
-            {
-                newDesk.StaffID = accountStaffs[0].StaffID;
-                return newDesk;
-            }
-            else if (desks.Count < accountStaffs.Count)
+            if(deskGroups.Count < accountStaffs.Count)
             {
                 foreach(var staff in accountStaffs)
                 {
-                    if(!desks.Any(x => x.StaffID == staff.StaffID)) {
+                    if(!deskGroups.Any(x => x.StaffID == staff.StaffID))
+                    {
                         newDesk.StaffID = staff.StaffID;
                         return newDesk;
                     }
                 }
+
+                throw new Exception("Unable to process payment evidence request: Could not find an accounts desk.");
             }
-            
-            foreach(var staff in accountStaffs)
+            else
             {
-                if(!desks.Any(x => x.StaffID == staff.StaffID)) {
-                    newDesk.StaffID = staff.StaffID;
+                if(deskGroups.Count == 0)
+                {
+                    newDesk.StaffID = accountStaffs.FirstOrDefault().StaffID;
+                    return newDesk;
+                }
+                else
+                {
+                    newDesk.StaffID = deskGroups.FirstOrDefault().StaffID;
                     return newDesk;
                 }
             }
-
-            newDesk.StaffID = desks[0].StaffID;
-            return newDesk;
         }
 
         public async Task<int> DeleteDeskByDeskId(int deskId)
