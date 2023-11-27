@@ -269,12 +269,16 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<object> GetSentBackApplications() => await _applicationService.GetSentBackApplications((int)WKPCompanyNumber);
 
         [HttpPost("ADD_COMMENT_BY_COMPANY")]
-        public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY(int appId, int? staffId, string comment, string? selectedTables)
-            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, true, WKPCompanyNumber, true);
+        public async Task<WebApiResponse> ADD_COMMENT_BY_COMPANY([FromBody] AddCommentByCompanyRequest request)
+        {
+            return await _applicationService.AddCommentToApplication(request.appId, request.staffId, APPLICATION_HISTORY_STATUS.AddedComment, request.comment, request.selectedTables, true, WKPCompanyNumber, true);
+        }
 
         [HttpPost("ADD_COMMENT_BY_STAFF")]
-        public async Task<WebApiResponse> ADD_COMMENT_BY_STAFF(int appId, int? staffId, string comment, string? selectedTables, bool? isPublic)
-            => await _applicationService.AddCommentToApplication(appId, staffId, APPLICATION_HISTORY_STATUS.AddedComment, comment, selectedTables, false, WKPCompanyNumber, isPublic);
+        public async Task<WebApiResponse> ADD_COMMENT_BY_STAFF([FromBody] AddCommentByStaffRequest request)
+        {
+            return await _applicationService.AddCommentToApplication(request.appId, request.staffId, APPLICATION_HISTORY_STATUS.AddedComment, request.comment, request.selectedTables, false, WKPCompanyNumber, request.isPublic);
+        }
 
         [HttpGet("GET_SENDBACK_COMMENTS")]
         public async Task<WebApiResponse> GET_SENDBACK_COMMENTS(int appId, bool isPublic) => await _applicationService.GetReturnToCompanyComments(appId, isPublic);
