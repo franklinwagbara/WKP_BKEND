@@ -93,7 +93,7 @@ namespace WKP.Infrastructure.GeneralServices
             {
                 foreach (var item in companyNames)
                 {
-                    if(item.length > 0)
+                    if(item.Length > 0)
                         strIntitials += item[0];
                 }
             }
