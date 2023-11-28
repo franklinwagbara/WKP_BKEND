@@ -79,31 +79,38 @@ namespace WKP.Infrastructure.GeneralServices
 
         public static string GenerateCompanyCode(string CompanyName)
 		{
-            var strIntitials = string.Empty;
-
-            var companyNames = CompanyName.Split(' ');
-
-            //check if company name has more than one string
-
-            if (companyNames.Length <= 1)
+            try
             {
-                strIntitials = CompanyName.Substring(0, 4);
-            }
-            else
-            {
-                foreach (var item in companyNames)
+                var strIntitials = string.Empty;
+
+                var companyNames = CompanyName.Split(' ');
+
+                //check if company name has more than one string
+
+                if (companyNames.Length <= 1)
                 {
-                    if(item.Length > 0)
-                        strIntitials += item[0];
+                    strIntitials = CompanyName.Substring(0, 4);
                 }
+                else
+                {
+                    foreach (var item in companyNames)
+                    {
+                        if(item.Length > 0)
+                            strIntitials += item[0];
+                    }
+                }
+
+                //var rndmize=new Randomize
+                var rnd = new Random();
+                var firstRndNumber = rnd.Next(0, 9999).ToString().PadLeft(4, '0');
+                var accessCaode = strIntitials.ToUpper() + firstRndNumber;
+
+                return accessCaode;
             }
-
-            //var rndmize=new Randomize
-            var rnd = new Random();
-            var firstRndNumber = rnd.Next(0, 9999).ToString().PadLeft(4, '0');
-            var accessCaode = strIntitials.ToUpper() + firstRndNumber;
-
-            return accessCaode;
+            catch (Exception e)
+            {
+                throw new Exception(e.ToString() + " +++ CompanyName: " + CompanyName);
+            }
 		}
         
         // private static Byte[] BitmapToBytes(Bitmap img)
