@@ -95,7 +95,8 @@ namespace WKP.Infrastructure.GeneralServices
                 {
                     foreach (var item in companyNames)
                     {
-                        strIntitials += item[0];
+                        if(item.Length > 0)
+                            strIntitials += item[0];
                     }
                 }
 
@@ -110,7 +111,6 @@ namespace WKP.Infrastructure.GeneralServices
             {
                 throw new Exception(e.ToString() + " +++ CompanyName: " + CompanyName);
             }
-            
 		}
         
         // private static Byte[] BitmapToBytes(Bitmap img)
