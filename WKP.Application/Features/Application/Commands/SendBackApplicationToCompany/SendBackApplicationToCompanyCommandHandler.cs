@@ -34,7 +34,7 @@ namespace WKP.Application.Features.Application.Commands.SendBackApplicationToCom
                 {
                     foreach(var sa in request.SelectedApps)
                     {
-                        int appId = sa != "undefined"? int.Parse(sa) : 0;
+                        int appId = sa;
                         var actingStaff = await _unitOfWork.StaffRepository.GetStaffByCompanyNumberWithSBU(request.UserId);
                         var actingStaffDesk = await _unitOfWork.DeskRepository.GetDeskByDeskIdAppIdWithStaff(request.DeskID, appId);
                         var app = await _unitOfWork.ApplicationRepository.GetAppByIdWithAll(appId);

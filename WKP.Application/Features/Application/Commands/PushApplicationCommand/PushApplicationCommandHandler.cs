@@ -48,7 +48,7 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
                 {
                     foreach(var sApp in request.SelectedApps)
                     {
-                        int appId = int.Parse(sApp.Replace('[', ' ').Replace(']', ' ').Trim());
+                        int appId = sApp;
                         var staffDesk = await _unitOfWork.DeskRepository.GetDeskByDeskIdAppIdWithStaff(request.DeskId, appId);
                         var app = await _unitOfWork.ApplicationRepository.GetAppByIdWithAll(appId);
 

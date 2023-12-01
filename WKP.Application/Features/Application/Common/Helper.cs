@@ -366,7 +366,7 @@ namespace WKP.Application.Application.Common
             catch (Exception){ throw; }
         }
 
-        public async Task<string> getTableNames(string[] tableIds)
+        public async Task<string> getTableNames(int[] tableIds)
         {
             try
             {
@@ -375,7 +375,7 @@ namespace WKP.Application.Application.Common
                 {
                     foreach (var id in tableIds)
                     {
-                        int tableID = id != "undefined" ? int.Parse(id) : 0;
+                        int tableID = id;
                         var SBU_TablesToDisplay = await _unitOfWork.TableDetailRepository
                                                         .GetById(tableID);
 

@@ -115,7 +115,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("PushApplication")]
-        public async Task<IActionResult> PushApplication(PushApplicationRequest request)
+        public async Task<IActionResult> PushApplication([FromBody] PushApplicationRequest request)
         {
             var command = _mapper.Map<PushApplicationCommand>(request);
             var result = await _mediator.Send(command);
@@ -155,7 +155,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("RETURN_APPLICATION_TO_STAFF")]
-        public async Task<IActionResult> ReturnApplicationToStaff(int deskID, string comment, string[] selectedApps, string[] SBU_IDs, string[] selectedTables, bool fromWPAReviewer)
+        public async Task<IActionResult> ReturnApplicationToStaff(int deskID, string comment, int[] selectedApps, int[] SBU_IDs, int[] selectedTables, bool fromWPAReviewer)
         {
             var request = new ReturnAppToStaffRequest(deskID, comment, selectedApps, SBU_IDs, selectedTables, fromWPAReviewer, (int)WKPCompanyNumber);
             var command = _mapper.Map<ReturnAppToStaffCommand>(request);
@@ -165,25 +165,19 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [HttpPost("SendBackApplicationToCompany")]
         public async Task<IActionResult> SendBackApplicationToCompany(
-            int deskID, 
-            string comment, 
-            string[] selectedApps, 
-            string[] selectedTables, 
-            int TypeOfPaymentId, 
-            string AmountNGN, 
-            string AmountUSD)
+            [FromBody] SendBackApplicationToCompanyRequest request)
         {
-            var request = new SendBackApplicationToCompanyRequest(
-                deskID, 
-                comment, 
-                selectedApps, 
-                selectedTables, 
-                TypeOfPaymentId, 
-                AmountNGN, 
-                AmountUSD, 
+            var requestTemp = new SendBackApplicationToCompanyRequest(
+                request.DeskID, 
+                request.Comment, 
+                request.SelectedApps, 
+                request.SelectedTables, 
+                request.TypeOfPaymentId, 
+                request.AmountNGN, 
+                request.AmountUSD, 
                 (int)WKPCompanyNumber, 
                 WKPCompanyEmail);
-            var command = _mapper.Map<SendBackApplicationToCompanyCommand>(request);
+            var command = _mapper.Map<SendBackApplicationToCompanyCommand>(requestTemp);
             var result = await _mediator.Send(command);
             return Response(result);
         }
@@ -231,10 +225,10 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("RejectApplication")]
-        public async Task<IActionResult> RejectApplication(int AppId, string Comment)
+        public async Task<IActionResult> RejectApplication([FromBody] RejectApplicationRequest request)
         {
-            var request = new RejectApplicationRequest(AppId, WKPCompanyEmail, Comment);
-            var command = _mapper.Map<RejectApplicationCommand>(request);
+            var request1 = new RejectApplicationRequest(request.AppId, WKPCompanyEmail, request.Comment);
+            var command = _mapper.Map<RejectApplicationCommand>(request1);
             var result = await _mediator.Send(command);
             return Response(result);
         }

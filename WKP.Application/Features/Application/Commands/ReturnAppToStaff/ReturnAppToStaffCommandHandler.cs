@@ -27,11 +27,9 @@ namespace WKP.Application.Features.Application.Commands.ReturnAppToStaff
             {
                 if(request.SelectedApps is not null)
                 {
-                    var SBUIds = _helper.ParseSBUIDs(request.SBU_IDs);
-
                     foreach(var SA in request.SelectedApps)
                     {
-                        int appId = SA != "undefined"? int.Parse(SA): throw new Exception("App Id cannot be 'undefined'");
+                        int appId = SA;
                         var staffActing = await _unitOfWork.StaffRepository.GetStaffByCompanyNumber(request.CompanyId);
                         var staffDesk = await _unitOfWork.DeskRepository.GetDeskByDeskIdAppIdWithStaff(request.DeskID, appId);
                         var app = await _unitOfWork.ApplicationRepository.GetAppByIdWithAll(appId);
@@ -58,7 +56,7 @@ namespace WKP.Application.Features.Application.Commands.ReturnAppToStaff
                         }
                         else
                         {
-                            return await ReturnAppToStaffFromWPAReviewer(staffDesk, app, SBUIds, request.Comment, returnedTables);
+                            return await ReturnAppToStaffFromWPAReviewer(staffDesk, app, request.SBU_IDs, request.Comment, returnedTables);
                         }
                     }
                 }

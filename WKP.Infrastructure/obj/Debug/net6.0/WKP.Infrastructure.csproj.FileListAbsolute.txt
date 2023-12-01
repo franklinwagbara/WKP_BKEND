@@ -23,7 +23,9 @@ C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infra
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\bin\Debug\net6.0\WKP.Infrastructure.pdb
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\bin\Debug\net6.0\WKP.Application.dll
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\bin\Debug\net6.0\WKP.Domain.dll
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\bin\Debug\net6.0\WKP_Database.dll
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\bin\Debug\net6.0\WKP.Application.pdb
+C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\bin\Debug\net6.0\WKP_Database.pdb
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\bin\Debug\net6.0\WKP.Domain.pdb
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\obj\Debug\net6.0\WKP.Infrastructure.csproj.AssemblyReference.cache
 C:\Users\BrandOneTech\source\repos\WorkProgramBackEnd\WorkProgram_BEnd\WKP.Infrastructure\obj\Debug\net6.0\WKP.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig

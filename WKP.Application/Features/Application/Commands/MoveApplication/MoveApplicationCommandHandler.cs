@@ -34,11 +34,17 @@ namespace WKP.Application.Features.Application.Commands.MoveApplication
                     if(request.SourceStaffID == 0 || request.TargetStaffID == 0 || appId == 0)
                             return Error.Failure(code: ErrorCodes.InternalFailure, description: "An error occured while trying to get process flow for this application. Make sure that source and target staffIDs are valid including appId");
                     
-                    var sourceStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(request.SourceStaffID);
-                    var targetStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(request.TargetStaffID);
+                    var sourceStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBURole(request.SourceStaffID);
+                    var targetStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBURole(request.TargetStaffID);
                     var sourceStaffDesk = await _unitOfWork.DeskRepository.GetDeskByStaffIdAppIdWithStaff(request.SourceStaffID, appId);
                     var targetStaffDesk = await _unitOfWork.DeskRepository.GetDeskByStaffIdAppIdWithStaff(request.TargetStaffID, appId);
                     var app = await _unitOfWork.ApplicationRepository.GetAppByIdWithAll(appId);
+
+                    if(sourceStaff.Role.RoleId == ROLEID.Accountant)
+                    {
+                        await MoveAccDesk(sourceStaff, targetStaff, app);
+                        return new ApplicationResult(request);
+                    }
 
                     if(sourceStaff == null || targetStaff == null || sourceStaffDesk == null || app == null)
                         return Error.Failure(code: ErrorCodes.InternalFailure, description: "An error occured while trying to get process flow for this application. Make sure that source and appId are valid.");
@@ -65,6 +71,47 @@ namespace WKP.Application.Features.Application.Commands.MoveApplication
             {
                 return Error.Failure(code: ErrorCodes.InternalFailure, description: e.Message);
             }
+        }
+
+        private async Task MoveAccDesk(staff sourceStaff, staff? targetStaff, Domain.Entities.Application? app)
+        {
+            if(targetStaff == null) throw new Exception("Target Staff can not be null.");
+
+            var sourceDesk = await _unitOfWork.AccountDeskRepository.GetAsync((a) => a.StaffID == sourceStaff.StaffID && a.AppId == app.Id, null);
+            
+            if(sourceDesk == null) throw new Exception("No source desk for the specified staff and app id.");
+
+            //check if app already exist on targets desk
+            var foundDesk = await _unitOfWork.AccountDeskRepository.GetAsync((a) => a.StaffID == targetStaff.StaffID && a.AppId == app.Id, null);
+
+            if(foundDesk != null) throw new Exception("Desk already exists for this staff.");
+
+            await _unitOfWork.ExecuteTransaction(async () => 
+            {
+                var newDesk = new AccountDesk
+                {
+                    ProcessID = sourceDesk.ProcessID,
+                    AppId = sourceDesk.AppId,
+                    CreatedAt = sourceDesk.CreatedAt,
+                    UpdatedAt = DateTime.Now,
+                    Comment = sourceDesk.Comment,
+                    LastJobDate = sourceDesk.LastJobDate,
+                    ProcessStatus = sourceDesk.ProcessStatus,
+                    StaffID = targetStaff.StaffID,
+                    PaymentId = sourceDesk.PaymentId,
+                    isApproved = sourceDesk.isApproved
+                };
+
+                await _unitOfWork.AccountDeskRepository.AddAsync(newDesk);
+                //delete desk from source
+                await _unitOfWork.AccountDeskRepository.DeleteAsync(sourceDesk);
+
+                _notifyStaff.Init(targetStaff, app, app.Concession, app.Field);
+                        await _notifyStaff.SendMoveNotification();
+
+                _notifyStaff.Init(sourceStaff, app, app.Concession, app.Field);
+                await _notifyStaff.SendMoveNotification(true);
+            });
         }
 
         private async Task CreateOrUpdateDesk(MoveApplicationCommand request, int appId, MyDesk sourceStaffDesk, MyDesk? targetStaffDesk)
