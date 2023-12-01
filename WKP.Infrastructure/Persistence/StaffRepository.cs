@@ -53,6 +53,11 @@ namespace WKP.Infrastructure.Persistence
             return await _context.Staffs.Include(x => x.StrategicBusinessUnit).Where(x => x.StaffID == StaffId).FirstOrDefaultAsync();
         }
 
+        public async Task<staff?> GetStaffByIdWithSBURole(int StaffId)
+        {
+            return await _context.Staffs.Include(x => x.StrategicBusinessUnit).Include(x => x.Role).Where(x => x.StaffID == StaffId).FirstOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<int>?> GetStaffIdsByRoleSBU(int? RoleId, int? SBUId)
         {
            return await _context.Staffs.Where(x => x.RoleID==RoleId && x.Staff_SBU==SBUId && x.DeleteStatus !=true).Select(x => x.StaffID).ToListAsync();

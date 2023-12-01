@@ -3,9 +3,9 @@ namespace WKP.Contracts.Features.Application
     public record ReturnAppToStaffRequest(
         int DeskID, 
         string Comment, 
-        string[] SelectedApps,
-        string[] SBU_IDs, 
-        string[] SelectedTables, 
+        int[] SelectedApps,
+        int[] SBU_IDs, 
+        int[] SelectedTables, 
         bool FromWPAReviewer, 
         int CompanyId
     );

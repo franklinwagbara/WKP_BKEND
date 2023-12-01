@@ -1,4 +1,4 @@
 namespace WKP.Contracts.Application
 {
-    public record PushApplicationRequest(int DeskId, string Comment, string[] SelectedApps);
+    public record PushApplicationRequest(int DeskId, string Comment, int[] SelectedApps);
 }

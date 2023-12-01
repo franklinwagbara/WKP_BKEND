@@ -277,7 +277,7 @@ namespace WKP.Infrastructure.Context
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.HasKey(e => e.RoleId);
+                entity.HasKey(e => e.id);
 
                 entity.ToTable("Role");
 

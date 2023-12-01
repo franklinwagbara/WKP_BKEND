@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using Backend_UMR_Work_Program.DataModels;
 using Backend_UMR_Work_Program.Models;
-using Backend_UMR_Work_Program.Models.Enurations;
+// using Backend_UMR_Work_Program.Models.Enurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
-using static Backend_UMR_Work_Program.Models.GeneralModel;
+using WKP.Domain.Enums_Contants;
+// using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Services
 {
@@ -685,11 +686,11 @@ namespace Backend_UMR_Work_Program.Services
 
         public async Task<AccountDesk> GetNextAccountDesk()
         {
-            var accountantRole = await _dbContext.Roles.Where(x => x.RoleName == RoleName.Accountant).FirstOrDefaultAsync();
+            var accountantRole = await _dbContext.Roles.Where(x => x.RoleName == ROLEID.Accountant).FirstOrDefaultAsync();
 
             //Get all the account staffs
             var accountStaffs = await _dbContext.staff.Where(x => x.RoleID == accountantRole.id).ToListAsync();
-            var desks = await _dbContext.AccountDesks.OrderBy(x => x.LastJobDate).ToListAsync();
+            // var desks = await _dbContext.AccountDesks.OrderBy(x => x.LastJobDate).ToListAsync();
 
             var deskGroups = _dbContext.AccountDesks
                             .GroupBy(x => x.StaffID)

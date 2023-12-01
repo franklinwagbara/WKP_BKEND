@@ -7,8 +7,8 @@ namespace WKP.Application.Features.Application.Commands.SendBackApplicationToCom
     public record SendBackApplicationToCompanyCommand(
         int DeskID, 
         string Comment, 
-        string[] SelectedApps, 
-        string[] SelectedTables, 
+        int[] SelectedApps, 
+        int[] SelectedTables, 
         int TypeOfPaymentId, 
         string AmountNGN, 
         string AmountUSD, 

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WKP.Application\WKP.Application.csproj" />
+    <ProjectReference Include="..\WKP_Database\WKP_Database.sqlproj" />
   </ItemGroup>
 
   <ItemGroup>
