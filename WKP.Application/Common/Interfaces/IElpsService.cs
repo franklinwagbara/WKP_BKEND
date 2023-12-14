@@ -10,5 +10,6 @@ namespace WKP.Application.Common.Interfaces
         public Task UpdateCompanyNameAndEmail(ElpsCompanyModel model, string email);
         public Task<ErrorOr<ElpsCompanyDetail>> GetCompanyDetailsByEmail(string Email);
         public Task<ErrorOr<ElpsStaffDetail>> GetStaffDetailByEmail(string Email);
+        public Task<ErrorOr<CompanyProfile>> GetCompanyProfile(string Email);
     }
 }

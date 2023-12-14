@@ -29,6 +29,7 @@ namespace WKP.Infrastructure.Context
         public virtual DbSet<Payments> Payments { get; set; }
         public virtual DbSet<SubmissionRejection> SubmissionRejections { get; set; }
         public virtual DbSet<ADMIN_COMPANY_DETAIL> ADMIN_COMPANY_DETAILs { get; set; }
+        public virtual DbSet<CompanyProfile> CompanyProfiles { get; set; }
 
         public WKPContext(DbContextOptions<WKPContext> options): base(options){}
 
@@ -433,6 +434,11 @@ namespace WKP.Infrastructure.Context
                 entity.Property(e => e.check_status)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CompanyProfile>(entity =>
+            {
+                entity.ToTable("CompanyProfile");
             });
         }
     }

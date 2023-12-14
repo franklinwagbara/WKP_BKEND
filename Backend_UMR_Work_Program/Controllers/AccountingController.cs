@@ -11,6 +11,7 @@ using WKP.Application.Features.Accounting.Queries;
 using WKP.Application.Features.Accounting.Queries.GetAllUSDPaymentApprovals;
 using WKP.Application.Features.Accounting.Queries.GetAppPayOnStaffDeskByStaffId;
 using WKP.Application.Features.Accounting.Queries.GetPaymentOnDeskByDeskId;
+using WKP.Application.Features.Accounting.Queries.NewFolder;
 using WKP.Contracts.Features.Accounting;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
@@ -79,6 +80,14 @@ namespace Backend_UMR_Work_Program.Controllers
         public async Task<IActionResult>  GetAppPaymentsOnMyDesk(GetPaymentOnDeskByDeskIdRequest request)
         {
             var query = _mapper.Map<GetPaymentOnDeskByDeskIdQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
+        [HttpGet("GET_ALL_PENDING_APP_PAYMENTS")]
+        public async Task<IActionResult> GetAllPendingAppPayments(GetAllPendingAppPaymentsRequest request)
+        {
+            var query = _mapper.Map<GetAllPendingAppPaymentsQuery>(request);
             var result = await _mediator.Send(query);
             return Response(result);
         }

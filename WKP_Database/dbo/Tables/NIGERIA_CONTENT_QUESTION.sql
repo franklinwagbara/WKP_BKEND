@@ -23,6 +23,8 @@
     [COMPANY_ID]                                                  VARCHAR (100) NULL,
     [CompanyNumber]                                               INT           NULL,
     [Field_ID]                                                    INT           NULL,
+    [CompanyOrganogramFilePath] NVARCHAR(MAX) NULL DEFAULT null , 
+    [CompanyOrganogramFileName] NVARCHAR(MAX) NULL DEFAULT null, 
     CONSTRAINT [PK_NIGERIA_CONTENT_QUESTION] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

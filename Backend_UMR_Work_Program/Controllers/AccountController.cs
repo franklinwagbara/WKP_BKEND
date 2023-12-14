@@ -15,7 +15,9 @@ using System.Net;
 using System.Security.Claims;
 using WKP.Application.Features.Account.Commands;
 using WKP.Application.Features.Account.Commands.ValidateLogin;
+using WKP.Application.Features.Account.Queries;
 using WKP.Contracts.Features.Account;
+using WKP.Contracts.Features.Application;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 using static Backend_UMR_Work_Program.Models.ViewModel;
 //using static Backend_UMR_Work_Program.Helpers.GeneralClass;
@@ -82,6 +84,14 @@ namespace Backend_UMR_Work_Program.Controllers
 					
 				return Redirect($"{_appSettings.LoginUrl}/login?id={id}");
 			}
+		}
+
+		[HttpGet("GetCompanyProfile")]
+		public async Task<IActionResult> GetCompanyProfile(GetCompanyProfileRequest request)
+		{
+			var query = _mapper.Map<GetCompanyProfileQuery>(request);
+			var result = await _mediator.Send(query);
+			return Response(result);
 		}
 
 		[HttpPost("UpdateCompanyDetails")]

@@ -244,5 +244,33 @@ namespace WKP.Infrastructure.Persistence
                 }).FirstOrDefaultAsync();
             return result;
         }
+
+        public async Task<IEnumerable<AccountDeskDTO>> GetAllPendingAppPayments()
+        {
+            return await _context.AccountDesks.Include(x => x.Payment)
+                                    .Include(x => x.Application)
+                                    .Include(x => x.Staff)
+                                    .Where(x => x.ProcessStatus.Equals(PAYMENT_STATUS.PaymentPending))
+                                    .Select(x => new AccountDeskDTO
+                                    {
+                                        Year = x.Application.YearOfWKP,
+                                        ReferenceNumber = x.Application.ReferenceNo,
+                                        ConcessionName = x.Application.Concession.Concession_Held,
+                                        FieldName = x.Application.Field != null ? x.Application.Field.Field_Name : null,
+                                        CompanyName = x.Application.Company.COMPANY_NAME,
+                                        CompanyEmail = x.Application.Company.EMAIL,
+                                        EvidenceFilePath = x.Payment != null ? x.Payment.PaymentEvidenceFilePath : null,
+                                        EvidenceFileName = x.Payment != null ? x.Payment.PaymentEvidenceFileName : null,
+                                        Desk = x,
+                                        Payment = x.Payment != null ? x.Payment : null,
+                                        Application = x.Application,
+                                        Staff = x.Staff,
+                                        Concession = x.Application.Concession,
+                                        Field = x.Application.Field,
+                                        PaymentStatus = x.ProcessStatus,
+                                        SubmittedAt = x.CreatedAt
+                                    })
+                                    .ToListAsync();
+        }
     }
 }

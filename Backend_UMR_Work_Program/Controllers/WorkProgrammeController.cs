@@ -8182,8 +8182,8 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-        [HttpPost("POST_NIGERIA_CONTENT_QUESTION")]
-        public async Task<object> POST_NIGERIA_CONTENT_QUESTION([FromBody] NIGERIA_CONTENT_QUESTION nigeria_content_question_model, string year, int id, string actionToDo)
+        [HttpPost("POST_NIGERIA_CONTENT_QUESTION"), DisableRequestSizeLimit, RequestFormLimits(MultipartBodyLengthLimit = Int32.MaxValue, ValueLengthLimit = Int32.MaxValue)]
+        public async Task<object> POST_NIGERIA_CONTENT_QUESTION([FromForm] NIGERIA_CONTENT_QUESTION nigeria_content_question_model, string year, int id, string actionToDo)
         {
 
             int save = 0;
@@ -8220,6 +8220,26 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Year_of_WP = year;
                             getData.Date_Updated = DateAndTime.Now;
                             getData.Updated_by = WKPCompanyId;
+
+                            #region Fileregion
+                            var file1 = Request.Form.Files.Count != 0 ? Request.Form.Files[0] : null;
+
+                            if (file1 != null)
+                            {
+                                var blobname1 = blobService.Filenamer(file1);
+                                string docName = "Company Organogram";
+                                getData.CompanyOrganogramFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Company Organograms Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                if (getData.CompanyOrganogramFilePath == null)
+                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                else
+                                    getData.CompanyOrganogramFileName = docName;
+                            }
+                            else
+                            {
+                                getData.CompanyOrganogramFilePath = null;
+                                getData.CompanyOrganogramFileName = null;
+                            }
+                            #endregion
 
                             _context.NIGERIA_CONTENT_QUESTIONs.Update(getData);
                             save += await _context.SaveChangesAsync();

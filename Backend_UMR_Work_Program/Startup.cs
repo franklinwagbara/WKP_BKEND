@@ -17,6 +17,7 @@ using Backend_UMR_Work_Program.DataModels;
 using Rotativa.AspNetCore;
 using WKP.Application;
 using WKP.Infrastructure;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Backend_UMR_Work_Program
 {
@@ -116,6 +117,12 @@ namespace Backend_UMR_Work_Program
                     errorNumbersToAdd: null)
                 ));
             services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = long.MaxValue;
+            });
+
             //services.AddTransient<PaymentService>();
             services.AddSingleton<IMailer, Mailer>();
             services.AddAzureClients(builder =>
