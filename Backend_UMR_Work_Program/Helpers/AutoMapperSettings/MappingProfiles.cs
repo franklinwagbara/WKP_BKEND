@@ -33,6 +33,8 @@ using WKP.Contracts.Features.Account;
 using WKP.Application.Features.Account.Commands.ValidateLogin;
 using WKP.Application.Features.Accounting.Queries.GetAppPayOnStaffDeskByStaffId;
 using WKP.Application.Features.Accounting.Queries.GetPaymentOnDeskByDeskId;
+using WKP.Application.Features.Account.Queries;
+using WKP.Application.Features.Accounting.Queries.NewFolder;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -68,6 +70,8 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<ValidateLoginRequest, ValidateLoginCommand>();
             CreateMap<GetAppPayOnStaffDeskByStaffIdRequest,GetAppPayOnStaffDeskByStaffIdQuery>();
             CreateMap<GetPaymentOnDeskByDeskIdRequest, GetPaymentOnDeskByDeskIdQuery>();
+            CreateMap<GetCompanyProfileRequest, GetCompanyProfileQuery>();
+            CreateMap<GetAllPendingAppPaymentsRequest, GetAllPendingAppPaymentsQuery>();
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();

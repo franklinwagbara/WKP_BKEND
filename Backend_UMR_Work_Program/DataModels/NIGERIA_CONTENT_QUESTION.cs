@@ -52,4 +52,7 @@ public partial class NIGERIA_CONTENT_QUESTION
     public int? CompanyNumber { get; set; }
 
     public int? Field_ID { get; set; }
+
+    public string? CompanyOrganogramFilePath { get; set; }
+    public string? CompanyOrganogramFileName { get; set; }
 }

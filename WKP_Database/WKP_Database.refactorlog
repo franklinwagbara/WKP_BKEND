@@ -28,4 +28,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="AccountDeskID" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="404de2f6-03bb-4785-aa73-3c3e1d20adaf" ChangeDateTime="12/13/2023 15:27:30">
+    <Property Name="ElementName" Value="[dbo].[NIGERIA_CONTENT_QUESTION].[CompanyOrganogramFileFileName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NIGERIA_CONTENT_QUESTION]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CompanyOrganogramFileName" />
+  </Operation>
 </Operations>

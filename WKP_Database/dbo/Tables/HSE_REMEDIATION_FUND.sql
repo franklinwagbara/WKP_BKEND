@@ -16,8 +16,8 @@
     [Date_Updated]                           DATETIME2 (7)  NULL,
     [Field_ID]                               INT            NULL,
     [Updated_by]                             NVARCHAR (MAX) NULL,
-    [evidenceOfPreviousYearsPaymentPath]     VARCHAR (MAX)  NULL,
-    [evidenceOfPreviousYearsPaymentFilename] VARCHAR (MAX)  NULL,
+    [evidenceOfPreviousYearsPaymentPath]     VARCHAR (MAX)  NULL ,
+    [evidenceOfPreviousYearsPaymentFilename] VARCHAR (MAX)  NULL ,
     CONSTRAINT [PK_HSE_REMEDIATION_FUND] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

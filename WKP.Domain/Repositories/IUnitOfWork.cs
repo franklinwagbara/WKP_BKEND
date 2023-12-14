@@ -25,6 +25,7 @@ namespace WKP.Domain.Repositories
         public IPaymentRepository PaymentRepository { get; }
         public ISubmissionRejectionRepository SubmissionRejectionRepository { get; }
         public IAdminCompanyDetailsRepository AdminCompanyDetailsRepository { get; }
+        public ICompanyProfileRepository CompanyProfileRepository { get; }
 
 
         public Task ExecuteTransaction(Func<Task> func);

@@ -45,6 +45,24 @@ namespace WKP.Infrastructure.GeneralServices
             }
         }
 
+        public async Task<ErrorOr<CompanyProfile>> GetCompanyProfile(string Email)
+        {
+            if (_appSettings.AppEmail == null)
+                throw new Exception("AppEmail must be provided.");
+
+            var url = "api/company/{compemail}/{email}/{apiHash}";
+            var secret = $"{_appSettings.AppEmail}{_appSettings.SecreteKey}";
+            var hashValue = secret.GenerateSha512();
+            var request = new RestRequest(url, Method.Get);
+            request.AddUrlSegment("compemail", Email);
+            request.AddUrlSegment("email", _appSettings.AppEmail);
+            request.AddUrlSegment("apiHash", hashValue);
+
+            var resultStr = await _elpsConnect.Get(request);
+            var result = JsonConvert.DeserializeObject<CompanyProfile>(resultStr);
+            return result;
+        }
+
         public async Task<ErrorOr<ElpsStaffDetail>> GetStaffDetailByEmail(string Email)
         {
             try
