@@ -60,4 +60,6 @@ public partial class NIGERIA_CONTENT_Training
     public int? CompanyNumber { get; set; }
 
     public int? Field_ID { get; set; }
+    public string? UploadAdditionalDocumentFileName { get; set; }
+    public string? UploadAdditionalDocumentFilePath { get; set; }
 }

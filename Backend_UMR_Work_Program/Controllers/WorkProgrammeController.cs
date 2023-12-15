@@ -7985,7 +7985,7 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         [HttpPost("POST_NIGERIA_CONTENT_TRAINING")]
-        public async Task<object> POST_NIGERIA_CONTENT_Training([FromBody] NIGERIA_CONTENT_Training nigeria_content_training_model, string year, string actionToDo)
+        public async Task<object> POST_NIGERIA_CONTENT_Training([FromForm] NIGERIA_CONTENT_Training nigeria_content_training_model, string year, string actionToDo)
         {
 
             int save = 0;
@@ -8011,6 +8011,26 @@ namespace Backend_UMR_Work_Program.Controllers
                     //nigeria_content_training_model.OML_Name = omlName;
                     //nigeria_content_training_model.Field_ID = concessionField?.Field_ID ?? null;
                     // nigeria_content_training_model.Actual_Proposed_Year = (int.Parse(year) + 1).ToString();
+
+                    #region Fileregion
+                    var file1 = Request.Form.Files.Count != 0 ? Request.Form.Files[0] : null;
+
+                    if (file1 != null)
+                    {
+                        var blobname1 = blobService.Filenamer(file1);
+                        string docName = "Company Organogram";
+                        nigeria_content_training_model.UploadAdditionalDocumentFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Company Additional Staff Disposition Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                        if (nigeria_content_training_model.UploadAdditionalDocumentFilePath == null)
+                            return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                        else
+                            nigeria_content_training_model.UploadAdditionalDocumentFileName = docName;
+                    }
+                    else
+                    {
+                        nigeria_content_training_model.UploadAdditionalDocumentFilePath = null;
+                        nigeria_content_training_model.UploadAdditionalDocumentFileName = null;
+                    }
+                    #endregion
 
                     if (action == GeneralModel.Insert)
                     {
@@ -8048,6 +8068,26 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.OML_Name = nigeria_content_training_model.OML_Name;
                             nigeria_content_training_model.Date_Updated = DateTime.Now;
                             nigeria_content_training_model.Updated_by = WKPCompanyId;
+
+                            #region Fileregion
+                            file1 = Request.Form.Files.Count != 0 ? Request.Form.Files[0] : null;
+
+                            if (file1 != null)
+                            {
+                                var blobname1 = blobService.Filenamer(file1);
+                                string docName = "Company Organogram";
+                                getData.UploadAdditionalDocumentFilePath = await blobService.UploadFileBlobAsync("documents", file1.OpenReadStream(), file1.ContentType, $"Company Additional Staff Disposition Documents/{blobname1}", docName.ToUpper(), (int)WKPCompanyNumber, int.Parse(year));
+                                if (getData.UploadAdditionalDocumentFilePath == null)
+                                    return BadRequest(new { message = "Failure : An error occured while trying to upload " + docName + " document." });
+                                else
+                                    getData.UploadAdditionalDocumentFileName = docName;
+                            }
+                            else
+                            {
+                                getData.UploadAdditionalDocumentFilePath = null;
+                                getData.UploadAdditionalDocumentFileName = null;
+                            }
+                            #endregion
 
                             _context.NIGERIA_CONTENT_Trainings.Update(getData);
                         }
