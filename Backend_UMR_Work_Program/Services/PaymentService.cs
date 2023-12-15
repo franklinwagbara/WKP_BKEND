@@ -451,7 +451,7 @@ namespace Backend_UMR_Work_Program.Services
                 var app = await _context.Applications.Where(
                     x => x.CompanyID == model.CompanyNumber
                     && x.ConcessionID == model.ConcessionId
-                    && x.FieldID == model.FieldId).FirstOrDefaultAsync();
+                    && x.FieldID == model.FieldId && x.YearOfWKP == model.Year).FirstOrDefaultAsync();
 
                 if (app == null)
                 {
@@ -493,7 +493,7 @@ namespace Backend_UMR_Work_Program.Services
                 var app = await _context.Applications.Where(
                     x => x.CompanyID == model.CompanyNumber
                     && x.ConcessionID == model.ConcessionId
-                    && x.FieldID == model.FieldId).FirstOrDefaultAsync();
+                    && x.FieldID == model.FieldId && x.YearOfWKP == model.Year).FirstOrDefaultAsync();
 
                 if (app == null)
                 {

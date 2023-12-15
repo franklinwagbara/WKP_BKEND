@@ -27,6 +27,8 @@
     [COMPANY_ID]                 VARCHAR (100) NULL,
     [CompanyNumber]              INT           NULL,
     [Field_ID]                   INT           NULL,
+    [UploadAdditionalDocumentFilePath] NVARCHAR(MAX) NULL DEFAULT null, 
+    [UploadAdditionalDocumentFileName] NVARCHAR(MAX) NULL DEFAULT null, 
     CONSTRAINT [PK_NIGERIA_CONTENT_Training] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
