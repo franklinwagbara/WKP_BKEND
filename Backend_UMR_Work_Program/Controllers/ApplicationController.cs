@@ -1734,36 +1734,17 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             try
             {
-                var SBU = await (from sb in _context.StrategicBusinessUnits
-                                 where sb.Id == id
-                                 select sb).FirstOrDefaultAsync();
-                if (SBU == null)
-                {
-                    return BadRequest(new { message = $"Error : SBU details could not be found or an invalid ID was supplied." });
-                }
-                else
-                {
-                    //SBU.SBU_Name = name.ToUpper();
-                    //SBU.SBU_Code = code.ToUpper();
-                    SBU.SBU_Name = name;
-                    SBU.SBU_Code = code;
-                    SBU.Tier = tier;
+                var sbu = await _context.StrategicBusinessUnits.FirstOrDefaultAsync(x => x.Id.Equals(id)) ?? throw new Exception($"SBU with Id={id} was not found.");
 
-                    if (await _context.SaveChangesAsync() > 0)
-                    {
-                        var SBUs = await (from sb in _context.StrategicBusinessUnits
-                                          where sb.SBU_Name.ToLower() == name.ToLower()
-                                          select sb).ToListAsync();
-                        return new
-                        {
-                            SBUs = SBUs,
-                        };
-                    }
-                    else
-                    {
-                        return BadRequest(new { message = $"Error : An error occured while trying to create this SBU." });
-                    }
-                }
+                sbu.SBU_Name = name;
+                sbu.SBU_Code = code;
+                sbu.Tier = tier;
+
+                _context.StrategicBusinessUnits.Update(sbu);
+                await _context.SaveChangesAsync();
+
+                var sbus = await _context.StrategicBusinessUnits.Where(x => x.SBU_Name.ToLower() == name.ToLower()).ToListAsync();
+                return new { SBUs = sbus };
             }
             catch (Exception e)
             {
