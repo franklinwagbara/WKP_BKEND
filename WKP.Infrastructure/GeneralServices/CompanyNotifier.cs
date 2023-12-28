@@ -120,8 +120,9 @@ namespace WKP.Infrastructure.GeneralServices
                 CompanyName = App?.Company.COMPANY_NAME ?? "---",
                 CategoryName = "New",
                 Field = Field != null? Field.Field_Name: "---",
-                Concession = Concession.ConcessionName ?? "---",
-                DateSubmitted = DateTime.Now
+                Concession = Concession?.Concession_Held ?? "---",
+                DateSubmitted = DateTime.Now,
+                Year = App?.YearOfWKP
             };
         }
     }
