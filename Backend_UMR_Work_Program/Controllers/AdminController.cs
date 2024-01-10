@@ -2677,6 +2677,30 @@ namespace Backend_UMR_Work_Program.Controllers
 
         #endregion
 
+        [AllowAnonymous]
+        [HttpPost("Update-Company-Info")]
+        public async Task<WebApiResponse> UpdateCompanyInfo(int Id, string Name)
+        {
+            try
+            {
+                var compInfo = await _context.ADMIN_COMPANY_INFORMATIONs.Where(x => x.Id == Id).FirstOrDefaultAsync() ?? throw new Exception("Could not find company with this id");
+                var compDetail = await _context.ADMIN_COMPANY_DETAILs.Where(x => x.EMAIL == compInfo.EMAIL).FirstOrDefaultAsync() ?? throw new Exception("Could not find company detail with the id");
+
+                compInfo.NAME = Name;
+                compInfo.COMPANY_NAME = Name;
+                _context.ADMIN_COMPANY_INFORMATIONs.Update(compInfo);
+
+                compDetail.COMPANY_NAME = Name;
+                _context.ADMIN_COMPANY_DETAILs.Update(compDetail);
+                await _context.SaveChangesAsync();
+
+                return new WebApiResponse {Data = compInfo};
+            }
+            catch (Exception e)
+            {
+                return new WebApiResponse { ResponseCode = AppResponseCodes.InternalError, Message = "Error : " + e.Message, StatusCode = ResponseCodes.InternalError };
+            }
+        }
     }
 
 
