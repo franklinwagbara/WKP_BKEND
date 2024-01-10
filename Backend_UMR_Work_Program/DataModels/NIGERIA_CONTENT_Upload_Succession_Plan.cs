@@ -50,4 +50,6 @@ public partial class NIGERIA_CONTENT_Upload_Succession_Plan
     public int? Field_ID { get; set; }
 
     public string? Year { get; set; }
+    public bool? IsThereSuccessionPlan { get; set; }
+    public string? ReasonForNoSuccessPlan { get; set; }
 }

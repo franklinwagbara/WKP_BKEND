@@ -35,4 +35,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CompanyOrganogramFileName" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="8348c8e5-39d8-4dab-ad76-2dadc8e493a6" ChangeDateTime="01/10/2024 17:57:55">
+    <Property Name="ElementName" Value="[dbo].[NIGERIA_CONTENT_Upload_Succession_Plan].[IsThereSuccessPlan]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NIGERIA_CONTENT_Upload_Succession_Plan]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsThereSuccessionPlan" />
+  </Operation>
 </Operations>

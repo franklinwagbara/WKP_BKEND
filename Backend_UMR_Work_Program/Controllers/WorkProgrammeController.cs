@@ -8166,6 +8166,9 @@ namespace Backend_UMR_Work_Program.Controllers
                             getData.Understudy_ = nigeria_content_succession_model.Understudy_;
                             getData.Year = nigeria_content_succession_model.Year;
 
+                            getData.IsThereSuccessionPlan = nigeria_content_succession_model.IsThereSuccessionPlan;
+                            getData.ReasonForNoSuccessPlan = nigeria_content_succession_model.ReasonForNoSuccessPlan;
+
                             _context.NIGERIA_CONTENT_Upload_Succession_Plans.Update(getData);
                             save += await _context.SaveChangesAsync();
 

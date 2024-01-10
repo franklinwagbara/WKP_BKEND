@@ -22,6 +22,8 @@
     [CompanyNumber]        INT            NULL,
     [Field_ID]             INT            NULL,
     [Year]                 VARCHAR (1000) NULL,
+    [IsThereSuccessionPlan] BIT NULL DEFAULT 0, 
+    [ReasonForNoSuccessPlan] NVARCHAR(MAX) NULL DEFAULT null, 
     CONSTRAINT [PK_NIGERIA_CONTENT_Upload_Succession_Plan] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
