@@ -6,7 +6,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using WKP.Application.Application.Common;
 using WKP.Application.Features.Application.Commands.SubmitApplication;
+using WKP.Application.Features.Common;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Services
@@ -22,6 +24,8 @@ namespace Backend_UMR_Work_Program.Services
         private readonly PaymentService _paymentService;
         private readonly ApplicationService _applicationService;
         private readonly ISender _mediator;
+        private readonly Helper _helper;
+        private readonly AppStatusHelper _appStatusHelper;
 
         public AccountingService(
             IMapper mapper,
@@ -32,7 +36,9 @@ namespace Backend_UMR_Work_Program.Services
             HelperService helperService,
             PaymentService paymentService,
             ApplicationService applicationService,
-            ISender mediator
+            ISender mediator,
+            Helper helper,
+            AppStatusHelper appStatusHelper
             )
         {
             _mapper = mapper;
@@ -43,6 +49,8 @@ namespace Backend_UMR_Work_Program.Services
             _paymentService = paymentService;
             _applicationService = applicationService;
             _mediator = mediator;
+            _helper = helper;
+            _appStatusHelper = appStatusHelper;
         }
 
         public async Task<WebApiResponse> GetAppPaymentsOnMyDesk(string staffEmail)
@@ -179,9 +187,28 @@ namespace Backend_UMR_Work_Program.Services
 
                 if(typeOfPayment.Category == PAYMENT_CATEGORY.OtherPayment)
                 {
-                    var returnedApp = await _context.ReturnedApplications.Where(x => x.AppId == app.Id).FirstOrDefaultAsync();
+                    var returnedApp = await _context.ReturnedApplications.Include(x => x.Staff).Where(x => x.AppId == app.Id).FirstOrDefaultAsync() ?? throw new Exception("Application does not exist in returned application table.");
                     _context.ReturnedApplications.Remove(returnedApp);
                     _context.SaveChanges();
+
+                    var staffDesk = await _context.MyDesks.Where(x => x.AppId == app.Id && x.StaffID == returnedApp.StaffId).FirstOrDefaultAsync() ?? throw new Exception("Staff Desk not found.");
+                    staffDesk.ProcessStatus = WKP.Domain.Enums_Contants.MAIN_APPLICATION_STATUS.ReSubmittedByCompany;
+
+                    _context.MyDesks.Update(staffDesk);
+                    _context.SaveChanges();
+
+                    await _helper.SaveApplicationHistory(
+                                app.Id, returnedApp.StaffId,
+                                WKP.Domain.Enums_Contants.MAIN_APPLICATION_STATUS.ReSubmittedByCompany,
+                                "Application submitted and landed on staff desk",
+                                null, false, null, APPLICATION_ACTION.CompanyReSubmit
+                    );
+
+                    await _appStatusHelper.UpdateAppStatus(_mapper.Map<WKP.Domain.Entities.Application>(app),
+                        _mapper.Map<WKP.Domain.Entities.MyDesk>(staffDesk), 
+                        _mapper.Map<WKP.Domain.Entities.staff>(returnedApp.Staff),
+                        WKP.Domain.Enums_Contants.MAIN_APPLICATION_STATUS.ReSubmittedByCompany, 
+                        WKP.Domain.Enums_Contants.MAIN_APPLICATION_STATUS.ReSubmittedByCompany);
 
                     //send mail to company
                     string subject = $"{app.YearOfWKP} Re-Submission of WORK PROGRAM application for field - {app.Field?.Field_Name} : {app.ReferenceNo}";

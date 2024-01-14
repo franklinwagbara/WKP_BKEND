@@ -158,6 +158,9 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<ADMIN_CONCESSIONS_INFORMATION_Model, ADMIN_CONCESSIONS_INFORMATION>().ReverseMap();
             CreateMap<ADMIN_COMPANY_CODE, CompanyCodeModel>().ReverseMap();
 
+            CreateMap<staff, WKP.Domain.Entities.staff>().ReverseMap();
+            CreateMap<MyDesk, WKP.Domain.Entities.MyDesk>().ReverseMap();
+            CreateMap<Application, WKP.Domain.Entities.Application>().ReverseMap();
         }
     }
 }

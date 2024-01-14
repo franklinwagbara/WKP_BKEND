@@ -16,6 +16,7 @@ namespace WKP.Domain.Enums_Contants
         public const string Processing = "Processing";
 
         public const string SubmittedByCompany = "Submitted By Company";
+        public const string ReSubmittedByCompany = "Re-Submitted By Company";
 
         public const string NotSubmitted = "Not Submitted";
     }

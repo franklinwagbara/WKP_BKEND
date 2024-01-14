@@ -20,7 +20,7 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
         private readonly IStaffNotifier _staffNotifier;
         private readonly AppStatusHelper _appStatusHelper;
 
-            string exPath = "";
+        string exPath = "";
 
 
         public PushApplicationCommandHandler(IUnitOfWork unitOfWork, Helper helper, IStaffNotifier staffNotifier, AppStatusHelper appStatusHelper)
@@ -36,28 +36,28 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
             {
                 var actingStaff = await _unitOfWork.StaffRepository.GetStaffByDeskId(request.DeskId);
 
-                if(actingStaff is null)
+                if (actingStaff is null)
                     return Error.NotFound(code: ErrorCodes.NotFound, description: $"Staff for Desk Id {request.DeskId} not found.");
-        
+
                 var actingStaffRole = await _unitOfWork.RoleRepository.GetAsync((r) => r.id == actingStaff.RoleID, null);
 
-                if(actingStaffRole is null)
-                    return Error.NotFound(code: ErrorCodes.NotFound, description:  $"Role for Id {actingStaff.RoleID} not found.");
+                if (actingStaffRole is null)
+                    return Error.NotFound(code: ErrorCodes.NotFound, description: $"Role for Id {actingStaff.RoleID} not found.");
 
-                if(request.SelectedApps is not null)
+                if (request.SelectedApps is not null)
                 {
-                    foreach(var sApp in request.SelectedApps)
+                    foreach (var sApp in request.SelectedApps)
                     {
                         int appId = sApp;
                         var staffDesk = await _unitOfWork.DeskRepository.GetDeskByDeskIdAppIdWithStaff(request.DeskId, appId);
                         var app = await _unitOfWork.ApplicationRepository.GetAppByIdWithAll(appId);
 
                         var appFlows = await _unitOfWork.AppProcessFlowRepo
-                                .GetAppProcessFlowBySBU_Role_Action(PROCESS_CONSTANTS.Push, 
+                                .GetAppProcessFlowBySBU_Role_Action(PROCESS_CONSTANTS.Push,
                                 (int)staffDesk.Staff.RoleID, (int)staffDesk.Staff.Staff_SBU);
-                        
+
                         var appFlowECs = await _unitOfWork.AppProcessFlowRepo
-                                .GetAppProcessFlowBySBU_Role_Action(PROCESS_CONSTANTS.ApprovedByEC, 
+                                .GetAppProcessFlowBySBU_Role_Action(PROCESS_CONSTANTS.ApprovedByEC,
                                 (int)staffDesk.Staff.RoleID, (int)staffDesk.Staff.Staff_SBU);
 
                         if (appFlows.Count() > 0)
@@ -88,7 +88,7 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
                         {
                             return Error.Failure(code: ErrorCodes.InternalFailure, description: "An error occured while trying to get process flow for this application.");
                         }
-                        
+
                     }
 
                     return Error.Failure(code: ErrorCodes.InternalFailure, description: "Something went wrong while processing your request.");
@@ -96,7 +96,7 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
                 else
                     return Error.Validation(code: ErrorCodes.InvalidParameterPassed, description: "SelectApps can not be null.");
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return Error.Failure(code: ErrorCodes.InternalFailure, description: exPath + ex.Message + ex.StackTrace?.ToString());
             }
@@ -126,24 +126,24 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
             await _helper.UpdateDeskAfterPush(staffDesk, request.Comment, DESK_PROCESS_STATUS.Pushed);
             await _helper.SaveApplicationHistory(app.Id, staffDesk.StaffID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved, request.Comment, null, false, null, APPLICATION_ACTION.Approve);
 
-                exPath += " 6 // " + JsonSerializer.Serialize(deskTemp) + " // " ;
+            exPath += " 6 // " + JsonSerializer.Serialize(deskTemp) + " // ";
 
             //Update Final Authority Approvals Table
             await _helper.UpdateApprovalTable(app.Id, request.Comment, staffDesk.StaffID, (int)staffDesk.Staff.Staff_SBU, staffDesk.DeskID, APPLICATION_HISTORY_STATUS.FinalAuthorityApproved);
 
-                exPath += " 7 ";
-            
+            exPath += " 7 ";
+
             //Sending notifications to Actor Staff
             _staffNotifier.Init(actingStaff, app, app.Concession, app.Field);
             await _staffNotifier.SendApprovalNotification();
 
-                exPath += " 8 ";
+            exPath += " 8 ";
 
 
             //Sending notifications to Receiver Staff
             var recStaff = await _unitOfWork.StaffRepository.GetStaffByIdWithSBU(deskTemp.StaffID);
 
-                exPath += " 9 ";
+            exPath += " 9 ";
 
             if (recStaff != null)
             {
@@ -151,11 +151,11 @@ namespace WKP.Application.Application.Commands.PushApplicationCommand
                 await _staffNotifier.SendPushNotification();
             }
 
-                exPath += " 10 ";
+            exPath += " 10 ";
 
             await _appStatusHelper.UpdateAppStatus(app, deskTemp, recStaff, DESK_PROCESS_STATUS.SubmittedByStaff);
 
-                exPath += " 11 ";
+            exPath += " 11 ";
         }
 
         private async Task PushAppToNextDesk(PushApplicationCommand request, MyDesk staffDesk, Domain.Entities.Application? app, ApplicationProccess appFlow)

@@ -462,7 +462,12 @@ namespace Backend_UMR_Work_Program.Services
                         PAYMENT_STATUS.PaymentPending, null, false);
                 }
 
-                var paymentExist = await _context.Payments.Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo && x.PaymentType.Category == paymentCategory).FirstOrDefaultAsync();
+                var paymentExist = await _context.Payments
+                    .Where(
+                        x => x.AppId == app.Id 
+                        && x.OrderId == app.ReferenceNo 
+                        && x.PaymentType.Category == paymentCategory 
+                        && x.Status == PAYMENT_STATUS.PaymentPending).OrderBy(x => x.TransactionDate).LastOrDefaultAsync();
 
                 if (paymentExist == null) return new WebApiResponse { ResponseCode = AppResponseCodes.PaymentDoesNotExist, Message = $"This payment record does not exist.", StatusCode = ResponseCodes.Badrequest };
 
@@ -504,7 +509,12 @@ namespace Backend_UMR_Work_Program.Services
                         PAYMENT_STATUS.PaymentPending, null, false);
                 }
 
-                var paymentExist = await _context.Payments.Include(x => x.PaymentType).Where(x => x.AppId == app.Id && x.OrderId == app.ReferenceNo && x.PaymentType.Category == paymentCategory).FirstOrDefaultAsync();
+                var paymentExist = await _context.Payments
+                    .Include(x => x.PaymentType)
+                    .Where(
+                        x => x.AppId == app.Id && x.OrderId == app.ReferenceNo 
+                        && x.PaymentType.Category == paymentCategory 
+                        && x.Status == PAYMENT_STATUS.PaymentPending).OrderBy(x => x.TransactionDate).LastOrDefaultAsync();
 
                 if (paymentExist != null) 
                     return new WebApiResponse { 

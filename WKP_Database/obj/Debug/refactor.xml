@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0">
+  <Operation Name="Rename Refactor" Key="424a6ae2-f207-4b34-992a-4c83e214a2b0" ChangeDateTime="03/25/2023 12:45:28" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition].[Budget_NGN]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisition]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Budget_Ngn" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="550ba51e-f0b0-4018-b287-a3f392d581ae" ChangeDateTime="06/13/2023 12:16:12" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[ApplicationDeskHistories].[ActionByStaff]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ApplicationDeskHistories]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ActionByCompany" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8ddf1775-88b2-4bd7-969f-6d71cbffc6c9" ChangeDateTime="06/28/2023 21:18:30" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[ReturnedApplications].[App]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ReturnedApplications]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AppId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2b8e7220-f0c8-4cd9-964b-68964a636646" ChangeDateTime="07/02/2023 16:23:15" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[AccountDesks].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AccountDesks]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AccountDeskID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="404de2f6-03bb-4785-aa73-3c3e1d20adaf" ChangeDateTime="12/13/2023 15:27:30" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[NIGERIA_CONTENT_QUESTION].[CompanyOrganogramFileFileName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NIGERIA_CONTENT_QUESTION]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CompanyOrganogramFileName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8348c8e5-39d8-4dab-ad76-2dadc8e493a6" ChangeDateTime="01/10/2024 17:57:55" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+    <Property Name="ElementName" Value="[dbo].[NIGERIA_CONTENT_Upload_Succession_Plan].[IsThereSuccessPlan]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NIGERIA_CONTENT_Upload_Succession_Plan]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsThereSuccessionPlan" />
+  </Operation>
+</Operations>
