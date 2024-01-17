@@ -606,7 +606,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 // var selectedTables = appHistory.Find(x => x.Staff_SBUID == getStaffSBU.Id);
 
-                var rpS = (await _context.ReturnedApplications.FirstOrDefaultAsync(x => x.AppId == appID)).SelectedTables.Split('|');
+                var rpS = (await _context.ReturnedApplications.FirstOrDefaultAsync(x => x.AppId == appID))?.SelectedTables.Split('|');
 
                 List<Table_Detail>? repudiatedSegments = null;
                 
