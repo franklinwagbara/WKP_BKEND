@@ -33,6 +33,7 @@ using WKP.Application.Features.Application.Queries.GetAllRejections;
 using WKP.Application.Features.Application.Queries.GetReturnedApplications;
 using WKP.Application.Features.Application.Queries.GetStaffDesksByStaffID;
 using WKP.Application.Features.Application.Queries.GetStaffsAppInfoWithSBURoleId;
+using WKP.Application.Features.Application.Queries.LockForms;
 using WKP.Contracts.Application;
 using WKP.Contracts.Features.Application;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
@@ -249,6 +250,14 @@ namespace Backend_UMR_Work_Program.Controllers
             return Response(result);
         }
 
+        [HttpGet("GetLockForms")]
+        public async Task<IActionResult> GetLockForms(LockFormsRequest request)
+        {
+            var query = _mapper.Map<LockFormsQuery>(request);
+            var result = await _mediator.Send(query);
+            return Response(result);
+        }
+
         //Rework
         [HttpGet("GetAppsOnMyDesk")]
         public async Task<object> GetAppsOnMyDesk() => await _applicationService.GetAppsOnMyDesk((int)WKPCompanyNumber);
@@ -291,9 +300,6 @@ namespace Backend_UMR_Work_Program.Controllers
         {
             return await _applicationService.ReSubmitApplicationWithoutFee(concessionId, fieldId);
         }
-
-        [HttpGet("GetLockForms")]
-        public async Task<WebApiResponse> GetLockForms(int year, int concessionId, int fieldId) => await _applicationService.LockForms(year, concessionId, fieldId);
 
         //Rework
         [HttpGet("All-Applications")] //For general application view
@@ -598,18 +604,21 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 var getSBU_TablesToDisplay = await _context.Table_Details.Where(x => x.SBU_ID.Contains(getStaffSBU.Id.ToString())).ToListAsync();
 
-                var selectedTables = appHistory.Find(x => x.Staff_SBUID == getStaffSBU.Id);
+                // var selectedTables = appHistory.Find(x => x.Staff_SBUID == getStaffSBU.Id);
+
+                var rpS = (await _context.ReturnedApplications.FirstOrDefaultAsync(x => x.AppId == appID)).SelectedTables.Split('|');
+
+                List<Table_Detail>? repudiatedSegments = null;
+                
+                if(rpS != null)
+                    repudiatedSegments = await _context.Table_Details.Where(x => rpS.Contains(x.TableSchema) && x.SBU_ID == getStaffSBU.Id.ToString()).ToListAsync();                
 
                 var sbuApprovals = new List<ApplicationSBUApproval>();
                 
                 if(getStaffSBU.Tier == 2 && appID != null)
-                {
                     sbuApprovals = await _context.ApplicationSBUApprovals.Include(x => x.Staff).Where(x => x.AppId == appID).ToListAsync();
-                }
                 else
-                {
                     sbuApprovals = null;
-                }
 
                 var appDetails = new 
                 {
@@ -618,6 +627,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     // Concession = application.Concession,
                     // Company = application.Company,
                     CompanyDetails = companyDetails,
+                    RepudiatedSegments = repudiatedSegments,
                     Staff = staffDesk,
                     currentDesks = currentDesks,
                     Application_History = appHistory.OrderByDescending(x => x.ID).ToList(),

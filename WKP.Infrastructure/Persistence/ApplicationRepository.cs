@@ -184,5 +184,13 @@ namespace WKP.Infrastructure.Persistence
                                 }).ToListAsync();
             return result;
         }
+
+        public async Task<IEnumerable<Domain.Entities.Application>?> GetAsync(int Year, int ConcessionId, int FieldId)
+        {
+            if(FieldId != 0)
+                return await _context.Applications.Where(x => x.YearOfWKP == Year && x.ConcessionID == ConcessionId && x.FieldID == FieldId).ToListAsync();
+            else
+                return await _context.Applications.Where(x => x.YearOfWKP == Year && x.ConcessionID == ConcessionId).ToListAsync();
+        }
     }
 }

@@ -36,6 +36,7 @@ using WKP.Application.Features.Accounting.Queries.GetPaymentOnDeskByDeskId;
 using WKP.Application.Features.Account.Queries;
 using WKP.Application.Features.Accounting.Queries.NewFolder;
 using WKP.Application.Fee.Queries.GetFees;
+using WKP.Application.Features.Application.Queries.LockForms;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -73,6 +74,7 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<GetPaymentOnDeskByDeskIdRequest, GetPaymentOnDeskByDeskIdQuery>();
             CreateMap<GetCompanyProfileRequest, GetCompanyProfileQuery>();
             CreateMap<GetAllPendingAppPaymentsRequest, GetAllPendingAppPaymentsQuery>();
+            CreateMap<LockFormsRequest, LockFormsQuery>();  
 
             CreateMap<Fee, FeeDTO>().ReverseMap();
             CreateMap<FeeDTO, Fee>().ReverseMap();

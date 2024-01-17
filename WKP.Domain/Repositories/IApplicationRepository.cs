@@ -4,6 +4,7 @@ namespace WKP.Domain.Repositories
 {
     public interface IApplicationRepository: IBaseRepository<Application>
     {
+        Task<IEnumerable<Application>?> GetAsync(int Year, int ConcessionId, int FieldId);
         Task<int> GetAllSubAppCountBySBU(int SBUId);
         Task<int> GetAllSubAppCount();
         Task<int> GetAllRejectedAppCount();
