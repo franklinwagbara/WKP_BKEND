@@ -645,7 +645,7 @@ namespace Backend_UMR_Work_Program.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new { message = "Error : " + e.Message });
+                return BadRequest(new { message = "Error : " + $"{e.Message} --- {e.StackTrace} ~~~ {e.InnerException?.ToString()}" });
             }
         }
 
