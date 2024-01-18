@@ -25,10 +25,13 @@ namespace WKP.Application.Features.Application.Queries.LockForms
                     throw new Exception("Year && ConcessionId cannot be zero");
                 
                 var apps = await _unitOfWork.ApplicationRepository.GetAsync(request.Year, request.ConcessionId, request.FieldId) ?? throw new Exception($"No Applications was found with Year: {request.Year}, ConcessionId: {request.ConcessionId}, FieldId: {request.FieldId}");
-                var submittedApp = apps.FirstOrDefault(a => a.Submitted == true);
-                var accountDesk = await _unitOfWork.AccountDeskRepository.GetAsync(x => x.AppId == apps.First().Id, null);
+                var submittedApp = apps?.FirstOrDefault(a => a.Submitted == true);
+                AccountDesk? accountDesk = null;
 
-                if(submittedApp != null)
+                if(apps != null)
+                    accountDesk = await _unitOfWork.AccountDeskRepository.GetAsync(x => x.AppId == apps.First().Id, null); 
+
+                if (submittedApp != null)
                 {
                     var returnedApp = await _unitOfWork.ReturnedApplicationRepository.GetAsync(x => x.AppId == submittedApp.Id, null);
                     var selectedTables = returnedApp?.SelectedTables.Split('|').ToList();
