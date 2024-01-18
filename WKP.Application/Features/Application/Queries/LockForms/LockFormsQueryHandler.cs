@@ -28,7 +28,7 @@ namespace WKP.Application.Features.Application.Queries.LockForms
                 var submittedApp = apps?.FirstOrDefault(a => a.Submitted == true);
                 AccountDesk? accountDesk = null;
 
-                if(apps != null)
+                if(apps != null && apps.Count() != 0)
                     accountDesk = await _unitOfWork.AccountDeskRepository.GetAsync(x => x.AppId == apps.First().Id, null); 
 
                 if (submittedApp != null)
