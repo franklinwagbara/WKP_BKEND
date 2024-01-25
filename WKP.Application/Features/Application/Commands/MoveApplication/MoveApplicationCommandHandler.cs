@@ -82,7 +82,7 @@ namespace WKP.Application.Features.Application.Commands.MoveApplication
             if(sourceDesk == null) throw new Exception("No source desk for the specified staff and app id.");
 
             //check if app already exist on targets desk
-            var foundDesk = await _unitOfWork.AccountDeskRepository.GetAsync((a) => a.StaffID == targetStaff.StaffID && a.AppId == app.Id, null);
+            var foundDesk = await _unitOfWork.AccountDeskRepository.GetAsync((a) => a.StaffID == targetStaff.StaffID && a.AppId == app.Id && a.ProcessStatus == PAYMENT_STATUS.PaymentPending, null);
 
             if(foundDesk != null) throw new Exception("Desk already exists for this staff.");
 
