@@ -37,6 +37,8 @@ using WKP.Application.Features.Account.Queries;
 using WKP.Application.Features.Accounting.Queries.NewFolder;
 using WKP.Application.Fee.Queries.GetFees;
 using WKP.Application.Features.Application.Queries.LockForms;
+using WKP.Contracts.Features.Admin;
+using WKP.Application.Features.Admin.Queries.GetCompanyElpsDetails;
 
 namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
 {
@@ -80,6 +82,8 @@ namespace Backend_UMR_Work_Program.Helpers.AutoMapperSettings
             CreateMap<FeeDTO, Fee>().ReverseMap();
             CreateMap<GetOtherFeesRequest, GetOtherFeesQuery>().ReverseMap();
             CreateMap<GetFeesRequest, GetFeesQuery>().ReverseMap();
+
+            CreateMap<GetCompanyElpsDetailsRequest, GetCompanyProfileQuery>().ReverseMap();
 
             CreateMap<UserMaster, UserMasterModel>().ReverseMap();
             CreateMap<CONCESSION_SITUATION, CONCESSION_SITUATION_Model>().ReverseMap();

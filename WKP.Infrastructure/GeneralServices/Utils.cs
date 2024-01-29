@@ -31,7 +31,7 @@ namespace WKP.Infrastructure.GeneralServices
 
         public static async Task<HttpResponseMessage> Send(string url, HttpRequestMessage message)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls 
+            ServicePointManager.SecurityProtocol =   SecurityProtocolType.Tls 
                                                    | SecurityProtocolType.Tls11 
                                                    | SecurityProtocolType.Tls12;
             using (var client = new HttpClient())

@@ -88,6 +88,31 @@ namespace WKP.Infrastructure.GeneralServices
             }
         }
 
+        public async Task<ErrorOr<ElpsCompanyDetail>> UpdateCompanyDetails(ElpsCompanyModel Model, string Email)
+        {
+            try
+            {
+                if (_appSettings.AppEmail == null)
+                    throw new Exception("AppEmail must be provided.");
+
+                var url = "api/company/{compemail}/{email}/{apiHash}";
+                var secret = $"{_appSettings.AppEmail}{_appSettings.SecreteKey}";
+                var hashValue = secret.GenerateSha512();
+                var request = new RestRequest(url, Method.Get);
+                request.AddUrlSegment("compemail", Email);
+                request.AddUrlSegment("email", _appSettings.AppEmail);
+                request.AddUrlSegment("apiHash", hashValue);
+
+                var resultStr = await _elpsConnect.Get(request);
+                var result = JsonConvert.DeserializeObject<ElpsCompanyDetail>(resultStr);
+                return result;
+            }
+            catch (Exception e)
+            {
+                return Error.Failure(code: ErrorCodes.InternalFailure, description: e.Message + " +++ " + e.StackTrace + " ~~~ " + e.InnerException?.ToString());
+            }
+        }
+
         // private readonly AppSettings _appSettings;
         // private readonly IConfiguration _configuration;
 
@@ -157,50 +182,51 @@ namespace WKP.Infrastructure.GeneralServices
         // 	return null;
         // }
 
-        // private string CallElps(string requestUri, HttpMethod method, object body = null)
-        // {
-        //     var resp = new HttpResponseMessage();
-        //     if (body != null)
-        //         resp = Utils.Send(
-        //             _appSettings.elpsBaseUrl,
-        //             new HttpRequestMessage(method, $"{requestUri}{_appSettings.AppEmail}/{HttpHash()}")
-        //             {
-        //                 Content = new StringContent(body.Stringify(), Encoding.UTF8, "application/json")
-        //             }).Result;
-        //     else
-        //         resp = Utils.Send(
-        //             _appSettings.elpsBaseUrl,
-        //             new HttpRequestMessage(method, $"{requestUri}{_appSettings.AppEmail}/{HttpHash()}") { }).Result;
+        private string CallElps(string requestUri, HttpMethod method, object body = null)
+        {
+            var resp = new HttpResponseMessage();
+            if (body != null)
+                resp = Utils.Send(
+                    _appSettings.elpsBaseUrl,
+                    new HttpRequestMessage(method, $"{requestUri}{_appSettings.AppEmail}/{HttpHash()}")
+                    {
+                        Content = new StringContent(body.Stringify(), Encoding.UTF8, "application/json")
+                    }).Result;
+            else
+                resp = Utils.Send(
+                    _appSettings.elpsBaseUrl,
+                    new HttpRequestMessage(method, $"{requestUri}{_appSettings.AppEmail}/{HttpHash()}") { }).Result;
 
-        //     if (resp.IsSuccessStatusCode)
-        //     {
-        //         var result = resp.Content.ReadAsStringAsync().Result;
-        //         //_context.Logs.Add(new Log
-        //         //{
-        //         //    Action = $"HTTP Request - {method.Method}",
-        //         //    Date = DateTime.UtcNow.AddHours(1),
-        //         //    Error = result
-        //         //});
-        //         return result;
-        //     }
+            if (resp.IsSuccessStatusCode)
+            {
+                var result = resp.Content.ReadAsStringAsync().Result;
+                //_context.Logs.Add(new Log
+                //{
+                //    Action = $"HTTP Request - {method.Method}",
+                //    Date = DateTime.UtcNow.AddHours(1),
+                //    Error = result
+                //});
+                return result;
+            }
 
-        //     //_context.Logs.Add(new Log
-        //     //{
-        //     //    Action = $"HTTP Request - {method.Method} \n {resp.RequestMessage.Stringify()}",
-        //     //    Date = DateTime.UtcNow.AddHours(1),
-        //     //    Error = resp.ReasonPhrase
-        //     //});
+            //_context.Logs.Add(new Log
+            //{
+            //    Action = $"HTTP Request - {method.Method} \n {resp.RequestMessage.Stringify()}",
+            //    Date = DateTime.UtcNow.AddHours(1),
+            //    Error = resp.ReasonPhrase
+            //});
 
-        //     return null;
-        // }
+            return null;
+        }
 
-        // private string HttpHash() => $"{_appSettings.AppEmail}{_appSettings.SecreteKey}".GenerateSha512();
-        public Task UpdateCompanyDetails(ElpsCompanyModel model, string email)
+        private string HttpHash() => $"{_appSettings.AppEmail}{_appSettings.SecreteKey}".GenerateSha512();
+
+        public Task UpdateCompanyNameAndEmail(ElpsCompanyModel model, string email)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdateCompanyNameAndEmail(ElpsCompanyModel model, string email)
+        Task IElpsService.UpdateCompanyDetails(ElpsCompanyModel model, string email)
         {
             throw new NotImplementedException();
         }

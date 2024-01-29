@@ -1970,7 +1970,7 @@ namespace Backend_UMR_Work_Program.Controllers
 
                     string year = application.YearOfWKP.ToString();
 
-                    if(staffRole.RoleName == ROLE.ExecutiveCommissioner || staffRole.RoleName == ROLE.FinalAuthority)
+                    if(staffRole.RoleName == ROLE.ExecutiveCommissioner || staffRole.RoleName == ROLE.FinalAuthority || staffRole.RoleName == ROLE.SuperAdmin)
                     {
                         var _geoActivitiesAcquisition = await (from d in _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();
                         var _geoActivitiesProcessing = await (from d in _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs where d.CompanyNumber == application.CompanyID && d.Year_of_WP == year select d).FirstOrDefaultAsync();

@@ -21,4 +21,8 @@
     <ProjectReference Include="..\WKP.Domain\WKP.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Admin\Command\" />
+  </ItemGroup>
+
 </Project>
