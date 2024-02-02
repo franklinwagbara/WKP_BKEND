@@ -2901,7 +2901,7 @@ namespace Backend_UMR_Work_Program.Controllers
                     var staff = await _context.staff.Where(x => x.StaffEmail == WKPCompanyEmail).FirstOrDefaultAsync();
                     var staffRole = await _context.Roles.Where(x => x.id == staff.RoleID).FirstOrDefaultAsync();
 
-                    if(staffRole.RoleName == ROLE.ExecutiveCommissioner || staffRole.RoleName == ROLE.FinalAuthority)
+                    if(staffRole.RoleName == ROLE.ExecutiveCommissioner || staffRole.RoleName == ROLE.FinalAuthority || staffRole.RoleName == ROLE.SuperAdmin)
                     {
                         var _budgetProposalNairaDollar = await (from d in _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs where d.CompanyNumber == application.CompanyID && d.Field_ID == fieldID && d.Year_of_WP == year select d).ToListAsync();
                         var _BudgetCapex = await (from c in _context.BUDGET_CAPEX_OPices where c.CompanyNumber == application.CompanyID && c.Item_Type == Item_types[0] && c.Year_of_WP == year select c).ToListAsync();
