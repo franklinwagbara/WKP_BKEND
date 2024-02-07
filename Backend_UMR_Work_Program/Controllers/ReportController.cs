@@ -2440,14 +2440,18 @@ namespace Backend_UMR_Work_Program.Controllers
 
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ConcessionSituation = await _context.CONCESSION_SITUATIONs.Where(c => c.Year == year).ToListAsync();
+                    if(year == "null")
+                        ConcessionSituation = await _context.CONCESSION_SITUATIONs.ToListAsync();
+                    else 
+                        ConcessionSituation = await _context.CONCESSION_SITUATIONs.Where(c => c.Year == year).ToListAsync();
                 }
                 else
                 {
-                    ConcessionSituation = await _context.CONCESSION_SITUATIONs.Where(c => c.Year == year && c.COMPANY_ID == WKPCompanyId && c.Year == year).ToListAsync();
+                    if(year == "null")
+                        ConcessionSituation = await _context.CONCESSION_SITUATIONs.ToListAsync();
+                    else
+                        ConcessionSituation = await _context.CONCESSION_SITUATIONs.Where(c => c.Year == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
-
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionSituation.OrderBy(x => x.Year), StatusCode = ResponseCodes.Success };
             }
 
@@ -2465,14 +2469,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if(year == "null")
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.ToListAsync();
+                    else
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.ToListAsync();
+                    else
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
-
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = GEOPHYSICALACTIVITIES.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
 
@@ -2492,14 +2500,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.ToListAsync();
+                    else
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.ToListAsync();
+                    else
+                        GEOPHYSICALACTIVITIES = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
-
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = GEOPHYSICALACTIVITIES.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
 
@@ -2519,14 +2531,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    DRILLING_OPERATIONS = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        DRILLING_OPERATIONS = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.ToListAsync();
+                    else
+                        DRILLING_OPERATIONS = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    DRILLING_OPERATIONS = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        DRILLING_OPERATIONS = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.ToListAsync();
+                    else
+                        DRILLING_OPERATIONS = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
-
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = DRILLING_OPERATIONS.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
 
@@ -2545,13 +2561,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    WORKOVERS_RECOMPLETION = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        WORKOVERS_RECOMPLETION = await _context.WORKOVERS_RECOMPLETION_JOBs1.ToListAsync();
+                    else
+                        WORKOVERS_RECOMPLETION = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    WORKOVERS_RECOMPLETION = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        WORKOVERS_RECOMPLETION = await _context.WORKOVERS_RECOMPLETION_JOBs1.ToListAsync();
+                    else
+                        WORKOVERS_RECOMPLETION = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = WORKOVERS_RECOMPLETION.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
@@ -2571,13 +2592,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    INITIAL_WELLCOMPLETION = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        INITIAL_WELLCOMPLETION = await _context.INITIAL_WELL_COMPLETION_JOBs1.ToListAsync();
+                    else
+                        INITIAL_WELLCOMPLETION = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    INITIAL_WELLCOMPLETION = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        INITIAL_WELLCOMPLETION = await _context.INITIAL_WELL_COMPLETION_JOBs1.ToListAsync();
+                    else
+                        INITIAL_WELLCOMPLETION = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = INITIAL_WELLCOMPLETION.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
@@ -2597,13 +2623,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs.ToListAsync();
+                    else
+                        FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs.ToListAsync();
+                    else
+                        FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLAN_EXCESSIVE_RESERVEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = FDP_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
@@ -2618,20 +2649,25 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("FDP_TOSUBMIT")]
         public async Task<WebApiResponse> Get_FIELD_DEVELOPMENT_PLAN_TOBESUBMITTED(string year)
         {
-            var FDP_Reserves = new List<FIELD_DEVELOPMENT_PLAN>();
+            var FDP_Plan = new List<FIELD_DEVELOPMENT_PLAN>();
             try
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLANs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        FDP_Plan = await _context.FIELD_DEVELOPMENT_PLANs.ToListAsync();
+                    else
+                        FDP_Plan = await _context.FIELD_DEVELOPMENT_PLANs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    FDP_Reserves = await _context.FIELD_DEVELOPMENT_PLANs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        FDP_Plan = await _context.FIELD_DEVELOPMENT_PLANs.ToListAsync();
+                    else
+                        FDP_Plan = await _context.FIELD_DEVELOPMENT_PLANs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
-
-                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = FDP_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = FDP_Plan.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
 
             catch (Exception e)
@@ -2649,13 +2685,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    FDP_Fields = await _context.FIELD_DEVELOPMENT_FIELDS_AND_STATUSes.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        FDP_Fields = await _context.FIELD_DEVELOPMENT_FIELDS_AND_STATUSes.ToListAsync();
+                    else
+                        FDP_Fields = await _context.FIELD_DEVELOPMENT_FIELDS_AND_STATUSes.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    FDP_Fields = await _context.FIELD_DEVELOPMENT_FIELDS_AND_STATUSes.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        FDP_Fields = await _context.FIELD_DEVELOPMENT_FIELDS_AND_STATUSes.ToListAsync();
+                    else
+                        FDP_Fields = await _context.FIELD_DEVELOPMENT_FIELDS_AND_STATUSes.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = FDP_Fields.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
@@ -2674,13 +2715,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    NDR = await _context.NDRs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        NDR = await _context.NDRs.ToListAsync();
+                    else
+                        NDR = await _context.NDRs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    NDR = await _context.NDRs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        NDR = await _context.NDRs.ToListAsync();
+                    else
+                        NDR = await _context.NDRs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = NDR.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
@@ -2694,20 +2740,25 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("OIL_CONDENSATE_PRODUCTION_ACTIVITIES")]
         public async Task<WebApiResponse> OIL_CONDENSATE_PRODUCTION_ACTIVITIES(string year)
         {
-            var OilCondensate = new List<OIL_CONDENSATE_PRODUCTION_ACTIVITy>();
+            var OIL_CONDENSATE_PRODUCTION_ACTIVITIEs = new List<OIL_CONDENSATE_PRODUCTION_ACTIVITy>();
             try
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OIL_CONDENSATE_PRODUCTION_ACTIVITIEs = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.ToListAsync();
+                    else
+                        OIL_CONDENSATE_PRODUCTION_ACTIVITIEs = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OIL_CONDENSATE_PRODUCTION_ACTIVITIEs = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.ToListAsync();
+                    else
+                        OIL_CONDENSATE_PRODUCTION_ACTIVITIEs = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
-
-                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
 
             catch (Exception e)
@@ -2724,11 +2775,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2748,11 +2805,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_monthly_Activities_PROPOSEDs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2772,11 +2835,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_FIVE_YEAR_PROJECTIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2796,11 +2865,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    GasProduction = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIEs.ToListAsync();
+                    else
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    GasProduction = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIEs.ToListAsync();
+                    else
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = GasProduction.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2821,11 +2896,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    GasProduction = await _context.GAS_PRODUCTION_ACTIVITIES_DOMESTIC_SUPPLies.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIES_DOMESTIC_SUPPLies.ToListAsync();
+                    else
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIES_DOMESTIC_SUPPLies.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    GasProduction = await _context.GAS_PRODUCTION_ACTIVITIES_DOMESTIC_SUPPLies.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIES_DOMESTIC_SUPPLies.ToListAsync();
+                    else
+                        GasProduction = await _context.GAS_PRODUCTION_ACTIVITIES_DOMESTIC_SUPPLies.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = GasProduction.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2847,11 +2928,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    GasProduction = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GasProduction = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs.ToListAsync();
+                    else
+                        GasProduction = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    GasProduction = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        GasProduction = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs.ToListAsync();
+                    else
+                        GasProduction = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_UNITIZATIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = GasProduction.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2871,12 +2958,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.Year_of_WP == year && c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR").ToListAsync();
+                    if (year == "null")
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR").ToListAsync();
+                    else
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.Year_of_WP == year && c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR").ToListAsync();
                 }
-
                 else
                 {
-                    Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR" && c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR").ToListAsync();
+                    else
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId && c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR").ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = Concession.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2896,17 +2988,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.FLAG1 == "COMPANY_CURRENT_RESERVE").ToListAsync();
+                    if (year == "null")
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.FLAG1 == "COMPANY_CURRENT_RESERVE").ToListAsync();
+                    else
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.Year_of_WP == year && c.FLAG1 == "COMPANY_CURRENT_RESERVE").ToListAsync();
                 }
-
                 else
                 {
-                    Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.FLAG1 == "COMPANY_CURRENT_RESERVE" && c.COMPANY_ID == WKPCompanyId).ToListAsync();
-                }
-
-                if (year != null)
-                {
-                    Concession = Concession.Where(c => c.Year_of_WP == year).ToList();
+                    if (year == "null")
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.FLAG1 == "COMPANY_CURRENT_RESERVE").ToListAsync();
+                    else
+                        Concession = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId && c.FLAG1 == "COMPANY_CURRENT_RESERVE").ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = Concession.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2926,12 +3018,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Company_Annual_PRODUCTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Company_Annual_PRODUCTIONs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Company_Annual_PRODUCTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Company_Annual_PRODUCTIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Company_Annual_PRODUCTIONs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Company_Annual_PRODUCTIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2951,12 +3048,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -2976,12 +3078,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_DECLINEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3001,12 +3108,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_LIFE_INDices.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_LIFE_INDices.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_LIFE_INDices.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_LIFE_INDices.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_LIFE_INDices.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_LIFE_INDices.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3026,12 +3138,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_DEPLETION_RATEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_DEPLETION_RATEs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_DEPLETION_RATEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_DEPLETION_RATEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_DEPLETION_RATEs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_DEPLETION_RATEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3051,12 +3168,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_MMBBLs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_MMBBLs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_MMBBLs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_MMBBLs.Where(c => c.Companyemail == WKPCompanyId).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_MMBBLs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_MMBBLs.Where(c => c.Year_of_WP == year && c.Companyemail == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3077,12 +3199,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_REPLACEMENT_RATIOs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_REPLACEMENT_RATIOs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_REPLACEMENT_RATIOs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate_Reserves = await _context.RESERVES_REPLACEMENT_RATIOs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate_Reserves = await _context.RESERVES_REPLACEMENT_RATIOs.ToListAsync();
+                    else
+                        OilCondensate_Reserves = await _context.RESERVES_REPLACEMENT_RATIOs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate_Reserves.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3102,14 +3229,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    BudgetCapex = await _context.BUDGET_CAPEX_OPices.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        BudgetCapex = await _context.BUDGET_CAPEX_OPices.ToListAsync();
+                    else
+                        BudgetCapex = await _context.BUDGET_CAPEX_OPices.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    BudgetCapex = await _context.BUDGET_CAPEX_OPices.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        BudgetCapex = await _context.BUDGET_CAPEX_OPices.ToListAsync();
+                    else
+                        BudgetCapex = await _context.BUDGET_CAPEX_OPices.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = BudgetCapex.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
@@ -3128,12 +3259,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    BudgetCapex = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        BudgetCapex = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.ToListAsync();
+                    else
+                        BudgetCapex = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    BudgetCapex = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        BudgetCapex = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.ToListAsync();
+                    else
+                        BudgetCapex = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = BudgetCapex.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3153,12 +3289,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.ToListAsync();
+                    else
+                        OilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIES_New_Technology_Conformity_Assessments.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = OilCondensate.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3178,12 +3319,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.FACILITIES_PROJECT_PERFORMANCEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.FACILITIES_PROJECT_PERFORMANCEs.ToListAsync();
+                    else
+                        ResultData = await _context.FACILITIES_PROJECT_PERFORMANCEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.FACILITIES_PROJECT_PERFORMANCEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.FACILITIES_PROJECT_PERFORMANCEs.ToListAsync();
+                    else
+                        ResultData = await _context.FACILITIES_PROJECT_PERFORMANCEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3203,14 +3349,18 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.LEGAL_LITIGATIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.LEGAL_LITIGATIONs.ToListAsync();
+                    else
+                        ResultData = await _context.LEGAL_LITIGATIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.LEGAL_LITIGATIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.LEGAL_LITIGATIONs.ToListAsync();
+                    else
+                        ResultData = await _context.LEGAL_LITIGATIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
@@ -3229,12 +3379,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.LEGAL_ARBITRATIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.LEGAL_ARBITRATIONs.ToListAsync();
+                    else
+                        ResultData = await _context.LEGAL_ARBITRATIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.LEGAL_ARBITRATIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.LEGAL_ARBITRATIONs.ToListAsync();
+                    else
+                        ResultData = await _context.LEGAL_ARBITRATIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3254,12 +3409,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.NIGERIA_CONTENT_Trainings.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.NIGERIA_CONTENT_Trainings.ToListAsync();
+                    else
+                        ResultData = await _context.NIGERIA_CONTENT_Trainings.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.NIGERIA_CONTENT_Trainings.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.NIGERIA_CONTENT_Trainings.ToListAsync();
+                    else
+                        ResultData = await _context.NIGERIA_CONTENT_Trainings.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3279,12 +3439,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.ToListAsync();
+                    else
+                        ResultData = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.ToListAsync();
+                    else
+                        ResultData = await _context.NIGERIA_CONTENT_Upload_Succession_Plans.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3304,12 +3469,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.ToListAsync();
+                    else
+                        ResultData = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.ToListAsync();
+                    else
+                        ResultData = await _context.STRATEGIC_PLANS_ON_COMPANY_BAses.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3329,12 +3499,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_TECHNICAL_SAFETY_CONTROL_STUDIES_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3354,12 +3529,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_MANAGEMENT_POSITIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_MANAGEMENT_POSITIONs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_MANAGEMENT_POSITIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_MANAGEMENT_POSITIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_MANAGEMENT_POSITIONs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_MANAGEMENT_POSITIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3379,11 +3559,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_SYSTEMs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3403,12 +3589,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_WASTE_MANAGEMENT_SYSTEMs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_SYSTEMs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_SYSTEMs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_WASTE_MANAGEMENT_SYSTEMs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_SYSTEMs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_SYSTEMs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3427,12 +3620,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_WASTE_MANAGEMENT_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_WASTE_MANAGEMENT_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3455,12 +3655,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_WASTE_MANAGEMENT_DZs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_DZs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_DZs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_WASTE_MANAGEMENT_DZs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_DZs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_WASTE_MANAGEMENT_DZs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3482,12 +3689,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OPERATIONS_SAFETY_CASEs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OPERATIONS_SAFETY_CASEs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3509,12 +3723,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_COMPLIANCE_MONITORING_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3536,12 +3757,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3563,12 +3791,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.DECOMMISSIONING_ABANDONMENTs.Where(c => c.WpYear == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.DECOMMISSIONING_ABANDONMENTs.ToListAsync();
+                    else
+                        ResultData = await _context.DECOMMISSIONING_ABANDONMENTs.Where(c => c.WpYear == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.DECOMMISSIONING_ABANDONMENTs.Where(c => c.CompanyEmail == WKPCompanyEmail && c.WpYear == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.DECOMMISSIONING_ABANDONMENTs.ToListAsync();
+                    else
+                        ResultData = await _context.DECOMMISSIONING_ABANDONMENTs.Where(c => c.WpYear == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.WpYear), StatusCode = ResponseCodes.Success };
 
             }
@@ -3590,12 +3825,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ENVIRONMENTAL_MANAGEMENT_PLANs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3617,12 +3859,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.ToListAsync();
+                    else
+                        ResultData = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.ToListAsync();
+                    else
+                        ResultData = await _context.BUDGET_PROPOSAL_IN_NAIRA_AND_DOLLAR_COMPONENTs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
 
             }
@@ -3641,12 +3890,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -3664,13 +3920,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
-
+                    if (year == "null")
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_PRESCRIPTIVE_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -3689,12 +3951,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_PRODUCED_WATER_MANAGEMENT_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -3712,11 +3981,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_OSP_REGISTRATIONS_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OSP_REGISTRATIONS_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OSP_REGISTRATIONS_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_OSP_REGISTRATIONS_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OSP_REGISTRATIONS_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OSP_REGISTRATIONS_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3737,12 +4012,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_OIL_SPILL_INCIDENTs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OIL_SPILL_INCIDENTs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OIL_SPILL_INCIDENTs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_OIL_SPILL_INCIDENTs.Where(c => c.CompanyName == WKPCompanyName && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OIL_SPILL_INCIDENTs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OIL_SPILL_INCIDENTs.Where(c => c.Year_of_WP == year && c.Companyemail == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -3760,12 +4042,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_CAUSES_OF_SPILLs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_CAUSES_OF_SPILLs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_CAUSES_OF_SPILLs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_CAUSES_OF_SPILLs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_CAUSES_OF_SPILLs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_CAUSES_OF_SPILLs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -3784,12 +4073,19 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_OIL_SPILL_REPORTING_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OIL_SPILL_REPORTING_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OIL_SPILL_REPORTING_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_OIL_SPILL_REPORTING_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OIL_SPILL_REPORTING_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OIL_SPILL_REPORTING_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
+
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
@@ -3803,18 +4099,25 @@ namespace Backend_UMR_Work_Program.Controllers
         [HttpGet("HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEW")]
         public async Task<WebApiResponse> HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEW(string year)
         {
-            var Resultdata = new List<HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEW>();
+            var ResultData = new List<HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEW>();
             try
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    Resultdata = await _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    Resultdata = await _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_ASSET_REGISTER_TEMPLATE_RBI_EQUIPMENT_INSPECTION_STRATEGY_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
-                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = Resultdata.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
+
+                return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
             }
             catch (Exception e)
             {
@@ -3831,12 +4134,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SAFETY_CULTURE_TRAININGs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SAFETY_CULTURE_TRAININGs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3857,12 +4165,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_OCCUPATIONAL_HEALTH_MANAGEMENTs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3883,12 +4196,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_QUALITY_CONTROLs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_QUALITY_CONTROLs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_QUALITY_CONTROLs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_QUALITY_CONTROLs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_QUALITY_CONTROLs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_QUALITY_CONTROLs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3909,12 +4227,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_CLIMATE_CHANGE_AND_AIR_QUALITies.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3934,12 +4257,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_INSPECTION_AND_MAINTENANCE_FACILITY_TYPE_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_INSPECTION_AND_MAINTENANCE_FACILITY_TYPE_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_INSPECTION_AND_MAINTENANCE_FACILITY_TYPE_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_INSPECTION_AND_MAINTENANCE_FACILITY_TYPE_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_INSPECTION_AND_MAINTENANCE_FACILITY_TYPE_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_INSPECTION_AND_MAINTENANCE_FACILITY_TYPE_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3959,12 +4287,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.PRESENTATION_UPLOADs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.PRESENTATION_UPLOADs.ToListAsync();
+                    else
+                        ResultData = await _context.PRESENTATION_UPLOADs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.PRESENTATION_UPLOADs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.PRESENTATION_UPLOADs.ToListAsync();
+                    else
+                        ResultData = await _context.PRESENTATION_UPLOADs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -3984,11 +4317,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.ToListAsync();
+                    else
+                        ResultData = await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.ToListAsync();
+                    else
+                        ResultData = await _context.PICTURE_UPLOAD_COMMUNITY_DEVELOPMENT_PROJECTs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4008,11 +4347,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Training_Skill_Acquisitions.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4031,11 +4376,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEW_Scholarships.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4055,11 +4406,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_CSR_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4078,11 +4435,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
                 else
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_MOUs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4101,12 +4464,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_TRAINING_SCHEMEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4126,12 +4494,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.ToListAsync();
+                    else
+                        ResultData = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_QUESTIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4151,12 +4524,17 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 if (WKUserRole == GeneralModel.Admin)
                 {
-                    ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.ToListAsync();
+                    else
+                        ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.Where(c => c.Year_of_WP == year).ToListAsync();
                 }
-
                 else
                 {
-                    ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.Where(c => c.COMPANY_ID == WKPCompanyId && c.Year_of_WP == year).ToListAsync();
+                    if (year == "null")
+                        ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.ToListAsync();
+                    else
+                        ResultData = await _context.NIGERIA_CONTENT_QUESTIONs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ResultData.OrderBy(x => x.Year_of_WP), StatusCode = ResponseCodes.Success };
@@ -4232,12 +4610,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_REMEDIATION_FUND>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.Where(c => c.Company_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_REMEDIATION_FUNDs.Where(c => c.Year_of_WP == year && c.Company_Email == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
@@ -4261,12 +4646,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_EFFLUENT_MONITORING_COMPLIANCE>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_EFFLUENT_MONITORING_COMPLIANCEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
@@ -4290,12 +4682,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_POINT_SOURCE_REGISTRATION>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.Where(c => c.Company_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_POINT_SOURCE_REGISTRATIONs.Where(c => c.Year_of_WP == year && c.Company_Email == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
@@ -4319,12 +4718,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_GHG_MANAGEMENT_PLAN>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.Where(c => c.CompanY_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_GHG_MANAGEMENT_PLANs.Where(c => c.Year_of_WP == year && c.CompanY_ID == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
@@ -4348,12 +4754,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_HOST_COMMUNITIES_DEVELOPMENT>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
@@ -4377,12 +4790,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEME>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_SCHOLASHIP_SCHEMEs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
@@ -4406,12 +4826,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUAL>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_SUSTAINABLE_DEVELOPMENT_COMMUNITY_PROJECT_PROGRAM_PLANNED_AND_ACTUALs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
@@ -4429,12 +4856,19 @@ namespace Backend_UMR_Work_Program.Controllers
                 var ConcessionsInformation = new List<HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEW>();
 
                 if (WKUserRole == GeneralModel.Admin)
-                    ConcessionsInformation = await _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs.ToListAsync();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs.Where(c => c.Year_of_WP == year).ToListAsync();
+                }
                 else
-                    ConcessionsInformation = await _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs.Where(c => c.COMPANY_ID == WKPCompanyId).ToListAsync();
-
-                if (!string.IsNullOrEmpty(year))
-                    ConcessionsInformation = ConcessionsInformation.Where(c => c.Year_of_WP == year).ToList();
+                {
+                    if (year == "null")
+                        ConcessionsInformation = await _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs.ToListAsync();
+                    else
+                        ConcessionsInformation = await _context.HSE_ACCIDENT_INCIDENCE_REPORTING_TYPE_OF_ACCIDENT_NEWs.Where(c => c.Year_of_WP == year && c.COMPANY_ID == WKPCompanyId).ToListAsync();
+                }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
             }
