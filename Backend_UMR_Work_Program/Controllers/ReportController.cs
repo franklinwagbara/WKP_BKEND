@@ -2388,7 +2388,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 if (WKUserRole == GeneralModel.Admin)
                 {
                     ConcessionsInformation = await _context.ADMIN_CONCESSIONS_INFORMATIONs.Where(c => c.DELETED_STATUS == null).ToListAsync();
-
                 }
                 else
                 {
@@ -2402,7 +2401,6 @@ namespace Backend_UMR_Work_Program.Controllers
                 else
                 {
                     ConcessionsInformation = ConcessionsInformation.Where(c => c.Year == dateYear).ToList();
-
                 }
 
                 return new WebApiResponse { ResponseCode = AppResponseCodes.Success, Message = "Success", Data = ConcessionsInformation, StatusCode = ResponseCodes.Success };
