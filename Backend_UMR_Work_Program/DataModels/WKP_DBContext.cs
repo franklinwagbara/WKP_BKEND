@@ -1186,6 +1186,10 @@ public partial class WKP_DBContext : DbContext
         {
             entity.ToTable("ADMIN_COMPANY_INFORMATION");
 
+            entity.HasMany(x => x.Concessions)
+                .WithOne()
+                .HasForeignKey(x => x.CompanyNumber);
+
             entity.Property(e => e.CATEGORY)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -1402,6 +1406,10 @@ public partial class WKP_DBContext : DbContext
             entity.HasKey(e => e.Consession_Id).HasName("PK_ADMIN_CONCESSIONS_INFORMATIONs");
 
             entity.ToTable("ADMIN_CONCESSIONS_INFORMATION");
+
+            entity.HasMany(x => x.Fields)
+                .WithOne()
+                .HasForeignKey(x => x.Concession_ID);
 
             entity.Property(e => e.Area)
                 .HasMaxLength(3900)

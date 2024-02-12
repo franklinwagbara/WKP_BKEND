@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend_UMR_Work_Program.DataModels;
 
@@ -42,4 +43,18 @@ public partial class HSE_ENVIRONMENTAL_MANAGEMENT_PLAN
     public DateTime? Date_Created { get; set; }
 
     public string? Created_by { get; set; }
+
+
+    [NotMapped]
+    public string? ConcessionName;
+    [NotMapped]
+    public string FieldName => Field?.Field_Name;
+    [NotMapped]
+    public string? ConcessionType;
+
+    [NotMapped]
+    public ADMIN_CONCESSIONS_INFORMATION Concession { get; set; }
+
+    [ForeignKey(nameof(Field_ID))]
+    public COMPANY_FIELD? Field { get; set; }
 }

@@ -1962,8 +1962,8 @@ namespace Backend_UMR_Work_Program.Controllers
                     var getStaffSBU = (from stf in _context.staff
                                        join sbu in _context.StrategicBusinessUnits on stf.Staff_SBU equals sbu.Id
                                        where stf.StaffEmail == WKPCompanyEmail
-                                       //"franlin.wagbara@brandonetech.com"
                                        select sbu).FirstOrDefault();
+                    var concession = await _context.ADMIN_CONCESSIONS_INFORMATIONs.FirstOrDefaultAsync(x => x.Consession_Id == application.ConcessionID);
 
                     var staff = await _context.staff.Where(x => x.StaffEmail == WKPCompanyEmail).FirstOrDefaultAsync();
                     var staffRole = await _context.Roles.Where(x => x.id == staff.RoleID).FirstOrDefaultAsync();
@@ -2551,7 +2551,7 @@ namespace Backend_UMR_Work_Program.Controllers
                             var _fiveYearReservesProjection = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_Fiveyear_Projections where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
                             var _reservesUpdateConcessionReservesJanuary = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year && c.FLAG1 == "COMPANY_CURRENT_RESERVE" select c).ToListAsync();
                             var _concessionReservesPrecedingYearJanuary = await (from c in _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year && c.FLAG1 == "COMPANY_RESERVE_OF_PRECEDDING_YEAR" select c).ToListAsync();
-                            var _wellType_oil = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
+                            var _wellType_oil = await (from c in _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year && c.OML_Name == concession.Concession_Held && c.Field_ID == fieldID select c).ToListAsync();
                             var _wellType_gas = await (from c in _context.GAS_PRODUCTION_ACTIVITIEs where c.CompanyNumber == application.CompanyID && c.Year_of_WP == year select c).ToListAsync();
                             var _workoverRecompletionJobsQuaterlyBasis = await (from c in _context.WORKOVERS_RECOMPLETION_JOBs1 where c.CompanyNumber == application.CompanyID && c.Field_ID == fieldID && c.Year_of_WP == year select c).ToListAsync();
                             var _initialWellCompletionJobsQuaterlyBasis = await (from c in _context.INITIAL_WELL_COMPLETION_JOBs1 where c.CompanyNumber == application.CompanyID && c.Field_ID == fieldID && c.Year_of_WP == year select c).ToListAsync();

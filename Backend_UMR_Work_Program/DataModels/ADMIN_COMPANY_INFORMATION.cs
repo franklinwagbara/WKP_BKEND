@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend_UMR_Work_Program.DataModels;
 
@@ -55,4 +56,6 @@ public partial class ADMIN_COMPANY_INFORMATION
 
     public string? CompanyAddress { get; set; }
 
+    [ForeignKey("Company_ID")]
+    public ICollection<ADMIN_CONCESSIONS_INFORMATION>? Concessions { get; set; }
 }

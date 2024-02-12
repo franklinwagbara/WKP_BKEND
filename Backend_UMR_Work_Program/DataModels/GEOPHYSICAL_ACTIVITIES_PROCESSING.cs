@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend_UMR_Work_Program.DataModels;
 
@@ -88,4 +89,17 @@ public partial class GEOPHYSICAL_ACTIVITIES_PROCESSING
     public string? No_of_Folds { get; set; }
 
     public string? Type_of_Processing { get; set; }
+
+    [NotMapped]
+    public string? ConcessionName;
+    [NotMapped]
+    public string FieldName => Field?.Field_Name;
+    [NotMapped]
+    public string? ConcessionType;
+
+    [NotMapped]
+    public ADMIN_CONCESSIONS_INFORMATION Concession { get; set; }
+
+    [ForeignKey(nameof(Field_ID))]
+    public COMPANY_FIELD? Field { get; set; }
 }

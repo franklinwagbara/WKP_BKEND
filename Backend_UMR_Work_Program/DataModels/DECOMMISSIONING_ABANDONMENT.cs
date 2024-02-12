@@ -1,4 +1,6 @@
-﻿namespace Backend_UMR_Work_Program.DataModels
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Backend_UMR_Work_Program.DataModels
 {
     public class DECOMMISSIONING_ABANDONMENT
     {
@@ -17,12 +19,25 @@
         public string? CreatedBy { get; set; }
         public string? UpdatedBy { get; set; }
 
-        public DECOMMISSIONING_ABANDONMENT()
-        {
-            OmlId = 0;
-            ApprovalCostUsd = 0;
-            AnnualObigationUsd = 0;
+        [NotMapped]
+        public string? ConcessionName;
+        [NotMapped]
+        public string FieldName => Field?.Field_Name;
+        [NotMapped]
+        public string? ConcessionType;
 
+        [NotMapped]
+        public ADMIN_CONCESSIONS_INFORMATION Concession { get; set; }
+
+        [ForeignKey(nameof(FieldId))]
+        public COMPANY_FIELD? Field { get; set; }
+
+            public DECOMMISSIONING_ABANDONMENT()
+            {
+                OmlId = 0;
+                ApprovalCostUsd = 0;
+                AnnualObigationUsd = 0;
+
+            }
         }
-    }
 }

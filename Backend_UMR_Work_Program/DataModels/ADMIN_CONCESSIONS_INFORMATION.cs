@@ -70,4 +70,6 @@ public partial class ADMIN_CONCESSIONS_INFORMATION
     public DateTime? Date_Created { get; set; }
 
     public DateTime? Date_Updated { get; set; }
+
+    public ICollection<COMPANY_FIELD>? Fields { get; set; }
 }
