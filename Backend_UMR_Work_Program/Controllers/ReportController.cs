@@ -5246,7 +5246,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
                     ExRAddition = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    fdfApproved = await _context.FIELD_DEVELOPMENT_FIELDS_TO_SUBMIT_FDPs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                    //fdfApproved = await _context.FIELD_DEVELOPMENT_FIELDS_TO_SUBMIT_FDPs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
                     seismicAcquisition = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
                     seismicProcessing = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
                     drillingOperations = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
@@ -5285,7 +5285,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                             {
                                                 Reserves = allData.Reserves.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
                                                 ExRAddition = allData.ExRAddition.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                //fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
                                                 seismicAcquisition = allData.seismicAcquisition.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
                                                 seismicProcessing = allData.seismicProcessing.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
                                                 drillingOperations = allData.drillingOperations.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
@@ -5313,7 +5313,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                     {
                                         Reserves = allData.Reserves.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
                                         ExRAddition = allData.ExRAddition.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held),
+                                        //fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held),
                                         seismicAcquisition = allData.seismicAcquisition.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
                                         seismicProcessing = allData.seismicProcessing.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
                                         drillingOperations = allData.drillingOperations.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
