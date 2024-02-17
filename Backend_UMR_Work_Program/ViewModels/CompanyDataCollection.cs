@@ -6,7 +6,7 @@ namespace Backend_UMR_Work_Program.ViewModels
     {
         public RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE? Reserves   {get; set;}                                                                                         
         public RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Addition? ExRAddition    {get; set;}                                                                                              
-        public FIELD_DEVELOPMENT_FIELDS_TO_SUBMIT_FDP? fdfApproved   {get; set;}                                                                                    
+        public FIELD_DEVELOPMENT_PLAN? fdfApproved   {get; set;}                                                                                    
         public List<GEOPHYSICAL_ACTIVITIES_ACQUISITION>? seismicAcquisition {get; set;}                  
         public List<GEOPHYSICAL_ACTIVITIES_PROCESSING>? seismicProcessing  {get; set;}                
         public List<DRILLING_OPERATIONS_CATEGORIES_OF_WELL>? drillingOperations {get; set;}                      
@@ -29,7 +29,7 @@ namespace Backend_UMR_Work_Program.ViewModels
         public List<IGrouping<int?, RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVE>>? Reserves { get; set; }
         public List<IGrouping<int?, RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Addition>>? ExRAddition { get; set; }
         public List<IGrouping<int?, 
-            FIELD_DEVELOPMENT_FIELDS_TO_SUBMIT_FDP>>? fdfApproved { get; set; }
+            FIELD_DEVELOPMENT_PLAN>>? fdfApproved { get; set; }
         public List<IGrouping<int?, 
             GEOPHYSICAL_ACTIVITIES_ACQUISITION>>? seismicAcquisition { get; set; }
         public List<IGrouping<int?, 
