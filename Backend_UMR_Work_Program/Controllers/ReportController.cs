@@ -5075,13 +5075,13 @@ namespace Backend_UMR_Work_Program.Controllers
 
         [AllowAnonymous]
         [HttpGet("Get_Executive_Summary_report")]
-        public async Task<WebApiResponse> GetExecutiveSummaryReport()
+        public async Task<WebApiResponse> GetExecutiveSummaryReport([FromQuery]int Year)
         {
             try
             {
                 var companies = await _context.ADMIN_COMPANY_INFORMATIONs.Include(x => x.Concessions).ThenInclude(x => x.Fields).ToListAsync() ?? throw new Exception("No company was found.");
                 var Executivesummary = new ExecutiveSummaryDTO();
-                var companyData = await FetchCompanyData(companies);
+                var companyData = await FetchCompanyData(companies, Year);
 
                 foreach (var company in companies)
                 {
@@ -5122,9 +5122,19 @@ namespace Backend_UMR_Work_Program.Controllers
                                                 else operationOpexDollar += Convert.ToDouble(c.dollar);
                                             });
 
-                                            var t1 = (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("NO");
-                                            var t2 = Convert.ToDouble(data?.productionOilCondensate?.Company_Oil);
-                                            var t3 = Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate).ToString();
+                                            var ReservesOil = data?.Reserves?.Company_Reserves_Oil == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("N2");
+                                            var ReservesGas = data?.Reserves?.Company_Reserves_AG == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("N2");
+                                            var ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("N2");
+                                            var ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("N2");
+                                            var FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No";
+                                            var SeismicAcquisition = data?.seismicAcquisition?.Count().ToString();
+                                            var SeismicProcessing = data?.seismicProcessing?.Count().ToString();
+                                            var WellsDrilling = data?.drillingOperations?.Count().ToString();
+                                            var WellsCompletion = data?.wellCompletion?.Count().ToString();
+                                            var WellsWorkover = data?.wellWorkOver?.Count().ToString();
+                                            var ProductionOilCondensate = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Company_Condensate == null) ? (data?.productionOilCondensate?.Company_Oil == null ? data?.productionOilCondensate?.Company_Condensate : data?.productionOilCondensate?.Company_Oil) : (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("N2");
+                                            var ProductionGas = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Gas_AG == null) ? (data?.productionOilCondensate?.Gas_NAG == null ? data?.productionOilCondensate?.Gas_AG : data?.productionOilCondensate?.Gas_NAG) : (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("N2");
+
 
                                             var summary = new ExecutiveSummaryRowDTO
                                             {
@@ -5190,6 +5200,19 @@ namespace Backend_UMR_Work_Program.Controllers
                                         
                                     });
 
+                                    var ReservesOil = data?.Reserves?.Company_Reserves_Oil == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("N2");
+                                    var ReservesGas = data?.Reserves?.Company_Reserves_AG == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("N2");
+                                    var ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("N2");
+                                    var ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("N2");
+                                    var FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No";
+                                    var SeismicAcquisition = data?.seismicAcquisition?.Count().ToString();
+                                    var SeismicProcessing = data?.seismicProcessing?.Count().ToString();
+                                    var WellsDrilling = data?.drillingOperations?.Count().ToString();
+                                    var WellsCompletion = data?.wellCompletion?.Count().ToString();
+                                    var WellsWorkover = data?.wellWorkOver?.Count().ToString();
+                                    var ProductionOilCondensate = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Company_Condensate == null) ? (data?.productionOilCondensate?.Company_Oil == null ? data?.productionOilCondensate?.Company_Condensate : data?.productionOilCondensate?.Company_Oil) : (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("N2");
+                                    var ProductionGas = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Gas_AG == null) ? (data?.productionOilCondensate?.Gas_NAG == null ? data?.productionOilCondensate?.Gas_AG : data?.productionOilCondensate?.Gas_NAG) : (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("N2");
+
                                     var summary = new ExecutiveSummaryRowDTO
                                     {
                                         Company = company,
@@ -5244,7 +5267,7 @@ namespace Backend_UMR_Work_Program.Controllers
             }
         }
 
-        private async Task<Dictionary<int, Dictionary<int, Dictionary<int, CompanyDataCollection>>>> FetchCompanyData(List<ADMIN_COMPANY_INFORMATION> companies)
+        private async Task<Dictionary<int, Dictionary<int, Dictionary<int, CompanyDataCollection>>>> FetchCompanyData(List<ADMIN_COMPANY_INFORMATION> companies, int Year)
         {
             try
             {
@@ -5254,24 +5277,24 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     var allData = new AllCompanyDataCollection
                     {
-                        Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        ExRAddition = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        fdfApproved = await _context.FIELD_DEVELOPMENT_PLANs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        seismicAcquisition = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        seismicProcessing = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        drillingOperations = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        wellCompletion = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        wellWorkOver = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        productionOilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        productionGas = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        facilitiesDevProjects = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        capexOpex = await _context.BUDGET_CAPEX_OPices.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        envStudies = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        safetyCulTrainings = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        hostComms = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(x => x.CompanyNumber == company.Id.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        opSafetyCases = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                        remediationFunds = await _context.HSE_REMEDIATION_FUNDs.Where(x => x.Company_Number == company.Id.ToString()).GroupBy(x => x.Company_Number).ToListAsync(),
-                        DAs = await _context.DECOMMISSIONING_ABANDONMENTs.Where(x => x.CompanyEmail == company.EMAIL).GroupBy(x => x.CompanyEmail).ToListAsync(),
+                        Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(x => x.CompanyNumber == company.Id && x.Year == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        ExRAddition = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        fdfApproved = await _context.FIELD_DEVELOPMENT_PLANs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        seismicAcquisition = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        seismicProcessing = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        drillingOperations = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        wellCompletion = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        wellWorkOver = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        productionOilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        productionGas = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        facilitiesDevProjects = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        capexOpex = await _context.BUDGET_CAPEX_OPices.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        envStudies = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        safetyCulTrainings = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        hostComms = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(x => x.CompanyNumber == company.Id.ToString() && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        opSafetyCases = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        remediationFunds = await _context.HSE_REMEDIATION_FUNDs.Where(x => x.Company_Number == company.Id.ToString() && x.Year_of_WP == Year.ToString()).GroupBy(x => x.Company_Number).ToListAsync(),
+                        DAs = await _context.DECOMMISSIONING_ABANDONMENTs.Where(x => x.CompanyEmail == company.EMAIL && x.WpYear == Year.ToString()).GroupBy(x => x.CompanyEmail).ToListAsync(),
                     };
 
                     result.Add(company.Id, new Dictionary<int, Dictionary<int, CompanyDataCollection>>());
