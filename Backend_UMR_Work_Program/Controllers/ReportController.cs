@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Quartz.Util;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using static Backend_UMR_Work_Program.Models.GeneralModel;
 
 namespace Backend_UMR_Work_Program.Controllers
@@ -5381,12 +5384,12 @@ namespace Backend_UMR_Work_Program.Controllers
         private string CleanSum(string? left, string? right)
         {
             string charsToRemove = "[,.]";
-            if (IsNullOrWhiteSpace(left) && IsNullOrWhiteSpace(right))
+            if (left.IsNullOrWhiteSpace() && right.IsNullOrWhiteSpace())
                 return "";
 
-            if(IsNullOrWhiteSpace(left))
+            if(left.IsNullOrWhiteSpace())
                 return Convert.ToDouble(Regex.Replace(right, charsToRemove, "")).ToString("N2");
-            else if(IsNullOrWhiteSpace(right))
+            else if(right.IsNullOrWhiteSpace())
                 return Convert.ToDouble(Regex.Replace(left, charsToRemove, "")).ToString("N2");
             else
             {
