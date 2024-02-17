@@ -5132,7 +5132,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                                 Concession = concession,
                                                 Field = field,
                                                 ReservesOil = Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("NO"),
-                                                ReservesGas = Convert.ToDouble(data?.Reserves?.Company_Reserves_A).ToString("NO"),
+                                                ReservesGas = Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("NO"),
                                                 ExReservesAdditionOil = Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("NO"),
                                                 ExReservesAdditionGas = Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("NO"),
                                                 FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No",
