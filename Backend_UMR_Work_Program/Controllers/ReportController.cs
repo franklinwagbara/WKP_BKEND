@@ -5122,37 +5122,36 @@ namespace Backend_UMR_Work_Program.Controllers
                                                 else operationOpexDollar += Convert.ToDouble(c.dollar);
                                             });
 
-                                            var ReservesOil = data?.Reserves?.Company_Reserves_Oil == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("N2");
-                                            var ReservesGas = data?.Reserves?.Company_Reserves_AG == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("N2");
-                                            var ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("N2");
-                                            var ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("N2");
+                                            var ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null);
+                                            var ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null);
+                                            var ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null);
+                                            var ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null);
                                             var FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No";
                                             var SeismicAcquisition = data?.seismicAcquisition?.Count().ToString();
                                             var SeismicProcessing = data?.seismicProcessing?.Count().ToString();
                                             var WellsDrilling = data?.drillingOperations?.Count().ToString();
                                             var WellsCompletion = data?.wellCompletion?.Count().ToString();
                                             var WellsWorkover = data?.wellWorkOver?.Count().ToString();
-                                            var ProductionOilCondensate = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Company_Condensate == null) ? (data?.productionOilCondensate?.Company_Oil == null ? data?.productionOilCondensate?.Company_Condensate : data?.productionOilCondensate?.Company_Oil) : (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("N2");
-                                            var ProductionGas = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Gas_AG == null) ? (data?.productionOilCondensate?.Gas_NAG == null ? data?.productionOilCondensate?.Gas_AG : data?.productionOilCondensate?.Gas_NAG) : (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("N2");
-
+                                            var ProductionOilCondensate = CleanSum(data?.productionOilCondensate?.Company_Oil, data?.productionOilCondensate?.Company_Condensate);
+                                            var ProductionGas = CleanSum(data?.productionOilCondensate?.Gas_AG, data?.productionOilCondensate?.Gas_NAG); 
 
                                             var summary = new ExecutiveSummaryRowDTO
                                             {
                                                 Company = company,
                                                 Concession = concession,
                                                 Field = field,
-                                                ReservesOil = data?.Reserves?.Company_Reserves_Oil == null? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("N2"),
-                                                ReservesGas = data?.Reserves?.Company_Reserves_AG == null? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("N2"),
-                                                ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil == null? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("N2"),
-                                                ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG == null? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("N2"),
+                                                ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null),
+                                                ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null),
+                                                ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null),
+                                                ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null),
                                                 FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No",
                                                 SeismicAcquisition = data?.seismicAcquisition?.Count().ToString(),
                                                 SeismicProcessing = data?.seismicProcessing?.Count().ToString(),
                                                 WellsDrilling = data?.drillingOperations?.Count().ToString(),
                                                 WellsCompletion = data?.wellCompletion?.Count().ToString(),
                                                 WellsWorkover = data?.wellWorkOver?.Count().ToString(),
-                                                ProductionOilCondensate = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Company_Condensate == null)? (data?.productionOilCondensate?.Company_Oil == null ? data?.productionOilCondensate?.Company_Condensate: data?.productionOilCondensate?.Company_Oil) : (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("N2"),
-                                                ProductionGas = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Gas_AG == null) ? (data?.productionOilCondensate?.Gas_NAG == null ? data?.productionOilCondensate?.Gas_AG : data?.productionOilCondensate?.Gas_NAG) : (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("N2"),
+                                                ProductionOilCondensate = CleanSum(data?.productionOilCondensate?.Company_Oil, data?.productionOilCondensate?.Company_Condensate),
+                                                ProductionGas = CleanSum(data?.productionOilCondensate?.Gas_AG, data?.productionOilCondensate?.Gas_NAG),
                                                 FDPPlanProjects = plannedProjects,
                                                 FDPCompletionTimeline = projectTimelines,
                                                 CapexExploration = explorationCapexDollar.ToString("N2"),
@@ -5200,36 +5199,36 @@ namespace Backend_UMR_Work_Program.Controllers
                                         
                                     });
 
-                                    var ReservesOil = data?.Reserves?.Company_Reserves_Oil == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("N2");
-                                    var ReservesGas = data?.Reserves?.Company_Reserves_AG == null ? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("N2");
-                                    var ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("N2");
-                                    var ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG == null ? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("N2");
+                                    var ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null);
+                                    var ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null);
+                                    var ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null);
+                                    var ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null);
                                     var FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No";
                                     var SeismicAcquisition = data?.seismicAcquisition?.Count().ToString();
                                     var SeismicProcessing = data?.seismicProcessing?.Count().ToString();
                                     var WellsDrilling = data?.drillingOperations?.Count().ToString();
                                     var WellsCompletion = data?.wellCompletion?.Count().ToString();
                                     var WellsWorkover = data?.wellWorkOver?.Count().ToString();
-                                    var ProductionOilCondensate = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Company_Condensate == null) ? (data?.productionOilCondensate?.Company_Oil == null ? data?.productionOilCondensate?.Company_Condensate : data?.productionOilCondensate?.Company_Oil) : (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("N2");
-                                    var ProductionGas = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Gas_AG == null) ? (data?.productionOilCondensate?.Gas_NAG == null ? data?.productionOilCondensate?.Gas_AG : data?.productionOilCondensate?.Gas_NAG) : (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("N2");
-
+                                    var ProductionOilCondensate = CleanSum(data?.productionOilCondensate?.Company_Oil, data?.productionOilCondensate?.Company_Condensate);
+                                    var ProductionGas = CleanSum(data?.productionOilCondensate?.Gas_AG, data?.productionOilCondensate?.Gas_NAG); 
+                                    
                                     var summary = new ExecutiveSummaryRowDTO
                                     {
                                         Company = company,
                                         Concession = concession,
                                         Field = null,
-                                        ReservesOil = data?.Reserves?.Company_Reserves_Oil == null? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("N2"),
-                                        ReservesGas = data?.Reserves?.Company_Reserves_AG == null? "" : Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("N2"),
-                                        ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil == null? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("N2"),
-                                        ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG == null? "" : Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("N2"),
+                                        ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null),
+                                        ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null),
+                                        ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null),
+                                        ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null),
                                         FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No",
                                         SeismicAcquisition = data?.seismicAcquisition?.Count().ToString(),
                                         SeismicProcessing = data?.seismicProcessing?.Count().ToString(),
                                         WellsDrilling = data?.drillingOperations?.Count().ToString(),
                                         WellsCompletion = data?.wellCompletion?.Count().ToString(),
                                         WellsWorkover = data?.wellWorkOver?.Count().ToString(),
-                                        ProductionOilCondensate = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Company_Condensate == null)? (data?.productionOilCondensate?.Company_Oil == null ? data?.productionOilCondensate?.Company_Condensate: data?.productionOilCondensate?.Company_Oil) : (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("N2"),
-                                        ProductionGas = (data?.productionOilCondensate?.Company_Oil == null || data?.productionOilCondensate?.Gas_AG == null) ? (data?.productionOilCondensate?.Gas_NAG == null ? data?.productionOilCondensate?.Gas_AG : data?.productionOilCondensate?.Gas_NAG) : (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("N2"),
+                                        ProductionOilCondensate = CleanSum(data?.productionOilCondensate?.Company_Oil, data?.productionOilCondensate?.Company_Condensate),
+                                        ProductionGas = CleanSum(data?.productionOilCondensate?.Gas_AG, data?.productionOilCondensate?.Gas_NAG),
                                         FDPPlanProjects = plannedProjects,
                                         FDPCompletionTimeline = projectTimelines,
                                         CapexExploration = explorationCapexDollar.ToString("N2"),
@@ -5377,6 +5376,22 @@ namespace Backend_UMR_Work_Program.Controllers
                 throw e;
             }
            
+        }
+
+        private string CleanSum(string? left, string? right)
+        {
+            string charsToRemove = "[,.]";
+            if (IsNullOrWhiteSpace(left) && IsNullOrWhiteSpace(right))
+                return "";
+
+            if(IsNullOrWhiteSpace(left))
+                return Convert.ToDouble(Regex.Replace(right, charsToRemove, "")).ToString("N2");
+            else if(IsNullOrWhiteSpace(right))
+                return Convert.ToDouble(Regex.Replace(left, charsToRemove, "")).ToString("N2");
+            else
+            {
+                return (Convert.ToDouble(Regex.Replace(left, charsToRemove, "")) + Convert.ToDouble(Regex.Replace(right, charsToRemove, ""))).ToString("N2");
+            }
         }
     }
 }
