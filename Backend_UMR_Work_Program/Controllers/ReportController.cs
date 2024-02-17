@@ -5235,8 +5235,12 @@ namespace Backend_UMR_Work_Program.Controllers
             }
             catch (Exception e)
             {
-
-                throw;
+                return new WebApiResponse
+                {
+                    Data = $"{e.Message}~~~{e.StackTrace}++++{e.InnerException}",
+                    Message = "Failed",
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                };
             }
         }
 
