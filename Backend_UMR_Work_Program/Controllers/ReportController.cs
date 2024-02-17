@@ -5121,8 +5121,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                             data?.capexOpex?.ForEach(c =>
                                             {
                                                 if (c.Item_Type == "Capex")
-                                                    explorationCapexDollar += Convert.ToDouble(c.dollar);
-                                                else operationOpexDollar += Convert.ToDouble(c.dollar);
+                                                    explorationCapexDollar += ConvertToDouble(c?.dollar);
+                                                else operationOpexDollar += ConvertToDouble(c?.dollar);
                                             });
 
                                             var ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null);
@@ -5196,8 +5196,8 @@ namespace Backend_UMR_Work_Program.Controllers
                                         if(c != null)
                                         {
                                             if (c.Item_Type == "Capex")
-                                                explorationCapexDollar += Convert.ToDouble(c.dollar);
-                                            else operationOpexDollar += Convert.ToDouble(c?.dollar);
+                                                explorationCapexDollar += ConvertToDouble(c?.dollar);
+                                            else operationOpexDollar += ConvertToDouble(c?.dollar);
                                         }
                                         
                                     });
@@ -5395,6 +5395,15 @@ namespace Backend_UMR_Work_Program.Controllers
             {
                 return (Convert.ToDouble(Regex.Replace(left, charsToRemove, "")) + Convert.ToDouble(Regex.Replace(right, charsToRemove, ""))).ToString("N2");
             }
+        }
+
+        private double ConvertToDouble(string? value)
+        {
+            string charsToRemove = "[,.]";
+            if (value.IsNullOrWhiteSpace())
+                return 0;
+
+            return Convert.ToDouble(Regex.Replace(value, charsToRemove, ""));
         }
     }
 }
