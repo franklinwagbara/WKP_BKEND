@@ -5122,27 +5122,31 @@ namespace Backend_UMR_Work_Program.Controllers
                                                 else operationOpexDollar += Convert.ToDouble(c.dollar);
                                             });
 
+                                            var t1 = (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("NO");
+                                            var t2 = Convert.ToDouble(data?.productionOilCondensate?.Company_Oil);
+                                            var t3 = Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate).ToString();
+
                                             var summary = new ExecutiveSummaryRowDTO
                                             {
                                                 Company = company,
                                                 Concession = concession,
                                                 Field = field,
-                                                ReservesOil = data?.Reserves?.Company_Reserves_Oil,
-                                                ReservesGas = data?.Reserves?.Company_Reserves_AG,
-                                                ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil,
-                                                ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG,
+                                                ReservesOil = Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("NO"),
+                                                ReservesGas = Convert.ToDouble(data?.Reserves?.Company_Reserves_A).ToString("NO"),
+                                                ExReservesAdditionOil = Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("NO"),
+                                                ExReservesAdditionGas = Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("NO"),
                                                 FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No",
                                                 SeismicAcquisition = data?.seismicAcquisition?.Count().ToString(),
                                                 SeismicProcessing = data?.seismicProcessing?.Count().ToString(),
                                                 WellsDrilling = data?.drillingOperations?.Count().ToString(),
                                                 WellsCompletion = data?.wellCompletion?.Count().ToString(),
                                                 WellsWorkover = data?.wellWorkOver?.Count().ToString(),
-                                                ProductionOilCondensate = Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate).ToString(),
-                                                ProductionGas = Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG).ToString(),
+                                                ProductionOilCondensate = (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("NO"),
+                                                ProductionGas = (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("NO"),
                                                 FDPPlanProjects = plannedProjects,
                                                 FDPCompletionTimeline = projectTimelines,
-                                                CapexExploration = explorationCapexDollar.ToString(),
-                                                OpexOperations = operationOpexDollar.ToString(),
+                                                CapexExploration = explorationCapexDollar.ToString("NO"),
+                                                OpexOperations = operationOpexDollar.ToString("NO"),
                                                 HSESafety = data?.envStudies != null ? "Yes" : "No",
                                                 HSETrainings = data?.safetyCulTrainings != null ? "Yes" : "No",
                                                 HSEIncidentRIP = data?.opSafetyCases != null ? "Yes" : "No",
@@ -5191,22 +5195,22 @@ namespace Backend_UMR_Work_Program.Controllers
                                         Company = company,
                                         Concession = concession,
                                         Field = null,
-                                        ReservesOil = data?.Reserves?.Company_Reserves_Oil,
-                                        ReservesGas = data?.Reserves?.Company_Reserves_AG,
-                                        ExReservesAdditionOil = data?.ExRAddition?.Reserves_Addition_Oil,
-                                        ExReservesAdditionGas = data?.ExRAddition?.Reserves_Addition_AG,
+                                        ReservesOil = Convert.ToDouble(data?.Reserves?.Company_Reserves_Oil).ToString("NO"),
+                                        ReservesGas = Convert.ToDouble(data?.Reserves?.Company_Reserves_AG).ToString("NO"),
+                                        ExReservesAdditionOil = Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_Oil).ToString("NO"),
+                                        ExReservesAdditionGas = Convert.ToDouble(data?.ExRAddition?.Reserves_Addition_AG).ToString("NO"),
                                         FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No",
                                         SeismicAcquisition = data?.seismicAcquisition?.Count().ToString(),
                                         SeismicProcessing = data?.seismicProcessing?.Count().ToString(),
                                         WellsDrilling = data?.drillingOperations?.Count().ToString(),
                                         WellsCompletion = data?.wellCompletion?.Count().ToString(),
                                         WellsWorkover = data?.wellWorkOver?.Count().ToString(),
-                                        ProductionOilCondensate = Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate).ToString(),
-                                        ProductionGas = Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG).ToString(),
+                                        ProductionOilCondensate = (Convert.ToDouble(data?.productionOilCondensate?.Company_Oil) + Convert.ToDouble(data?.productionOilCondensate?.Company_Condensate)).ToString("NO"),
+                                        ProductionGas = (Convert.ToDouble(data?.productionOilCondensate?.Gas_AG) + Convert.ToDouble(data?.productionOilCondensate?.Gas_NAG)).ToString("NO"),
                                         FDPPlanProjects = plannedProjects,
                                         FDPCompletionTimeline = projectTimelines,
-                                        CapexExploration = explorationCapexDollar.ToString(),
-                                        OpexOperations = operationOpexDollar.ToString(),
+                                        CapexExploration = explorationCapexDollar.ToString("NO"),
+                                        OpexOperations = operationOpexDollar.ToString("NO"),
                                         HSESafety = data?.envStudies != null ? "Yes" : "No",
                                         HSETrainings = data?.safetyCulTrainings != null ? "Yes" : "No",
                                         HSEIncidentRIP = data?.opSafetyCases != null ? "Yes" : "No",
@@ -5238,106 +5242,114 @@ namespace Backend_UMR_Work_Program.Controllers
 
         private async Task<Dictionary<int, Dictionary<int, Dictionary<int, CompanyDataCollection>>>> FetchCompanyData(List<ADMIN_COMPANY_INFORMATION> companies)
         {
-            Dictionary<int, Dictionary<int, Dictionary<int, CompanyDataCollection>>> result = new Dictionary<int, Dictionary<int, Dictionary<int, CompanyDataCollection>>>();
- 
-            foreach (var company in companies) 
+            try
             {
-                var allData = new AllCompanyDataCollection
-                {
-                    Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    ExRAddition = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    fdfApproved = await _context.FIELD_DEVELOPMENT_PLANs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    seismicAcquisition = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    seismicProcessing = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    drillingOperations = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    wellCompletion = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    wellWorkOver = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    productionOilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    productionGas = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    facilitiesDevProjects = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    capexOpex = await _context.BUDGET_CAPEX_OPices.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    envStudies = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    safetyCulTrainings = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    hostComms = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(x => x.CompanyNumber == company.Id.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    opSafetyCases = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
-                    remediationFunds = await _context.HSE_REMEDIATION_FUNDs.Where(x => x.Company_Number == company.Id.ToString()).GroupBy(x => x.Company_Number).ToListAsync(),
-                    DAs = await _context.DECOMMISSIONING_ABANDONMENTs.Where(x => x.CompanyEmail == company.EMAIL).GroupBy(x => x.CompanyEmail).ToListAsync(),
-                };
+                Dictionary<int, Dictionary<int, Dictionary<int, CompanyDataCollection>>> result = new Dictionary<int, Dictionary<int, Dictionary<int, CompanyDataCollection>>>();
 
-                result.Add(company.Id, new Dictionary<int, Dictionary<int, CompanyDataCollection>>());
-
-                if (company.Concessions != null && company.Concessions.Count > 0)
+                foreach (var company in companies)
                 {
-                    foreach (var concession in company.Concessions.ToList())
+                    var allData = new AllCompanyDataCollection
                     {
-                        result[company.Id].Add(concession.Consession_Id, new Dictionary<int, CompanyDataCollection>());
+                        Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        ExRAddition = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        fdfApproved = await _context.FIELD_DEVELOPMENT_PLANs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        seismicAcquisition = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        seismicProcessing = await _context.GEOPHYSICAL_ACTIVITIES_PROCESSINGs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        drillingOperations = await _context.DRILLING_OPERATIONS_CATEGORIES_OF_WELLs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        wellCompletion = await _context.INITIAL_WELL_COMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        wellWorkOver = await _context.WORKOVERS_RECOMPLETION_JOBs1.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        productionOilCondensate = await _context.OIL_CONDENSATE_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        productionGas = await _context.GAS_PRODUCTION_ACTIVITIEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        facilitiesDevProjects = await _context.OIL_AND_GAS_FACILITY_MAINTENANCE_PROJECTs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        capexOpex = await _context.BUDGET_CAPEX_OPices.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        envStudies = await _context.HSE_ENVIRONMENTAL_STUDIES_NEWs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        safetyCulTrainings = await _context.HSE_SAFETY_CULTURE_TRAININGs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        hostComms = await _context.HSE_HOST_COMMUNITIES_DEVELOPMENTs.Where(x => x.CompanyNumber == company.Id.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        opSafetyCases = await _context.HSE_OPERATIONS_SAFETY_CASEs.Where(x => x.CompanyNumber == company.Id).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        remediationFunds = await _context.HSE_REMEDIATION_FUNDs.Where(x => x.Company_Number == company.Id.ToString()).GroupBy(x => x.Company_Number).ToListAsync(),
+                        DAs = await _context.DECOMMISSIONING_ABANDONMENTs.Where(x => x.CompanyEmail == company.EMAIL).GroupBy(x => x.CompanyEmail).ToListAsync(),
+                    };
 
-                        if (concession != null)
+                    result.Add(company.Id, new Dictionary<int, Dictionary<int, CompanyDataCollection>>());
+
+                    if (company.Concessions != null && company.Concessions.Count > 0)
+                    {
+                        foreach (var concession in company.Concessions.ToList())
                         {
-                            if (concession.Fields != null && concession.Fields.Count > 0)
+                            result[company.Id].Add(concession.Consession_Id, new Dictionary<int, CompanyDataCollection>());
+
+                            if (concession != null)
                             {
-                                foreach (var field in concession.Fields)
+                                if (concession.Fields != null && concession.Fields.Count > 0)
                                 {
-                                    if (field != null)
+                                    foreach (var field in concession.Fields)
                                     {
-                                        result[company.Id][concession.Consession_Id].Add(field.Field_ID,
-                                            new CompanyDataCollection
-                                            {
-                                                Reserves = allData.Reserves.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                ExRAddition = allData.ExRAddition.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                seismicAcquisition = allData.seismicAcquisition.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
-                                                seismicProcessing = allData.seismicProcessing.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
-                                                drillingOperations = allData.drillingOperations.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
-                                                wellCompletion = allData.wellCompletion.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
-                                                wellWorkOver = allData.wellWorkOver.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
-                                                productionOilCondensate = allData.productionOilCondensate.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                productionGas = allData.productionGas.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                facilitiesDevProjects = allData.facilitiesDevProjects.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
-                                                capexOpex = allData.capexOpex.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
-                                                envStudies = allData.envStudies.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                safetyCulTrainings = allData.safetyCulTrainings.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                hostComms = allData.hostComms.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                opSafetyCases = allData.opSafetyCases.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                remediationFunds = allData.remediationFunds.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
-                                                DAs = allData.DAs.Where(x => x.Key == company.EMAIL).SelectMany(x => x).FirstOrDefault(x => x.OmlId == concession.Consession_Id && x.FieldId == field.Field_ID),
-                                            });
+                                        if (field != null)
+                                        {
+                                            result[company.Id][concession.Consession_Id].Add(field.Field_ID,
+                                                new CompanyDataCollection
+                                                {
+                                                    Reserves = allData.Reserves.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    ExRAddition = allData.ExRAddition.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    seismicAcquisition = allData.seismicAcquisition.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
+                                                    seismicProcessing = allData.seismicProcessing.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
+                                                    drillingOperations = allData.drillingOperations.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
+                                                    wellCompletion = allData.wellCompletion.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
+                                                    wellWorkOver = allData.wellWorkOver.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
+                                                    productionOilCondensate = allData.productionOilCondensate.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    productionGas = allData.productionGas.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    facilitiesDevProjects = allData.facilitiesDevProjects.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
+                                                    capexOpex = allData.capexOpex.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID).ToList(),
+                                                    envStudies = allData.envStudies.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    safetyCulTrainings = allData.safetyCulTrainings.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    hostComms = allData.hostComms.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    opSafetyCases = allData.opSafetyCases.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    remediationFunds = allData.remediationFunds.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held && x.Field_ID == field.Field_ID),
+                                                    DAs = allData.DAs.Where(x => x.Key == company.EMAIL).SelectMany(x => x).FirstOrDefault(x => x.OmlId == concession.Consession_Id && x.FieldId == field.Field_ID),
+                                                });
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                result[company.Id][concession.Consession_Id].Add(
-                                    0,
-                                    new CompanyDataCollection
-                                    {
-                                        Reserves = allData.Reserves.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        ExRAddition = allData.ExRAddition.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held),
-                                        seismicAcquisition = allData.seismicAcquisition.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
-                                        seismicProcessing = allData.seismicProcessing.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
-                                        drillingOperations = allData.drillingOperations.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
-                                        wellCompletion = allData.wellCompletion.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
-                                        wellWorkOver = allData.wellWorkOver.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
-                                        productionOilCondensate = allData.productionOilCondensate.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        productionGas = allData.productionGas.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        facilitiesDevProjects = allData.facilitiesDevProjects.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
-                                        capexOpex = allData.capexOpex.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
-                                        envStudies = allData.envStudies.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        safetyCulTrainings = allData.safetyCulTrainings.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        hostComms = allData.hostComms.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        opSafetyCases = allData.opSafetyCases.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        remediationFunds = allData.remediationFunds.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
-                                        DAs = allData.DAs.Where(x => x.Key == company.EMAIL).SelectMany(x => x).FirstOrDefault(x => x.OmlId == concession.Consession_Id),
-                                    }
-                                );
+                                else
+                                {
+                                    result[company.Id][concession.Consession_Id].Add(
+                                        0,
+                                        new CompanyDataCollection
+                                        {
+                                            Reserves = allData.Reserves.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            ExRAddition = allData.ExRAddition.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            fdfApproved = allData.fdfApproved.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x?.OML_Name == concession.Concession_Held),
+                                            seismicAcquisition = allData.seismicAcquisition.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
+                                            seismicProcessing = allData.seismicProcessing.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
+                                            drillingOperations = allData.drillingOperations.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
+                                            wellCompletion = allData.wellCompletion.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
+                                            wellWorkOver = allData.wellWorkOver.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
+                                            productionOilCondensate = allData.productionOilCondensate.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            productionGas = allData.productionGas.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            facilitiesDevProjects = allData.facilitiesDevProjects.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
+                                            capexOpex = allData.capexOpex.Where(x => x.Key == company.Id).SelectMany(x => x).Where(x => x.OML_Name == concession.Concession_Held).ToList(),
+                                            envStudies = allData.envStudies.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            safetyCulTrainings = allData.safetyCulTrainings.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            hostComms = allData.hostComms.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            opSafetyCases = allData.opSafetyCases.Where(x => x.Key == company.Id).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            remediationFunds = allData.remediationFunds.Where(x => x.Key == company.Id.ToString()).SelectMany(x => x).FirstOrDefault(x => x.OML_Name == concession.Concession_Held),
+                                            DAs = allData.DAs.Where(x => x.Key == company.EMAIL).SelectMany(x => x).FirstOrDefault(x => x.OmlId == concession.Consession_Id),
+                                        }
+                                    );
+                                }
                             }
                         }
                     }
-                }
-            };
+                };
 
-            return result;
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+           
         }
     }
 }
