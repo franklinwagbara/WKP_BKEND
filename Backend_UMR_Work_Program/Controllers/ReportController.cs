@@ -5125,19 +5125,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                                 else operationOpexDollar += ConvertToDouble(c?.dollar);
                                             });
 
-                                            var ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null);
-                                            var ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null);
-                                            var ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null);
-                                            var ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null);
-                                            var FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No";
-                                            var SeismicAcquisition = data?.seismicAcquisition?.Count().ToString();
-                                            var SeismicProcessing = data?.seismicProcessing?.Count().ToString();
-                                            var WellsDrilling = data?.drillingOperations?.Count().ToString();
-                                            var WellsCompletion = data?.wellCompletion?.Count().ToString();
-                                            var WellsWorkover = data?.wellWorkOver?.Count().ToString();
-                                            var ProductionOilCondensate = CleanSum(data?.productionOilCondensate?.Company_Oil, data?.productionOilCondensate?.Company_Condensate);
-                                            var ProductionGas = CleanSum(data?.productionOilCondensate?.Gas_AG, data?.productionOilCondensate?.Gas_NAG); 
-
                                             var summary = new ExecutiveSummaryRowDTO
                                             {
                                                 Company = company,
@@ -5147,7 +5134,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                                 ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null),
                                                 ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null),
                                                 ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null),
-                                                FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No",
+                                                FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.Trim().ToLower() == "approved" ? "Yes" : "No",
                                                 SeismicAcquisition = data?.seismicAcquisition?.Count().ToString(),
                                                 SeismicProcessing = data?.seismicProcessing?.Count().ToString(),
                                                 WellsDrilling = data?.drillingOperations?.Count().ToString(),
@@ -5202,19 +5189,6 @@ namespace Backend_UMR_Work_Program.Controllers
                                         
                                     });
 
-                                    var ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null);
-                                    var ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null);
-                                    var ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null);
-                                    var ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null);
-                                    var FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No";
-                                    var SeismicAcquisition = data?.seismicAcquisition?.Count().ToString();
-                                    var SeismicProcessing = data?.seismicProcessing?.Count().ToString();
-                                    var WellsDrilling = data?.drillingOperations?.Count().ToString();
-                                    var WellsCompletion = data?.wellCompletion?.Count().ToString();
-                                    var WellsWorkover = data?.wellWorkOver?.Count().ToString();
-                                    var ProductionOilCondensate = CleanSum(data?.productionOilCondensate?.Company_Oil, data?.productionOilCondensate?.Company_Condensate);
-                                    var ProductionGas = CleanSum(data?.productionOilCondensate?.Gas_AG, data?.productionOilCondensate?.Gas_NAG); 
-                                    
                                     var summary = new ExecutiveSummaryRowDTO
                                     {
                                         Company = company,
@@ -5224,7 +5198,7 @@ namespace Backend_UMR_Work_Program.Controllers
                                         ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null),
                                         ExReservesAdditionOil = CleanSum(data?.ExRAddition?.Reserves_Addition_Oil, null),
                                         ExReservesAdditionGas = CleanSum(data?.ExRAddition?.Reserves_Addition_AG, null),
-                                        FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.ToLower() == "Approved" ? "Yes" : "No",
+                                        FDPApproved = data?.fdfApproved != null && data?.fdfApproved?.Status?.Trim().ToLower() == "approved" ? "Yes" : "No",
                                         SeismicAcquisition = data?.seismicAcquisition?.Count().ToString(),
                                         SeismicProcessing = data?.seismicProcessing?.Count().ToString(),
                                         WellsDrilling = data?.drillingOperations?.Count().ToString(),
