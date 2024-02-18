@@ -5382,28 +5382,29 @@ namespace Backend_UMR_Work_Program.Controllers
         }
 
         private string CleanSum(string? left, string? right)
-        {
-            string charsToRemove = "[,.]";
-            if (left.IsNullOrWhiteSpace() && right.IsNullOrWhiteSpace())
-                return "";
-
-            if(left.IsNullOrWhiteSpace())
-                return Convert.ToDouble(Regex.Replace(right, charsToRemove, "")).ToString("N2");
-            else if(right.IsNullOrWhiteSpace())
-                return Convert.ToDouble(Regex.Replace(left, charsToRemove, "")).ToString("N2");
-            else
+        { 
+            if(double.TryParse(left, out double leftParsed))
+            { 
+                if(double.TryParse(right, out double rightParsed))
+                    return (leftParsed + rightParsed).ToString("N2");
+                else
+                    return leftParsed.ToString("N2");
+            }
+            else 
             {
-                return (Convert.ToDouble(Regex.Replace(left, charsToRemove, "")) + Convert.ToDouble(Regex.Replace(right, charsToRemove, ""))).ToString("N2");
+                if (double.TryParse(right, out double rightParsed))
+                    return rightParsed.ToString("N2");
+                else
+                    return "";
             }
         }
 
         private double ConvertToDouble(string? value)
         {
-            string charsToRemove = "[,.]";
-            if (value.IsNullOrWhiteSpace())
+            if(double.TryParse(value, out double parsedValue))
+                return parsedValue;
+            else
                 return 0;
-
-            return Convert.ToDouble(Regex.Replace(value, charsToRemove, ""));
         }
     }
 }
