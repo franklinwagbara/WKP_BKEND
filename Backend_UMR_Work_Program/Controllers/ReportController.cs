@@ -5125,6 +5125,11 @@ namespace Backend_UMR_Work_Program.Controllers
                                                 else operationOpexDollar += ConvertToDouble(c?.dollar);
                                             });
 
+                                            var ProductionOilCondensate = CleanSum(data?.productionOilCondensate?.Company_Oil, data?.productionOilCondensate?.Company_Condensate);
+                                            var ProductionGas = CleanSum(data?.productionOilCondensate?.Gas_AG, data?.productionOilCondensate?.Gas_NAG);
+                                            var ReservesOil = CleanSum(data?.Reserves?.Company_Reserves_Oil, null);
+                                            var ReservesGas = CleanSum(data?.Reserves?.Company_Reserves_AG, null);
+
                                             var summary = new ExecutiveSummaryRowDTO
                                             {
                                                 Company = company,
@@ -5253,7 +5258,7 @@ namespace Backend_UMR_Work_Program.Controllers
                 {
                     var allData = new AllCompanyDataCollection
                     {
-                        Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(x => x.CompanyNumber == company.Id && x.Year == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
+                        Reserves = await _context.RESERVES_UPDATES_OIL_CONDENSATE_STATUS_OF_RESERVEs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
                         ExRAddition = await _context.RESERVES_UPDATES_OIL_CONDENSATE_Reserves_Additions.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
                         fdfApproved = await _context.FIELD_DEVELOPMENT_PLANs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
                         seismicAcquisition = await _context.GEOPHYSICAL_ACTIVITIES_ACQUISITIONs.Where(x => x.CompanyNumber == company.Id && x.Year_of_WP == Year.ToString()).GroupBy(x => x.CompanyNumber).ToListAsync(),
