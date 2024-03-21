@@ -689,7 +689,7 @@ namespace Backend_UMR_Work_Program.Services
             var accountantRole = await _dbContext.Roles.Where(x => x.RoleName == ROLEID.Accountant).FirstOrDefaultAsync();
 
             //Get all the account staffs
-            var accountStaffs = await _dbContext.staff.Where(x => x.RoleID == accountantRole.id).ToListAsync();
+            var accountStaffs = await _dbContext.staff.Where(x => x.RoleID == accountantRole.id && x.ActiveStatus == true).ToListAsync();
             // var desks = await _dbContext.AccountDesks.OrderBy(x => x.LastJobDate).ToListAsync();
 
             var deskGroups = _dbContext.AccountDesks
@@ -708,11 +708,11 @@ namespace Backend_UMR_Work_Program.Services
                 CreatedAt = DateTime.Now,
             };
 
-            if(deskGroups.Count < accountStaffs.Count)
+            if (deskGroups.Count < accountStaffs.Count)
             {
-                foreach(var staff in accountStaffs)
+                foreach (var staff in accountStaffs)
                 {
-                    if(!deskGroups.Any(x => x.StaffID == staff.StaffID))
+                    if (!deskGroups.Any(x => x.StaffID == staff.StaffID))
                     {
                         newDesk.StaffID = staff.StaffID;
                         return newDesk;
@@ -723,13 +723,23 @@ namespace Backend_UMR_Work_Program.Services
             }
             else
             {
-                if(deskGroups.Count == 0)
+                if (deskGroups.Count == 0)
                 {
-                    newDesk.StaffID = accountStaffs.FirstOrDefault().StaffID;
+                    newDesk.StaffID = accountStaffs.FirstOrDefault(x => x.ActiveStatus == true && x.RoleID == accountantRole.id).StaffID;
                     return newDesk;
                 }
                 else
                 {
+
+                    foreach (var desk in deskGroups)
+                    {
+                        if (accountStaffs.FirstOrDefault(x => x.StaffID == desk.StaffID) != null)
+                        {
+                            newDesk.StaffID = desk.StaffID;
+                            return newDesk;
+                        }
+                    }
+
                     newDesk.StaffID = deskGroups.FirstOrDefault().StaffID;
                     return newDesk;
                 }
