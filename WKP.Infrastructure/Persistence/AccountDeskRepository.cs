@@ -199,6 +199,7 @@ namespace WKP.Infrastructure.Persistence
         {
             var result = await _context.AccountDesks
                 .Include(x => x.Staff)
+                .Where(x => x.Staff.ActiveStatus == true)
                 .GroupBy(x => x.StaffID)
                 .Select(x => new 
                 {
